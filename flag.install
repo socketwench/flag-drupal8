@@ -1,0 +1,131 @@
+<?php
+// $Id$
+
+function flag_install() {
+  // If Views Bookmark is available, skip the install and do an upgrade instead.
+  if (strpos($GLOBALS['db_type'], 'mysql') === 0) {
+    include_once(drupal_get_path('module', 'flag') .'/flag.module');
+    include_once(drupal_get_path('module', 'flag') .'/flag.views_bookmark.inc');
+    if (flag_views_bookmark_update_needed()) {
+      flag_views_bookmark_update();
+      return;
+    }
+  }
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {flags} (
+        fid int(10) unsigned NOT NULL default '0',
+        name varchar(32) default '',
+        title varchar(255) default '',
+        flag varchar(255) default '',
+        flag_long varchar(255) default '',
+        flag_message varchar(255) default '',
+        unflag varchar(255) default '',
+        unflag_long varchar(255) default '',
+        unflag_message varchar(255) default '',
+        roles varchar(255) default '',
+        global int(1) default 0,
+        teaser int(1) default 0,
+        node_form int(1) default 0,
+        PRIMARY KEY (fid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      db_query("CREATE TABLE {flag_content} (
+        fid int(10) unsigned NOT NULL default '0',
+        uid int(10) unsigned NOT NULL default '0',
+        content_type varchar(32) default '',
+        content_id int(10) unsigned NOT NULL default '0',
+        timestamp int(11) unsigned NOT NULL default '0',
+        PRIMARY KEY (fid, uid, content_type, content_id)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      db_query("CREATE TABLE {flag_types} (
+        fid int(10) unsigned NOT NULL default '0',
+        node_type varchar(32) NOT NULL default '',
+        PRIMARY KEY (fid, node_type)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      db_query("CREATE TABLE {flag_counts} (
+        fid int(10) unsigned NOT NULL default '0',
+        content_type int(10) unsigned NOT NULL default '0',
+        content_id int(10) unsigned NOT NULL default '0',
+        count int(10) unsigned NOT NULL default '0',
+        PRIMARY KEY (fid, content_type, content_id)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      $success = TRUE;
+      break;
+
+    case 'pgsql':
+      db_query("CREATE TABLE {flags} (
+        fid serial,
+        name varchar(32) default '',
+        title varchar(255) default '',
+        flag varchar(255) default '',
+        flag_long varchar(255) default '',
+        flag_message varchar(255) default '',
+        unflag varchar(255) default '',
+        unflag_long varchar(255) default '',
+        unflag_message varchar(255) default '',
+        roles varchar(255) default '',
+        global smallint default 0,
+        teaser smallint default 0,
+        node_form smallint default 0,
+        PRIMARY KEY (fid)
+      )");
+      db_query("CREATE TABLE {flag_content} (
+        fid int NOT NULL default '0',
+        uid int NOT NULL default '0',
+        content_type varchar(32) default '',
+        content_id int NOT NULL default '0',
+        timestamp int NOT NULL default '0',
+        PRIMARY KEY (fid, uid, content_type, content_id)
+      )");
+      db_query("CREATE TABLE {flag_types} (
+        fid int NOT NULL default '0',
+        node_type varchar(32) NOT NULL default '',
+        PRIMARY KEY (fid, node_type)
+      )");
+      db_query("CREATE TABLE {flag_counts} (
+        fid int NOT NULL default '0',
+        content_type varchar(32) default '',
+        content_id int NOT NULL default '0',
+        count int NOT NULL default '0',
+        PRIMARY KEY (fid, content_type, content_id)
+      )");
+      $success = TRUE;
+      break;
+  }
+
+  if ($success) {
+    // Insert a starting record.
+    db_query("INSERT INTO {flags} (fid, name, title, flag, flag_long, flag_message, unflag, unflag_long, unflag_message, roles, global, teaser, node_form) VALUES (1, 'bookmarks', 'Bookmarks', 'bookmark this', 'Add this post to your bookmarks', 'This post has been added to your bookmarks', 'unbookmark this', 'Remove this post from your bookmarks', 'This post has been removed from your bookmarks', '2', 0, 0, 0)");
+    db_query("INSERT INTO {flag_types} (fid, node_type) VALUES (1, 'story')");
+    db_query("INSERT INTO {flag_types} (fid, node_type) VALUES (1, 'forum')");
+    db_query("INSERT INTO {flag_types} (fid, node_type) VALUES (1, 'blog')");
+
+    // Bump up the counter so next fid is, at least, '2'.
+    db_next_id('{flags}_fid');
+  }
+
+  if ($success) {
+    drupal_set_message(t('Flag module installed tables successfully.'));
+  }
+  else {
+    drupal_set_message(t('The installation of Flag module failed.'), 'error');
+  }
+}
+
+function flag_uninstall() {
+  db_query('DROP TABLE {flags}');
+  db_query('DROP TABLE {flag_content}');
+  db_query('DROP TABLE {flag_types}');
+  db_query('DROP TABLE {flag_counts}');
+  db_query('DELETE FROM {sequences} WHERE name = "{flags}_fid"');
+
+  $result = db_query('SELECT name FROM {variable} WHERE name LIKE "flag_%"');
+  while ($row = db_fetch_object($result)) {
+    variable_del($row->name);
+  }
+
+  drupal_set_message(t('Flag has been uninstalled.'));
+}
+

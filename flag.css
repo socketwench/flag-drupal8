@@ -1,0 +1,12 @@
+.flag-message {
+  position: absolute;
+  top: 1.7em;
+  line-height: normal;
+  left: 0;
+  width: 300px;
+  font-size: .8em;
+}
+
+.flag-wrapper {
+  position: relative;
+}
