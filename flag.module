@@ -166,7 +166,7 @@ function flag_link($type, $node = NULL, $teaser = FALSE) {
       ),
     );
 
-    if ($flag_status[$flag->name]) {
+    if (!empty($flag_status[$flag->name])) {
       // Already flagged.
       $links['flag-'. $flag->name] = $unflag_link;
     }
@@ -631,7 +631,7 @@ function flag($action, $flag_name, $content_type, $content_id, $uid = NULL) {
   }
 
   // Perform the flagging or unflagging of this flag.
-  $uid = $flags[$flag_name]->global ? 0 : $user->uid;
+  $uid = $flag->global ? 0 : $user->uid;
   $flagged = db_result(db_query("SELECT fid FROM {flag_content} WHERE fid = %d AND uid = %d AND content_type = '%s' AND content_id = %d", $fid, $uid, $content_type, $content_id));
   if ($flagged && $action == 'unflag') {
     db_query("DELETE FROM {flag_content} WHERE fid = %d AND uid = %d AND content_type = '%s' AND content_id = %d", $fid, $uid, $content_type, $content_id);
