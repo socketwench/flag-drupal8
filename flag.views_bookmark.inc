@@ -12,7 +12,7 @@
  */
 function flag_views_bookmark_update_needed() {
   $result = db_query("SHOW TABLES LIKE '%views_bookmarks%'");
-  if (db_num_rows($result) > 0) {
+  if (mysqli_num_rows($result) > 0) {
     return TRUE;
   }
   return FALSE;
@@ -31,7 +31,8 @@ function flag_views_bookmark_update() {
   // Uninstall Views Bookmark.
   flag_views_bookmark_update_uninstall();
   // Update views.
-  flag_views_bookmark_update_views();
+  // TODO: Update for D6.
+  //flag_views_bookmark_update_views();
 
   drupal_set_message('The Flag module has been installed, replacing Views Bookmark. Views Bookmark has been disabled, please remove it from your installation.');
 }
@@ -45,7 +46,7 @@ function flag_views_bookmark_update() {
 function flag_views_bookmark_update_prepare() {
   // Ensure the Flag tables are not installed.
   $result = db_query("SHOW TABLES LIKE 'flags'");
-  if (db_num_rows($result) > 0) {
+  if (mysqli_num_rows($result) > 0) {
     // Remove Flag tables if already present.
     include_once(drupal_get_path('module', 'flag') .'/flag.install');
     flag_uninstall();
@@ -79,20 +80,23 @@ function flag_views_bookmark_update_tables() {
   $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} DROP PRIMARY KEY");
 
   // Rename columns.
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_node_count} CHANGE COLUMN vbid fid int(10) unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_node_count} CHANGE COLUMN nid content_id int(10) unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN vbid fid int(10) unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN nid content_id int(10) unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN vbid fid int(10) unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN type node_type varchar(32) default ''");
-  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN vbid fid int(10) unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_node_count} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_node_count} CHANGE COLUMN nid content_id int unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN nid content_id int unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN uid uid int unsigned NOT NULL default '0' AFTER content_id");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN type node_type varchar(32) NOT NULL default ''");
+  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN mark flag_short varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN mark_long flag_long varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN mark_message flag_message varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN unmark unflag_short varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN unmark_long unflag_long varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN unmark_message unflag_message varchar(255) default ''");
-  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN show_on_form node_form int(1) default 0");
+  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN global global tinyint default 0");
+  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN teaser teaser tinyint default 0");
+  $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN show_on_form node_form tinyint default 0");
 
   // Add columns.
   $ret[] = update_sql("ALTER TABLE {views_bookmark_node_count} ADD content_type varchar(32) default '' AFTER fid");
@@ -107,14 +111,30 @@ function flag_views_bookmark_update_tables() {
 
   // Set defaults.
   $ret[] = update_sql("UPDATE {flag_content} SET content_type = 'node'");
+  $ret[] = update_sql("UPDATE {flag_counts} SET content_type = 'node'");
+
+  // Create primary keys.
+  $ret[] = update_sql("ALTER TABLE {flags} ADD PRIMARY KEY (fid)");
+  $ret[] = update_sql("ALTER TABLE {flag_types} ADD INDEX (fid)");
+  $ret[] = update_sql("ALTER TABLE {flag_counts} ADD PRIMARY KEY (fid, content_type, content_id)");
+  $ret[] = update_sql("ALTER TABLE {flag_content} ADD INDEX fid_content_type (fid, content_type)");
+  $ret[] = update_sql("ALTER TABLE {flag_content} ADD INDEX content_type_cotnent_id (content_type, content_id)");
+  $ret[] = update_sql("ALTER TABLE {flag_content} ADD PRIMARY KEY (fid, content_type, content_id, uid)");
+  $ret[] = update_sql("ALTER TABLE {flag_content} ADD INDEX content_type_content_id (content_type, content_id)");
+  $ret[] = update_sql("ALTER TABLE {flag_content} ADD INDEX content_type_uid (content_type, uid)");
+
+  // Change fid to a serial column.
+  $ret[] = update_sql("ALTER TABLE {flags} CHANGE COLUMN fid fid int(10) unsigned NOT NULL auto_increment");
 
   // Give each flag a "name" attribute.
   $result = db_query("SELECT fid, title FROM {flags}");
   while ($row = db_fetch_object($result)) {
     $name = substr(preg_replace('/[^a-z_]/', '', str_replace(' ', '_', drupal_strtolower(trim($row->title)))), 0, 32);
     $ret[] = update_sql("UPDATE {flags} SET name = '". $name ."' WHERE fid = ". $row->fid);
-    drupal_set_message(t('The views bookmark %bookmark has been migrated to Flag. It was given the machine-name %name, which you may change on the <a href="!url">%bookmark configuration form</a>.', array('%bookmark' => $row->title, '%name' => $name, '!url' => 'admin/build/flags/'. $name)));
+    drupal_set_message(t('The views bookmark %bookmark has been migrated to Flag. It was given the machine-name %name, which you may change on the <a href="!url">%bookmark configuration form</a>.', array('%bookmark' => $row->title, '%name' => $name, '!url' => url('admin/build/flags/edit/'. $name))));
   }
+  // The key for flag name must be added after giving names.
+  $ret[] = update_sql("ALTER TABLE {flags} ADD UNIQUE KEY (name)");
 
   return $ret;
 }
@@ -148,10 +168,10 @@ function flag_views_bookmark_update_views() {
   );
 
   // Update database views automatically.
-  $result = db_query("SELECT vid FROM {view_view}");
+  $result = db_query("SELECT name FROM {view_view}");
 
   while ($view = db_fetch_object($result)) {
-    $view = views_load_view($view->vid);
+    $view = views_get_view($view->name);
     $view_changed = FALSE;
 
     // Build a list of possible replacements.
@@ -173,7 +193,7 @@ function flag_views_bookmark_update_views() {
 
     if ($view_changed) {
       drupal_set_message(t('The view %name contained Views Bookmark configuration. It has been migrated to Flag.', array('%name' => $view->name)));
-      _views_save_view($view);
+      $view->save();
     }
   }
 

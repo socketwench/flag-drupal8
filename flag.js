@@ -1,6 +1,6 @@
 // $Id$
-if (Drupal.jsEnabled) {
-  $(document).ready(function () {
+Drupal.behaviors.flag = function() {
+  // Note, extra indentation left here to maintain ease of patching for D5 version.
 
     // Helper function for flipping the flag link contents.
     function flipLink(element, settings) {
@@ -15,20 +15,24 @@ if (Drupal.jsEnabled) {
         var newLink = $(settings.flag);
       }
 
+      // Initially hide the message so we can fade it in.
+      $('.flag-message', newLink).css('display', 'none');
+
       // Reattach the behavior to the new link.
       if ($('a', newLink).size() > 0) {
         $('a', newLink).bind('click', function() { return flagClick(this, settings) });
-    }
-    else {
-      $(newLink).bind('click', function() { return flagClick(this, settings) });
-    }
+      }
+      else {
+        $(newLink).bind('click', function() { return flagClick(this, settings) });
+      }
 
       if ($(element).parent('.flag-wrapper').length > 0) {
         $(element).parent().parent().empty().append(newLink);
-    }
-    else {
+      }
+      else {
         $(element).parent().empty().append(newLink);
-    }
+      }
+
       $('.flag-message', newLink).fadeIn();
     }
 
@@ -70,7 +74,6 @@ if (Drupal.jsEnabled) {
     }
 
     // On load, bind the click behavior for all links on the page.
-    console.log(Drupal.settings.flag.flags);
     for (i in Drupal.settings.flag.flags) {
       // This bind method is a little silly. We should just be able to pass
       // in the settings as additional data to the click method, but this
@@ -84,5 +87,5 @@ if (Drupal.jsEnabled) {
         return flagClick(this, Drupal.settings.flag.flags[name][nid]);
       });
     }
-  });
+  // Intentional extra indention.
 }

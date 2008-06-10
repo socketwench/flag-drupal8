@@ -362,45 +362,45 @@ function flag_views_default_views() {
     $view->menu = TRUE;
     $view->menu_tab = FALSE;
     $view->menu_tab_default = FALSE;
-    $view->sort = array (
+    $view->sort = array(
     );
-    $view->argument = array (
+    $view->argument = array(
     );
-    $view->field = array (
-      array (
+    $view->field = array(
+      array(
         'tablename' => 'node',
         'field' => 'type',
         'label' => 'Type',
         'sortable' => '1',
       ),
-      array (
+      array(
         'tablename' => 'node',
         'field' => 'title',
         'label' => 'Title',
         'handler' => 'views_handler_field_nodelink_with_flag',
         'sortable' => '1',
       ),
-      array (
+      array(
         'tablename' => 'users',
         'field' => 'name',
         'label' => 'Author',
         'sortable' => '1',
       ),
-      array (
+      array(
         'tablename' => "flag_ops_". $flag->name,
         'field' => 'ops',
         'label' => 'Ops',
       ),
     );
-    $view->filter = array (
-      array (
+    $view->filter = array(
+      array(
         'tablename' => 'node',
         'field' => 'status',
         'operator' => '=',
         'options' => '',
         'value' => '1',
       ),
-      array (
+      array(
         'tablename' => "flag_content_". $flag->name,
         'field' => 'uid',
         'operator' => 'IS NOT',
@@ -414,15 +414,15 @@ function flag_views_default_views() {
     // view. If comment module is added later, these fields will be added.
     if (module_exists('comment')) {
       $op_field = array_pop($view->field);
-      $view->field = array_merge($view->field, array (
-        array (
+      $view->field = array_merge($view->field, array(
+        array(
           'tablename' => 'node_comment_statistics',
           'field' => 'comment_count',
           'label' => 'Replies',
           'handler' => 'views_handler_comments_with_new',
           'sortable' => '1',
         ),
-        array (
+        array(
           'tablename' => 'node_comment_statistics',
           'field' => 'last_comment_timestamp',
           'label' => 'Last Post',
