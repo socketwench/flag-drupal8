@@ -4,13 +4,12 @@ Drupal.behaviors.flag = function() {
 
     // Helper function for flipping the flag link contents.
     function flipLink(element, settings) {
-      // If this is a 'flag this' link...
-      if ($(element).is('.flag')) {
-        // ...then turn it into an 'unflag this' link;
+      if (currentClass.indexOf('unflag') == -1) {
+        // Add the unflag link.
         var newLink = $(settings.unflag);
       }
       else {
-        // else, turn it into a 'flag this' link.
+        // Add the flag link.
         var newLink = $(settings.flag);
       }
 
