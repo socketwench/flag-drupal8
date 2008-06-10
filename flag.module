@@ -228,7 +228,7 @@ function flag_link_alter(&$links, &$node) {
 function flag_form_alter(&$form, &$form_state, $form_id) {
 
   global $user;
-  if ($form_id == 'node_type_form') {
+  if ($form_id == 'node_type_form' && isset($form['identity']['type'])) {
     $flags = flag_get_flags('node', $form['#node_type']->type, $user);
     foreach ($flags as $flag) {
       if ($flag->node_form) {
@@ -243,7 +243,8 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
       }
     }
   }
-  elseif (($form_id == $form['type']['#value'] .'_node_form')) {
+  elseif (isset($form['type']) && isset($form['#node'])
+      && ($form_id == $form['type']['#value'] .'_node_form')) {
     if (!$user || !$user->uid) {
       return;
     }
