@@ -1,10 +1,6 @@
 <?php
 // $Id$
 
-if (module_exists('views')) {
-  include_once drupal_get_path('module', 'flag') .'/flag.views.inc';
-}
-
 /**
  * Implementation of hook_menu().
  */
@@ -66,6 +62,27 @@ function flag_menu() {
  */
 function flag_perm() {
   return array('administer flags');
+}
+
+/**
+ * Access checking to check an account for flagging ability.
+ *
+ * @param $flag
+ *   The flag object being checked for access by a user.
+ * @param $account
+ *   Optional. The user object. If none given, the current user will be used.
+ *
+ * @return
+ *   Boolean TRUE if the user is allowed to flag/unflag. FALSE otherwise.
+ */
+function flag_access($flag, $account = NULL) {
+  if (!isset($account)) {
+    global $user;
+    $account = $user;
+  }
+
+  $matched_roles = array_intersect($flag->roles, array_keys($account->roles));
+  return !empty($matched_roles) || empty($flag->roles) || $account->uid == 1;
 }
 
 /**
@@ -877,8 +894,7 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on account permissions.
   if (isset($account) && $account->uid != 1) {
     foreach ($filtered_flags as $fid => $flag) {
-      $matched_roles = array_intersect($flag->roles, array_keys($account->roles));
-      if (empty($matched_roles) && !empty($flag->roles)) {
+      if (!flag_access($flag, $account)) {
         unset($filtered_flags[$fid]);
       }
     }
