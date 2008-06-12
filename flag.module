@@ -664,10 +664,10 @@ function flag_nodes($nodes) {
 function flag_theme() {
   return array(
     'flag' => array(
-      'arguments' => array('flag' => NULL, 'nid' => NULL, 'is_flagged' => NULL),
+      'arguments' => array('flag' => NULL, 'content_type' => NULL, 'content_id' => NULL, 'is_flagged' => NULL),
     ),
     'flag_link' => array(
-      'arguments' => array('flag' => NULL, 'nid' => NULL, 'action' => NULL, 'after_flagging' => NULL),
+      'arguments' => array('flag' => NULL, 'content_type' => NULL, 'content_id' => NULL, 'action' => NULL, 'after_flagging' => NULL),
     ),
   );
 }
