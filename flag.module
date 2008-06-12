@@ -107,18 +107,6 @@ function flag_content_enabled($flag, $content_type, $content_subtype) {
  * Helper function for adding the JavaScript behaviour.
  */
 function flag_add_js($nid, $flag_name, $flag_html, $unflag_html) {
-  static $added_flags, $js_added;
-
-  if (!isset($js_added)) {
-    drupal_add_js(drupal_get_path('module', 'flag') .'/flag.js');
-    drupal_add_js(array('flag' => array('cleanUrl' => variable_get('clean_url', 0))), 'setting');
-    $js_added = TRUE;
-  }
-
-  if (!(isset($added_flags[$flag_name][$nid]))) {
-    drupal_add_js(array('flag' => array('flags' => array($flag_name => array('node_'. $nid => array('flag' => $flag_html, 'unflag' => $unflag_html))))), 'setting');
-    $added_flags[$flag_name][$nid] = TRUE;
-  }
 }
 
 /**
@@ -126,17 +114,20 @@ function flag_add_js($nid, $flag_name, $flag_html, $unflag_html) {
  * and language translation.
  *
  * @param $flag
- *    The flag object.
- * @param $node
- *    The node in whose context to interpret the tokens. Pass NULL to use
- *    the 'global' context.
+ *   The flag object.
+ * @param $content_type
+ *   The type of content being used for token replacements. Usually 'node'.
+ * @param $nid
+ *   The nid in whose context to interpret the tokens. The node will only be
+ *   loaded if tokens are used. Omit to use the 'global' context.
  * @param $variables
- *    Array containing the names of the label variables to process.
+ *   Array containing the names of the label variables to process.
  * @param $options
- *    Optional. Options to pass to token_replace().
- * @return A new flag object with the labels processed.
+ *   Optional. Options to pass to token_replace().
+ * @return
+ *   A new flag object with the labels processed.
  */
-function _flag_process_labels($flag, $node, $variables = NULL, $options = array()) {
+function flag_process_labels($flag, $content_type = NULL, $content_id = NULL, $variables = NULL, $options = array()) {
   $flag = drupal_clone($flag);
   if (!isset($variables)) {
     $variables = array('flag_short', 'flag_long');
@@ -146,7 +137,11 @@ function _flag_process_labels($flag, $node, $variables = NULL, $options = array(
       if (isset($flag->$var)) {
         $flag->$var = t(filter_xss_admin($flag->$var));
         if (strpos($flag->$var, '[') !== FALSE && module_exists('token')) {
-          $flag->$var = token_replace($flag->$var, isset($node) ? 'node' : 'global', $node, '[', ']', $options);
+          if (isset($content_id) && $content_type == 'node') {
+            $object = node_load($content_id);
+            $scope = 'node';
+          }
+          $flag->$var = token_replace($flag->$var, isset($scope) ? $scope : 'global', isset($object) ? $object : NULL, '[', ']', $options);
         }
       }
     }
@@ -158,16 +153,17 @@ function _flag_process_labels($flag, $node, $variables = NULL, $options = array(
  * Implementation of hook_link().
  */
 function flag_link($type, $node = NULL, $teaser = FALSE) {
-  if ($type != 'node' || !$node || !$node->type) {
+  if ($type != 'node' || !isset($node) || !isset($node->type)) {
     return;
   }
   global $user;
 
   // Anonymous users can't create flags with this system.
-  if (!$user || !$user->uid)
+  if (!$user || !$user->uid) {
     return;
+  }
 
-  // Get flag status for this node.
+  // Get the user's flag status for this node.
   $flag_status = flag_get_user_flags('node', $node->nid);
 
   // Get all possible flags for this node.
@@ -179,82 +175,17 @@ function flag_link($type, $node = NULL, $teaser = FALSE) {
     }
 
     // Token replacements.
-    $flag = _flag_process_labels($flag, $node, array('flag_short', 'flag_long'), array('teaser' => $teaser));
+    $flag = flag_process_labels($flag, $type, $node->nid, array('flag_short', 'flag_long', 'flag_message'), array('teaser' => $teaser));
 
-    $flag_link = array(
-      'title' => $flag->flag_short,
-      'href' => 'flag/flag/'. $flag->name .'/node/'. $node->nid,
-      'query' => drupal_get_destination(),
-      'attributes' => array(
-        'title' => $flag->flag_long,
-        'class' => 'flag flag-'. $flag->name,
-      ),
-    );
-
-    $unflag_link = array(
-      'title' => $flag->unflag_short,
-      'href' => 'flag/unflag/'. $flag->name .'/node/'. $node->nid,
-      'query' => drupal_get_destination(),
-      'attributes' => array(
-        'title' => $flag->unflag_long,
-        'class' => 'unflag flag-'. $flag->name,
-      ),
-    );
-
-    if (!empty($flag_status[$flag->name])) {
-      // Already flagged.
-      $links['flag-'. $flag->name] = $unflag_link;
-    }
-    else {
-      // Not flagged.
-      $links['flag-'. $flag->name] = $flag_link;
-    }
-
-    // Add additional classes for javascript links.
-    $flag_link['attributes']['class'] .= ' unflagged';
-    $unflag_link['attributes']['class'] .= ' flagged';
-
-    // Save both complete links in the link array for use later in the
-    // javascript.
-    $links['flag-'. $flag->name]['flag'] = array(
-      'flag' => $flag_link,
-      'unflag' => $unflag_link,
+    // The flag links are actually fully rendered theme functions.
+    // The HTML attribute is set to TRUE to allow whatever the themer desires.
+    $links['flag-'. $flag->name] = array(
+      'title' => theme('flag', $flag, $type, $node->nid, isset($flag_status[$flag->name])),
+      'html' => TRUE,
     );
   }
 
   return $links;
-}
-
-/**
- * Implemenation of hook_link_alter().
- *
- * The javascript enhancements are made in the link_alter function so that other
- * modules may have a chance to edit the links before they are rendered for
- * the javascript settings.
- */
-function flag_link_alter(&$links, &$node) {
-  foreach ($links as $key => $link) {
-    if (strpos($key, 'flag-') === 0) {
-      $name = str_replace('flag-', '', $key);
-      $flag = flag_get_flag($name);
-      // Token replacements.
-      $flag = _flag_process_labels($flag, $node, array('flag_short', 'flag_long', 'flag_message'));
-
-      $flag_link = $link['flag']['flag'];
-      $unflag_link = $link['flag']['unflag'];
-
-      // Add an additional class to match the normal link rendering.
-      $flag_link['attributes']['class'] .= ' flag-'. $name;
-      $unflag_link['attributes']['class'] .= ' flag-'. $name;
-
-      // Add javascript behavior.
-      $flag_html = theme('flag_link_js', 'unflag', $flag_link, $flag);
-      $unflag_html = theme('flag_link_js', 'flag', $unflag_link, $flag);
-
-      drupal_add_css(drupal_get_path('module', 'flag') .'/flag.css');
-      flag_add_js($node->nid, $name, $flag_html, $unflag_html);
-    }
-  }
 }
 
 /**
@@ -631,7 +562,7 @@ function flag_page($action = 'flag', $flag_name, $content_type, $content_id = ''
     $flag = flag_get_flag($flag_name);
     // Token replacements.
     if ($content_type == 'node') {
-      $flag = _flag_process_labels($flag, node_load($content_id), array('flag_message'));
+      $flag = flag_process_labels($flag, $content_type, $content_id, array('flag_message'));
     }
     drupal_set_message($flag->{$action .'_message'});
     drupal_goto();
@@ -699,7 +630,7 @@ function flag_node_operations() {
 
   foreach ($flags as $flag) {
     // Token replacements.
-    $flag = _flag_process_labels($flag, NULL, array('flag_short', 'unflag_short'));
+    $flag = flag_process_labels($flag, NULL, NULL, array('flag_short'));
 
     $operations['flag_'. $flag->name] = array(
       'label' => $flag->flag_short,
@@ -732,19 +663,72 @@ function flag_nodes($nodes) {
  */
 function flag_theme() {
   return array(
-    'flag_link_js' => array(
-      'arguments' => array('action' => NULL, 'link' => NULL, 'flag' => NULL),
+    'flag' => array(
+      'arguments' => array('flag' => NULL, 'nid' => NULL, 'is_flagged' => NULL),
+    ),
+    'flag_link' => array(
+      'arguments' => array('flag' => NULL, 'nid' => NULL, 'action' => NULL, 'after_flagging' => NULL),
     ),
   );
 }
 
 /**
- * Theme the additional message appended to flags.
+ * Theme an entire flag link, including JavaScript behaviors.
+ *
+ * @param $flag
+ *   The flag object.
+ * @param $content_type
+ *   The type of content being flagged. Usually "node".
+ * @param $content_id
+ *   The ID of the content being flagged.
+ * @param $is_flagged
+ *   Boolean value of the current status of the flag being output.
  */
-function theme_flag_link_js($action, $link, $flag) {
+function theme_flag($flag, $content_type, $content_id, $is_flagged) {
+  static $added_flags, $js_added;
+
+  // Add initial JS/CSS to the page.
+  if (!isset($js_added)) {
+    drupal_add_css(drupal_get_path('module', 'flag') .'/flag.css');
+    drupal_add_js(drupal_get_path('module', 'flag') .'/flag.js');
+    drupal_add_js(array('flag' => array('cleanUrl' => variable_get('clean_url', 0))), 'setting');
+    $js_added = TRUE;
+  }
+
+  // Add JavaScript copies of the links so we can swap them out when the user clicks.
+  if (!(isset($added_flags[$flag->name][$content_type][$content_id]))) {
+    $flag_html = theme('flag_link', $flag, $content_type, $content_id, 'flag', TRUE);
+    $unflag_html = theme('flag_link', $flag, $content_type, $content_id, 'unflag', TRUE);
+    drupal_add_js(array('flag' => array('flags' => array($flag->name => array($content_type .'_'. $content_id => array('flag' => $flag_html, 'unflag' => $unflag_html))))), 'setting');
+    $added_flags[$flag->name][$content_type][$content_id] = TRUE;
+  }
+
+  return theme('flag_link', $flag, $content_type, $content_id, $is_flagged ? 'unflag' : 'flag');
+}
+
+/**
+ * Theme an individual link and a message after the link is marked.
+ *
+ * @param $flag
+ *   The flag object.
+ * @param $content_type
+ *   The type of content being flagged. Usually "node".
+ * @param $content_id
+ *   The ID of the content being flagged.
+ * @param $action
+ *   Either "flag" or "unflag".
+ * @param $after_flagging
+ *   This function is called for both the link both before and after being
+ *   flagged. If displaying to the user immediately after flagging, this value
+ *   will be boolean TRUE. This is usually used in conjunction with immedate
+ *   JavaScript-based toggling of flags.
+ */
+function theme_flag_link($flag, $content_type, $content_id, $action, $after_flagging = FALSE) {
   $output = '<span class="flag-wrapper">';
-  $output .= l($link['title'], $link['href'], $link);
-  $output .= '<span class="flag-message flag-'. $action .'-message">'. $flag->{$action .'_message'} .'</span>';
+  $output .= l($flag->{$action .'_short'}, 'flag/'. $action .'/'. $flag->name .'/'. $content_type .'/'. $content_id, array('query' => drupal_get_destination(), 'attributes' => array('title' => $flag->{$action .'_long'}, 'class' => $action .' flag-'. $flag->name . ($after_flagging ? $action .'ed' : ''))));
+  if ($after_flagging) {
+    $output .= '<span class="flag-message flag-'. $action .'-message">'. $flag->{$action .'_message'} .'</span>';
+  }
   $output .= '</span>';
   return $output;
 }
