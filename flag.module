@@ -86,6 +86,24 @@ function flag_access($flag, $account = NULL) {
 }
 
 /**
+ * Content type checking to see if a flag applies to a certain type of data.
+ *
+ * @param $flag
+ *   The flag object whose available types are being checked.
+ * @param $content_type
+ *   The type of content being checked, usually "node".
+ * @param $content_subtype
+ *   The subtype (node type) being checked.
+ *
+ * @return
+ *   Boolean TRUE if the flag is enabled for this type and subtype.
+ *   FALSE otherwise.
+ */
+function flag_content_enabled($flag, $content_type, $content_subtype) {
+  return in_array($content_subtype, $flag->{$content_type .'_types'});
+}
+
+/**
  * Helper function for adding the JavaScript behaviour.
  */
 function flag_add_js($nid, $flag_name, $flag_html, $unflag_html) {
@@ -885,7 +903,7 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on subtype.
   if (isset($content_subtype)) {
     foreach ($filtered_flags as $fid => $flag) {
-      if (!in_array($content_subtype, $flag->{$content_type .'_types'})) {
+      if (!flag_content_enabled($flag, $content_type, $content_subtype)) {
         unset($filtered_flags[$fid]);
       }
     }
