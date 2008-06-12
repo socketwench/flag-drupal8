@@ -7,335 +7,263 @@
  */
 
 /**
- * Implementation of hook_views_tables
+ * Implementation of hook_views_date().
  */
-function flag_views_tables() {
+function flag_views_data() {
+  $data = array();
+
+  $data['flag_content']['table']['group'] = t('Flags');
+
+  $data['flag_content']['uid'] = array(
+    'title' => t('User ID'),
+    'help' => t('The user that flagged an item.'),
+    'relationship' => array(
+      'base' => 'users',
+      'field' => 'uid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Flag user'),
+    ),
+  );
+
+  $data['flag_content']['timestamp'] = array(
+    'title' => t('Flagged time'),
+    'help' => t('Display the time the node was flagged by a user.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+     ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
+  // Specialized is null/is not null filter.
+  $data['flag_content']['flagged'] = array(
+    'title' => t('Flagged'),
+    'help' => t('Filter to ensure a node has or has not been flagged.'),
+    'filter' => array(
+      'handler' => 'flag_handler_filter_flagged',
+      'label' => t('Flagged'),
+    ),
+  );
+
+  // Flag node links.
+  $data['flag_content']['flag_ops'] = array(
+    'group' => t('Flags'),
+    'title' => t('Flag link'),
+    'help' => t('Display flag/unflag links.'),
+    'real field' => 'uid',
+    'field' => array(
+      'handler' => 'flag_handler_field_ops',
+    ),
+  );
+
+  $data['flag_counts']['table']['group'] = t('Flags');
+
+  // For use with the relationship.
+  $data['flag_counts']['table']['join'] = array(
+    'flag_content' => array(
+      'left_field' => 'nid',
+      'field' => 'content_id',
+    ),
+  );
+
+  $data['flag_counts']['count'] = array(
+    'title' => t('Flag Count'),
+    'help' => t('The number of times a node has been flagged total by any user.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+     ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'nodequeue_handler_argument_subqueue_qid',
+      'name field' => 'title',
+      'name table' => 'nodequeue_subqueue',
+      'empty field name' => t('No queue'),
+    ),
+  );
+
+  return $data;
+}
+
+/**
+ * Implementation of hook_views_data_alter().
+ */
+function flag_views_data_alter(&$data) {
+  // Flag node relationship.
+  $data['node']['flag_rel'] = array(
+    'group' => t('Node'),
+    'title' => t('Flagged'),
+    'help' => t('Add a relationship to limit results to a particular flag, or display information about the flags on a node.'),
+    'real field' => 'nid',
+    'relationship' => array(
+      'handler' => 'flag_handler_relationship_node',
+      'base' => 'flag_content',
+      'field' => 'content_id',
+      'label' => t('flag'),
+    ),
+  );
+}
+
+/**
+ * A helper function that creates a radio list of available flags.
+ *
+ * This function is used to select the desired flag when setting up flag
+ * relationships and fields.
+ */
+function flag_views_flag_config_form($type, $current_flag) {
   $flags = flag_get_flags();
   foreach ($flags as $flag) {
-    // Localize the flag title:
-    $flag = _flag_process_labels($flag, NULL, array('title'));
-    $table = array(
-      'name' => 'flag_content',
-      'join' => array(
-        'left' => array(
-          'table' => 'node',
-          'field' => 'nid'
-        ),
-        'right' => array(
-          'field' => 'content_id'
-        ),
-        'extra' => array(
-          'fid' => $flag->fid
-        ),
-      ),
-      'fields' => array(
-        'timestamp' => array(
-          'name' => t('Flag: @s Flagged Time', array('@s' => $flag->title)),
-          'sortable' => TRUE,
-          'handler' => views_handler_field_dates(),
-          'option' => 'string',
-          'help' => t('Display the time the node was flagged by a user.')
-                  .' '. t('The option field may be used to specify the custom date format as it\'s required by the date() function or if "as time ago" has been chosen to customize the granularity of the time interval.'),
-        ),
-      ),
-      'filters' => array(
-        'uid' => array(
-          'name' => t('Flag: @s', array('@s' => $flag->title)),
-          // Do not be concerned about reversal here. IS NOT NULL means flagged.
-          'operator' => array('IS NOT' => 'Is Flagged By'),
-          'list' => array('***CURRENT_USER***' => t('Currently Logged In User'), 'uid' => t('Any User')),
-          'list-type' => 'select',
-          'handler' => 'flag_filter_handler_uid',
-          'help' => t('This will filter a only nodes that have the %s flag. If using <em>Any User</em>, often the <em>Node: Distinct</em> filter will also be desired. The <em>Any User</em> filter is not necessary if combining with other flag sorts or arguments.', array('%s' => $flag->title)),
-          'fid' => $flag->fid,
-        ),
-        'timestamp' => array(
-          'name' => t('Flag: @s Flagged Time', array('@s' => $flag->title)),
-          'operator' => 'views_handler_operator_gtlt',
-          'value' => views_handler_filter_date_value_form(),
-          'handler' => 'views_handler_filter_timestamp',
-          'option' => 'string',
-          'help' => t('This filter allows nodes to be filtered by the time they were flagged by a user.')
-            .' '. views_t_strings('filter date'),
-        ),
-      ),
-      'sorts' => array(
-        'timestamp' => array(
-          'name' => t('Flag: @s Flagged Time', array('@s' => $flag->title)),
-          'help' => t('Sort by the time a node was flagged using the %s flag.', array('%s' => $flag->title)),
-        ),
-      ),
-    );
-    $tables['flag_content_'. $flag->name] = $table;
-
-    $table = array(
-      'name' => 'users',
-      'join' => array(
-        'left' => array(
-          'table' => 'flag_content_'. $flag->name,
-          'field' => 'uid',
-        ),
-        'right' => array(
-          'field' => 'uid'
-        ),
-      ),
-      'fields' => array(
-        'name' => array(
-          'name' => t('Flag: User for @s', array('@s' => $flag->title)),
-          'handler' => 'views_handler_field_username',
-          'sortable' => TRUE,
-          'help' => t('This will display the user who flagged the node.'),
-          'uid' => 'uid',
-          'addlfields' => array('uid'),
-        ),
-      ),
-      'sorts' => array(
-        'name' => array(
-          'name' => t('Flag: User for @s', array('@s' => $flag->title)),
-          'help' => t('Sort by the the name of the users who flagged the node using the %s flag. This probably makes sense only when the list is filtered for a single node; e.g., on a "Who\'s flagged this" tab.', array('%s' => $flag->title)),
-        ),
-      ),
-    );
-    $tables["flag_users_". $flag->name] = $table;
-
-    $table = array(
-      'name' => 'flag_types',
-      'provider' => 'flag',
-      'join' => array(
-        'left' => array(
-          'table' => 'node',
-          'field' => 'type'
-        ),
-        'right' => array(
-          'field' => 'node_type'
-        ),
-        'extra' => array(
-          'fid' => $flag->fid
-        ),
-      ),
-    );
-    $tables['flag_types_'. $flag->name] = $table;
-
-    $table = array(
-      'name' => 'flag_counts',
-      'provider' => 'flag',
-      'join' => array(
-        'left' => array(
-          'table' => 'node',
-          'field' => 'nid'
-        ),
-        'right' => array(
-          'field' => 'content_id'
-        ),
-        'extra' => array(
-          'fid' => $flag->fid
-        ),
-      ),
-      'fields' => array(
-        'count' => array(
-          'name' => t('Flag: Count for @s', array('@s' => $flag->title)),
-          'sortable' => true,
-          'handler' => array(
-            'views_handler_field_int' => t('Display the count as an integer'),
-            'flag_field_handler_count' => t('Display the count in a phrase'),
-          ),
-          'option' => 'string',
-          'help' => t('If you choose <em>Display the count in a phrase</em>, use the Option field plus the <code>@count</code> placeholder to craft your phrase. A pipe character may separate the singular form from the plural form. Another pipe may separate a leading zero phrase --which may well be an empty string-- from the aforementioned two. Examples: <code>"@count", "1 vote|@count votes", "needs voting|1 vote|@count votes", "|1 vote|@count votes", "|@count|@count"</code>.'),
-        ),
-      ),
-      'filters' => array(
-        'count' => array(
-          'name' => t('Flag: Count for @s', array('@s' => $flag->title)),
-          'help' => t('This will filter by the number of times that a node has been flagged.'),
-          'operator' => 'views_handler_operator_gtlt',
-          'option' => 'integer',
-        ),
-      ),
-      'sorts' => array(
-        'count' => array(
-          'name' => t('Flag: @s Count', array('@s' => $flag->title)),
-          'help' => t('Sort by the total flag count for each node.'),
-        ),
-      ),
-    );
-    $tables['flag_counts_'. $flag->name] = $table;
-
-    $table = array(
-      'name' => 'flag_content',
-      'join' => array(
-        'left' => array(
-          'table' => 'node',
-          'field' => 'nid',
-        ),
-        'right' => array(
-          'field' => 'content_id',
-        ),
-        'extra' => array(
-          'fid' => $flag->fid,
-          'uid' => $flag->global ? 0 : '***CURRENT_USER***',
-          // Note: since this is a LEFT JOIN, we also get records where
-          // uid is empty; that is, nodes which haven't been flagged.
-          // This is intentional, as we want to display the Ops field
-          // for unflagged nodes too.
-          // The Ops field handler utilizes uid being empty (NULL) to
-          // efficiently figure out whether or not a node is flagged.
-        ),
-      ),
-      'fields' => array(
-        'ops' => array(
-          'field' => 'uid',
-          'name' => t('Flag: Ops for @s', array('@s' => $flag->title)),
-          'help' => t('Display an AJAX link to flag, or unflag, the node. Note that the operation is made on behalf of the user who <em>browses the page</em> and not the user whose name happens to appear adjacent to the link.'),
-          'handler' => 'flag_field_handler_ops',
-          'query_handler' => 'flag_query_handler_ops',
-          'fid' => $flag->fid,
-        ),
-      ),
-    );
-    $tables["flag_ops_". $flag->name] = $table;
+    // Localize Flag titles.
+    $flag = flag_process_labels($flag, NULL, NULL, array('title'));
+    $options[$flag->name] = $flag->title;
   }
 
-  return $tables;
+  $form = array(
+    '#type' => $type,
+    '#title' => t('Flag'),
+    '#options' => $options,
+    '#default_value' => $current_flag,
+    '#required' => TRUE,
+  );
+
+  return $form;
 }
 
 /**
- * Handler that prints the proper operations for a flag.
+ * Helper function that gets the first defined flag and returns it's name.
  */
-function flag_field_handler_ops($fieldinfo, $fielddata, $value, $data) {
-  $flag = flag_get_flag(NULL, $fieldinfo['fid']);
+function flag_views_flag_default() {
+  static $default_flag;
 
-  $node_type_field = 'flag_types_'. $flag->name .'_node_type';
-  if (!$data->$node_type_field) {
-    // Flag does not apply to this node.
-    return;
+  if (!isset($default_flag)) {
+    $flag = array_shift(flag_get_flags());
+    $default_flag = $flag->name;
   }
 
-  $flags = flag_get_flags(NULL, NULL, $GLOBALS['user']);
-  if (!isset($flags[$flag->fid])) {
-    // Flag does not apply to this user.
-    return;
+  return $default_flag;
+}
+
+/**
+ * Specialized relationship handler associating flags and nodes.
+ */
+class flag_handler_relationship_node extends views_handler_relationship {
+  function options(&$options) {
+    parent::options($options);
+    $options['flag'] = flag_views_flag_default();
   }
 
-  // Token replacements.
-  $flag = _flag_process_labels($flag, node_load($data->nid), array('flag', 'flag_long'));
-
-  $flag_html = l($flag->flag_short, 'flag/flag/'. $flag->name .'/node/'. $data->nid, array('class' => "flag-flag links_flag_". $flag->name, 'title' => $flag->flag_long), drupal_get_destination());
-  $unflag_html = l($flag->unflag_short, 'flag/unflag/'. $flag->name .'/node/'. $data->nid, array('class' => "flag-unflag links_flag_". $flag->name, 'title' => $flag->unflag_long), drupal_get_destination());
-
-  flag_add_js($data->nid, $flag->name, $flag_html, $unflag_html);
-
-  // The value of this field is NULL if there isn't a record for this
-  // node in the 'flag_content' table. That is, value is NULL if
-  // this node isn't flagged.
-  if (!is_null($value)) {
-    return $unflag_html;
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['flag'] = flag_views_flag_config_form('radios', $this->options['flag']);
   }
-  else {
-    return $flag_html;
+
+  /**
+   * Display which flag has been select in the relationship summary.
+   */
+  function admin_summary() {
+    if ($this->options['flag']) {
+      return $this->options['flag'];
+    }
+  }
+
+  /**
+   * Called to implement a relationship in a query.
+   */
+  function query() {
+    // Figure out what base table this relationship brings to the party.
+    $join = new views_join();
+    $join->definition = array(
+      'table' => 'flag_content',
+      'field' => 'content_id',
+      'left_table' => 'node',
+      'left_field' => 'nid',
+    );
+
+    if (!empty($this->options['required'])) {
+      $join->definition['type'] = 'INNER';
+    }
+
+    $flag = flag_get_flag($this->options['flag']);
+    $join->definition['extra'] = array(
+      array(
+        'field' => 'fid',
+        'value' => $flag->fid,
+        'numeric' => TRUE,
+      ),
+      array(
+        'field' => 'content_type',
+        'alias' => $this->alias,
+        'value' => 'node',
+      ),
+    );
+    $join->construct();
+
+    $alias = $join->definition['table'] . '_' . $join->definition['left_table'];
+
+    $this->alias = $this->query->add_relationship($alias, $join, 'flag_content', $this->relationship);
+
+    // Save the flag to the view so we can retrieve it when outputing.
+    $this->view->flags[$this->alias] = $flag;
   }
 }
 
 /**
- * This handler loads the type of the node so the display handler, above,
- * can determine if the flag applies to it.
+ * Views field handler for the Flag operations links (flag/unflag).
  */
-function flag_query_handler_ops($field, $fieldinfo, &$query) {
-  $fid = $fieldinfo['fid'];
-  $flag = flag_get_flag(NULL, $fid);
+class flag_handler_field_ops extends views_handler_field {
+  function init(&$view, &$options) {
+    parent::init($view, $options);
 
-  // Load the type of the node.
-  // I could simply do $query->add_field('type', 'node', 'node_type') and get
-  // rid of this pseudo table, defined in hook_views_tables(), but I suspect
-  // that it will be easier to port to Views 2 if we don't hardcode the 'node'.
-  $query->add_field('node_type', 'flag_types_'. $flag->name, 'flag_types_'. $flag->name .'_node_type');
-}
-
-/**
- * Handler that lets us filter nodes to include only those by a particular user.
- */
-function flag_filter_handler_uid($op, $filter, $filterinfo, &$query) {
-  // Load the views flag to check if it's global.
-  $flag = flag_get_flag(NULL, $filterinfo['fid']);
-
-  $tn = $query->add_table($filterinfo['table']);
-  $tname = $query->get_table_name($filterinfo['table'], $tn);
-  $query->add_where("$tname.uid $filter[operator] NULL");
-  if ($filter['value'] == '***CURRENT_USER***' && !$flag->global) {
-    $query->add_where("$tname.uid = ***CURRENT_USER***");
-  }
-}
-
-/**
- * Handler that prints the 'count' field in a zero/singular/plural phrase, localizable.
- */
-function flag_field_handler_count($fieldinfo, $fielddata, $value, $data) {
-  return _flag_format_plural($value, $fielddata['options']);
-}
-
-/**
- * Give an argument handler to limit nodes to those flagged by a uid.
- */
-function flag_views_arguments() {
-  $flags = flag_get_flags();
-  foreach ($flags as $flag) {
-    // Localize the flag title:
-    $flag = _flag_process_labels($flag, NULL, array('title'));
-    $argument = array(
-      'name' => t("Flags '@s' for UID", array('@s' => $flag->title)),
-      'handler' => "flag_arg_uid",
-      'help' => t("This argument allows users to filter a view to nodes flagged with the '%s' flag for the specified user.", array("%s" => $flag->title)),
-      'table' => "flag_content_". $flag->name,
+    // We need the node type to check access in the render function.
+    $this->additional_fields['node_type'] = array(
+      'table' => 'node',
+      'field' => 'type',
     );
-    $arguments["flag_content_". $flag->name] = $argument;
   }
-  return $arguments;
+
+  function render($values) {
+    // Pull up the flag object created by the relationship.
+    $flag = $this->view->flags[$this->table_alias];
+    $node_type = $values->{$this->aliases['node_type']};
+    $is_flagged = !is_null($values->{$this->field_alias});
+
+    if (!flag_access($flag) || !flag_content_enabled($flag, 'node', $node_type)) {
+      // Flag does not apply to this user or node type.
+      return;
+    }
+
+    // Token replacements.
+    $flag = flag_process_labels($flag, 'node', $values->nid, array('flag_short', 'flag_long', 'flag_message'));
+    return theme('flag', $flag, 'node', $values->nid, $is_flagged);
+  }
 }
 
-function flag_arg_uid($op, &$query, $argtype, $arg = '') {
-  switch ($op) {
-    case 'summary':
-      // We have to do a couple of kind of ugly things here. First,
-      // because we're dynamic we dig some table info out of the
-      // arguments array. Second, the default behavior on our
-      // pseudotables is to lock the table to current user, but
-      // we are overriding that.
+/**
+ * Handler to filter for nodes that are not in a queue.
+ */
+class flag_handler_filter_flagged extends views_handler_filter_in_operator {
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['operator']['#options'] = array(
+      'in' => t('Is flagged with'),
+      'not in' => t('Is not flagged with'),
+    );
+    $form['value'] = flag_views_flag_config_form('checkboxes', $form['value']['#default_value']);
+  }
 
-      $argdata = _views_get_arguments();
-      $table = $argdata[$argtype]['table'];
-
-      $table_data = _views_get_tables();
-      $joininfo = $table_data[$table]['join'];
-      unset($joininfo['extra']);
-
-      $query->add_table($table, true, 1, $joininfo);
-      $query->add_table('users', true, 1, array('left' => array('table' => $table, 'field' => 'uid'), 'right' => array('field' => 'uid')));
-      $query->add_field('name', 'users');
-      $query->add_field('uid', 'users');
-      $query->add_where("$table.uid IS NOT NULL");
-      $fieldinfo['field'] = "users.name";
-      return $fieldinfo;
-      break;
-    case 'filter':
-      $uid = intval($arg);
-      $argdata = _views_get_arguments();
-      $table = $argdata[$argtype['type']]['table'];
-
-      $table_data = _views_get_tables();
-      $joininfo = $table_data[$table]['join'];
-      $joininfo['extra']['uid'] = $uid;
-
-      $query->add_table($table, true, 1, $joininfo);
-      $query->add_where("$table.uid IS NOT NULL");
-      break;
-    case 'link':
-      $name = ($query->name ? $query->name : variable_get('anonymous', t('Anonymous')));
-      return l($name, "$arg/" . intval($query->uid));
-    case 'title':
-      if (!$query) {
-        return variable_get('anonymous', t('Anonymous'));
-      }
-      $user = db_fetch_object(db_query("SELECT name FROM {users} WHERE uid = '%d'", $query));
-      return $user->name;
+  function query() {
+    $operator = empty($this->operator) ? 'IS NOT' : 'IS';
+    $this->query->add_where($this->options['group'], "$this->table_alias.uid $operator NULL");
   }
 }
 
@@ -347,7 +275,7 @@ function flag_views_default_views() {
 
   foreach ($flags as $flag) {
     // Localize the flag title:
-    $flag = _flag_process_labels($flag, NULL, array('title'));
+    $flag = flag_process_labels($flag, NULL, NULL, array('title'));
     $fid = $flag->fid;
     $view = new stdClass();
     $view->name = 'flags_'. $flag->name;
