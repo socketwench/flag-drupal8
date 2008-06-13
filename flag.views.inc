@@ -13,6 +13,7 @@ function flag_views_data() {
   $data = array();
 
   $data['flag_content']['table']['group'] = t('Flags');
+  $data['flag_counts']['table']['group'] = t('Flags');
 
   $data['flag_content']['uid'] = array(
     'title' => t('User ID'),
@@ -29,6 +30,46 @@ function flag_views_data() {
     'title' => t('Flagged time'),
     'help' => t('Display the time the node was flagged by a user.'),
     'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+     ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_date',
+    ),
+  );
+
+  // Specialized is null/is not null filter.
+  $data['flag_content']['flagged'] = array(
+    'title' => t('Flagged'),
+    'help' => t('Filter to ensure a node has or has not been flagged.'),
+    'real field' => 'uid',
+    'filter' => array(
+      'handler' => 'flag_handler_filter_flagged',
+      'label' => t('Flagged'),
+    ),
+  );
+
+  // Flag node links.
+  $data['flag_content']['flag_ops'] = array(
+    'title' => t('Flag link'),
+    'help' => t('Display flag/unflag links.'),
+    'real field' => 'uid',
+    'field' => array(
+      'handler' => 'flag_handler_field_ops',
+    ),
+  );
+
+  // Flag count totals.
+  $data['flag_counts']['count'] = array(
+    'title' => t('Flag Count'),
+    'help' => t('The number of times a node has been flagged total by any user.'),
+    'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
      ),
@@ -43,55 +84,6 @@ function flag_views_data() {
     ),
   );
 
-  // Specialized is null/is not null filter.
-  $data['flag_content']['flagged'] = array(
-    'title' => t('Flagged'),
-    'help' => t('Filter to ensure a node has or has not been flagged.'),
-    'filter' => array(
-      'handler' => 'flag_handler_filter_flagged',
-      'label' => t('Flagged'),
-    ),
-  );
-
-  // Flag node links.
-  $data['flag_content']['flag_ops'] = array(
-    'group' => t('Flags'),
-    'title' => t('Flag link'),
-    'help' => t('Display flag/unflag links.'),
-    'real field' => 'uid',
-    'field' => array(
-      'handler' => 'flag_handler_field_ops',
-    ),
-  );
-
-  $data['flag_counts']['table']['group'] = t('Flags');
-
-  // For use with the relationship.
-  $data['flag_counts']['table']['join'] = array(
-    'flag_content' => array(
-      'left_field' => 'nid',
-      'field' => 'content_id',
-    ),
-  );
-
-  $data['flag_counts']['count'] = array(
-    'title' => t('Flag Count'),
-    'help' => t('The number of times a node has been flagged total by any user.'),
-    'field' => array(
-      'handler' => 'views_handler_field_numeric',
-      'click sortable' => TRUE,
-     ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    'argument' => array(
-      'handler' => 'nodequeue_handler_argument_subqueue_qid',
-      'name field' => 'title',
-      'name table' => 'nodequeue_subqueue',
-      'empty field name' => t('No queue'),
-    ),
-  );
-
   return $data;
 }
 
@@ -100,14 +92,28 @@ function flag_views_data() {
  */
 function flag_views_data_alter(&$data) {
   // Flag node relationship.
-  $data['node']['flag_rel'] = array(
-    'group' => t('Node'),
+  $data['node']['flag_content_rel'] = array(
+    'group' => t('Flags'),
     'title' => t('Flagged'),
-    'help' => t('Add a relationship to limit results to a particular flag, or display information about the flags on a node.'),
+    'help' => t('Limit results to a particular flag, or display information about the flags on a node.'),
     'real field' => 'nid',
     'relationship' => array(
-      'handler' => 'flag_handler_relationship_node',
+      'handler' => 'flag_handler_relationship_content_node',
       'base' => 'flag_content',
+      'field' => 'content_id',
+      'label' => t('flag'),
+    ),
+  );
+
+  // Flag-count node relationship.
+  $data['node']['flag_counts_rel'] = array(
+    'group' => t('Flags'),
+    'title' => t('Flag counts'),
+    'help' => t('Add information about the flag total counts.'),
+    'real field' => 'nid',
+    'relationship' => array(
+      'handler' => 'flag_handler_relationship_counts_node',
+      'base' => 'flag_counts',
       'field' => 'content_id',
       'label' => t('flag'),
     ),
@@ -156,24 +162,34 @@ function flag_views_flag_default() {
 /**
  * Specialized relationship handler associating flags and nodes.
  */
-class flag_handler_relationship_node extends views_handler_relationship {
+class flag_handler_relationship_content_node extends views_handler_relationship {
   function options(&$options) {
     parent::options($options);
     $options['flag'] = flag_views_flag_default();
+    $options['user_scope'] = 'current';
+    $options['required'] = 1;
   }
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
+    $form['label']['#description'] .= ' '. t('The name of the selected flag makes a good label.');
+
     $form['flag'] = flag_views_flag_config_form('radios', $this->options['flag']);
+    $form['flag']['#title'] = t('Flagged');
+
+    $form['user_scope'] = array(
+      '#type' => 'radios',
+      '#title' => t('By'),
+      '#options' => array('current' => t('Current user'), 'any' => t('Any user')),
+      '#default_value' => $this->options['user_scope'],
+    );
+
+    $form['required']['#title'] = t('Include only flagged content');
+    $form['required']['#description'] = t('If checked, only content that has this flag will be included. Leave unchecked if needing to display lists of specifically unflagged content.');
   }
 
-  /**
-   * Display which flag has been select in the relationship summary.
-   */
   function admin_summary() {
-    if ($this->options['flag']) {
-      return $this->options['flag'];
-    }
+    return $this->options['flag'] .' - '. ($this->options['user_scope'] == 'current' ? 'current user' : 'any user');
   }
 
   /**
@@ -204,13 +220,86 @@ class flag_handler_relationship_node extends views_handler_relationship {
         'field' => 'content_type',
         'alias' => $this->alias,
         'value' => 'node',
+        'numeric' => FALSE,
+      ),
+    );
+    if ($this->options['user_scope'] == 'current' && !$flag->global) {
+      $join->definition['extra'][] = array(
+        'field' => 'uid',
+        'value' => '***CURRENT_USER***',
+        'numeric' => TRUE,
+      );
+    }
+    $join->construct();
+
+    $alias = $join->definition['table'] . '_' . $join->definition['left_table'];
+
+    $this->alias = $this->query->add_relationship($alias, $join, 'flag_content', $this->relationship);
+
+    // Save the flag to the view so we can retrieve it when outputing.
+    $this->view->flags[$this->alias] = $flag;
+  }
+}
+
+
+/**
+ * Specialized relationship handler associating flag counts and nodes.
+ */
+class flag_handler_relationship_counts_node extends views_handler_relationship {
+  function options(&$options) {
+    parent::options($options);
+    $options['flag'] = flag_views_flag_default();
+    $options['required'] = 1;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['flag'] = flag_views_flag_config_form('radios', $this->options['flag']);
+
+    $form['required']['#title'] = t('Include only content flagged at least once');
+    $form['required']['#description'] = t('If checked, only content that has been flagged will be included.');
+  }
+
+  function admin_summary() {
+    return $this->options['flag'];
+  }
+
+  /**
+   * Called to implement a relationship in a query.
+   */
+  function query() {
+    // Figure out what base table this relationship brings to the party.
+    $join = new views_join();
+    $join->definition = array(
+      'table' => 'flag_counts',
+      'field' => 'content_id',
+      'left_table' => 'node',
+      'left_field' => 'nid',
+    );
+
+    if (!empty($this->options['required'])) {
+      $join->definition['type'] = 'INNER';
+    }
+
+    $flag = flag_get_flag($this->options['flag']);
+    $join->definition['extra'] = array(
+      array(
+        'field' => 'fid',
+        'value' => $flag->fid,
+        'numeric' => TRUE,
+      ),
+      array(
+        'field' => 'content_type',
+        'alias' => $this->alias,
+        'value' => 'node',
+        'numeric' => FALSE,
       ),
     );
     $join->construct();
 
     $alias = $join->definition['table'] . '_' . $join->definition['left_table'];
 
-    $this->alias = $this->query->add_relationship($alias, $join, 'flag_content', $this->relationship);
+    $this->alias = $this->query->add_relationship($alias, $join, 'flag_counts', $this->relationship);
 
     // Save the flag to the view so we can retrieve it when outputing.
     $this->view->flags[$this->alias] = $flag;
@@ -251,19 +340,24 @@ class flag_handler_field_ops extends views_handler_field {
 /**
  * Handler to filter for nodes that are not in a queue.
  */
-class flag_handler_filter_flagged extends views_handler_filter_in_operator {
+class flag_handler_filter_flagged extends views_handler_filter_boolean_operator {
+  function options(&$options) {
+    parent::options($options);
+    $options['value'] = 1;
+  }
+
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-    $form['operator']['#options'] = array(
-      'in' => t('Is flagged with'),
-      'not in' => t('Is not flagged with'),
-    );
-    $form['value'] = flag_views_flag_config_form('checkboxes', $form['value']['#default_value']);
+    $form['value']['#type'] = 'radios';
+    $form['value']['#title'] = t('Status');
+    $form['value']['#options'] = array(1 => t('Flagged'), 0 => t('Not flagged'));
+    $form['value']['#default_value'] = empty($this->options['value']) ? 0 : $this->options['value'];
+    $form['value']['#description'] = t('This filter only works if the relationship used has the "Include only flagged content" option unchecked. Otherwise, this filter is not necessary, because all records are already limited to flagged content.');
   }
 
   function query() {
-    $operator = empty($this->operator) ? 'IS NOT' : 'IS';
-    $this->query->add_where($this->options['group'], "$this->table_alias.uid $operator NULL");
+    $operator = $this->value ? 'IS NOT' : 'IS';
+    $this->query->add_where($this->options['group'], $this->relationship .'.uid '. $operator .' NULL');
   }
 }
 
