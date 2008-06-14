@@ -85,7 +85,7 @@ function flag_views_bookmark_update_tables() {
   $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN nid content_id int unsigned NOT NULL default '0'");
   $ret[] = update_sql("ALTER TABLE {views_bookmark_nodes} CHANGE COLUMN uid uid int unsigned NOT NULL default '0' AFTER content_id");
   $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
-  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN type node_type varchar(32) NOT NULL default ''");
+  $ret[] = update_sql("ALTER TABLE {views_bookmark_nodetypes} CHANGE COLUMN type type varchar(32) NOT NULL default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN vbid fid smallint unsigned NOT NULL default '0'");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN mark flag_short varchar(255) default ''");
   $ret[] = update_sql("ALTER TABLE {views_bookmarks} CHANGE COLUMN mark_long flag_long varchar(255) default ''");
