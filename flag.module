@@ -294,7 +294,7 @@ function flag_node_type($op, $info) {
   switch ($op) {
     case 'delete':
       // Remove entry from flaggable content types.
-      db_query("DELETE FROM {flag_types} WHERE node_type = '%s'", $info->type);
+      db_query("DELETE FROM {flag_types} WHERE type = '%s'", $info->type);
       break;
   }
 }
@@ -315,7 +315,7 @@ function flag_admin_page() {
     ));
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles));
-    $rows[] = array($flag->title, empty($flag->roles) ? '<em>'. t('No roles') .'</em>' : implode(', ', $roles), implode(', ', $flag->node_types), $ops);
+    $rows[] = array($flag->title, empty($flag->roles) ? '<em>'. t('No roles') .'</em>' : implode(', ', $roles), implode(', ', $flag->types), $ops);
   }
   $output = theme('table', array(t('Flag'), t('Roles'), t('Node Types'), t('Operations')), $rows);
   return $output;
@@ -426,11 +426,11 @@ function flag_form(&$form_state, $name = NULL) {
     '#description' => t('Checking <em>authenticated user</em> will allow all logged-in users to flag content with this flag. Anonymous users may not flag content.'),
   );
 
-  $form['node_types'] = array(
+  $form['types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('What nodes this flag may be used on'),
     '#options' => node_get_types('names'),
-    '#default_value' => isset($flag) ? $flag->node_types : array(),
+    '#default_value' => isset($flag) ? $flag->types : array(),
     '#description' => t('Check any node types that this flag may be used on. You must check at least one node type.'),
     '#required' => TRUE
   );
@@ -489,9 +489,9 @@ function flag_form_submit($form, &$form_state) {
     $fid = db_last_insert_id('flags', 'fid');
   }
 
-  foreach ($form_state['values']['node_types'] as $node_type) {
-    if ($node_type) {
-      db_query("INSERT INTO {flag_types} (fid, node_type) VALUES (%d, '%s')", $fid, $node_type);
+  foreach ($form_state['values']['types'] as $type) {
+    if ($type) {
+      db_query("INSERT INTO {flag_types} (fid, type) VALUES (%d, '%s')", $fid, $type);
     }
   }
   drupal_set_message(t('Flag @name has been saved.', array('@name' => $form_state['values']['title'])));
@@ -871,12 +871,12 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
     while ($flag = db_fetch_object($result)) {
       $flag->roles = empty($flag->roles) ? array() : explode(',', $flag->roles);
       if (!isset($flags[$flag->fid])) {
-        $flag->node_types = array($flag->node_type);
-        unset($flag->node_type);
+        $flag->types = array($flag->type);
+        unset($flag->type);
         $flags[$flag->fid] = $flag;
       }
       else {
-        array_push($flags[$flag->fid]->node_types, $flag->node_type);
+        array_push($flags[$flag->fid]->types, $flag->type);
       }
     }
   }
