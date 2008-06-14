@@ -50,9 +50,9 @@ function flag_views_convert($display, $type, &$view, $field, $id) {
         case 'ops':
           $new_field = array(
             'label' => $field['label'],
-            'id' => 'flag_ops',
+            'id' => 'ops',
             'table' => 'flag_content',
-            'field' => 'flag_ops',
+            'field' => 'ops',
             'relationship' => 'flag_content_rel',
           );
           $new_rel = 'flag_content_rel';

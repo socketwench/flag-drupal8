@@ -65,6 +65,15 @@ function flag_perm() {
 }
 
 /**
+ * Implementation of hook_init().
+ */
+function flag_init() {
+  if (module_exists('trigger')) {
+    include_once drupal_get_path('module', 'flag') .'/flag.actions.inc';
+  }
+}
+
+/**
  * Access checking to check an account for flagging ability.
  *
  * @param $flag
@@ -100,7 +109,7 @@ function flag_access($flag, $account = NULL) {
  *   FALSE otherwise.
  */
 function flag_content_enabled($flag, $content_type, $content_subtype) {
-  return in_array($content_subtype, $flag->{$content_type .'_types'});
+  return in_array($content_subtype, $flag->types);
 }
 
 /**
@@ -725,7 +734,7 @@ function theme_flag($flag, $content_type, $content_id, $is_flagged) {
  */
 function theme_flag_link($flag, $content_type, $content_id, $action, $after_flagging = FALSE) {
   $output = '<span class="flag-wrapper">';
-  $output .= l($flag->{$action .'_short'}, 'flag/'. $action .'/'. $flag->name .'/'. $content_type .'/'. $content_id, array('query' => drupal_get_destination(), 'attributes' => array('title' => $flag->{$action .'_long'}, 'class' => $action .' flag-'. $flag->name . ($after_flagging ? $action .'ed' : ''))));
+  $output .= l($flag->{$action .'_short'}, 'flag/'. $action .'/'. $flag->name .'/'. $content_type .'/'. $content_id, array('query' => drupal_get_destination(), 'attributes' => array('title' => $flag->{$action .'_long'}, 'class' => $action .' flag-'. $flag->name . ($after_flagging ? ($action == 'flag' ? ' unflagged' : ' flagged') : ''))));
   if ($after_flagging) {
     $output .= '<span class="flag-message flag-'. $action .'-message">'. $flag->{$action .'_message'} .'</span>';
   }
