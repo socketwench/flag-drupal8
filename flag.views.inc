@@ -56,7 +56,7 @@ function flag_views_data() {
   );
 
   // Flag node links.
-  $data['flag_content']['flag_ops'] = array(
+  $data['flag_content']['ops'] = array(
     'title' => t('Flag link'),
     'help' => t('Display flag/unflag links.'),
     'real field' => 'uid',

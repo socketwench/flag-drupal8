@@ -99,7 +99,7 @@ function flag_views_convert($display, $type, &$view, $field, $id) {
         case 'timestamp':
           $new_field = array(
             'operator' => $field['operator'],
-            'value' => '', // Sorry timestamp, your values don't convert. :P
+            'value' => flag_views_convert_timestamp_value($field['value']),
             'group' => 0,
             'id' => 'timestamp',
             'table' => 'flag_content',
@@ -201,7 +201,7 @@ function flag_views_convert($display, $type, &$view, $field, $id) {
     }
     elseif ($new_rel == 'uid') {
       $view->display[$display]->display_options['relationships'][$new_rel] = array(
-        'label' => $flag_name .' user',
+        'label' => isset($flag_name) ? $flag_name .' user' : 'user',
         'required' => 0,
         'id' => 'uid',
         'table' => 'flag_content',
@@ -215,4 +215,22 @@ function flag_views_convert($display, $type, &$view, $field, $id) {
   if (isset($flag_content_rel_user) && isset($view->display[$display]->display_options['relationships']['flag_content_rel'])) {
     $view->display[$display]->display_options['relationships']['flag_content_rel']['user_scope'] = 'current';
   }
+}
+
+/**
+ * In Views 1, dates were simply stored as a single string. In Views 2, the
+ * value is stored as an array of options.
+ */
+function flag_views_convert_timestamp_value($value) {
+  $type = 'date';
+  if (stripos($value, 'now') !== FALSE) {
+    $type = 'offset';
+    $value = trim(str_ireplace('now', '', $value));
+  }
+  return array(
+    'type' => $type,
+    'value' => $value,
+    'min' => '',
+    'max' => '',
+  );
 }
