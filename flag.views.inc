@@ -368,94 +368,158 @@ function flag_views_default_views() {
   $flags = flag_get_flags();
 
   foreach ($flags as $flag) {
-    // Localize the flag title:
     $flag = flag_process_labels($flag, NULL, NULL, array('title'));
-    $fid = $flag->fid;
-    $view = new stdClass();
-    $view->name = 'flags_'. $flag->name;
-    $view->access = empty($flag->roles) ? array(DRUPAL_AUTHENTICATED_RID) : $flag->roles;
+
+    $view = new view;
+    $view->name = 'flag_'. $flag->name;
     $view->description = t('View for flag: !flag-title', array('!flag-title' => $flag->title));
-    $view->page = TRUE;
-    $view->page_title = t('My !flag-title', array('!flag-title' => $flag->title));
-    $view->page_type = 'table';
-    $view->url = 'flags/'. $flag->name;
-    $view->use_pager = TRUE;
-    $view->nodes_per_page = '25';
-    $view->menu = TRUE;
-    $view->menu_tab = FALSE;
-    $view->menu_tab_default = FALSE;
-    $view->sort = array(
-    );
-    $view->argument = array(
-    );
-    $view->field = array(
-      array(
-        'tablename' => 'node',
+    $view->tag = t('default');
+    $view->view_php = '';
+    $view->base_table = 'node';
+    $view->is_cacheable = '0';
+    $view->api_version = 2;
+    $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+    $handler = $view->new_display('default', 'Defaults', 'default');
+    $handler->override_option('relationships', array(
+      'uid' => array(
+        'label' => 'user',
+        'required' => 0,
+        'id' => 'uid',
+        'table' => 'flag_content',
+        'field' => 'uid',
+        'relationship' => 'flag_content_rel',
+      ),
+      'flag_content_rel' => array(
+        'label' => $flag->name,
+        'required' => 1,
+        'flag' => $flag->name,
+        'user_scope' => 'current',
+        'id' => 'flag_content_rel',
+        'table' => 'node',
+        'field' => 'flag_content_rel',
+        'relationship' => 'none',
+      ),
+    ));
+
+    $fields = array(
+      'type' => array(
+        'id' => 'type',
+        'table' => 'node',
         'field' => 'type',
         'label' => 'Type',
-        'sortable' => '1',
       ),
-      array(
-        'tablename' => 'node',
+      'title' => array(
+        'id' => 'title',
+        'table' => 'node',
         'field' => 'title',
         'label' => 'Title',
-        'handler' => 'views_handler_field_nodelink_with_flag',
-        'sortable' => '1',
       ),
-      array(
-        'tablename' => 'users',
-        'field' => 'name',
+      'name' => array(
         'label' => 'Author',
-        'sortable' => '1',
-      ),
-      array(
-        'tablename' => "flag_ops_". $flag->name,
-        'field' => 'ops',
-        'label' => 'Ops',
-      ),
-    );
-    $view->filter = array(
-      array(
-        'tablename' => 'node',
-        'field' => 'status',
-        'operator' => '=',
-        'options' => '',
-        'value' => '1',
-      ),
-      array(
-        'tablename' => "flag_content_". $flag->name,
-        'field' => 'uid',
-        'operator' => 'IS NOT',
-        'options' => '',
-        'value' => '***CURRENT_USER***',
+        'link_to_user' => 1,
+        'id' => 'name',
+        'table' => 'users',
+        'field' => 'name',
+        'relationship' => 'uid',
       ),
     );
-    $view->requires = array('node', 'users');
 
-    // If comment module exists, append two additional fields to the default
-    // view. If comment module is added later, these fields will be added.
     if (module_exists('comment')) {
-      $op_field = array_pop($view->field);
-      $view->field = array_merge($view->field, array(
-        array(
-          'tablename' => 'node_comment_statistics',
+      $fields += array(
+        'comment_count' => array(
+          'id' => 'comment_count',
+          'table' => 'node_comment_statistics',
           'field' => 'comment_count',
           'label' => 'Replies',
-          'handler' => 'views_handler_comments_with_new',
-          'sortable' => '1',
         ),
-        array(
-          'tablename' => 'node_comment_statistics',
+        'last_comment_timestamp' => array(
+          'id' => 'last_comment_timestamp',
+          'table' => 'node_comment_statistics',
           'field' => 'last_comment_timestamp',
           'label' => 'Last Post',
-          'handler' => 'views_handler_field_since',
-          'sortable' => '1',
-          'defaultsort' => 'DESC',
         ),
-      ));
-      array_push($view->field, $op_field);
-      $view->requires = array_merge($view->requires, array('node_comment_statistics'));
+      );
     }
+
+    $fields += array(
+      'ops' => array(
+        'label' => 'Ops',
+        'id' => 'ops',
+        'table' => 'flag_content',
+        'field' => 'ops',
+        'relationship' => 'flag_content_rel',
+      ),
+    );
+
+    $handler->override_option('fields', $fields);
+    $handler->override_option('filters', array(
+      'status' => array(
+        'operator' => '=',
+        'value' => 1,
+        'group' => '0',
+        'exposed' => FALSE,
+        'expose' => array(
+          'operator' => FALSE,
+          'label' => '',
+        ),
+        'id' => 'status',
+        'table' => 'node',
+        'field' => 'status',
+        'relationship' => 'none',
+      ),
+    ));
+    $handler->override_option('access', array(
+      'type' => 'role',
+      'role' => drupal_map_assoc($flag->roles),
+      'perm' => '',
+    ));
+
+    $style_options = array(
+      'columns' => array(),
+      'default' => module_exists('comment') ? 'last_comment_timestamp' : 'title',
+      'info' => array(
+        'type' => array(
+          'sortable' => TRUE,
+        ),
+        'title' => array(
+          'sortable' => TRUE,
+        ),
+        'name' => array(
+          'sortable' => TRUE,
+        ),
+      ),
+      'override' => FALSE,
+      'order' => 'asc',
+    );
+
+    if (module_exists('comment')) {
+      $style_options['info'] += array(
+        'comment_count' => array(
+          'sortable' => TRUE,
+        ),
+        'last_comment_timestamp' => array(
+          'sortable' => TRUE,
+        ),
+      );
+    }
+
+    $handler->override_option('title', $flag->global ? $flag->title : t('My !flag-title', array('!flag-title' => $flag->title)));
+    $handler->override_option('items_per_page', '25');
+    $handler->override_option('use_pager', TRUE);
+    $handler->override_option('style_plugin', 'table');
+    $handler->override_option('style_options', $style_options);
+    $handler = $view->new_display('page', 'Page', 'page_1');
+    $handler->override_option('path', 'flags/'. $flag->name);
+    $handler->override_option('menu', array(
+      'type' => 'normal',
+      'title' => $flag->title,
+      'weight' => '0',
+    ));
+    $handler->override_option('tab_options', array(
+      'type' => 'none',
+      'title' => NULL,
+      'weight' => NULL,
+    ));
 
     $views[$view->name] = $view;
   }
