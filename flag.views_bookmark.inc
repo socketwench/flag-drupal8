@@ -31,8 +31,7 @@ function flag_views_bookmark_update() {
   // Uninstall Views Bookmark.
   flag_views_bookmark_update_uninstall();
   // Update views.
-  // TODO: Update for D6.
-  //flag_views_bookmark_update_views();
+  // In Drupal 6, this is handled in flag.views_convert.inc.
 
   drupal_set_message('The Flag module has been installed, replacing Views Bookmark. Views Bookmark has been disabled, please remove it from your installation.');
 }
@@ -146,92 +145,6 @@ function flag_views_bookmark_update_uninstall() {
   // Uninstall Views Bookmark.
   module_disable(array('views_bookmark'));
   drupal_set_installed_schema_version('views_bookmark', SCHEMA_UNINSTALLED);
-}
-
-function flag_views_bookmark_update_views() {
-  $ret = array();
-  // Ensure views is available.
-  include_once(drupal_get_path('module', 'views') .'/views.module');
-  // Load the cache to ensure _views_get_default_views() is available.
-  if (function_exists('views_load_cache')) {
-    views_invalidate_cache();
-    views_load_cache();
-  }
-
-  // Get list of available flags.
-  $flags = flag_get_flags();
-  $key_search = array(
-    '^views_bookmark_ops_([0-9]+)' => 'flag_ops_',
-    '^views_bookmark_nodes_([0-9]+)' => 'flag_content_',
-    '^views_bookmark_users_([0-9]+)' => 'flag_users_',
-    '^views_bookmark_node_count_([0-9]+)' => 'flag_counts_',
-  );
-
-  // Update database views automatically.
-  $result = db_query("SELECT name FROM {view_view}");
-
-  while ($view = db_fetch_object($result)) {
-    $view = views_get_view($view->name);
-    $view_changed = FALSE;
-
-    // Build a list of possible replacements.
-    foreach (array('sort', 'argument', 'field', 'filter', 'exposed_filter') as $view_portion) {
-      foreach ($view->$view_portion as $delta => $individual_piece) {
-        foreach ($individual_piece as $config => $value) {
-          foreach ($key_search as $search => $replace) {
-            $matches = array();
-            if (!empty($value) && is_string($value) && preg_match('/'. $search .'/', $value, $matches)) {
-              $fid = $matches[1];
-              $replace = $replace . $flags[$fid]->name;
-              $view->{$view_portion}[$delta][$config] = preg_replace('/'. $search .'/', $replace, $value);
-              $view_changed = TRUE;
-            }
-          }
-        }
-      }
-    }
-
-    if ($view_changed) {
-      drupal_set_message(t('The view %name contained Views Bookmark configuration. It has been migrated to Flag.', array('%name' => $view->name)));
-      $view->save();
-    }
-  }
-
-  // Because we can't actually update default views, just give the user a warning.
-  $default_views = _views_get_default_views();
-  $default_views_warnings = array();
-
-  foreach ($default_views as $view) {
-    foreach (array('sort', 'argument', 'field', 'filter', 'exposed_filter') as $view_portion) {
-      foreach ($view->$view_portion as $delta => $individual_piece) {
-        $value = $individual_piece['id'];
-        foreach ($key_search as $search => $replace) {
-          $matches = array();
-          if (!empty($value) && is_string($value) && preg_match('/'. $search .'/', $value, $matches)) {
-            $fid = $matches[1];
-            $replace = $replace . $flags[$fid]->name;
-            $view->{$view_portion}[$delta][$config] = preg_replace('/'. $search .'/', $replace, $value);
-            $default_views_warnings[] = t('%name needs the %id @portion updated.', array('%name' => $view->name, '%id' => $value, '@portion' => $view_portion));
-          }
-        }
-      }
-    }
-  }
-
-  if (!empty($default_views_warnings)) {
-    $message = t('The following are default views that are provided by modules and need to be updated in order to work properly with Flag. More information is available at the <a href="http://drupal.org/node/268269">Views Bookmark to Flag upgrade handbook</a>.') . theme('item_list', $default_views_warnings);
-    drupal_set_message($message, 'error');
-    watchdog('flag', $message, WATCHDOG_ERROR);
-  }
-
-  // Clear views caches.
-  if (function_exists('views_devel_caches')) {
-    $caches = views_devel_caches();
-    foreach ($caches as $cache_table) {
-      db_query('TRUNCATE {'. $cache_table .'}');
-    }
-  }
-  return $ret;
 }
 
 if (!function_exists('update_sql')) {
