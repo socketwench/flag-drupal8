@@ -39,18 +39,11 @@ Drupal.behaviors.flag = function() {
     function flagClick(element, settings) {
       // Hide any other active messages.
       $('span.flag-message:visible').fadeOut();
-      // Remove the destination parameter.
-      if (Drupal.settings.flag.cleanUrl == '1') {
-        var requestUrl = element.href.slice(0, element.href.lastIndexOf('?')) + '/1';
-      }
-      else {
-        var requestUrl = element.href.slice(0, element.href.indexOf('&')) + '/1';
-      }
 
       // Send POST request
       $.ajax({
         type: 'POST',
-        url: requestUrl,
+        url: element.href,
         data: { js: true },
         dataType: 'json',
         success: function (data) {
