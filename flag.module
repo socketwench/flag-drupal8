@@ -54,14 +54,16 @@ function flag_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  if (module_exists('trigger')) {
+    $items['admin/build/flags/actions'] = array(
+      'title' => 'Actions',
+      'page callback' => 'flag_actions_page',
+      'access callback' => 'user_access',
+      'access arguments' => array('administer actions'),
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
   return $items;
-}
-
-/**
- * Implementation of hook_perm().
- */
-function flag_perm() {
-  return array('administer flags');
 }
 
 /**
@@ -71,6 +73,16 @@ function flag_init() {
   if (module_exists('trigger')) {
     include_once drupal_get_path('module', 'flag') .'/flag.actions.inc';
   }
+  if (module_exists('token')) {
+    include_once drupal_get_path('module', 'flag') .'/flag.token.inc';
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function flag_perm() {
+  return array('administer flags');
 }
 
 /**
@@ -126,8 +138,8 @@ function flag_add_js($nid, $flag_name, $flag_html, $unflag_html) {
  *   The flag object.
  * @param $content_type
  *   The type of content being used for token replacements. Usually 'node'.
- * @param $nid
- *   The nid in whose context to interpret the tokens. The node will only be
+ * @param $content_id
+ *   The ID in whose context to interpret the tokens. The content will only be
  *   loaded if tokens are used. Omit to use the 'global' context.
  * @param $variables
  *   Array containing the names of the label variables to process.
@@ -319,8 +331,8 @@ function flag_admin_page() {
 
   foreach ($flags as $flag) {
     $ops = theme('links', array(
-      'flags_edit' =>  array('title' => t('Edit'), 'href' => "admin/build/flags/edit/". $flag->name),
-      'flags_delete' =>  array('title' => t('Delete'), 'href' => "admin/build/flags/delete/". $flag->name),
+      'flags_edit' =>  array('title' => t('edit'), 'href' => "admin/build/flags/edit/". $flag->name),
+      'flags_delete' =>  array('title' => t('delete'), 'href' => "admin/build/flags/delete/". $flag->name),
     ));
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles));
@@ -610,11 +622,9 @@ function flag($action, $flag_name, $content_type, $content_id, $uid = NULL) {
   $flagged = db_result(db_query("SELECT fid FROM {flag_content} WHERE fid = %d AND uid = %d AND content_type = '%s' AND content_id = %d", $fid, $uid, $content_type, $content_id));
   if ($flagged && $action == 'unflag') {
     db_query("DELETE FROM {flag_content} WHERE fid = %d AND uid = %d AND content_type = '%s' AND content_id = %d", $fid, $uid, $content_type, $content_id);
-    module_invoke_all('flag', 'unflag', $flag_name, $content_type, $content_id, $uid);
   }
   elseif (!$flagged && $action == 'flag') {
     db_query("INSERT INTO {flag_content} (fid, content_type, content_id, uid, timestamp) VALUES (%d, '%s', %d, %d, %d)", $fid, $content_type, $content_id, $uid, time());
-    module_invoke_all('flag', 'flag', $flag_name, $content_type, $content_id, $uid);
   }
 
   // Update the flag count for this node.
@@ -623,7 +633,46 @@ function flag($action, $flag_name, $content_type, $content_id, $uid = NULL) {
   if (!db_affected_rows()) {
     db_query("INSERT INTO {flag_counts} (fid, content_type, content_id, count) VALUES (%d, '%s', %d, %d)", $fid, $content_type, $content_id, $count);
   }
+
+  // Let other modules perform actions.
+  if ($flagged && $action == 'unflag') {
+    module_invoke_all('flag', 'unflag', $flag_name, $content_type, $content_id, $uid);
+  }
+  elseif (!$flagged && $action == 'flag') {
+    module_invoke_all('flag', 'flag', $flag_name, $content_type, $content_id, $uid);
+  }
   return TRUE;
+}
+
+/**
+ * Implementation of hook_flag(). Trigger actions if any are available.
+ */
+function flag_flag($action, $flag_name, $content_type, $content_id, $uid) {
+  if (module_exists('trigger')) {
+
+    // TODO: Create a real class for flag actions?
+    $flag_action = new stdClass();
+    $flag_action->action = $action;
+    $flag_action->flag = $flag_name;
+    $flag_action->content_type = $content_type;
+    $flag_action->content_id = $content_id;
+
+    switch ($content_type) {
+      case 'node':
+        $node = node_load($content_id);
+        $flag_action->content_title = $node->title;
+        $flag_action->content_url = url('node/'. $node->nid, array('absolute' => TRUE));
+        break;
+    }
+
+    $flag = flag_get_flag($flag_name);
+    $context = (array)$flag_action;
+    $aids = _trigger_get_hook_aids('flag', $action);
+    foreach ($aids as $aid => $action_info) {
+      actions_do($aid, $flag, $context);
+    }
+
+  }
 }
 
 /**
@@ -668,6 +717,18 @@ function flag_nodes($nodes) {
 }
 
 /**
+ * Implementation of hook_mail().
+ */
+function flag_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'over_threshold':
+      $message['subject'] = $params['subject'];
+      $message['body'] = $params['body'];
+      break;
+  }
+}
+
+/**
  * Implementation of hook_theme().
  */
 function flag_theme() {
@@ -677,6 +738,12 @@ function flag_theme() {
     ),
     'flag_link' => array(
       'arguments' => array('flag' => NULL, 'content_type' => NULL, 'content_id' => NULL, 'action' => NULL, 'after_flagging' => NULL),
+    ),
+    'flag_token_help' => array(
+      'arguments' => array('types' => NULL, 'prefix' => NULL, 'suffix' => NULL),
+    ),
+    'flag_actions_page' => array(
+      'arguments' => array('actions'),
     ),
   );
 }
@@ -736,7 +803,7 @@ function theme_flag_link($flag, $content_type, $content_id, $action, $after_flag
   $output = '<span class="flag-wrapper">';
   $output .= l($flag->{$action .'_short'}, 'flag/'. $action .'/'. $flag->name .'/'. $content_type .'/'. $content_id, array('query' => drupal_get_destination(), 'attributes' => array('title' => $flag->{$action .'_long'}, 'class' => $action .' flag-'. $flag->name . ($after_flagging ? ($action == 'flag' ? ' unflagged' : ' flagged') : ''))));
   if ($after_flagging) {
-    $output .= '<span class="flag-message flag-'. $action .'-message">'. $flag->{$action .'_message'} .'</span>';
+    $output .= '<span class="flag-message flag-'. $action .'-message">'. $flag->{($action == 'flag' ? 'unflag' : 'flag') .'_message'} .'</span>';
   }
   $output .= '</span>';
   return $output;
@@ -819,9 +886,9 @@ function flag_get_counts($content_type, $content_id, $reset = FALSE) {
 
   if (!isset($counts[$content_type][$content_id])) {
     $counts[$content_type][$content_id] = array();
-    $result = db_query("SELECT f.name, f.fid, f.title, fc.count FROM {flags} f LEFT JOIN {flag_counts} fc ON f.fid = fc.fid WHERE fc.content_type = '%s' AND fc.content_id = %d", $content_type, $content_id);
+    $result = db_query("SELECT f.name, fc.count FROM {flags} f LEFT JOIN {flag_counts} fc ON f.fid = fc.fid WHERE fc.content_type = '%s' AND fc.content_id = %d", $content_type, $content_id);
     while ($row = db_fetch_object($result)) {
-      $counts[$content_type][$content_id][$row->name] = array('type' => $row->title, 'count' => $row->count);
+      $counts[$content_type][$content_id][$row->name] = $row->count;
     }
   }
 
