@@ -18,6 +18,12 @@ function flag_token_list($type = 'all') {
     $tokens['flag-action']['flag-content-id'] = t('The ID of content being flagged, may be a nid or cid.');
     $tokens['flag-action']['flag-count'] = t('The current count total for this flag.');
   }
+  if ($type == 'node' || $type == 'all') {
+    $flags = flag_get_flags();
+    foreach ($flags as $flag) {
+      $tokens['node']['flag-'. str_replace('_', '-', $flag->name) .'-count'] = t('Total flag count for flag @flag', array('@flag' => $flag->title));
+    }
+  }
   return $tokens;
 }
 
@@ -25,22 +31,31 @@ function flag_token_list($type = 'all') {
  * Implementation of hook_token_values().
  */
 function flag_token_values($type, $object = NULL) {
-  $tokens = array();
+  $values = array();
   if ($type == 'flag') {
-    $tokens['flag-name'] = check_plain($object->name);
-    $tokens['flag-title'] = check_plain($object->title);
+    $values['flag-name'] = check_plain($object->name);
+    $values['flag-title'] = check_plain($object->title);
   }
   elseif ($type == 'flag-action') {
     $counts = flag_get_counts($object->content_type, $object->content_id);
-    $tokens['flag-action'] = $object->action;
-    $tokens['flag-content-url'] = $object->content_url;
-    $tokens['flag-content-title'] = $object->content_title;
-    $tokens['flag-content-type'] = $object->content_type;
-    $tokens['flag-content-id'] = $object->content_id;
-    $tokens['flag-count'] = $counts[$object->flag];
+    $values['flag-action'] = $object->action;
+    $values['flag-content-url'] = $object->content_url;
+    $values['flag-content-title'] = $object->content_title;
+    $values['flag-content-type'] = $object->content_type;
+    $values['flag-content-id'] = $object->content_id;
+    $values['flag-count'] = $counts[$object->flag];
+  }
+  elseif ($type == 'node') {
+    $values = array();
+    $counts = flag_get_counts('node', $node->nid);
+    $flags = flag_get_flags();
+    foreach ($flags as $flag) {
+      $count = isset($counts[$flag->name]) ? $counts[$flag->name] : 0;
+      $values['flag-'. str_replace('_', '-', $flag->name) .'-count'] = $count;
+    }
   }
 
-  return $tokens;
+  return $values;
 }
 
 /**
