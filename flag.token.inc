@@ -48,7 +48,7 @@ function flag_token_values($type, $object = NULL) {
   elseif ($type == 'node') {
     $values = array();
     $counts = flag_get_counts('node', $node->nid);
-    $flags = flag_get_flags();
+    $flags = flag_get_flags('node');
     foreach ($flags as $flag) {
       $count = isset($counts[$flag->name]) ? $counts[$flag->name] : 0;
       $values['flag-'. str_replace('_', '-', $flag->name) .'-count'] = $count;
