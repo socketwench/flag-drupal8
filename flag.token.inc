@@ -19,7 +19,7 @@ function flag_token_list($type = 'all') {
     $tokens['flag-action']['flag-count'] = t('The current count total for this flag.');
   }
   if ($type == 'node' || $type == 'all') {
-    $flags = flag_get_flags();
+    $flags = flag_get_flags('node');
     foreach ($flags as $flag) {
       $tokens['node']['flag-'. str_replace('_', '-', $flag->name) .'-count'] = t('Total flag count for flag @flag', array('@flag' => $flag->title));
     }
