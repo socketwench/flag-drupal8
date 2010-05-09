@@ -1,0 +1,6 @@
+; $Id$
+name = Flag actions
+description = Execute actions on Flag events.
+core = 6.x
+dependencies[] = flag
+package = Flags
