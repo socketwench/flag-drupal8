@@ -36,7 +36,7 @@ to construct a view in order to take advantage of it.
 The module will come installed with a simple flag called "bookmarks" and 
 a simple view for 'My bookmarks'. This is a default view provided by the 
 Flag module, but can be customized to fit the needs of your site. To 
-customize this view, go to admin/build/views and find the 
+customize this view, go to admin/structure/views and find the 
 'flags_bookmarks' view. Click the 'Add' action to customize the view. 
 Once saved, the new version of the view will be used rather than the one 
 provided by Flag.
@@ -59,7 +59,7 @@ Installation
 ------------
 1) Copy the flag directory to the modules folder in your installation.
 
-2) Enable the module using Administer -> Modules (/admin/build/modules)
+2) Enable the module using Administer -> Modules (/admin/modules)
 
 Optional Installation
 ---------------------
@@ -78,7 +78,7 @@ and the Flag site building page. To configure:
    options are provided below each field on the flag edit form.
 
 2) Go to the Views building pages at
-   Administer -> Site Building -> Views (/admin/build/views)
+   Administer -> Site Building -> Views (/admin/structure/views)
 
    A default view is provided to get you started organizing your flags. You
    can override the view or use it as a template to control the display of your

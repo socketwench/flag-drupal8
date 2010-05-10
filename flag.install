@@ -122,7 +122,7 @@ function _flag_flag_content_installed() {
 
 function _flag_flag_content_message() {
   $t = get_t();
-  return $t("You are trying to install the <em>Flag</em> module. However, you have the <em>\"Flag content\"</em> module installed, and these two modules aren't compatible (because they happen to use a database table by the same name). To install the <em>Flag</em> module, you'll first have to disable and then <a href='@uninstall-url'>uninstall</a> the <em>\"Flag content\"</em> module.", array('@uninstall-url' => url('admin/build/modules/uninstall')));
+  return $t("You are trying to install the <em>Flag</em> module. However, you have the <em>\"Flag content\"</em> module installed, and these two modules aren't compatible (because they happen to use a database table by the same name). To install the <em>Flag</em> module, you'll first have to disable and then <a href='@uninstall-url'>uninstall</a> the <em>\"Flag content\"</em> module.", array('@uninstall-url' => url('admin/modules/uninstall')));
 }
 
 /**
