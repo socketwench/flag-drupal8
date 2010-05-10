@@ -43,14 +43,14 @@ class flag_handler_relationship_content extends views_handler_relationship {
     if (!$form['flag']['#options']) {
       $form = array(
         'error' => array(
-          '#value' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', array('%type' => $content_type, '@create-url' => url('admin/build/flags'))) . '</p>',
+          '#value' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', array('%type' => $content_type, '@create-url' => url(FLAG_ADMIN_PATH))) . '</p>',
         ),
       );
       $form_state['no flags exist'] = TRUE;
     }
     if (module_exists('session_api')) {
       $form['session_warning'] = array(
-        '#value' => '<p class="warning form-item">' . t('<strong>Warning</strong>: Adding this relationship for any flag that contains <strong>anonymous flagging access</strong> will disable page caching for anonymous users when this view is executed. It is recommended to create a dedicated page for views containing anonymous user data.', array('%type' => $content_type, '@create-url' => url('admin/build/flags'))) . '</p>',
+        '#value' => '<p class="warning form-item">' . t('<strong>Warning</strong>: Adding this relationship for any flag that contains <strong>anonymous flagging access</strong> will disable page caching for anonymous users when this view is executed. It is recommended to create a dedicated page for views containing anonymous user data.', array('%type' => $content_type, '@create-url' => url(FLAG_ADMIN_PATH))) . '</p>',
       );
     }
   }

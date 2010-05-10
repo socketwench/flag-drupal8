@@ -214,7 +214,7 @@ function flag_action_form($context, $content_type) {
   );
 
   if (empty($options)) {
-    $error = t('There are no available %type flags. Before you can create an action of this type, you need to <a href="!url">create a %type flag</a>.', array('%type' => $content_type, '!url' => url('admin/build/flags/add')));
+    $error = t('There are no available %type flags. Before you can create an action of this type, you need to <a href="!url">create a %type flag</a>.', array('%type' => $content_type, '!url' => url(FLAG_ADMIN_PATH . '/add')));
     $form['flag_action']['flag']['#type'] = 'item';
     $form['flag_action']['flag']['#children'] = $error;
     $form['flag_action']['flag']['#element_validate'][] = 'flag_action_validate_flag';

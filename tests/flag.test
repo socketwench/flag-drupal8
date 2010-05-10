@@ -54,7 +54,7 @@ class FlagTestCase extends DrupalWebTestCase {
     $saved['types'] = array('page');
     unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[story]'], $saved['types[page]']);
 
-    $this->drupalPost('admin/build/flags/add/node/' . $edit['name'], $edit, t('Submit'));
+    $this->drupalPost(FLAG_ADMIN_PATH . '/add/node/' . $edit['name'], $edit, t('Submit'));
 
     $flag = flag_get_flag($edit['name']);
 
@@ -90,7 +90,7 @@ class FlagTestCase extends DrupalWebTestCase {
     $saved['types'] = array('story');
     unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[story]'], $saved['types[page]']);
 
-    $this->drupalPost('admin/build/flags/edit/' . $flag->name, $edit, t('Submit'));
+    $this->drupalPost(FLAG_ADMIN_PATH . '/edit/' . $flag->name, $edit, t('Submit'));
 
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $flag = flag_get_flag($edit['name']);
@@ -104,7 +104,7 @@ class FlagTestCase extends DrupalWebTestCase {
     }
 
     // Delete the flag through the UI.
-    $this->drupalPost('admin/build/flags/delete/' . $flag->name, array(), t('Delete'));
+    $this->drupalPost(FLAG_ADMIN_PATH . '/delete/' . $flag->name, array(), t('Delete'));
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $this->assertFalse(flag_get_flag($flag->name), t('Flag successfully deleted.'));
   }

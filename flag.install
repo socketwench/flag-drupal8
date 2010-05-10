@@ -7,31 +7,20 @@
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function flag_install() {
-  // Load the flag API in case we want to use it when installing.
-  include_once(drupal_get_path('module', 'flag') .'/flag.module');
-
-  // If Views Bookmark is available, skip the install and do an upgrade instead.
-  if (strpos($GLOBALS['db_type'], 'mysql') === 0) {
-    include_once(drupal_get_path('module', 'flag') .'/includes/flag.views_bookmark.inc');
-    if (flag_views_bookmark_update_needed()) {
-      flag_views_bookmark_update();
-      return;
-    }
-  }
-
-  drupal_install_schema('flag');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function flag_uninstall() {
-  drupal_uninstall_schema('flag');
-  $result = db_query("SELECT name FROM {variable} WHERE name LIKE 'flag_%'");
-  while ($row = db_fetch_object($result)) {
+  $result = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', 'flag_%', 'LIKE')
+    ->execute();
+  foreach ($result as $row) {
     variable_del($row->name);
   }
 
@@ -302,206 +291,34 @@ function flag_schema() {
   return $schema;
 }
 
-/**
- * Add auto-increment to the flags.fid column for users upgrading from Drupal 5.
- *
- * Delete obsolete actions provided by beta3.
- *
- * Note: To ease maintenance, this code is compatible with both D5 and D6.
- *
- * Check out #305391 for a discussion about this code.
- */
-function flag_update_6000() {
-  $ret = array();
-
-  // Convert the flags.fid column to auto-increment.
-  db_drop_primary_key($ret, 'flags');
-  db_change_field($ret, 'flags', 'fid', 'fid', array(
-    'type' => 'serial',
-    'size' => 'small',
-    'unsigned' => TRUE,
-    'not null' => TRUE,
-  ), array('primary key' => array('fid')));
-
-  // This conditional ensures we have Actions 2.x, not Actions 1.x.
-  //
-  // At the beginning we had only db_table_exists() checks here. However, it
-  // turned out that db_table_exists() fails when the $db_prefix string contains
-  // a dot. So module_exists() and function_exists() are added, as backup.
-  if (module_exists('trigger') || function_exists('_actions_get_hook_aids') || db_table_exists('actions_assignments') || db_table_exists('trigger_assignments')) {
-
-    // Step 1: Find all actions we need to delete.
-
-    $aids = array();
-    // We can't just search for "actions of type flag" because this isn't future-compatible.
-    $res = db_query("SELECT aid FROM {actions} WHERE callback IN ('flag_action_email', 'flag_action_delete', 'flag_action_unpublish', 'flag_action_moderate')");
-    while ($row = db_fetch_object($res)) {
-      $aids[] = $row->aid;
-    }
-
-    if (!$aids) {
-      $ret[] = array(
-        'success' => TRUE,
-        'query' => t('No old actions to remove.'),
-      );
-    }
-    else {
-      $ret[] = array(
-        'success' => TRUE,
-        'query' => t('Deleting the following actions: @aids', array('@aids' => implode(', ', $aids))),
-      );
-    }
-
-    // Step 2: Delete them through API.
-
-    // We can't do `if (module_exists('actions'))`: this code should work for D6 as
-    // well, and it doesn't have an Actions module.
-    if (function_exists('actions_delete')) {
-      foreach ($aids as $aid) {
-        actions_delete($aid);
-        $ret[] = array(
-          'success' => TRUE,
-          'query' => t('actions_delete("@aid") called.', array('@aid' => $aid)),
-        );
-      }
-    }
-
-    // Step 3: Delete them through SQL, in case Actions/Trigger aren't enabled.
-
-    foreach ($aids as $aid) {
-      foreach (array('actions', 'actions_assignments', 'trigger_assignments') as $table) {
-        if (db_table_exists($table)) {
-          $ret[] = _flag_update_sql("DELETE FROM {{$table}} WHERE aid = '%s'", $aid);
-        }
-      }
-    }
-    // Note: No need to delete from the {actions_aid} table; Actions doesn't do that.
-
-    // Step 4: Remove a bogus record possibly created because of a bug (see
-    // http://drupal.org/node/271460).
-
-    foreach (array('actions_assignments', 'trigger_assignments') as $table) {
-      if (db_table_exists($table)) {
-        $ret[] = _flag_update_sql("DELETE FROM {{$table}} WHERE hook = 'flag' AND aid = ''");
-      }
-    }
-  }
-  else {
-    $ret[] = array(
-      'success' => TRUE,
-      'query' => t('Cleanup of Actions tables is unneeded.'),
-    );
-  }
-
-  return $ret;
-}
-
-/**
- * Move flag messages and link titles into the options array.
- */
-function flag_update_6001() {
-  $ret = array();
-
-  if (db_column_exists('flags', 'flag_short')) {
-    $result = db_query("SELECT * FROM {flags}");
-    while ($flag = db_fetch_object($result)) {
-      $options = unserialize($flag->options);
-      $options['flag_short'] = $flag->flag_short;
-      $options['flag_long'] = $flag->flag_long;
-      $options['flag_message'] = $flag->flag_message;
-      $options['unflag_short'] = $flag->unflag_short;
-      $options['unflag_long'] = $flag->unflag_long;
-      $options['unflag_message'] = $flag->unflag_message;
-      db_query("UPDATE {flags} SET options = '%s' WHERE fid = %d", serialize($options), $flag->fid);
-    }
-
-    db_drop_field($ret, 'flags', 'flag_short');
-    db_drop_field($ret, 'flags', 'flag_long');
-    db_drop_field($ret, 'flags', 'flag_message');
-    db_drop_field($ret, 'flags', 'unflag_short');
-    db_drop_field($ret, 'flags', 'unflag_long');
-    db_drop_field($ret, 'flags', 'unflag_message');
-  }
-  return $ret;
-}
-
-/**
- * Add a 'serial' primary key, fcid, to the flag_content table.
- */
-function flag_update_6002() {
-  $ret = array();
-
-  if (db_column_exists('flag_content', 'fcid')) {
-    db_drop_primary_key($ret, 'flag_content');
-    db_add_field($ret, 'flag_content', 'fcid', array(
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ), array(
-        'primary key' => array('fcid'),
-      )
-    );
-    db_add_unique_key($ret, 'flag_content', 'fid_content_type_content_id_uid', array('fid', 'content_type', 'content_id', 'uid'));
-  }
-  return $ret;
-}
-
-/**
- * Remove the previous default views that are no longer bundled with Flag.
- *
- * These views are saved to the database so that they are preserved.
- */
-function flag_update_6003() {
-  $ret = array();
-
-  // Bail out if Views doesn't exist.
-  if (!function_exists('views_get_view')) {
-    return $ret;
-  }
-
-  drupal_load('module', 'flag');
-  $flags = flag_get_flags();
-  foreach ($flags as $name => $flag) {
-    if ($view = views_get_view('flags_'. $name)) {
-      if (!$view->disabled && $view->type == t('Default')) {
-        $view->save();
-        $ret[] = array('success' => TRUE, 'query' => t('The view %name as been saved to the database. Flag no longer provides this view by default.', array('%name' => $view->name)));
-      }
-    }
-  }
-
-  return $ret;
-}
-
-/**
- * Remove count = 0 rows from the count tables.
- */
-function flag_update_6004() {
-  // Same update as flag_update_6203()
-  return array();
+function flag_update_last_removed() {
+  return 6004;
 }
 
 /**
  * Convert role access to have separate "flag" and "unflag" permissions.
  */
 function flag_update_6200() {
-  $ret = array();
-
   if (db_column_exists('flags', 'roles')) {
-    $result = db_query('SELECT * FROM {flags}');
-    while ($flag = db_fetch_object($result)) {
+    $result = db_select('flags', 'f')
+      ->fields('f')
+      ->execute();
+    foreach ($result as $flag) {
       $roles = array_filter(explode(',', $flag->roles));
       $options = unserialize($flag->options);
       $options['roles'] = array(
         'flag' => $roles,
         'unflag' => $roles,
       );
-      db_query("UPDATE {flags} SET options = '%s' WHERE fid = %d", serialize($options), $flag->fid);
+      db_update('flags')
+        ->fields(array(
+          'options' => serialize($options),
+        ))
+        ->condition('fid', $flag->fid)
+        ->execute();
     }
-    db_drop_field($ret, 'flags', 'roles');
+    db_drop_field('flags', 'roles');
   }
-
-  return $ret;
 }
 
 /**
@@ -511,65 +328,43 @@ function flag_update_6200() {
  * index would be helpful for sorting by counts.
  */
 function flag_update_6201() {
-  $ret = array();
-
   // Remove "content type" from one key, see http://drupal.org/node/612602.
-  db_drop_unique_key($ret, 'flag_content', 'fid_content_type_content_id_uid');
-  db_add_unique_key($ret, 'flag_content', 'fid_content_id_uid', array('fid', 'content_id', 'uid'));
+  db_drop_unique_key('flag_content', 'fid_content_type_content_id_uid');
+  db_add_unique_key('flag_content', 'fid_content_id_uid', array('fid', 'content_id', 'uid'));
 
   // Add a count index, see http://drupal.org/node/489610.
-  db_add_index($ret, 'flag_counts', 'count', array('count'));
-
-  return $ret;
+  db_add_index('flag_counts', 'count', array('count'));
 }
 
 /**
  * Add the sid column and unique index on the flag_content table.
  */
 function flag_update_6202() {
-  $ret = array();
-
   // Drop the keys affected by the addition of the SID column.
-  db_drop_unique_key($ret, 'flag_content', 'fid_content_id_uid');
-  db_drop_index($ret, 'flag_content', 'content_type_uid');
+  db_drop_unique_key('flag_content', 'fid_content_id_uid');
+  db_drop_index('flag_content', 'content_type_uid');
 
   // Add the column.
-  db_add_field($ret, 'flag_content', 'sid', array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0));
+  db_add_field('flag_content', 'sid', array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0));
 
   // Re-add the removed keys.
-  db_add_unique_key($ret, 'flag_content', 'fid_content_id_uid_sid', array('fid', 'content_id', 'uid', 'sid'));
-  db_add_index($ret, 'flag_content', 'content_type_uid_sid', array('content_type', 'uid', 'sid'));
-
-  return $ret;
+  db_add_unique_key('flag_content', 'fid_content_id_uid_sid', array('fid', 'content_id', 'uid', 'sid'));
+  db_add_index('flag_content', 'content_type_uid_sid', array('content_type', 'uid', 'sid'));
 }
 
 /**
  * Remove count = 0 rows from the count tables.
  */
 function flag_update_6203() {
-  $ret = array();
-  $ret[] = update_sql("DELETE FROM {flag_counts} WHERE count = 0");
-  return $ret;
+  db_delete('flag_counts')
+    ->condition('count', 0)
+    ->execute();
 }
 
 /**
  * Remove "content type" from the flag_counts primary key.
  */
 function flag_update_6204() {
-  $ret = array();
-  db_drop_primary_key($ret, 'flag_counts');
-  db_add_primary_key($ret, 'flag_counts', array('fid', 'content_id'));
-  return $ret;
-}
-
-// This is a replacement for update_sql(). The latter doesn't support placeholders.
-function _flag_update_sql($sql) {
-  $args = func_get_args();
-  array_shift($args);
-  $result = db_query($sql, $args);
-  // Users are going to see '%s' and '%d' in the report and they're going to
-  // think there's a bug. So lets replace the placeholders with something less
-  // suspicious.
-  $sql = strtr($sql, array('%s' => '***', '%d' => '***'));
-  return array('success' => $result !== FALSE, 'query' => check_plain($sql));
+  db_drop_primary_key('flag_counts');
+  db_add_primary_key('flag_counts', array('fid', 'content_id'));
 }

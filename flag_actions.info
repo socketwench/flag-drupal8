@@ -1,6 +1,10 @@
 ; $Id$
 name = Flag actions
 description = Execute actions on Flag events.
-core = 6.x
+core = 7.x
 dependencies[] = flag
 package = Flags
+configure = admin/structure/webform/flags
+
+files[] = flag.install
+files[] = flag_actions.module

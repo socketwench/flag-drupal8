@@ -35,7 +35,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
       '#dependency' => array('edit-options-validate-type' => array($this->id)),
     );
     if (!$options) {
-      $form[$this->_option_name('flag_name')]['#description'] = '<p class="warning">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use one.', array('%type' => $this->flag_type, '@create-url' => 'admin/build/flags')) . '</p>';
+      $form[$this->_option_name('flag_name')]['#description'] = '<p class="warning">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use one.', array('%type' => $this->flag_type, '@create-url' => FLAG_ADMIN_PATH)) . '</p>';
     }
 
     $form[$this->_option_name('flag_test')] = array(
@@ -203,7 +203,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
   function test_flagged($ids, $flag) {
     // view_break_phrase() is guaranteed to return only integers, so this is SQL safe.
     $flattened_ids = implode(',', $ids);
-    return $this->_test_by_sql("SELECT content_id FROM {flag_counts} WHERE fid = %d AND content_id IN ($flattened_ids) AND count > 0", array($flag->fid));
+    return $this->_test_by_sql("SELECT content_id FROM {flag_counts} WHERE fid = :fid AND content_id IN ($flattened_ids) AND count > 0", array(':fid' => $flag->fid));
   }
 
   function test_flagged_by_current_user($ids, $flag) {
@@ -213,14 +213,14 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
       return FALSE;
     }
     $flattened_ids = implode(',', $ids);
-    return $this->_test_by_sql("SELECT content_id FROM {flag_content} WHERE fid = %d AND content_id IN ($flattened_ids) AND uid = %d", array($flag->fid, $user->uid));
+    return $this->_test_by_sql("SELECT content_id FROM {flag_content} WHERE fid = :fid AND content_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
   }
 
   // Helper: executes an SQL query and returns all the content_id's.
   function _test_by_sql($sql, $args) {
     $passed = array();
     $result = db_query($sql, $args);
-    while ($row = db_fetch_object($result)) {
+    foreach ($result as $row) {
       $passed[] = $row->content_id;
     }
     return $passed;

@@ -8,15 +8,17 @@
 
 define('FLAG_API_VERSION', 2);
 
+define('FLAG_ADMIN_PATH', 'admin/structure/flags');
+
 include_once dirname(__FILE__) .'/flag.inc';
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function flag_menu() {
   $items = array();
 
-  $items['admin/build/flags'] = array(
+  $items[FLAG_ADMIN_PATH] = array(
     'title' => 'Flags',
     'page callback' => 'flag_admin_page',
     'access callback' => 'user_access',
@@ -25,7 +27,7 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/build/flags/edit'] = array(
+  $items[FLAG_ADMIN_PATH . '/edit'] = array(
     'title' => 'Edit flags',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_form'),
@@ -34,7 +36,7 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/build/flags/delete'] = array(
+  $items[FLAG_ADMIN_PATH . '/delete'] = array(
     'title' => 'Delete flags',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_delete_confirm'),
@@ -43,7 +45,7 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/build/flags/list'] = array(
+  $items[FLAG_ADMIN_PATH . '/list'] = array(
     'title' => 'List',
     'page callback' => 'flag_admin_page',
     'access callback' => 'user_access',
@@ -52,7 +54,7 @@ function flag_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -1,
   );
-  $items['admin/build/flags/add'] = array(
+  $items[FLAG_ADMIN_PATH . '/add'] = array(
     'title' => 'Add',
     'page callback' => 'flag_add_page',
     'access callback' => 'user_access',
@@ -61,7 +63,7 @@ function flag_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
-  $items['admin/build/flags/import'] = array(
+  $items[FLAG_ADMIN_PATH . '/import'] = array(
     'title' => 'Import',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_import_form'),
@@ -70,7 +72,7 @@ function flag_menu() {
     'file' => 'includes/flag.export.inc',
     'weight' => 2,
   );
-  $items['admin/build/flags/export'] = array(
+  $items[FLAG_ADMIN_PATH . '/export'] = array(
     'title' => 'Export',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_export_form'),
@@ -79,7 +81,7 @@ function flag_menu() {
     'file' => 'includes/flag.export.inc',
     'weight' => 3,
   );
-  $items['admin/build/flags/update/%'] = array(
+  $items[FLAG_ADMIN_PATH . '/update/%'] = array(
     'title' => 'Update',
     'page callback' => 'flag_update_page',
     'page arguments' => array(4),
@@ -107,15 +109,13 @@ function flag_menu() {
 }
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
  */
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
+  include_once $path .'/includes/flag.token.inc';
   if (module_exists('trigger')) {
     include_once $path .'/includes/flag.actions.inc';
-  }
-  if (module_exists('token')) {
-    include_once $path .'/includes/flag.token.inc';
   }
   if (module_exists('session_api')) {
     // Set the anonymous user SID immediately, in case the user logs in.
@@ -124,7 +124,7 @@ function flag_init() {
 }
 
 /**
- * Implementation of hook_views_api().
+ * Implements hook_views_api().
  */
 function flag_views_api() {
   return array(
@@ -134,7 +134,7 @@ function flag_views_api() {
 }
 
 /**
- * Implementation of hook_features_api().
+ * Implements hook_features_api().
  */
 function flag_features_api() {
   return array(
@@ -147,10 +147,15 @@ function flag_features_api() {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
-function flag_perm() {
-  return array('administer flags');
+function flag_permission() {
+  return array(
+    'administer flags' => array(
+      'title' => t('administer flags'),
+      'description' => t('Create and edit site-wide flags.'),
+    ),
+  );
 }
 
 /**
@@ -182,7 +187,10 @@ function flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
 }
 
 /**
- * Implementation of hook_link().
+ * Implements hook_link().
+ *
+ * This hook does not exist in Drupal 7, it is called from flag_node_view() and
+ * flag_comment_view() functions.
  */
 function flag_link($type, $object = NULL, $teaser = FALSE) {
   if (!isset($object) || !flag_fetch_definition($type)) {
@@ -221,7 +229,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
 }
 
 /**
- * Implementation of hook_flag_link().
+ * Implements hook_flag_link().
  *
  * When Flag uses a link type provided by this module, it will call this
  * implementation of hook_flag_link(). It returns a single link's attributes,
@@ -241,12 +249,12 @@ function flag_flag_link($flag, $action, $content_id) {
   $token = flag_get_token($content_id);
   return array(
     'href' => 'flag/'. ($flag->link_type == 'confirm' ? 'confirm/' : '') ."$action/$flag->name/$content_id",
-    'query' => drupal_get_destination() . ($flag->link_type == 'confirm' ? '' : '&token='. $token),
+    'query' => drupal_get_destination() + ($flag->link_type == 'confirm' ? array() : array('token' => $token)),
   );
 }
 
 /**
- * Implementation of hook_flag_link_types().
+ * Implements hook_flag_link_types().
  */
 function flag_flag_link_types() {
   return array(
@@ -270,13 +278,11 @@ function flag_flag_link_types() {
 }
 
 /**
- * Implementation of hook_content_extra_fields().
- *
- * Informations for non-CCK 'node fields' defined in core.
+ * Implements hook_field_extra_fields().
  */
-function flag_content_extra_fields($type_name) {
+function flag_field_extra_fields() {
   $extra = array();
-  $flags = flag_get_flags('node', $type_name);
+  $flags = flag_get_flags('node');
 
   // Filter out flags which need to be included on the node form.
   foreach ($flags as $name => $flag) {
@@ -286,21 +292,23 @@ function flag_content_extra_fields($type_name) {
   }
 
   if (!empty($flags)) {
-    $extra['flag'] = array(
-      'label' => t('Flags'),
-      'description' => t('Flags fieldset.'),
-      'weight' => 0
-    );
+    foreach (node_type_get_types() as $type) {
+      $extra['node'][$type->type]['flag'] = array(
+        'label' => t('Flags'),
+        'description' => t('Flags fieldset.'),
+        'weight' => 0
+      );
+    }
   }
   return $extra;
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function flag_form_alter(&$form, &$form_state, $form_id) {
-
   global $user;
+
   if ($form_id == 'node_type_form' && isset($form['identity']['type'])) {
     $flags = flag_get_flags('node', $form['#node_type']->type, $user);
     foreach ($flags as $flag) {
@@ -319,7 +327,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
       $form['workflow']['flag'] += array(
         '#type' => 'item',
         '#title' => t('Default flags'),
-        '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', array('@flag-url' => url('admin/build/flags'))),
+        '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', array('@flag-url' => url(FLAG_ADMIN_PATH))),
         // Make the spacing a bit more compact:
         '#prefix' => '<div class="form-checkboxes">',
         '#suffix' => '</div>',
@@ -384,6 +392,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'fieldset',
         '#title' => t('Flags'),
         '#collapsible' => TRUE,
+        '#attributes' => array('class' => array('flag-fieldset')),
         // Vertical tabs support:
         '#group' => 'additional_settings',
         '#attached' => array(
@@ -398,157 +407,243 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_nodeapi().
+ * Implements hook_comment_view().
  */
-function flag_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-  global $user;
-  switch ($op) {
-    case 'update':
-    case 'insert':
-      // Response to the flag checkboxes added to the form in flag_form_alter().
-      $remembered = FALSE;
-      if (isset($node->flag)) {
-        foreach ($node->flag as $name => $state) {
-          $flag = flag_get_flag($name);
-          // Flagging may trigger actions. We want actions to get the current
-          // node, not a stale database-loaded one:
-          if (!$remembered) {
-            $flag->remember_content($node->nid, $node);
-            // Actions may modify a node, and we don't want to overwrite this
-            // modification:
-            $remembered = TRUE;
-          }
-          flag($state ? 'flag' : 'unflag', $name, $node->nid, $user, TRUE);
-        }
+function flag_comment_view($comment) {
+  $links = flag_link('comment', $comment);
+  $comment->content['links']['flag'] = array(
+    '#theme' => 'links',
+    '#links' => $links,
+    '#attributes' => array('class' => array('links', 'inline')),
+  );
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function flag_node_view($node, $view_mode) {
+  $links = flag_link('node', $node, $view_mode == 'teaser');
+  $node->content['links']['flag'] = array(
+    '#theme' => 'links',
+    '#links' => $links,
+    '#attributes' => array('class' => array('links', 'inline')),
+  );
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function flag_node_insert($node) {
+  flag_node_save($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function flag_node_update($node) {
+  flag_node_save($node);
+}
+
+/**
+ * Shared saving routine between flag_node_insert() and flag_node_update().
+ */
+function flag_node_save($node) {
+  // Response to the flag checkboxes added to the form in flag_form_alter().
+  $remembered = FALSE;
+  $account = user_load($node->uid);
+  if (isset($node->flag)) {
+    foreach ($node->flag as $name => $state) {
+      $flag = flag_get_flag($name);
+      // Flagging may trigger actions. We want actions to get the current
+      // node, not a stale database-loaded one:
+      if (!$remembered) {
+        $flag->remember_content($node->nid, $node);
+        // Actions may modify a node, and we don't want to overwrite this
+        // modification:
+        $remembered = TRUE;
       }
-      break;
-    case 'delete':
-      foreach (flag_get_flags('node') as $flag) {
-        // If the flag is being tracked by translation set and the node is part
-        // of a translation set, don't delete the flagging record.
-        // Instead, data will be updated in the 'translation_change' op, below.
-        if (!$flag->i18n || empty($node->tnid)) {
-          db_query("DELETE FROM {flag_content} WHERE fid = %d AND content_id = %d", $flag->fid, $node->nid);
-          db_query("DELETE FROM {flag_counts} WHERE fid = %d AND content_id = %d", $flag->fid, $node->nid);
-        }
-      }
-      break;
-    case 'translation_change':
-      if (isset($node->translation_change)) {
-        // If there is only one node remaining, track by nid rather than tnid.
-        // Otherwise, use the new tnid.
-        $content_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
-        foreach (flag_get_flags('node') as $flag) {
-          if ($flag->i18n) {
-            db_query("UPDATE {flag_content} SET content_id = %d WHERE fid = %d AND content_id = %d", $content_id, $flag->fid, $node->translation_change['old_tnid']);
-            db_query("UPDATE {flag_counts} SET content_id = %d WHERE fid = %d AND content_id = %d", $content_id, $flag->fid, $node->translation_change['old_tnid']);
-          }
-        }
-      }
-      break;
+      flag($state ? 'flag' : 'unflag', $name, $node->nid, $account, TRUE);
+    }
   }
 }
 
 /**
- * Implementation of hook_user().
+ * Implements hook_node_delete().
  */
-function flag_user($op, &$edit, &$account, $category = NULL) {
-  switch ($op) {
-    case 'login':
-      // Migrate anonymous flags to this user's account.
-      if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
-        // The @ symbol suppresses errors if the user flags a piece of content
-        // they have already flagged as a logged-in user.
-        @db_query("UPDATE {flag_content} SET uid = %d, sid = 0 WHERE uid = 0 AND sid = %d", $account->uid, $sid);
-        // Delete any remaining flags this user had as an anonymous user.
-        db_query("DELETE FROM {flag_content} WHERE uid = 0 AND sid = %d", flag_get_sid(0));
-        // Clean up anonymous cookies.
-        if (isset($_COOKIE['flags'])) {
-          setcookie('flags', FALSE, 0, base_path());
-          unset($_COOKIE['flags']);
-        }
-        foreach ($_COOKIE as $key => $value) {
-          if (strpos($key, 'flag_global_') === 0) {
-            setcookie($key, FALSE, 0, base_path());
-            unset($_COOKIE[$key]);
-          }
-        }
-      }
-      break;
-    case 'delete':
-      // Remove flags by this user.
-      $result = db_query("SELECT fc.fid, fc.content_id, c.count FROM {flag_content} fc LEFT JOIN {flag_counts} c ON fc.content_id = c.content_id AND fc.content_type = c.content_type WHERE fc.uid = %d", $account->uid);
-      while ($flag_data = db_fetch_object($result)) {
-        $flag_data->count--;
-        db_query("UPDATE {flag_counts} SET count = %d WHERE fid = %d AND content_id = %d", $flag_data->count, $flag_data->fid, $flag_data->content_id);
-      }
-      db_query("DELETE FROM {flag_content} WHERE uid = %d", $account->uid);
-      break;
-    case 'view';
-      $flags = flag_get_flags('user');
-      $flag_items = array();
-      foreach ($flags as $flag) {
-        if (!$flag->access($account->uid)) {
-          // User has no permission to use this flag.
-          continue;
-        }
-        if (!$flag->uses_hook_link(array())){
-          // Flag not set to appear on profile.
-          continue;
-        }
-        $flag_items[$flag->name] = array(
-          '#type' => 'user_profile_item',
-          '#title' => $flag->get_title($account->uid),
-          '#value' => $flag->theme($flag->is_flagged($account->uid) ? 'unflag' : 'flag', $account->uid),
-          '#attributes' => array('class' => 'flag-profile-' . $flag->name),
-        );
-      }
-      if (!empty($flag_items)) {
-        $account->content['flags'] = $flag_items;
-        $account->content['flags'] += array(
-          '#type' => 'user_profile_category',
-          '#title' => t('Actions'),
-          '#attributes' => array('class' => 'flag-profile'),
-        );
-      }
-      break;
+function flag_node_delete($node) {
+  foreach (flag_get_flags('node') as $flag) {
+    // If the flag is being tracked by translation set and the node is part
+    // of a translation set, don't delete the flagging record.
+    // Instead, data will be updated in the 'translation_change' op, below.
+    if (!$flag->i18n || empty($node->tnid)) {
+      db_delete('flag_content')
+        ->condition('fid', $flag->fid)
+        ->condition('content_id', $node->nid);
+      db_delete('flag_counts')
+        ->condition('fid', $flag->fid)
+        ->condition('content_id', $node->nid);
+    }
   }
 }
 
 /**
- * Implementation of hook_session_api_cleanup().
+ * Implements hook_translation_change().
+ */
+function flag_node_translation_change($node) {
+  if (isset($node->translation_change)) {
+    // If there is only one node remaining, track by nid rather than tnid.
+    // Otherwise, use the new tnid.
+    $content_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
+    foreach (flag_get_flags('node') as $flag) {
+      if ($flag->i18n) {
+        db_update('flag_content')->fields(array('content_id' => $content_id))
+          ->condition('fid', $flag->fid)
+          ->condition('content_id', $node->translation_change['old_tnid'])
+          ->execute();
+        db_update('flag_counts')->fields(array('content_id' => $content_id))
+          ->condition('fid', $flag->fid)
+          ->condition('content_id', $node->translation_change['old_tnid'])
+          ->execute();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function flag_user_login(&$edit, &$account) {
+  // Migrate anonymous flags to this user's account.
+  if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
+    // The @ symbol suppresses errors if the user flags a piece of content
+    // they have already flagged as a logged-in user.
+    @db_update('flag_content')
+      ->fields(array(
+        'uid' => $account->uid,
+        'sid' => 0,
+      ))
+      ->condition('uid', 0)
+      ->condition('sid', $sid)
+      ->execute();
+
+    // Delete any remaining flags this user had as an anonymous user.
+    db_delete('flag_content')
+      ->condition('uid', 0)
+      ->condition('sid', flag_get_sid(0))
+      ->execute();
+
+    // Clean up anonymous cookies.
+    if (isset($_COOKIE['flags'])) {
+      setcookie('flags', FALSE, 0, base_path());
+      unset($_COOKIE['flags']);
+    }
+    foreach ($_COOKIE as $key => $value) {
+      if (strpos($key, 'flag_global_') === 0) {
+        setcookie($key, FALSE, 0, base_path());
+        unset($_COOKIE[$key]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function flag_user_cancel($edit, $account, $method) {
+  // Remove flags by this user.
+  $query = db_select('flag_content', 'fc');
+  $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.content_type = c.content_type');
+  $result = $query
+    ->fields('fc', array('fid', 'content_id'))
+    ->fields('c', array('count'))
+    ->condition('fc.uid', $account->uid)
+    ->execute();
+
+  foreach ($result as $flag_data) {
+    $flag_data->count--;
+    db_update('flag_counts')
+      ->fields(array(
+        'count' => $flag_data->count,
+      ))
+      ->condition('fid', $flag_data->fid)
+      ->condition('content_id', $flag_data->content_id)
+      ->execute();
+  }
+  db_delete('flag_content')
+    ->condition('uid', $account->uid)
+    ->execute();
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function flag_user_view($account, $view_mode) {
+  $flags = flag_get_flags('user');
+  $flag_items = array();
+  foreach ($flags as $flag) {
+    if (!$flag->access($account->uid)) {
+      // User has no permission to use this flag.
+      continue;
+    }
+    if (!$flag->uses_hook_link(array())){
+      // Flag not set to appear on profile.
+      continue;
+    }
+    $flag_items[$flag->name] = array(
+      '#type' => 'user_profile_item',
+      '#title' => $flag->get_title($account->uid),
+      '#value' => $flag->theme($flag->is_flagged($account->uid) ? 'unflag' : 'flag', $account->uid),
+      '#attributes' => array('class' => array('flag-profile-' . $flag->name)),
+    );
+  }
+  if (!empty($flag_items)) {
+    $account->content['flags'] = $flag_items;
+    $account->content['flags'] += array(
+      '#type' => 'user_profile_category',
+      '#title' => t('Actions'),
+      '#attributes' => array('class' => array('flag-profile')),
+    );
+  }
+}
+
+/**
+ * Implements hook_session_api_cleanup().
  *
  * Clear out anonymous user flaggings during Session API cleanup.
  */
 function flag_session_api_cleanup($arg = 'run') {
   // Session API 1.1 version:
   if ($arg == 'run') {
-    $result = db_query("SELECT fc.sid FROM {flag_content} fc LEFT JOIN {session_api} s ON (fc.sid = s.sid) WHERE fc.sid <> 0 AND s.sid IS NULL");
-    while ($row = db_fetch_object($result)) {
-      db_query("DELETE FROM {flag_content} WHERE sid = %d", $row->sid);
+    $query = db_select('flag_content', 'fc');
+    $query->leftJoin('session_api', 's', 'fc.sid = s.sid');
+    $result = $query
+      ->fields('fc', array('sid'))
+      ->condition('fc.sid', 0, '<>')
+      ->isNull('s.sid')
+      ->execute();
+    foreach ($result as $row) {
+      db_delete('flag_content')
+        ->condition('sid', $row->sid)
+        ->execute();
     }
   }
   // Session API 1.2+ version.
   elseif (is_array($arg)) {
     $outdated_sids = $arg;
-    db_query('DELETE FROM {flag_content} WHERE sid IN (' . implode(',', $outdated_sids) . ')');
+    db_delete('flag_content')->condition('sid', $outdated_sids, 'IN')->execute();
   }
 }
 
 /**
- * Implementation of hook_node_type().
+ * Implements hook_node_type().
  */
-function flag_node_type($op, $info) {
-  switch ($op) {
-    case 'delete':
-      // Remove entry from flaggable content types.
-      db_query("DELETE FROM {flag_types} WHERE type = '%s'", $info->type);
-      break;
-  }
+function flag_node_type_delete($info) {
+  // Remove entry from flaggable content types.
+  db_delete('flag_types')->condition('type', $info->type)->execute();
 }
 
 /**
- * Implementation of hook_activity_info().
+ * Implements hook_activity_info().
  */
 function flag_activity_info() {
   $info = new stdClass();
@@ -605,8 +700,8 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
   // If an error was received, set a message and exit.
   if (isset($error)) {
     if ($js) {
-      drupal_set_header('Content-Type: text/javascript; charset=utf-8');
-      print drupal_to_js(array(
+      drupal_add_http_header('Content-Type', 'text/javascript; charset=utf-8');
+      print drupal_json_encode(array(
         'status' => FALSE,
         'errorMessage' => $error,
       ));
@@ -621,10 +716,10 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
 
   // If successful, return data according to the request type.
   if ($js) {
-    drupal_set_header('Content-Type: text/javascript; charset=utf-8');
+    drupal_add_http_header('Content-Type', 'text/javascript; charset=utf-8');
     $flag = flag_get_flag($flag_name);
     $flag->link_type = 'toggle';
-    print drupal_to_js(array(
+    print drupal_json_encode(array(
       'status' => TRUE,
       'newLink' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id, TRUE),
       // Further information for the benefit of custom JavaScript event handlers:
@@ -702,7 +797,7 @@ function flag($action, $flag_name, $content_id, $account = NULL) {
 }
 
 /**
- * Implementation of hook_flag(). Trigger actions if any are available.
+ * Implements hook_flag(). Trigger actions if any are available.
  */
 function flag_flag($action, $flag, $content_id, $account) {
   if (module_exists('trigger')) {
@@ -737,7 +832,7 @@ function flag_flag($action, $flag, $content_id, $account) {
 }
 
 /**
- * Implementation of hook_flag_access().
+ * Implements hook_flag_access().
  */
 function flag_flag_access($flag, $content_id, $action, $account) {
   // Restrict access by authorship. It's important that TRUE is never returned
@@ -782,7 +877,7 @@ function flag_flag_access($flag, $content_id, $action, $account) {
 }
 
 /**
- * Implementation of hook_flag_access_multiple().
+ * Implements hook_flag_access_multiple().
  */
 function flag_flag_access_multiple($flag, $content_ids, $account) {
   $access = array();
@@ -792,10 +887,12 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     // above, but returns an array of 'nid' => $access values. Similarly, we
     // should never return TRUE in any of these access values, only FALSE if we
     // want to deny access, or use the current access value provided by Flag.
-    $nids = implode(',', array_map('intval', array_keys($content_ids)));
-    $placeholders = implode(',', array_fill(0, sizeof($flag->types), "'%s'"));
-    $result = db_query("SELECT nid, uid FROM {node} WHERE nid IN ($nids) AND type in ($placeholders)", $flag->types);
-    while ($row = db_fetch_object($result)) {
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid', 'uid'))
+      ->condition('nid', $content_ids, 'IN')
+      ->condition('type', $flag->types, 'IN')
+      ->execute();
+    foreach ($result as $row) {
       if ($flag->access_author == 'own') {
         $access[$row->nid] = $row->uid != $account->uid ? FALSE : NULL;
       }
@@ -807,8 +904,14 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
 
   if ($flag->content_type == 'comment') {
     // Restrict access by comment ownership.
-    $cids = implode(',', array_map('intval', array_keys($content_ids)));
-    $result = db_query("SELECT c.cid, c.nid, c.uid as comment_uid, n.nid as node_uid FROM {comments} c LEFT JOIN {node} n ON c.nid = n.nid WHERE cid IN ($cids)");
+    $query = db_select('comments', 'c');
+    $query->leftJoin('node', 'n', 'c.nid = n.nid');
+    $result = $query
+      ->fields('c', array('cid', 'nid'))
+      ->addField('c', 'uid', 'comment_uid')
+      ->addField('n', 'uid', 'node_uid')
+      ->condition('c.cid', $content_ids, 'IN')
+      ->execute();
     while ($row = db_fetch_object($result)) {
       if ($flag->access_author == 'node_own') {
         $access[$row->cid] = $row->node_uid != $account->uid ? FALSE : NULL;
@@ -840,9 +943,14 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
  *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
  */
 function flag_trim_flag($flag, $account, $cutoff_size) {
-  $result = db_query("SELECT * FROM {flag_content} WHERE fid = %d AND (uid = %d OR uid = 0) ORDER BY timestamp DESC", $flag->fid, $account->uid);
+  $result = db_select('flag_content', 'fc')
+    ->fields('fc')
+    ->condition('fid', $flag->fid)
+    ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
+    ->orderBy('timestamp', 'DESC')
+    ->execute();
   $i = 1;
-  while ($row = db_fetch_object($result)) {
+  foreach ($result as $row) {
     if ($i++ > $cutoff_size) {
       flag('unflag', $flag->name, $row->content_id, $account);
     }
@@ -859,19 +967,30 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
  *   empty, this will remove all of this flag's content.
  */
 function flag_reset_flag($flag, $content_id = NULL) {
-  $result = db_query("SELECT * FROM {flag_content} WHERE fid = %d" . ($content_id ? " AND content_id = %d" : ''), $flag->fid, $content_id);
+  $query = db_select('flag_content', 'fc')
+    ->fields('fc')
+    ->condition('fid', $flag->fid);
+
+  if ($content_id) {
+    $query->condition('content_id', $content_id);
+  }
+
+  $result = $query->execute()->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);;
   $rows = array();
-  while ($row = db_fetch_array($result)) {
+  foreach ($result as $row) {
     $rows[] = $row;
   }
   module_invoke_all('flag_reset', $flag, $content_id, $rows);
 
-  db_query("DELETE FROM {flag_content} WHERE fid = %d" . ($content_id ? " AND content_id = %d" : ''), $flag->fid, $content_id);
-  return db_affected_rows();
+  $query = db_delete('flag_content')->condition('fid' , $flag->fid);
+  if ($content_id) {
+    $query->condition('content_id', $content_id);
+  }
+  return $query->execute();
 }
 
 /**
- * Implementation of hook_node_operations().
+ * Implements hook_node_operations().
  *
  * Add additional options on the admin/build/node page.
  */
@@ -912,7 +1031,7 @@ function flag_nodes($nodes, $action, $flag_name) {
 }
 
 /**
- * Implementation of hook_user_operations().
+ * Implements hook_user_operations().
  */
 function flag_user_operations() {
   global $user;
@@ -944,7 +1063,7 @@ function flag_users($users, $action, $flag_name) {
 }
 
 /**
- * Implementation of hook_mail().
+ * Implements hook_mail().
  */
 function flag_mail($key, &$message, $params) {
   switch ($key) {
@@ -956,7 +1075,7 @@ function flag_mail($key, &$message, $params) {
 }
 
 /**
- * Implementation of hook_service().
+ * Implements hook_service().
  */
 function flag_service() {
   $items = array();
@@ -1039,29 +1158,33 @@ function flag_service() {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function flag_theme() {
   $path = drupal_get_path('module', 'flag') .'/theme';
 
   return array(
     'flag' => array(
-      'arguments' => array('flag' => NULL, 'action' => NULL, 'content_id' => NULL, 'after_flagging' => FALSE),
+      'variables' => array('flag' => NULL, 'action' => NULL, 'content_id' => NULL, 'after_flagging' => FALSE),
       'template' => 'flag',
       'pattern' => 'flag__',
       'path' => $path,
     ),
     'flag_token_help' => array(
-      'arguments' => array('types' => NULL, 'prefix' => NULL, 'suffix' => NULL),
+      'variables' => array('types' => array('all'), 'prefix' => '[', 'suffix' => ']'),
+      'file' => 'includes/flag.token.inc',
     ),
     'flag_admin_page' => array(
-      'arguments' => array('flags' => NULL, 'default_flags' => NULL),
+      'variables' => array('flags' => NULL, 'default_flags' => NULL),
+      'file' => 'includes/flag.admin.inc',
     ),
     'flag_form_roles' => array(
-      'arguments' => array('element' => NULL),
+      'render element' => 'element',
+      'file' => 'includes/flag.admin.inc',
     ),
     'flag_rules_radios' => array(
-      'arguments' => array(),
+      'render element' => 'element',
+      'file' => 'includes/flag.rules_forms.inc',
     ),
   );
 }
@@ -1268,8 +1391,15 @@ function flag_get_counts($content_type, $content_id, $reset = FALSE) {
 
   if (!isset($counts[$content_type][$content_id])) {
     $counts[$content_type][$content_id] = array();
-    $result = db_query("SELECT f.name, fc.count FROM {flags} f LEFT JOIN {flag_counts} fc ON f.fid = fc.fid WHERE fc.content_type = '%s' AND fc.content_id = %d", $content_type, $content_id);
-    while ($row = db_fetch_object($result)) {
+    $query = db_select('flags', 'f');
+    $query->leftJoin('flag_counts', 'fc', 'f.fid = fc.fid');
+    $result = $query
+      ->fields('f', array('name'))
+      ->fields('fc', array('count'))
+      ->condition('fc.content_type', $content_type)
+      ->condition('fc.content_id', $content_id)
+      ->execute();
+    foreach ($result as $row) {
       $counts[$content_type][$content_id][$row->name] = $row->count;
     }
   }
@@ -1293,7 +1423,8 @@ function flag_get_flag_counts($flag_name, $reset = FALSE) {
   }
   if (!isset($counts[$flag_name])) {
     $flag = flag_get_flag($flag_name);
-    $counts[$flag_name] = db_result(db_query("SELECT COUNT(*) FROM {flag_content} WHERE fid = %d", $flag->fid));
+    $counts[$flag_name] = db_select('flag_count', 'fc')->fields('fc', array('fcid'))
+      ->condition('fid', $flag->fid)->countQuery()->execute()->fetchField();
   }
 
   return $counts[$flag_name];
@@ -1351,8 +1482,13 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
     $flags = array();
 
     // Database flags.
-    $result = db_query("SELECT f.*, fn.type FROM {flags} f LEFT JOIN {flag_types} fn ON fn.fid = f.fid");
-    while ($row = db_fetch_object($result)) {
+    $query = db_select('flags', 'f');
+    $query->leftJoin('flag_types', 'fn', 'fn.fid = f.fid');
+    $result = $query
+      ->fields('f', array('fid', 'content_type', 'name', 'title', 'global', 'options'))
+      ->fields('fn', array('type'))
+      ->execute();
+    foreach ($result as $row) {
       if (!isset($flags[$row->name])) {
         $flags[$row->name] = flag_flag::factory_by_row($row);
       }
@@ -1464,8 +1600,11 @@ function flag_get_default_flags($include_disabled = FALSE) {
 function flag_get_flagged_content($flag_name) {
   $return = array();
   $flag = flag_get_flag($flag_name);
-  $result = db_query("SELECT * FROM {flag_content} WHERE fid = %d", $flag->fid);
-  while ($row = db_fetch_object($result)) {
+  $result = db_select('flag_content', 'fc')
+    ->fields('fc')
+    ->condition('fid', $flag->fid)
+    ->execute();
+  foreach ($result as $row) {
     $return[] = $row;
   }
   return $return;
@@ -1478,7 +1617,11 @@ function flag_get_flagged_content($flag_name) {
  *   The flag content ID for which to look up the content ID.
  */
 function flag_get_content_id($fcid) {
-  return db_result(db_query("SELECT content_id FROM {flag_content} WHERE fcid = %d", $fcid));
+  return db_select('flag_content', 'fc')
+    ->fields('fc', array('content_id'))
+    ->condition('fcid', $fcid)
+    ->execute()
+    ->fetchField();
 }
 
 /**
@@ -1524,8 +1667,18 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
     if (!isset($flagged_content[$uid][$content_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
       $flagged_content[$uid][$sid][$content_type][$content_id] = array();
-      $result = db_query("SELECT * FROM {flag_content} WHERE content_type = '%s' AND content_id = %d AND (uid = %d OR uid = 0) AND sid = %s", $content_type, $content_id, $uid, $sid);
-      while ($flag_content = db_fetch_object($result)) {
+      $result = db_select('flag_content', 'fc')
+        ->fields('fc')
+        ->condition('content_type', $content_type)
+        ->condition('content_id', $content_id)
+        ->condition(db_or()
+          ->condition('uid', $uid)
+          ->condition('uid', 0)
+        )
+        ->condition('sid', $sid)
+        ->execute();
+
+      foreach ($result as $flag_content) {
         $flagged_content[$uid][$sid][$content_type][$content_id][$flag_names[$flag_content->fid]] = $flag_content;
       }
     }
@@ -1536,8 +1689,16 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
     if (!isset($flagged_content[$uid][$sid]['all'][$content_type])) {
       $flag_names = _flag_get_flag_names();
       $flagged_content[$uid][$sid]['all'][$content_type] = TRUE;
-      $result = db_query("SELECT * FROM {flag_content} WHERE content_type = '%s' AND (uid = %d OR uid = 0) AND sid = %s", $content_type, $uid, $sid);
-      while ($flag_content = db_fetch_object($result)) {
+      $result = db_select('flag_content', 'fc')
+        ->fields('fc')
+        ->condition('content_type', $content_type)
+        ->condition(db_or()
+          ->condition('uid', $account->uid)
+          ->condition('uid', 0)
+        )
+        ->condition('sid', $sid)
+        ->execute();
+      foreach ($result as $flag_content) {
         $flagged_content[$uid][$sid][$content_type]['all'][$flag_names[$flag_content->fid]][$flag_content->content_id] = $flag_content;
       }
     }
@@ -1568,8 +1729,13 @@ function flag_get_content_flags($content_type, $content_id, $flag_name = NULL, $
 
   if (!isset($content_flags[$content_type][$content_id]) || $reset) {
     $flag_names = _flag_get_flag_names();
-    $result = db_query("SELECT * FROM {flag_content} WHERE content_type = '%s' AND content_id = %d ORDER BY timestamp DESC", $content_type, $content_id);
-    while ($flag_content = db_fetch_object($result)) {
+    $result = db_select('flag_content', 'fc')
+      ->fields('fc')
+      ->condition('content_type', $content_type)
+      ->condition('content_id', $content_id)
+      ->orderBy('timestamp', 'DESC')
+      ->execute();
+    foreach ($result as $flag_content) {
       // Build a list of flaggings for all flags by user.
       $content_flags[$content_type][$content_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
       // Build a list of flaggings for each individual flag.

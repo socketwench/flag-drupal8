@@ -8,7 +8,7 @@
  */
 
 /**
- * Implementation of hook_flag_definitions().
+ * Implements hook_flag_definitions().
  *
  * Defines the flags this module implements.
  *
@@ -81,7 +81,7 @@ function flag_create_handler($content_type) {
   if (isset($definition) && class_exists($definition['handler'])) {
     $handler = new $definition['handler'];
   }
-  else  {
+  else {
     $handler = new flag_broken;
   }
   $handler->content_type = $content_type;
@@ -162,7 +162,7 @@ class flag_flag {
       $flag->$option = $value;
     }
 
-    if (is_array($config['locked'])) {
+    if (isset($config['locked']) && is_array($config['locked'])) {
       $flag->locked = drupal_map_assoc($config['locked']);
     }
 
@@ -425,7 +425,7 @@ class flag_flag {
       $account = $GLOBALS['user'];
     }
 
-    if (isset($content_id) && !$this->applies_to_content_id($content_id) ){
+    if (isset($content_id) && !$this->applies_to_content_id($content_id)) {
       // Flag does not apply to this content.
       return FALSE;
     }
@@ -628,8 +628,15 @@ class flag_flag {
    *
    * @private
    */
-  function _is_flagged($content_id, $uid, $sid) { 
-    return db_result(db_query("SELECT fid FROM {flag_content} WHERE fid = %d AND uid = %d AND sid = %d AND content_id = %d", $this->fid, $uid, $sid, $content_id));
+  function _is_flagged($content_id, $uid, $sid) {
+    return db_select('flag_content', 'fc')
+      ->fields('fc', array('fid'))
+      ->condition('fid', $this->fid)
+      ->condition('uid', $uid)
+      ->condition('sid', $sid)
+      ->condition('content_id', $content_id)
+      ->execute()
+      ->fetchField();
   }
 
   /**
@@ -641,8 +648,16 @@ class flag_flag {
    * @private
    */
   function _flag($content_id, $uid, $sid) {
-    db_query("INSERT INTO {flag_content} (fid, content_type, content_id, uid, sid, timestamp) VALUES (%d, '%s', %d, %d, %d, %d)", $this->fid, $this->content_type, $content_id, $uid, $sid, time());
-    $fcid = db_last_insert_id('flag_content', 'fcid');
+    $fcid = db_insert('flag_content')
+      ->fields(array(
+        'fid' => $this->fid,
+        'content_type' => $this->content_type,
+        'content_id' => $content_id,
+        'uid' => $uid,
+        'sid' => $sid,
+        'timestamp' => REQUEST_TIME,
+      ))
+      ->execute();
     $this->_update_count($content_id);
     return $fcid;
   }
@@ -656,9 +671,16 @@ class flag_flag {
    * @private
    */
   function _unflag($content_id, $uid, $sid) {
-    $fcid = db_result(db_query("SELECT fcid FROM {flag_content} WHERE fid = %d AND content_id = %d AND uid = %d AND sid = %d", $this->fid, $content_id, $uid, $sid));
+    $fcid = db_select('flag_content', 'fc')
+      ->fields('fc', array('fcid'))
+      ->condition('fid', $this->fid)
+      ->condition('uid', $uid)
+      ->condition('sid', $sid)
+      ->condition('content_id', $content_id)
+      ->execute()
+      ->fetchField();
     if ($fcid) {
-      db_query("DELETE FROM {flag_content} WHERE fcid = %d", $fcid);
+      db_delete('flag_content')->condition('fcid', $fcid)->execute();
       $this->_update_count($content_id);
     }
     // Remove anonymous cookies (if any).
@@ -674,14 +696,25 @@ class flag_flag {
    * @private
    */
   function _update_count($content_id) {
-    $count = db_result(db_query("SELECT COUNT(*) FROM {flag_content} WHERE fid = %d AND content_id = %d", $this->fid, $content_id));
+    $count = db_select('flag_content', 'fc')->fields('fc', array('fcid'))
+      ->condition('fid', $this->fid)
+      ->condition('content_id', $content_id)
+      ->countQuery()->execute()->fetchField();
     if ($count == 0) {
-      db_query("DELETE FROM {flag_counts} WHERE fid = %d AND content_id = %d", $this->fid, $content_id);
+      db_delete('flag_counts')->condition('fid', $this->fid)->condition('content_id', $content_id)->execute();
     }
     else {
-      db_query("UPDATE {flag_counts} SET count = %d WHERE fid = %d AND content_id = %d", $count, $this->fid, $content_id);
-      if (!db_affected_rows()) {
-        db_query("INSERT INTO {flag_counts} (fid, content_type, content_id, count) VALUES (%d, '%s', %d, %d)", $this->fid, $this->content_type, $content_id, $count);
+      $num_updated = db_update('flag_counts')->fields(array('count' => $count))
+        ->condition('fid', $this->fid)
+        ->condition('content_id', $content_id)
+        ->execute();
+      if (!$num_updated) {
+        db_insert('flag_counts')->fields(array(
+          'fid' => $this->fid,
+          'content_type' => $this->content_type,
+          'content_id' => $content_id,
+          'count' => $count))
+          ->execute();
       }
     }
   }
@@ -703,7 +736,7 @@ class flag_flag {
       if ($cookie_lifetime == 0) {
         $cookie_lifetime = 3600;
       }
-      setcookie($cookie_key, 1, time() + $cookie_lifetime, base_path());
+      setcookie($cookie_key, 1, REQUEST_TIME + $cookie_lifetime, base_path());
       $_COOKIE[$cookie_key] = 1;
     }
     // The anonymous per-user flags are stored in a single cookie, so that all
@@ -716,7 +749,7 @@ class flag_flag {
       if (array_search($cookie_key, $cookie_flags) === FALSE) {
         $cookie_flags[] = $cookie_key;
         $cookie_flags = implode(' ', array_filter($cookie_flags));
-        setcookie('flags', $cookie_flags, time() + $cookie_lifetime, base_path());
+        setcookie('flags', $cookie_flags, REQUEST_TIME + $cookie_lifetime, base_path());
         $_COOKIE['flags'] = $cookie_flags;
       }
     }
@@ -739,7 +772,7 @@ class flag_flag {
       if ($cookie_lifetime == 0) {
         $cookie_lifetime = 3600;
       }
-      setcookie($cookie_key, 0, time() + $cookie_lifetime, base_path());
+      setcookie($cookie_key, 0, REQUEST_TIME + $cookie_lifetime, base_path());
       $_COOKIE[$cookie_key] = 0;
     }
     // User flags, update the single cookie for all user-data.
@@ -775,7 +808,9 @@ class flag_flag {
    * For global flags, pass '0' as the user ID and session ID.
    */
   function get_user_count($uid, $sid) {
-    return db_result(db_query('SELECT COUNT(*) FROM {flag_content} WHERE fid = %d AND uid = %d AND sid = %d', $this->fid, $uid, $sid));
+    return db_select('flag_content', 'fc')->fields('fc', array('fcid'))
+      ->condition('fid', $this->fid)->condition('uid', $uid)->condition('sid', $sid)
+      ->countQuery()->execute();
   }
 
   /**
@@ -800,7 +835,7 @@ class flag_flag {
     }
     $label = t($this->$label);
     if (strpos($label, '[') !== FALSE && module_exists('token')) {
-      $label = $this->replace_tokens($label, array('global' => NULL), $content_id);
+      $label = $this->replace_tokens($label, array('global' => NULL), array('sanitize' => FALSE), $content_id);
     }
     return filter_xss_admin($label);
   }
@@ -814,12 +849,12 @@ class flag_flag {
   }
 
   /**
-   * Replaces tokens in a label. Only the 'global' token context is regognized
+   * Replaces tokens in a label. Only the 'global' token context is recognized
    * by default, so derived classes should override this method to add all
    * token contexts they understand.
    */
-  function replace_tokens($label, $contexts, $content_id) {
-    return token_replace_multiple($label, $contexts);
+  function replace_tokens($label, $contexts, $options, $content_id) {
+    return token_replace($label, $contexts, $options);
   }
 
   /**
@@ -877,7 +912,7 @@ class flag_flag {
   function get_valid_actions() {
     $actions = module_invoke_all('action_info');
     foreach ($actions as $callback => $action) {
-      if ($action['type'] != $this->content_type && !isset($action['hooks'][$this->content_type])) {
+      if ($action['type'] != $this->content_type && !in_array('any', $action['triggers'])) {
         unset($actions[$callback]);
       }
     }
@@ -971,10 +1006,19 @@ class flag_flag {
    * Saves an existing flag to the database. Better use save().
    */
   function update() {
-    db_query("UPDATE {flags} SET name = '%s', title = '%s', global = %d, options = '%s' WHERE fid = %d", $this->name, $this->title, $this->global, $this->get_serialized_options(), $this->fid);
-    db_query("DELETE FROM {flag_types} WHERE fid = %d", $this->fid);
+    db_update('flags')->fields(array(
+      'name' => $this->name,
+      'title' => $this->title,
+      'global' => $this->global,
+      'options' => $this->get_serialized_options()))
+      ->condition('fid', $this->fid)
+      ->execute();
+    db_delete('flag_types')->condition('fid', $this->fid)->execute();
     foreach ($this->types as $type) {
-      db_query("INSERT INTO {flag_types} (fid, type) VALUES (%d, '%s')", $this->fid, $type);
+      db_insert('flag_types')->fields(array(
+        'fid' => $this->fid,
+        'type' => $type))
+        ->execute();
     }
   }
 
@@ -982,10 +1026,22 @@ class flag_flag {
    * Saves a new flag to the database. Better use save().
    */
   function insert() {
-    db_query("INSERT INTO {flags} (content_type, name, title, global, options) VALUES ('%s', '%s', '%s', %d, '%s')", $this->content_type, $this->name, $this->title, $this->global, $this->get_serialized_options());
-    $this->fid = db_last_insert_id('flags', 'fid');
+    $this->fid = db_insert('flags')
+      ->fields(array(
+        'content_type' => $this->content_type,
+        'name' => $this->name,
+        'title' => $this->title,
+        'global' => $this->global,
+        'options' => $this->get_serialized_options(),
+      ))
+      ->execute();
     foreach ($this->types as $type) {
-      db_query("INSERT INTO {flag_types} (fid, type) VALUES (%d, '%s')", $this->fid, $type);
+      db_insert('flag_types')
+        ->fields(array(
+          'fid' => $this->fid,
+          'type' => $type,
+        ))
+        ->execute();
     }
   }
 
@@ -1005,10 +1061,10 @@ class flag_flag {
    * Deletes a flag from the database.
    */
   function delete() {
-    db_query('DELETE FROM {flags} WHERE fid = %d', $this->fid);
-    db_query('DELETE FROM {flag_content} WHERE fid = %d', $this->fid);
-    db_query('DELETE FROM {flag_types} WHERE fid = %d', $this->fid);
-    db_query('DELETE FROM {flag_counts} WHERE fid = %d', $this->fid);
+    db_delete('flags')->condition('fid', $this->fid)->execute();
+    db_delete('flag_content')->condition('fid', $this->fid)->execute();
+    db_delete('flag_types')->condition('fid', $this->fid)->execute();
+    db_delete('flag_counts')->condition('fid', $this->fid)->execute();
   }
 
   /**
@@ -1055,12 +1111,12 @@ class flag_flag {
       $js_action = $this->global ? ($action == 'flag' ? 'unflag' : 'flag') : 'flag';
       if (!isset($js_added[$this->name . '_' . $content_id])) {
         $js_added[$this->name . '_' . $content_id] = TRUE;
-        $js_template = theme($this->theme_suggestions(), $this, 'unflag', $content_id, $after_flagging);
-        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), 'setting');
+        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => 'unflag', 'content_id' => $content_id, 'after_flagging' => $after_flagging));
+        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), array('type' => 'setting', 'scope' => JS_DEFAULT));
       }
     }
 
-    return theme($this->theme_suggestions(), $this, $action, $content_id, $after_flagging);
+    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'content_id' => $content_id, 'after_flagging' => $after_flagging));
   }
 
   /**
@@ -1134,7 +1190,7 @@ class flag_node extends flag_flag {
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on node edit form'),
       '#default_value' => $this->show_on_form,
-      '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/content/types'))),
+      '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/structure/types'))),
       '#access' => empty($this->locked['show_on_form']),
     );
   }
@@ -1155,11 +1211,12 @@ class flag_node extends flag_flag {
 
     // Ensure that only flaggable node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_content_id().
-    $nids = implode(',', array_map('intval', array_keys($content_ids)));
-    $placeholders = implode(',', array_fill(0, sizeof($this->types), "'%s'"));
-    $result = db_query("SELECT nid as content_id FROM {node} WHERE nid IN ($nids) AND type NOT IN ($placeholders)", $this->types);
-    while ($row = db_fetch_object($result)) {
-      $access[$row->content_id] = FALSE;
+    $result = db_select('node', 'n')->fields('n', array('nid'))
+      ->condition('nid', $content_ids, 'IN')
+      ->condition('type', $this->types, 'NOT IN')
+      ->execute();
+    foreach ($result as $row) {
+      $access[$row->nid] = FALSE;
     }
 
     return $access;
@@ -1208,13 +1265,13 @@ class flag_node extends flag_flag {
     return array('node');
   }
 
-  function replace_tokens($label, $contexts, $content_id) {
+  function replace_tokens($label, $contexts, $options, $content_id) {
     if (is_numeric($content_id) && ($node = $this->fetch_content($content_id))) {
       $contexts['node'] = $node;
     }
     // Nodes accept the node-type as a $content_id in the case that a new node
     // is being created and a full node object does not yet exist.
-    elseif (!empty($content_id) && ($type = node_get_types('type', $content_id))) {
+    elseif (!empty($content_id) && ($type = node_type_get_type($content_id))) {
       $content_id = NULL;
       $contexts['node'] = (object) array(
         'nid' => NULL,
@@ -1222,7 +1279,7 @@ class flag_node extends flag_flag {
         'title' => '',
       );
     }
-    return parent::replace_tokens($label, $contexts, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $content_id);
   }
 
   function get_flag_action($content_id) {
@@ -1236,7 +1293,7 @@ class flag_node extends flag_flag {
   function get_valid_actions() {
     $actions = module_invoke_all('action_info');
     foreach ($actions as $callback => $action) {
-      if ($action['type'] != 'node' && !isset($action['hooks']['nodeapi'])) {
+      if ($action['type'] != 'node' && !in_array('any', $action['triggers'])) {
         unset($actions[$callback]);
       }
     }
@@ -1279,7 +1336,7 @@ class flag_node extends flag_flag {
 /**
  * Implements a comment flag.
  */
-class flag_comment extends flag_flag  {
+class flag_comment extends flag_flag {
   function options() {
     $options = parent::options();
     $options += array(
@@ -1315,7 +1372,7 @@ class flag_comment extends flag_flag  {
   }
 
   function _load_content($content_id) {
-    return _comment_load($content_id);
+    return comment_load($content_id);
   }
 
   function applies_to_content_object($comment) {
@@ -1331,11 +1388,15 @@ class flag_comment extends flag_flag  {
 
     // Ensure node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_content_id().
-    $cids = implode(',', array_map('intval', array_keys($content_ids)));
-    $placeholders = implode(',', array_fill(0, sizeof($this->types), "'%s'"));
-    $result = db_query("SELECT cid as content_id FROM {comments} c INNER JOIN {node} n ON c.nid = n.nid WHERE cid IN ($cids) and n.type NOT IN ($placeholders)", $this->types);
-    while ($row = db_fetch_object($result)) {
-      $access[$row->content_id] = FALSE;
+    $query = db_select('comments', 'c');
+    $query->innerJoin('node', 'n', 'c.nid = n.nid');
+    $result = $query
+      ->fields('c', array('cid'))
+      ->condition('c.cid', $content_ids, 'IN')
+      ->condition('n.type', $this->types, 'NOT IN')
+      ->execute();
+    foreach ($result as $row) {
+      $access[$row->nid] = FALSE;
     }
 
     return $access;
@@ -1356,14 +1417,14 @@ class flag_comment extends flag_flag  {
     return array('comment', 'node');
   }
 
-  function replace_tokens($label, $contexts, $content_id) {
+  function replace_tokens($label, $contexts, $options, $content_id) {
     if ($content_id) {
       if (($comment = $this->fetch_content($content_id)) && ($node = node_load($comment->nid))) {
         $contexts['node'] = $node;
         $contexts['comment'] = $comment;
       }
     }
-    return parent::replace_tokens($label, $contexts, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $content_id);
   }
 
   function get_flag_action($content_id) {
@@ -1457,7 +1518,7 @@ class flag_user extends flag_flag {
   }
 
   function _load_content($content_id) {
-    return user_load(array('uid' => $content_id));
+    return user_load($content_id);
   }
 
   function applies_to_content_object($user) {
@@ -1503,7 +1564,7 @@ class flag_user extends flag_flag {
   }
 
   function uses_hook_link($teaser) {
-    if ($this->show_on_profile){
+    if ($this->show_on_profile) {
       return TRUE;
     }
     return FALSE;
@@ -1513,11 +1574,11 @@ class flag_user extends flag_flag {
     return array('user');
   }
 
-  function replace_tokens($label, $contexts, $content_id) {
+  function replace_tokens($label, $contexts, $options, $content_id) {
     if ($content_id && ($user = $this->fetch_content($content_id))) {
       $contexts['user'] = $user;
     }
-    return parent::replace_tokens($label, $contexts, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $content_id);
   }
 
   function get_flag_action($content_id) {
@@ -1568,7 +1629,7 @@ class flag_broken extends flag_flag {
   function options_form(&$form) {
     $form = array();
     $form['error'] = array(
-      '#value' => '<div class="error">'. t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->content_type)) .'</div>',
+      '#value' => '<div class="error">' . t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->content_type)) . '</div>',
     );
   }
 }

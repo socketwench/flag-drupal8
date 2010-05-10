@@ -72,7 +72,7 @@ The configuration for Flag is spread between Views configuration
 and the Flag site building page. To configure:
 
 1) Configure the flags for your site at
-   Administer -> Site Building -> Flags (/admin/build/flags)
+   Administer -> Structure -> Flags (/admin/structure/flags)
 
    You can create and edit flags on this page. Descriptions for the various
    options are provided below each field on the flag edit form.

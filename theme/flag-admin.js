@@ -1,9 +1,11 @@
 // $Id$
+(function ($) {
 
 /**
  * Behavior to disable the "unflag" option if "flag" is not available.
  */
-Drupal.behaviors.flagRoles = function(context) {
+Drupal.behaviors.flagRoles = {};
+Drupal.behaviors.flagRoles.attach = function(context) {
   $('#flag-roles input.flag-access', context).change(function() {
     var unflagCheckbox = $(this).parents('tr:first').find('input.unflag-access').get(0);
     if (this.checked) {
@@ -25,17 +27,17 @@ Drupal.behaviors.flagRoles = function(context) {
   });
 
   $('#flag-roles input.unflag-access', context).change(function() {
-    if ($(this).parents('tr:first').find('input.unflag-access:checked:not(:disabled)').size() > 0) {
-      $('#edit-unflag-denied-text-wrapper').slideUp();
+    if ($(this).parents('table:first').find('input.unflag-access:enabled:not(:checked)').size() == 0) {
+      $('div.form-item-unflag-denied-text').slideUp();
     }
     else {
-      $('#edit-unflag-denied-text-wrapper').slideDown();
+      $('div.form-item-unflag-denied-text').slideDown();
     }
   });
 
   // Hide the link options by default if needed.
-  if ($('#flag-roles input.unflag-access:checked:not(:disabled)').size() > 0) {
-    $('#edit-unflag-denied-text-wrapper').css('display', 'none');
+  if ($('#flag-roles input.unflag-access:enabled:not(:checked)').size() == 0) {
+    $('div.form-item-unflag-denied-text').css('display', 'none');
   }
 };
 
@@ -43,7 +45,8 @@ Drupal.behaviors.flagRoles = function(context) {
 /**
  * Behavior to make link options dependent on the link radio button.
  */
-Drupal.behaviors.flagLinkOptions = function(context) {
+Drupal.behaviors.flagLinkOptions = {};
+Drupal.behaviors.flagLinkOptions.attach = function(context) {
   $('.flag-link-options input.form-radio', context).change(function() {
     var radioButton = this;
     $('#link-options').slideUp(function() {
@@ -69,20 +72,25 @@ Drupal.behaviors.flagLinkOptions = function(context) {
 /**
  * Vertical tabs integration.
  */
-Drupal.verticalTabs = Drupal.verticalTabs || {};
+Drupal.behaviors.flagSummary = {};
 
-Drupal.verticalTabs.flag = function() {
-  var flags = [];
-  $('fieldset.vertical-tabs-flag input.form-checkbox').each(function() {
-    if (this.checked) {
-      flags.push(this.name.replace(/flag\[([a-z0-9]+)\]/, '$1'));
+Drupal.behaviors.flagSummary.attach = function (context) {
+  $('fieldset.flag-fieldset', context).setSummary(function(context) {
+    var flags = [];
+
+    $('input.form-checkbox', context).each(function() {
+      if (this.checked) {
+        flags.push(this.name.replace(/flag\[([a-z0-9]+)\]/, '$1'));
+      }
+    });
+
+    if (flags.length) {
+      return flags.join(', ');
+    }
+    else {
+      return Drupal.t('No flags');
     }
   });
+};
 
-  if (flags.length) {
-    return flags.join(', ');
-  }
-  else {
-    return Drupal.t('No flags');
-  }
-}
+})(jQuery);

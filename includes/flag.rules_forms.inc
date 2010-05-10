@@ -96,8 +96,9 @@ function flag_rules_condition_flagged_label($settings, $argument_labels, $elemen
  * Form utilities for the default input form of flags.
  ******************************************************************************/
 
-function theme_flag_rules_radios($element) {
-  
+function theme_flag_rules_radios($variables) {
+  $element = $variables['element'];
+
   if (!empty($element['#disabled'])) {
     drupal_set_message($element['#description'], 'error');
   }
@@ -112,7 +113,7 @@ function theme_flag_rules_radios($element) {
       $flag->global ? t('Yes') : t('No'),
     );
   }
-  return theme('table', $headers, $rows);
+  return theme('table', array('header' => $headers, 'rows' => $rows));
 }
 
 function _flag_rules_flags_options($flag_type = NULL) {

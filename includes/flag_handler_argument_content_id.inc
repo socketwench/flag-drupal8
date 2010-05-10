@@ -34,8 +34,11 @@ class flag_handler_argument_content_id extends views_handler_argument_numeric {
     $titles = array();
     $placeholders = implode(', ', array_fill(0, sizeof($this->value), '%d'));
 
-    $result = db_query("SELECT o.". $views_info['title field'] ." FROM {". $views_info['views table'] ."} o WHERE o.". $views_info['join field'] ." IN ($placeholders)", $this->value);
-    while ($title = db_fetch_object($result)) {
+    $result = db_select($views_info['views table'], 'o')
+      ->fields('o', array($views_info['title field']))
+      ->condition('o.' . $views_info['join field'], $this->value, 'IN')
+      ->execute();
+    foreach ($result as $title) {
       $titles[] = check_plain($title->$views_info['title field']);
     }
     return $titles;

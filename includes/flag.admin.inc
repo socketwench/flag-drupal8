@@ -12,22 +12,25 @@
 function flag_admin_page() {
   $flags = flag_get_flags();
   $default_flags = flag_get_default_flags(TRUE);
-  return theme('flag_admin_page', $flags, $default_flags);
+  return theme('flag_admin_page', array('flags' => $flags, 'default_flags' => $default_flags));
 }
 
 /**
  * Theme the output for the main flag administration page.
  */
-function theme_flag_admin_page($flags, $default_flags) {
-  $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system. You may <a href="@add-url">add new flags</a>.', array('@add-url' => url('admin/build/flags/add'))) . '</p>';
+function theme_flag_admin_page($variables) {
+  $flags = $variables['flags'];
+  $default_flags = $variables['default_flags'];
+
+  $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system. You may <a href="@add-url">add new flags</a>.', array('@add-url' => url(FLAG_ADMIN_PATH . '/add'))) . '</p>';
 
   // Build out the list of normal, database flags.
   foreach ($flags as $flag) {
-    $ops = theme('links', array(
-      'flags_edit' =>  array('title' => t('edit'), 'href' => 'admin/build/flags/edit/' . $flag->name),
-      'flags_delete' =>  array('title' => t('delete'), 'href' => 'admin/build/flags/delete/' . $flag->name),
-      'flags_export' =>  array('title' => t('export'), 'href' => 'admin/build/flags/export/' . $flag->name),
-    ));
+    $ops = theme('links', array('links' => array(
+      'flags_edit' =>  array('title' => t('edit'), 'href' => FLAG_ADMIN_PATH . '/edit/' . $flag->name),
+      'flags_delete' =>  array('title' => t('delete'), 'href' => FLAG_ADMIN_PATH . '/delete/' . $flag->name),
+      'flags_export' =>  array('title' => t('export'), 'href' => FLAG_ADMIN_PATH . '/export/' . $flag->name),
+    )));
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
     $rows[] = array(
@@ -46,7 +49,7 @@ function theme_flag_admin_page($flags, $default_flags) {
   }
 
   $header = array(t('Flag'), t('Flag type'), t('Roles'), t('Node types'), t('Global?'), t('Operations'));
-  $output .= theme('table', $header, $rows);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
 
   // Build a list of disabled, module-based flags.
   $rows = array();
@@ -54,14 +57,14 @@ function theme_flag_admin_page($flags, $default_flags) {
     if (!isset($flags[$name])) {
       if ($flag->api_version < FLAG_API_VERSION) {
         $flag_updates_needed = TRUE;
-        $ops = theme('links', array(
-          'flags_update' => array('title' => '<strong>' . t('update code') . '</strong>', 'href' => 'admin/build/flags/update/' . $flag->name, 'html' => TRUE),
-        ));
+        $ops = theme('links', array('links' => array(
+          'flags_update' => array('title' => '<strong>' . t('update code') . '</strong>', 'href' => FLAG_ADMIN_PATH . '/update/' . $flag->name, 'html' => TRUE),
+        )));
       }
       else {
-        $ops = theme('links', array(
-          'flags_enable' => array('title' => t('enable'), 'href' => 'admin/build/flags/edit/' . $flag->name),
-        ));
+        $ops = theme('links', array('links' => array(
+          'flags_enable' => array('title' => t('enable'), 'href' => FLAG_ADMIN_PATH . '/edit/' . $flag->name),
+        )));
       }
       // $flag->roles['flag'] not exist on older flags.
       $roles = array_flip(array_intersect(array_flip(user_roles()), !empty($flag->roles['flag']) ? $flag->roles['flag'] : array()));
@@ -80,7 +83,7 @@ function theme_flag_admin_page($flags, $default_flags) {
 
   if (!empty($rows)) {
     $header = array(t('Disabled Flags'), t('Module'), t('Flag type'), t('Operations'));
-    $output .= theme('table', $header, $rows);
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
   }
 
   if (!module_exists('views')) {
@@ -97,10 +100,10 @@ function theme_flag_admin_page($flags, $default_flags) {
   }
 
   if (!module_exists('flag_actions')) {
-    $output .= '<p>' . t('Flagging an item may trigger <em>actions</em>. However, you don\'t have the <em>Flag actions</em> module <a href="@modules-url">enabled</a>, so you won\'t be able to enjoy this feature.', array('@actions-url' => url('admin/build/flags/actions'), '@modules-url' => url('admin/build/modules'))) . '</p>';
+    $output .= '<p>' . t('Flagging an item may trigger <em>actions</em>. However, you don\'t have the <em>Flag actions</em> module <a href="@modules-url">enabled</a>, so you won\'t be able to enjoy this feature.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'), '@modules-url' => url('admin/build/modules'))) . '</p>';
   }
   else {
-    $output .= '<p>' . t('Flagging an item may trigger <a href="@actions-url">actions</a>.', array('@actions-url' => url('admin/build/flags/actions'))) . '</p>';
+    $output .= '<p>' . t('Flagging an item may trigger <a href="@actions-url">actions</a>.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'))) . '</p>';
   }
 
   if (!module_exists('rules')) {
@@ -130,9 +133,7 @@ function flag_add_page($type = NULL, $name = NULL) {
 /**
  * Present a form for creating a new flag, setting the type of flag.
  */
-function flag_add_form(&$form_state) {
-  $form = array();
-
+function flag_add_form($form, &$form_state) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Flag name'),
@@ -175,13 +176,13 @@ function flag_add_form_validate($form, &$form_state) {
 }
 
 function flag_add_form_submit($form, &$form_state) {
-  $form_state['redirect'] = 'admin/build/flags/add/' . $form_state['values']['type'] . '/' . $form_state['values']['name'];
+  $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'] . '/' . $form_state['values']['name'];
 }
 
 /**
  * Add/Edit flag page.
  */
-function flag_form(&$form_state, $name, $type = NULL) {
+function flag_form($form, &$form_state, $name, $type = NULL) {
   if (isset($type)) {
     // Adding a new flag.
     $flag = flag_flag::factory_by_content_type($type);
@@ -198,7 +199,7 @@ function flag_form(&$form_state, $name, $type = NULL) {
         $flag = $default_flags[$name];
       }
       else {
-        drupal_goto('admin/build/flags');
+        drupal_goto(FLAG_ADMIN_PATH);
       }
     }
     drupal_set_title(t('Edit @title flag', array('@title' => $flag->get_title())));
@@ -300,7 +301,7 @@ function flag_form(&$form_state, $name, $type = NULL) {
     $form['messages']['token_help'] = array(
       '#title' => t('Token replacement'),
       '#type' => 'fieldset',
-      '#description' => t('The above six options may contain the following wildcard replacements. For example, "Mark Link" could be entered as "Add [title] to your flags" or "Add this [type-name] to your flags". These wildcards will be replaced with the appropriate field from the node.') . theme('flag_token_help', $flag->get_labels_token_types()),
+      '#description' => t('The above six options may contain the following wildcard replacements. For example, "Mark Link" could be entered as "Add [title] to your flags" or "Add this [type-name] to your flags". These wildcards will be replaced with the appropriate field from the node.') . theme('flag_token_help', array('types' => $flag->get_labels_token_types())),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
@@ -317,11 +318,16 @@ function flag_form(&$form_state, $name, $type = NULL) {
     '#tree' => FALSE,
     '#weight' => 10,
   );
-
+  
+  $options = array();
+  $node_types = node_type_get_types();
+  foreach ($node_types as $node_type) {
+    $options[$node_type->type] = check_plain($node_type->name);
+  }
   $form['access']['types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Flaggable content'),
-    '#options' => array_map('check_plain', node_get_types('names')),
+    '#options' => $options,
     '#default_value' => $flag->types,
     '#description' => t('Check any node types that this flag may be used on. You must check at least one node type.'),
     '#required' => TRUE,
@@ -340,6 +346,10 @@ function flag_form(&$form_state, $name, $type = NULL) {
     '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
     '#theme' => 'flag_form_roles',
     '#weight' => -2,
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
+      'css' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.css'),
+    ),
   );
   if (module_exists('session_api')) {
     $form['access']['roles']['#description'] .= ' ' . t('Support for anonymous users is being provided by <a href="http://drupal.org/project/session_api">Session API</a>.');
@@ -469,19 +479,18 @@ function flag_form_submit($form, &$form_state) {
   $flag->enable();
   drupal_set_message(t('Flag @name has been saved.', array('@name' => $flag->get_title())));
   _flag_clear_cache();
-  $form_state['redirect'] = 'admin/build/flags';
+  $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
 
 /**
  * Output the access options for roles in a table.
  */
-function theme_flag_form_roles($element) {
-  drupal_add_css(drupal_get_path('module', 'flag') . '/theme/flag-admin.css', 'module', 'all', FALSE);
-  drupal_add_js(drupal_get_path('module', 'flag') . '/theme/flag-admin.js', 'module', 'header', FALSE, TRUE, FALSE);
+function theme_flag_form_roles($variables) {
+  $element = $variables['element'];
 
   $header = array(
-    array('class' => 'checkbox', 'data' => t('Flag')),
-    array('class' => 'checkbox', 'data' => t('Unflag')),
+    array('class' => array('checkbox'), 'data' => t('Flag')),
+    array('class' => array('checkbox'), 'data' => t('Unflag')),
     t('Role'),
   );
   $rows = array();
@@ -490,32 +499,31 @@ function theme_flag_form_roles($element) {
     $role_name = $element['flag'][$role]['#title'];
     unset($element['flag'][$role]['#title']);
     unset($element['unflag'][$role]['#title']);
-    $element['flag'][$role]['#attributes']['class'] = 'flag-access';
-    $element['unflag'][$role]['#attributes']['class'] = 'unflag-access';
-    $row[] = array('class' => 'checkbox', 'data' => drupal_render($element['flag'][$role]));
-    $row[] = array('class' => 'checkbox', 'data' => drupal_render($element['unflag'][$role]));
+    $element['flag'][$role]['#attributes']['class'] = array('flag-access');
+    $element['unflag'][$role]['#attributes']['class'] = array('unflag-access');
+    $row[] = array('class' => array('checkbox'), 'data' => drupal_render($element['flag'][$role]));
+    $row[] = array('class' => array('checkbox'), 'data' => drupal_render($element['unflag'][$role]));
     $row[] = $role_name;
     $rows[] = $row;
   }
 
-  $element['#children'] = theme('table', $header, $rows, array('class' => 'flag-admin-table', 'id' => 'flag-roles'));
-  return theme('form_element', $element, $element['#children']);
+  return theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('flag-admin-table'), 'id' => 'flag-roles')));
 }
 
 /**
  * Delete flag page.
  */
-function flag_delete_confirm(&$form_state, $name) {
+function flag_delete_confirm($form, &$form_state, $name) {
   $flag = flag_get_flag($name);
   if (empty($flag)) {
-    drupal_goto('admin/build/flags');
+    drupal_goto(FLAG_ADMIN_PATH);
   }
 
   $form['fid'] = array('#type' => 'value', '#value' => $flag->fid);
 
   return confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $flag->get_title())),
-    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/build/flags',
+    !empty($_GET['destination']) ? $_GET['destination'] : FLAG_ADMIN_PATH,
     isset($flag->module) ? t('This flag is provided by the @module module. It will loose any customizations and be disabled.', array('@module' => node_get_types('name', $flag->module))) : t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
@@ -529,14 +537,16 @@ function flag_delete_confirm_submit($form, &$form_state) {
     _flag_clear_cache();
   }
   drupal_set_message(t('Flag @name has been deleted.', array('@name' => $flag->get_title())));
-  $form_state['redirect'] = 'admin/build/flags';
+  $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
 
 /**
  * FormAPI after_build function to add descriptions to radio buttons.
  */
 function flag_expand_link_option($element) {
-  drupal_add_js(drupal_get_path('module', 'flag') . '/theme/flag-admin.js', 'module', 'header', FALSE, TRUE, FALSE);
+  $element['#attached'] = array(
+    'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
+  );
 
   foreach (element_children($element) as $key) {
     // Add a description to the link option.
@@ -548,7 +558,7 @@ function flag_expand_link_option($element) {
       $element[$key]['#attributes']['rel'] = implode(' ', $element['#flag_link_fields'][$key]);
     }
   }
-  $element['#attributes']['class'] = 'flag-link-options';
+  $element['#attributes']['class'] = array('flag-link-options');
 
   return $element;
 }

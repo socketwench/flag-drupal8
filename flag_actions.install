@@ -10,14 +10,12 @@
  * Implementation of hook_install().
  */
 function flag_actions_install() {
-  drupal_install_schema('flag_actions');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function flag_actions_uninstall() {
-  drupal_uninstall_schema('flag_actions');
 }
 
 /**

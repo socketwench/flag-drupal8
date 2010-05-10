@@ -1,4 +1,5 @@
 // $Id$
+(function ($) {
 
 /**
  * Terminology:
@@ -200,7 +201,8 @@ Drupal.flagCookie = function(name, value, options) {
   }
 };
 
-Drupal.behaviors.flagLink = function(context) {
+Drupal.behaviors.flagLink = {};
+Drupal.behaviors.flagLink.attach = function(context) {
   // For all anonymous users, require JavaScript for flagging to prevent spiders
   // from flagging things inadvertently.
   if (Drupal.settings.flag && Drupal.settings.flag.anonymous) {
@@ -216,3 +218,5 @@ Drupal.behaviors.flagLink = function(context) {
   // On load, bind the click behavior for all links on the page.
   Drupal.flagLink(context);
 };
+
+})(jQuery);
