@@ -139,6 +139,7 @@ function flag_views_api() {
 function flag_features_api() {
   return array(
     'flag' => array(
+      'name' => t('Flag'),
       'feature_source' => TRUE,
       'default_hook' => 'flag_default_flags',
       'file' => drupal_get_path('module', 'flag') . '/includes/flag.features.inc',
