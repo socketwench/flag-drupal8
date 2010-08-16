@@ -297,20 +297,21 @@ function flag_form($form, &$form_state, $name, $type = NULL) {
     '#access' => empty($flag->locked['unflag_message']),
   );
 
-  if (module_exists('token')) {
-    $form['messages']['token_help'] = array(
-      '#title' => t('Token replacement'),
-      '#type' => 'fieldset',
-      '#description' => t('The above six options may contain the following wildcard replacements. For example, "Mark Link" could be entered as "Add [title] to your flags" or "Add this [type-name] to your flags". These wildcards will be replaced with the appropriate field from the node.') . theme('flag_token_help', array('types' => $flag->get_labels_token_types())),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-  }
-  else {
-    $form['messages']['token_help'] = array(
-      '#value' => '<em>' . t('Note: You don\'t have the <a href="@token-url">Token</a> module installed. If you have it installed, and enabled, you\'ll be able to embed tokens in the six labels above.', array('@token-url' => 'http://drupal.org/project/token')) . '</em>',
-    );
-  }
+  $form['messages']['tokens_help'] = array(
+    '#title' => t('Token replacement'),
+    '#type' => 'fieldset',
+    '#description' =>
+      '<p>' . t('The above six texts may contain any of the tokens listed below. For example, <em>"Flag link text"</em> could be entered as:') . '</p>' .
+      theme('item_list', array('items' => array(
+        t('Add &lt;em&gt;[node:title]&lt;/em&gt; to your favorites'),
+        t('Add this [node:type] to your favorites'),
+        t('Vote for this proposal ([node:flag-vote-count] people have already done so)'),
+      ), 'attributes' => array('class' => 'token-examples'))) .
+      '<p>' . t('These tokens will be replaced with the appropriate fields from the node (or user, or comment).') . '</p>' .
+      theme('flag_tokens_browser', array('types' => $flag->get_labels_token_types())),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
 
   $form['access'] = array(
     '#type' => 'fieldset',

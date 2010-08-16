@@ -138,69 +138,21 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
 }
 
 /**
- * This is a replacement for Token's theme_token_help().
+ * Returns HTML for a tokens browser.
  *
- * This is a duplicate of the Token's function, but with a small modification:
- * the $type parameter is now $types, allowing for listing tokens from several
- * categories.
- *
- * @todo Replace this with whatever UI is created in D7 for tokens.
+ * @param $variables
+ *   An associative array containing:
+ *   - types: An array naming the types of tokens to show.
+ *   - global_types: Whether to show global tokens.
  */
-function theme_flag_token_help($variables) {
+function theme_flag_tokens_browser($variables) {
   $types = $variables['types'];
-  $prefix = $variables['prefix'];
-  $suffix = $variables['suffix'];
+  $global_types = $variables['global_types'];
 
-  $tokens = flag_token_get_list($types);
-
-  $header = array(t('Token'), t('Replacement value'));
-  $rows = array();
-  foreach ($tokens as $key => $category) {
-    $rows[] = array(array('data' => drupal_ucfirst($key) . ' ' . t('tokens'), 'class' => array('region'), 'colspan' => 2));
-    foreach ($category as $token => $description) {
-      $row = array();
-      $row[] = $prefix . $key . ':' . $token . $suffix;
-      $row[] = $description;
-      $rows[] = $row;
-    }
+  if (module_exists('token')) {
+    return theme('token_tree', array('token_types' => $types, 'global_types' => $global_types));
   }
-
-  $output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('description'))));
-  return $output;
-}
-
-/**
- * This is a replacement for Token's token_get_list().
- *
- * It is used only by theme_flag_token_help(), above.
- *
- * This is a duplicate of the Token's function, but with a small modification:
- * the $type parameter is now $types, allowing for listing tokens from several
- * categories.
- *
- * @todo Replace this with whatever UI is created in D7 for tokens.
- */
-function flag_token_get_list($types = array('all')) {
-  $return = array();
-  foreach ($types as $type) {
-    foreach (module_implements('token_info') as $module) {
-      $function = $module . '_token_info';
-      $result = $function($type);
-      if (is_array($result)) {
-        foreach ($result['tokens'] as $category => $tokens) {
-          foreach ($tokens as $token => $info) {
-            $return[$category][$token] = $info['name'];
-          }
-        }
-      }
-    }
+  else {
+    return '<p><em>' . t("Note: You don't have the <a href='@token-url'>Token</a> module installed, so the list of available tokens isn't shown here. You don't have to install <a href='@token-url'>Token</a> to be able to use tokens, but if you have it installed, and enabled, you'll be able to enjoy an interactive tokens browser.", array('@token-url' => 'http://drupal.org/project/token')) . '</em></p>';
   }
-  // For aesthetic reasons, we don't want the 'global' section to appear in
-  // varying places, so let's move it to the bottom.
-  if (isset($return['global'])) {
-    $global = $return['global'];
-    unset($return['global']);
-    $return['global'] = $global;
-  }
-  return $return;
 }

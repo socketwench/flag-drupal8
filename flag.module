@@ -1169,8 +1169,8 @@ function flag_theme() {
       'pattern' => 'flag__',
       'path' => $path,
     ),
-    'flag_token_help' => array(
-      'variables' => array('types' => array('all'), 'prefix' => '[', 'suffix' => ']'),
+    'flag_tokens_browser' => array(
+      'variables' => array('types' => array('all'), 'global_types' => TRUE),
       'file' => 'includes/flag.token.inc',
     ),
     'flag_admin_page' => array(

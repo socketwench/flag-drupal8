@@ -834,8 +834,8 @@ class flag_flag {
       return;
     }
     $label = t($this->$label);
-    if (strpos($label, '[') !== FALSE && module_exists('token')) {
-      $label = $this->replace_tokens($label, array('global' => NULL), array('sanitize' => FALSE), $content_id);
+    if (strpos($label, '[') !== FALSE) {
+      $label = $this->replace_tokens($label, array(), array('sanitize' => FALSE), $content_id);
     }
     return filter_xss_admin($label);
   }
