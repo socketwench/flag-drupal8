@@ -48,25 +48,24 @@ Drupal.behaviors.flagRoles.attach = function(context) {
 Drupal.behaviors.flagLinkOptions = {};
 Drupal.behaviors.flagLinkOptions.attach = function(context) {
   $('.flag-link-options input.form-radio', context).change(function() {
+    // Reveal only the fieldset whose ID is link-options-LINKTYPE,
+    // where LINKTYPE is the value of the selected radio button.
     var radioButton = this;
-    $('#link-options').slideUp(function() {
-      $('#link-options input').each(function() {
-        $(this).parents('.form-item:first').css('display', 'none');
-      });
-      var linkOptionFields = $(radioButton).attr('rel');
-      if (linkOptionFields) {
-        linkOptionFields = linkOptionFields.split(' ');
-        for (var n in linkOptionFields) {
-          $('#link-options input[name=' + linkOptionFields[n] + ']').parents('.form-item:first').css('display', 'block');
-        }
-        $('#link-options').slideDown();
-      }
-    });
-  });
+    var $relevant   = $('fieldset#link-options-' + radioButton.value);
+    var $irrelevant = $('fieldset[id^=link-options-]').not($relevant);
+
+    $relevant.show();
+    $irrelevant.hide();
+
+    if ($relevant.size()) {
+      $('#link-options-intro').show();
+    }
+    else {
+      $('#link-options-intro').hide();
+    }
+  })
   // Hide the link options by default if needed.
-  if (!$('.flag-link-options input.form-radio:checked').attr('rel')) {
-    $('#link-options').css('display', 'none');
-  }
+  .filter(':checked').trigger('change');
 };
 
 /**

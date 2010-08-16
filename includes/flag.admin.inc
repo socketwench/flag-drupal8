@@ -406,15 +406,23 @@ function flag_form($form, &$form_state, $name, $type = NULL) {
     '#access' => empty($flag->locked['link_type']),
   );
 
-  $form['link_options'] = array(
+  $form['display']['link_options_intro'] = array(
+    '#markup' => '<p id="link-options-intro">' . t('The selected link type may require these additional settings:') . '</p>',
+    '#weight' => 20,
+  );
+
+  $form['display']['link_options_confirm'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Link options'),
-    '#description' => t('The selected link type may require these additional settings.'),
-    '#attributes' => array('id' => 'link-options'),
+    '#title' => t('Options for the "Confirmation form" link type'),
+    // Any "link type" provider module must put its settings fields inside
+    // a fieldset whose HTML ID is link-options-LINKTYPE, where LINKTYPE is
+    // the machine-name of the link type. This is necessary for the
+    // radiobutton's JavaScript dependency feature to work.
+    '#id' => 'link-options-confirm',
     '#weight' => 21,
   );
 
-  $form['link_options']['flag_confirmation'] = array(
+  $form['display']['link_options_confirm']['flag_confirmation'] = array(
     '#type' => 'textfield',
     '#title' => t('Flag confirmation message'),
     '#default_value' => isset($flag->flag_confirmation) ? $flag->flag_confirmation : '',
@@ -422,7 +430,7 @@ function flag_form($form, &$form_state, $name, $type = NULL) {
     '#access' => empty($flag->locked['flag_confirmation']),
   );
 
-  $form['link_options']['unflag_confirmation'] = array(
+  $form['display']['link_options_confirm']['unflag_confirmation'] = array(
     '#type' => 'textfield',
     '#title' => t('Unflag confirmation message'),
     '#default_value' => isset($flag->unflag_confirmation) ? $flag->unflag_confirmation : '',
@@ -552,10 +560,6 @@ function flag_expand_link_option($element) {
     // Add a description to the link option.
     if (isset($element['#option_descriptions'][$key])) {
       $element[$key]['#description'] = $element['#option_descriptions'][$key];
-    }
-    // Add a list of fields dependent on this link type using the rel attribute.
-    if (isset($element['#flag_link_fields'][$key])) {
-      $element[$key]['#attributes']['rel'] = implode(' ', $element['#flag_link_fields'][$key]);
     }
   }
   $element['#attributes']['class'] = array('flag-link-options');
