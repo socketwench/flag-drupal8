@@ -741,9 +741,7 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
 /**
  * Form for confirming the (un)flagging of a piece of content.
  */
-function flag_confirm(&$form_state, $action = 'flag', $flag_name, $content_id = '') {
-  $form = array();
-
+function flag_confirm($form, &$form_state, $action = 'flag', $flag_name, $content_id = '') {
   $form['action'] = array(
     '#type' => 'value',
     '#value' => $action,
