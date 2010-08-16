@@ -345,6 +345,7 @@ function flag_form($form, &$form_state, $name, $type = NULL) {
     '#access' => empty($flag->locked['roles']),
     '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
     '#theme' => 'flag_form_roles',
+    '#theme_wrappers' => array('form_element'),
     '#weight' => -2,
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
