@@ -611,12 +611,29 @@ class flag_flag {
    *   TRUE if the content is flagged, FALSE otherwise.
    */
   function is_flagged($content_id, $uid = NULL, $sid = NULL) {
+    return (bool) $this->get_flagging_record($content_id, $uid, $sid);
+  }
+
+  /**
+   * Returns the flagging record.
+   *
+   * This method returns the "flagging record": the {flag_content} record that
+   * exists for each flagged item (for a certain user). If the item isn't
+   * flagged, returns NULL. This method could be useful, for example, when you
+   * want to find out the 'fcid' or 'timestamp' values.
+   *
+   * Thanks to using a cache, inquiring several different flags about the same
+   * item results in only one SQL query.
+   *
+   * Parameters are the same as is_flagged()'s.
+   */
+  function get_flagging_record($content_id, $uid = NULL, $sid = NULL) {
     $uid = $this->global ? 0 : (!isset($uid) ? $GLOBALS['user']->uid : $uid);
     $sid = $this->global ? 0 : (!isset($sid) ? flag_get_sid($uid) : $sid);
 
     // flag_get_user_flags() does caching.
     $user_flags = flag_get_user_flags($this->content_type, $content_id, $uid, $sid);
-    return isset($user_flags[$this->name]);
+    return isset($user_flags[$this->name]) ? $user_flags[$this->name] : NULL;
   }
 
   /**
@@ -1270,9 +1287,11 @@ class flag_node extends flag_flag {
     return parent::flag($action, $content_id, $account, $skip_permission_check);
   }
 
-  function is_flagged($content_id, $uid = NULL, $sid = NULL) {
+  // Instead of overriding is_flagged() we override get_flagging_record(),
+  // which is the underlying method.
+  function get_flagging_record($content_id, $uid = NULL, $sid = NULL) {
     $content_id = $this->get_translation_id($content_id);
-    return parent::is_flagged($content_id, $uid, $sid);
+    return parent::get_flagging_record($content_id, $uid, $sid);
   }
 
   function get_labels_token_types() {
