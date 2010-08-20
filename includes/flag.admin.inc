@@ -27,9 +27,9 @@ function theme_flag_admin_page($variables) {
   // Build out the list of normal, database flags.
   foreach ($flags as $flag) {
     $ops = theme('links', array('links' => array(
-      'flags_edit' =>  array('title' => t('edit'), 'href' => FLAG_ADMIN_PATH . '/edit/' . $flag->name),
-      'flags_delete' =>  array('title' => t('delete'), 'href' => FLAG_ADMIN_PATH . '/delete/' . $flag->name),
-      'flags_export' =>  array('title' => t('export'), 'href' => FLAG_ADMIN_PATH . '/export/' . $flag->name),
+      'flags_edit' =>  array('title' => t('edit'), 'href' => $flag->admin_path('edit')),
+      'flags_delete' =>  array('title' => t('delete'), 'href' => $flag->admin_path('delete')),
+      'flags_export' =>  array('title' => t('export'), 'href' => $flag->admin_path('export')),
     )));
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
@@ -58,12 +58,12 @@ function theme_flag_admin_page($variables) {
       if ($flag->api_version < FLAG_API_VERSION) {
         $flag_updates_needed = TRUE;
         $ops = theme('links', array('links' => array(
-          'flags_update' => array('title' => '<strong>' . t('update code') . '</strong>', 'href' => FLAG_ADMIN_PATH . '/update/' . $flag->name, 'html' => TRUE),
+          'flags_update' => array('title' => '<strong>' . t('update code') . '</strong>', 'href' => $flag->admin_path('update'), 'html' => TRUE),
         )));
       }
       else {
         $ops = theme('links', array('links' => array(
-          'flags_enable' => array('title' => t('enable'), 'href' => FLAG_ADMIN_PATH . '/edit/' . $flag->name),
+          'flags_enable' => array('title' => t('enable'), 'href' => $flag->admin_path('edit')),
         )));
       }
       // $flag->roles['flag'] not exist on older flags.
@@ -122,8 +122,11 @@ function theme_flag_admin_page($variables) {
  * Menu callback for adding a new flag.
  */
 function flag_add_page($type = NULL, $name = NULL) {
+  drupal_set_title(t('Add new flag'));
   if (isset($type) && isset($name)) {
-    return drupal_get_form('flag_form', $name, $type);
+    $flag = flag_flag::factory_by_content_type($type);
+    $flag->name = $name;
+    return drupal_get_form('flag_form', $flag);
   }
   else {
     return drupal_get_form('flag_add_form');
@@ -182,29 +185,7 @@ function flag_add_form_submit($form, &$form_state) {
 /**
  * Add/Edit flag page.
  */
-function flag_form($form, &$form_state, $name, $type = NULL) {
-  if (isset($type)) {
-    // Adding a new flag.
-    $flag = flag_flag::factory_by_content_type($type);
-    $flag->name = $name;
-    drupal_set_title(t('Add new flag'));
-  }
-  else {
-    // Editing an existing flag.
-    $flag = flag_get_flag($name);
-    if (empty($flag)) {
-      // Check if we're overriding a default flag.
-      $default_flags = flag_get_default_flags(TRUE);
-      if (isset($default_flags[$name])) {
-        $flag = $default_flags[$name];
-      }
-      else {
-        drupal_goto(FLAG_ADMIN_PATH);
-      }
-    }
-    drupal_set_title(t('Edit @title flag', array('@title' => $flag->get_title())));
-  }
-
+function flag_form($form, &$form_state, $flag) {
   $form['#flag'] = $flag;
 
   $form['name'] = array(
@@ -523,17 +504,13 @@ function theme_flag_form_roles($variables) {
 /**
  * Delete flag page.
  */
-function flag_delete_confirm($form, &$form_state, $name) {
-  $flag = flag_get_flag($name);
-  if (empty($flag)) {
-    drupal_goto(FLAG_ADMIN_PATH);
-  }
-
+function flag_delete_confirm($form, &$form_state, $flag) {
   $form['fid'] = array('#type' => 'value', '#value' => $flag->fid);
 
   return confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $flag->get_title())),
     !empty($_GET['destination']) ? $_GET['destination'] : FLAG_ADMIN_PATH,
+    // @todo: The following doesn't work on D7. And why is node_get_types() used in the first place?!
     isset($flag->module) ? t('This flag is provided by the @module module. It will loose any customizations and be disabled.', array('@module' => node_get_types('name', $flag->module))) : t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );

@@ -9,6 +9,7 @@
 define('FLAG_API_VERSION', 2);
 
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
+define('FLAG_ADMIN_PATH_START', 3);
 
 include_once dirname(__FILE__) .'/flag.inc';
 
@@ -27,19 +28,36 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-  $items[FLAG_ADMIN_PATH . '/edit'] = array(
-    'title' => 'Edit flags',
+  $items[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
+    'load arguments' => array(TRUE), // Allow for disabled flags.
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_form'),
+    'page arguments' => array('flag_form', FLAG_ADMIN_PATH_START + 1),
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_CALLBACK,
+    // Make the flag title the default title for descendant menu items.
+    'title callback' => '_flag_menu_title',
+    'title arguments' => array(FLAG_ADMIN_PATH_START + 1),
   );
-  $items[FLAG_ADMIN_PATH . '/delete'] = array(
-    'title' => 'Delete flags',
+  $items[FLAG_ADMIN_PATH . '/manage/%flag/edit'] = array(
+    'load arguments' => array(TRUE), // Allow for disabled flags.
+    'title' => 'Edit flag',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items[FLAG_ADMIN_PATH . '/manage/%flag/export'] = array(
+    'title' => 'Export',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_delete_confirm'),
+    'page arguments' => array('flag_export_form', FLAG_ADMIN_PATH_START + 1),
+    'access arguments' => array('administer flags'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/flag.export.inc',
+    'weight' => 20,
+  );
+  $items[FLAG_ADMIN_PATH . '/manage/%flag/delete'] = array(
+    'title' => 'Delete flag',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flag_delete_confirm', FLAG_ADMIN_PATH_START + 1),
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.admin.inc',
@@ -81,31 +99,70 @@ function flag_menu() {
     'file' => 'includes/flag.export.inc',
     'weight' => 3,
   );
-  $items[FLAG_ADMIN_PATH . '/update/%'] = array(
+  $items[FLAG_ADMIN_PATH . '/manage/%flag/update'] = array(
+    'load arguments' => array(TRUE), // Allow for disabled flags.
     'title' => 'Update',
     'page callback' => 'flag_update_page',
-    'page arguments' => array(4),
+    'page arguments' => array(FLAG_ADMIN_PATH_START + 1),
     'access arguments' => array('administer flags'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/flag.export.inc',
   );
-  $items['flag'] = array(
+  $items['flag/%/%flag/%'] = array(
     'title' => 'Flag',
     'page callback' => 'flag_page',
+    'page arguments' => array(1, 2, 3),
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  $items['flag/confirm'] = array(
+  $items['flag/confirm/%/%flag/%'] = array(
     'title' => 'Flag confirm',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_confirm'),
+    'page arguments' => array('flag_confirm', 2, 3, 4),
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
 
   return $items;
+}
+
+/**
+ * Menu loader for '%flag' arguments.
+ *
+ * @param $include_disabled
+ *   Whether to return a disabled flag too. Normally only enabled flags are
+ *   returned. Some menu items operate on disabled flags and in this case
+ *   you need to turn on this switch by doing
+ *   <code>'load arguments' => array(TRUE)</code> in your menu router.
+ *
+ * @return
+ *   Either the flag object, or FALSE if none was found.
+ */
+function flag_load($flag_name, $include_disabled = FALSE) {
+  if (($flag = flag_get_flag($flag_name))) {
+    return $flag;
+  }
+  else {
+    // No enabled flag was found. Search among the disabled ones.
+    if ($include_disabled) {
+      $default_flags = flag_get_default_flags(TRUE);
+      if (isset($default_flags[$flag_name])) {
+        return $default_flags[$flag_name];
+      }
+    }
+  }
+  // A menu loader has to return FALSE (not NULL) when no object is found.
+  return FALSE;
+}
+
+/**
+ * Menu title callback.
+ */
+function _flag_menu_title($flag) {
+  // The following conditional it to handle a D7 bug (@todo: link).
+  return $flag ? $flag->get_title() : '';
 }
 
 /**
@@ -673,8 +730,11 @@ function flag_activity_info() {
  * Menu callback for (un)flagging a node.
  *
  * Used both for the regular callback as well as the JS version.
+ *
+ * @param $action
+ *   Either 'flag' or 'unflag'.
  */
-function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
+function flag_page($action, $flag, $content_id) {
   global $user;
 
   // Shorten up the variables that affect the behavior of this page.
@@ -692,7 +752,7 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
     $error = t('You must have JavaScript and cookies enabled in your browser to flag content.');
   }
   else {
-    $result = flag($action, $flag_name, $content_id);
+    $result = $flag->flag($action, $content_id);
     if (!$result) {
       $error = t('You are not allowed to flag, or unflag, this content.');
     }
@@ -718,7 +778,6 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
   // If successful, return data according to the request type.
   if ($js) {
     drupal_add_http_header('Content-Type', 'text/javascript; charset=utf-8');
-    $flag = flag_get_flag($flag_name);
     $flag->link_type = 'toggle';
     print drupal_json_encode(array(
       'status' => TRUE,
@@ -732,7 +791,6 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
     exit;
   }
   else {
-    $flag = flag_get_flag($flag_name);
     drupal_set_message($flag->get_label($action . '_message', $content_id));
     drupal_goto();
   }
@@ -740,22 +798,24 @@ function flag_page($action = NULL, $flag_name = NULL, $content_id = NULL) {
 
 /**
  * Form for confirming the (un)flagging of a piece of content.
+ *
+ * @param $action
+ *   Either 'flag' or 'unflag'.
  */
-function flag_confirm($form, &$form_state, $action = 'flag', $flag_name, $content_id = '') {
+function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
   $form['action'] = array(
     '#type' => 'value',
     '#value' => $action,
   );
   $form['flag_name'] = array(
     '#type' => 'value',
-    '#value' => $flag_name,
+    '#value' => $flag->name,
   );
   $form['content_id'] = array(
     '#type' => 'value',
     '#value' => $content_id,
   );
 
-  $flag = flag_get_flag($flag_name);
   $question = $flag->get_label($action .'_confirmation', $content_id);
   $path = isset($_GET['destination']) ? $_GET['destination'] : '<front>';
   $yes = $flag->get_label($action .'_short', $content_id);

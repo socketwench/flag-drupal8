@@ -138,8 +138,8 @@ function flag_import_form_submit($form, &$form_state) {
  * Export a flag and display it in a form.
  */
 function flag_export_form($form, &$form_state, $flag = NULL) {
-  // Convert a flag name (if any) to the list of export flags.
-  if (is_object($flag) || ($flag = flag_get_flag($flag))) {
+  // If we were passed a flag, use it as the list of flags to export.
+  if ($flag) {
     $flags = array($flag);
   }
 
@@ -196,19 +196,12 @@ function flag_export_form_submit($form, &$form_state) {
 /**
  * Page for displaying an upgrade message and export form for Flag 1.x flags.
  */
-function flag_update_page($flag_name) {
-  $flags = flag_get_default_flags(TRUE);
-  if (!isset($flags[$flag_name])) {
-    drupal_not_found();
-    return;
-  }
-
-  if ($flags[$flag_name]->api_version == FLAG_API_VERSION) {
+function flag_update_page($flag) {
+  if ($flag->api_version == FLAG_API_VERSION) {
     drupal_set_message(t('The flag %name is already up-to-date with the latest Flag API and does not need upgrading.'));
     drupal_goto(FLAG_ADMIN_PATH);
   }
 
-  $flag = $flags[$flag_name];
   drupal_set_message(t('The flag %name is currently using the Flag API version @version, which is not compatible with the current version of Flag. You can upgrade this flag by pasting the below code into <em>@module_flag_default_flags()</em> function in the @module.module file.', array('%name' => $flag->name, '@version' => $flag->api_version, '@module' => $flag->module)), 'warning');
 
   flag_update_export($flag);

@@ -208,7 +208,6 @@ class flag_flag {
     drupal_alter('flag_options', $options, $this);
     return $options;
   }
-
   /**
    * Provides a form for setting options.
    *
@@ -1117,6 +1116,19 @@ class flag_flag {
       $flag_status = variable_get('flag_default_flag_status', array());
       $flag_status[$this->name] = TRUE;
       variable_set('flag_default_flag_status', $flag_status);
+    }
+  }
+
+  /**
+   * Returns administrative menu path for carrying out some action.
+   */
+  function admin_path($action) {
+    if ($action == 'edit') {
+      // Since 'edit' is the default tab, we omit the action.
+      return FLAG_ADMIN_PATH . '/manage/' . $this->name;
+    }
+    else {
+      return FLAG_ADMIN_PATH . '/manage/' . $this->name . '/' . $action;
     }
   }
 
