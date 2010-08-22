@@ -17,8 +17,6 @@ include_once dirname(__FILE__) .'/flag.inc';
  * Implements hook_menu().
  */
 function flag_menu() {
-  $items = array();
-
   $items[FLAG_ADMIN_PATH] = array(
     'title' => 'Flags',
     'page callback' => 'flag_admin_page',
@@ -28,6 +26,39 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
+  $items[FLAG_ADMIN_PATH . '/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items[FLAG_ADMIN_PATH . '/add'] = array(
+    'title' => 'Add',
+    'page callback' => 'flag_add_page',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer flags'),
+    'file' => 'includes/flag.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+  $items[FLAG_ADMIN_PATH . '/import'] = array(
+    'title' => 'Import',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flag_import_form'),
+    'access arguments' => array('administer flags'),
+    'file' => 'includes/flag.export.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+  $items[FLAG_ADMIN_PATH . '/export'] = array(
+    'title' => 'Export',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flag_export_form'),
+    'access arguments' => array('administer flags'),
+    'file' => 'includes/flag.export.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
   $items[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
     'load arguments' => array(TRUE), // Allow for disabled flags.
     'page callback' => 'drupal_get_form',
@@ -44,14 +75,15 @@ function flag_menu() {
     'load arguments' => array(TRUE), // Allow for disabled flags.
     'title' => 'Edit flag',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
   );
   $items[FLAG_ADMIN_PATH . '/manage/%flag/export'] = array(
     'title' => 'Export',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_export_form', FLAG_ADMIN_PATH_START + 1),
     'access arguments' => array('administer flags'),
-    'type' => MENU_LOCAL_TASK,
     'file' => 'includes/flag.export.inc',
+    'type' => MENU_LOCAL_TASK,
     'weight' => 20,
   );
   $items[FLAG_ADMIN_PATH . '/manage/%flag/delete'] = array(
@@ -63,51 +95,16 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_CALLBACK,
   );
-  $items[FLAG_ADMIN_PATH . '/list'] = array(
-    'title' => 'List',
-    'page callback' => 'flag_admin_page',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.admin.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -1,
-  );
-  $items[FLAG_ADMIN_PATH . '/add'] = array(
-    'title' => 'Add',
-    'page callback' => 'flag_add_page',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 1,
-  );
-  $items[FLAG_ADMIN_PATH . '/import'] = array(
-    'title' => 'Import',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_import_form'),
-    'access arguments' => array('administer flags'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'includes/flag.export.inc',
-    'weight' => 2,
-  );
-  $items[FLAG_ADMIN_PATH . '/export'] = array(
-    'title' => 'Export',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_export_form'),
-    'access arguments' => array('administer flags'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'includes/flag.export.inc',
-    'weight' => 3,
-  );
   $items[FLAG_ADMIN_PATH . '/manage/%flag/update'] = array(
     'load arguments' => array(TRUE), // Allow for disabled flags.
     'title' => 'Update',
     'page callback' => 'flag_update_page',
     'page arguments' => array(FLAG_ADMIN_PATH_START + 1),
     'access arguments' => array('administer flags'),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/flag.export.inc',
+    'type' => MENU_CALLBACK,
   );
+
   $items['flag/%/%flag/%'] = array(
     'title' => 'Flag',
     'page callback' => 'flag_page',
