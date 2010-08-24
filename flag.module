@@ -1703,7 +1703,7 @@ function flag_get_content_id($fcid) {
  *   an array of the structure
  *   [flag_name] => (fcid => [fcid], uid => [uid], content_id => [content_id], timestamp => [timestamp], ...)
  *
- *   If returning all nodes, an array of arrays for each flag:
+ *   If returning all items' flags, an array of arrays for each flag:
  *   [flag_name] => [content_id] => Object from above.
  *
  */
