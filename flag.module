@@ -1699,11 +1699,12 @@ function flag_get_content_id($fcid) {
  *   Reset the internal cache and execute the SQL query another time.
  *
  * @return $flags
- *   If returning a single node's flags, an array of the structure
- *   [name] => (fid => [fid], uid => [uid] nid => [nid], timestamp => [timestamp])
+ *   If returning a single item's flags (that is, when $content_id isn't NULL),
+ *   an array of the structure
+ *   [flag_name] => (fcid => [fcid], uid => [uid], content_id => [content_id], timestamp => [timestamp], ...)
  *
- *   If returning all nodes, an array of the arrays for each node.
- *   [nid] => [name] => Object from above.
+ *   If returning all nodes, an array of arrays for each flag:
+ *   [flag_name] => [content_id] => Object from above.
  *
  */
 function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
@@ -1720,7 +1721,7 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
 
   if (isset($content_id)) {
-    if (!isset($flagged_content[$uid][$content_type][$content_id])) {
+    if (!isset($flagged_content[$uid][$sid][$content_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
       $flagged_content[$uid][$sid][$content_type][$content_id] = array();
       $result = db_select('flag_content', 'fc')
@@ -1742,14 +1743,14 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
   }
 
   else {
-    if (!isset($flagged_content[$uid][$sid]['all'][$content_type])) {
+    if (!isset($flagged_content[$uid][$sid][$content_type]['all'])) {
       $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid]['all'][$content_type] = TRUE;
+      $flagged_content[$uid][$sid][$content_type]['all'] = array();
       $result = db_select('flag_content', 'fc')
         ->fields('fc')
         ->condition('content_type', $content_type)
         ->condition(db_or()
-          ->condition('uid', $account->uid)
+          ->condition('uid', $uid)
           ->condition('uid', 0)
         )
         ->condition('sid', $sid)
