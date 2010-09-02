@@ -32,12 +32,12 @@ function flag_menu() {
     'weight' => -10,
   );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
-    'title' => 'Add',
+    'title' => 'Add a new flag',
     'page callback' => 'flag_add_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.admin.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'weight' => 1,
   );
   $items[FLAG_ADMIN_PATH . '/import'] = array(
@@ -160,6 +160,17 @@ function flag_load($flag_name, $include_disabled = FALSE) {
 function _flag_menu_title($flag) {
   // The following conditional it to handle a D7 bug (@todo: link).
   return $flag ? $flag->get_title() : '';
+}
+
+/**
+ * Implements hook_help().
+ */
+function flag_help($path, $arg) {
+  switch ($path) {
+    case FLAG_ADMIN_PATH:
+      $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system.') . '</p>';
+      return $output;
+  }
 }
 
 /**

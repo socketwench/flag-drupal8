@@ -21,8 +21,7 @@ function flag_admin_page() {
 function theme_flag_admin_page($variables) {
   $flags = $variables['flags'];
   $default_flags = $variables['default_flags'];
-
-  $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system. You may <a href="@add-url">add new flags</a>.', array('@add-url' => url(FLAG_ADMIN_PATH . '/add'))) . '</p>';
+  $output = '';
 
   // Build out the list of normal, database flags.
   foreach ($flags as $flag) {
