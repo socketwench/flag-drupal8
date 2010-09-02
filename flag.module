@@ -375,7 +375,7 @@ function flag_field_extra_fields() {
 function flag_form_alter(&$form, &$form_state, $form_id) {
   global $user;
 
-  if ($form_id == 'node_type_form' && isset($form['identity']['type'])) {
+  if ($form_id == 'node_type_form') {
     $flags = flag_get_flags('node', $form['#node_type']->type, $user);
     foreach ($flags as $flag) {
       if ($flag->show_on_form) {
@@ -436,6 +436,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
         '#description' => $flag->get_label('flag_long', $nid ? $nid : $form['type']['#value']),
         '#default_value' => $flag_status,
         '#return_value' => 1,
+        '#attributes' => array('title' => $flag->get_title()), // Used by our drupalSetSummary().
       );
       // If the user does not have access to the flag, set as a value.
       if (!$access) {
@@ -458,9 +459,9 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'fieldset',
         '#title' => t('Flags'),
         '#collapsible' => TRUE,
-        '#attributes' => array('class' => array('flag-fieldset')),
         // Vertical tabs support:
         '#group' => 'additional_settings',
+        '#attributes' => array('class' => array('flag-fieldset')),
         '#attached' => array(
           'js' => array(
             'vertical-tabs' => drupal_get_path('module', 'flag') . '/theme/flag-admin.js',

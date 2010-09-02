@@ -74,13 +74,10 @@ Drupal.behaviors.flagLinkOptions.attach = function(context) {
 Drupal.behaviors.flagSummary = {};
 
 Drupal.behaviors.flagSummary.attach = function (context) {
-  $('fieldset.flag-fieldset', context).setSummary(function(context) {
+  $('fieldset.flag-fieldset', context).drupalSetSummary(function(context) {
     var flags = [];
-
-    $('input.form-checkbox', context).each(function() {
-      if (this.checked) {
-        flags.push(this.name.replace(/flag\[([a-z0-9]+)\]/, '$1'));
-      }
+    $('input:checkbox:checked', context).each(function() {
+      flags.push(this.title);
     });
 
     if (flags.length) {
