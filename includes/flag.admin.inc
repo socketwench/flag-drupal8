@@ -26,11 +26,11 @@ function theme_flag_admin_page($variables) {
 
   // Build out the list of normal, database flags.
   foreach ($flags as $flag) {
-    $ops = theme('links', array('links' => array(
+    $ops = array(
       'flags_edit' =>  array('title' => t('edit'), 'href' => $flag->admin_path('edit')),
       'flags_delete' =>  array('title' => t('delete'), 'href' => $flag->admin_path('delete')),
       'flags_export' =>  array('title' => t('export'), 'href' => $flag->admin_path('export')),
-    )));
+    );
 
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
     $rows[] = array(
@@ -39,7 +39,7 @@ function theme_flag_admin_page($variables) {
       empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles),
       $flag->types ? implode(', ', $flag->types) : '-',
       $flag->global ? t('Yes') : t('No'),
-      $ops,
+      theme('links', array('links' => $ops)),
     );
   }
   if (!$flags) {
@@ -55,16 +55,13 @@ function theme_flag_admin_page($variables) {
   $rows = array();
   foreach ($default_flags as $name => $flag) {
     if (!isset($flags[$name])) {
+      $ops = array();
       if ($flag->api_version < FLAG_API_VERSION) {
         $flag_updates_needed = TRUE;
-        $ops = theme('links', array('links' => array(
-          'flags_update' => array('title' => '<strong>' . t('update code') . '</strong>', 'href' => $flag->admin_path('update'), 'html' => TRUE),
-        )));
+        $ops['flags_update'] = array('title' => '<strong>' . t('update code') . '</strong>', 'href' => $flag->admin_path('update'), 'html' => TRUE);
       }
       else {
-        $ops = theme('links', array('links' => array(
-          'flags_enable' => array('title' => t('enable'), 'href' => $flag->admin_path('edit')),
-        )));
+        $ops['flags_enable'] = array('title' => t('enable'), 'href' => $flag->admin_path('edit'));
       }
       // $flag->roles['flag'] not exist on older flags.
       $roles = array_flip(array_intersect(array_flip(user_roles()), !empty($flag->roles['flag']) ? $flag->roles['flag'] : array()));
@@ -72,7 +69,7 @@ function theme_flag_admin_page($variables) {
         $flag->name,
         $flag->module,
         $flag->content_type,
-        $ops,
+        theme('links', array('links' => $ops)),
       );
     }
   }
