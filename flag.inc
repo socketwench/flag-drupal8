@@ -895,7 +895,7 @@ class flag_flag {
    * Derived classes should override this.
    */
   function get_labels_token_types() {
-    return array('global');
+    return array();
   }
 
   /**
@@ -1307,7 +1307,7 @@ class flag_node extends flag_flag {
   }
 
   function get_labels_token_types() {
-    return array('node');
+    return array_merge(array('node'), parent::get_labels_token_types());
   }
 
   function replace_tokens($label, $contexts, $options, $content_id) {
@@ -1459,7 +1459,7 @@ class flag_comment extends flag_flag {
   }
 
   function get_labels_token_types() {
-    return array('comment', 'node');
+    return array_merge(array('comment', 'node'), parent::get_labels_token_types());
   }
 
   function replace_tokens($label, $contexts, $options, $content_id) {
@@ -1616,7 +1616,7 @@ class flag_user extends flag_flag {
   }
 
   function get_labels_token_types() {
-    return array('user');
+    return array_merge(array('user'), parent::get_labels_token_types());
   }
 
   function replace_tokens($label, $contexts, $options, $content_id) {
