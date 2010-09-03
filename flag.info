@@ -3,7 +3,7 @@ name = Flag
 description = Create customized flags that users can set on content.
 core = 7.x
 package = Flags
-configure = admin/structure/webform/flags
+configure = admin/structure/flags
 
 ; Flag core.
 files[] = flag.inc
