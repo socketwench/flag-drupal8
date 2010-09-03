@@ -19,11 +19,11 @@ function flag_token_info() {
     'description' => t('Tokens related to flag data.'),
     'needs-data' => 'flag',
   );
-  $tokens['flag']['flag-name'] = array(
+  $tokens['flag']['name'] = array(
     'name' => t('Flag name'),
     'description' => t('The flag machine-readable name.'),
   );
-  $tokens['flag']['flag-title'] = array(
+  $tokens['flag']['title'] = array(
     'name' => t('Flag title'),
     'description' => t('The human-readable flag title.'),
   );
