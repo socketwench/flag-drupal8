@@ -489,12 +489,9 @@ function flag_comment_view($comment) {
  * Implements hook_node_view().
  */
 function flag_node_view($node, $view_mode) {
-  $links = flag_link('node', $node, $view_mode == 'teaser');
-  $node->content['links']['flag'] = array(
-    '#theme' => 'links',
-    '#links' => $links,
-    '#attributes' => array('class' => array('links', 'inline')),
-  );
+  // @todo: Drupal 7's API is about to change (again) and we'll have to update this hook.
+  // See http://drupal.org/node/921232
+  $node->content['links']['#links'] += (array) flag_link('node', $node, $view_mode == 'teaser');
 }
 
 /**
