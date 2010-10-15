@@ -81,7 +81,7 @@ function flag_actions_update_6200() {
   $ret = array();
 
   // Add the new repeat_threshold column.
-  if (!db_column_exists('flag_actions', 'repeat_threshold')) {
+  if (!db_field_exists('flag_actions', 'repeat_threshold')) {
     $column = array(
       'type' => 'int',
       'size' => 'small',

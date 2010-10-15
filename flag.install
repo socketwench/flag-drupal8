@@ -299,7 +299,7 @@ function flag_update_last_removed() {
  * Convert role access to have separate "flag" and "unflag" permissions.
  */
 function flag_update_6200() {
-  if (db_column_exists('flags', 'roles')) {
+  if (db_field_exists('flags', 'roles')) {
     $result = db_select('flags', 'f')
       ->fields('f')
       ->execute();
