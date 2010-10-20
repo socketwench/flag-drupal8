@@ -1674,7 +1674,7 @@ class flag_broken extends flag_flag {
   function options_form(&$form) {
     $form = array();
     $form['error'] = array(
-      '#value' => '<div class="error">' . t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->content_type)) . '</div>',
+      '#markup' => '<div class="error">' . t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->content_type)) . '</div>',
     );
   }
 }

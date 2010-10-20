@@ -656,7 +656,7 @@ function flag_user_view($account, $view_mode) {
     $flag_items[$flag->name] = array(
       '#type' => 'user_profile_item',
       '#title' => $flag->get_title($account->uid),
-      '#value' => $flag->theme($flag->is_flagged($account->uid) ? 'unflag' : 'flag', $account->uid),
+      '#markup' => $flag->theme($flag->is_flagged($account->uid) ? 'unflag' : 'flag', $account->uid),
       '#attributes' => array('class' => array('flag-profile-' . $flag->name)),
     );
   }
