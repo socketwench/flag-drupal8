@@ -204,7 +204,7 @@ function flag_views_default_views() {
   $handler->override_option('access', $access);
   $handler->override_option('title', 'User bookmarks');
   $handler->override_option('empty', 'This user has not yet bookmarked any content.');
-  $handler->override_option('empty_format', '1');
+  $handler->override_option('empty_format', filter_fallback_format());
   $handler->override_option('items_per_page', '25');
   $handler->override_option('use_pager', TRUE);
   $handler->override_option('style_plugin', 'table');
@@ -258,7 +258,7 @@ function flag_views_default_views() {
   $handler->override_option('items_per_page', '25');
   $handler->override_option('use_pager', TRUE);
   $handler->override_option('empty', 'You have not yet bookmarked any content. Click the "'. $flag->flag_short .'" link when viewing a piece of content to add it to this list.');
-  $handler->override_option('empty_format', FILTER_FORMAT_DEFAULT);
+  $handler->override_option('empty_format', filter_fallback_format());
   $handler->override_option('style_plugin', 'table');
   $handler->override_option('style_options', $style_options);
   $handler = $view->new_display('page', 'Page', 'page');
