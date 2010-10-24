@@ -1476,7 +1476,7 @@ class flag_comment extends flag_flag {
     $flag_action = parent::get_flag_action($content_id);
     $comment = $this->fetch_content($content_id);
     $flag_action->content_title = $comment->subject;
-    $flag_action->content_url = _flag_url("node/$comment->nid/$comment->cid", "comment-$comment->cid");
+    $flag_action->content_url = _flag_url("comment/$comment->cid", "comment-$comment->cid");
     return $flag_action;
   }
 
