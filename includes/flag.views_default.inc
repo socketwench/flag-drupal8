@@ -146,7 +146,7 @@ function flag_views_default_views() {
 
   // Additional relationship for this view.
   $relationships_tab = $relationships;
-  $relationships_tab['flag_content_rel']['user_scope'] = 'all';
+  $relationships_tab['flag_content_rel']['user_scope'] = 'any';
   $relationships_tab += array(
     'uid' => array(
       'label' => 'bookmarks_user',
