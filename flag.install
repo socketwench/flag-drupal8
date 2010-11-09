@@ -58,11 +58,24 @@ function flag_enable() {
       'unflag_short' => 'Unbookmark this',
       'unflag_long' => 'Remove this post from your bookmarks',
       'unflag_message' => 'This post has been removed from your bookmarks',
-      'types' => array('story', 'forum', 'blog'),
+      'types' => _flag_install_get_suggested_node_types(),
     );
     $flag->form_input($configuration);
     $flag->save();
   }
+}
+
+/**
+ * Returns some node types to which the demonstration 'bookmarks' flag will apply.
+ */
+function _flag_install_get_suggested_node_types() {
+  $preferred = array('article', 'story', 'forum', 'blog');
+  $existing = array_intersect($preferred, array_keys(node_type_get_types()));
+  if (!$existing) {
+    // As a last resort, take the first preference.
+    return array($preferred[0]);
+  }
+  return $existing;
 }
 
 /**
