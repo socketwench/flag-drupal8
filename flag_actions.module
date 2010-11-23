@@ -188,7 +188,7 @@ function flag_actions_update_action($aid, $event, $threshold, $repeat_threshold,
  *   The flag action ID to delete.
  */
 function flag_actions_delete_action($aid) {
-  return db_delete('flag_actions', array('return' => RETURN_AFFECTED))
+  return db_delete('flag_actions', array('return' => Database::RETURN_AFFECTED))
     ->condition('aid', $aid)
     ->execute();
 }
