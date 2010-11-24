@@ -870,21 +870,22 @@ function flag_flag($action, $flag, $content_id, $account) {
     $context['account'] = $account;
     $context['flag'] = $flag;
     $context['op'] = $action;
-
     // We add to the $context all the objects we know about:
     $context = array_merge($flag->get_relevant_action_objects($content_id), $context);
+    // The primary object the actions work on.
+    $object = $flag->fetch_content($content_id);
 
     // Generic "all flags" actions.
-    foreach (_trigger_get_hook_aids($action, $action) as $aid => $action_info) {
+    foreach (trigger_get_assigned_actions('flag_' . $action)  as $aid => $action_info) {
       // The 'if ($aid)' is a safeguard against http://drupal.org/node/271460#comment-886564
       if ($aid) {
-        actions_do($aid, $flag, $context);
+        actions_do($aid, $object, $context);
       }
     }
     // Actions specifically for this flag.
-    foreach (_trigger_get_hook_aids($action . '_' . $flag->name, $action) as $aid => $action_info) {
+    foreach (trigger_get_assigned_actions('flag_' . $action . '_' . $flag->name) as $aid => $action_info) {
       if ($aid) {
-        actions_do($aid, $flag, $context);
+        actions_do($aid, $object, $context);
       }
     }
   }
