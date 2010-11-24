@@ -7,25 +7,23 @@
  */
 
 /**
- * Implementation of hook_hook_info().
+ * Implementation of hook_trigger_info().
  */
-function flag_hook_info() {
+function flag_trigger_info() {
   $hooks = array(
     'flag' => array(
-      'flag' => array(
-        'flag' => array(
-          'runs when' => t('Content has been flagged with any flag'),
-        ),
-        'unflag' => array(
-          'runs when' => t('Content has been unflagged with any flag')
-        ),
+      'flag_flag' => array(
+        'label' => t('Content has been flagged with any flag'),
+      ),
+      'flag_unflag' => array(
+        'label' => t('Content has been unflagged with any flag')
       ),
     ),
   );
 
   foreach (flag_get_flags() as $flag) {
-    $hooks['flag']['flag']['flag_'. $flag->name]['runs when'] = t('A %type has been flagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
-    $hooks['flag']['flag']['unflag_'. $flag->name]['runs when'] = t('A %type has been unflagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
+    $hooks['flag']['flag_flag_'. $flag->name]['label'] = t('A %type has been flagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
+    $hooks['flag']['flag_unflag_'. $flag->name]['label'] = t('A %type has been unflagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
   }
 
   return $hooks;
@@ -38,27 +36,27 @@ function flag_action_info() {
   return array(
     'flag_node_action' => array(
       'type' => 'node',
-      'description' => t('Flag (or unflag) a node'),
+      'label' => t('Flag (or unflag) a node'),
       'configurable' => TRUE,
-      'hooks' => array(
-        'node' => array('view', 'presave', 'insert', 'update', 'delete', 'view'),
-        'comment' => array('insert', 'update', 'delete', 'view'),
+      'triggers' => array(
+        'node_presave', 'node_insert', 'node_update', 'node_delete', 'node_view',
+        'comment_insert', 'comment_update', 'comment_delete', 'comment_view',
       ),
     ),
     'flag_comment_action' => array(
       'type' => 'comment',
-      'description' => t('Flag (or unflag) a comment'),
+      'label' => t('Flag (or unflag) a comment'),
       'configurable' => TRUE,
-      'hooks' => array(
-        'comment' => array('insert', 'update', 'delete', 'view'),
+      'triggers' => array(
+        'comment_insert', 'comment_update', 'comment_delete', 'comment_view',
       ),
     ),
     'flag_user_action' => array(
       'type' => 'user',
-      'description' => t('Flag (or unflag) a user'),
+      'label' => t('Flag (or unflag) a user'),
       'configurable' => TRUE,
-      'hooks' => array(
-        'user' => array('insert', 'update', 'delete', 'login', 'logout', 'view'),
+      'triggers' => array(
+        'user_insert', 'user_update', 'user_delete', 'user_login', 'user_logout', 'user_view',
       ),
     ),
   );
@@ -77,24 +75,27 @@ function flag_action_info_alter(&$actions) {
 
   foreach ($actions as $name => $action) {
     if (strpos($name, 'node') === 0) {
-      $actions[$name]['hooks']['flag'] = array('flag', 'unflag');
+      $actions[$name]['triggers'][] = 'flag_flag';
+      $actions[$name]['triggers'][] = 'flag_unflag';
       foreach ($node_flags as $flag) {
-        $actions[$name]['hooks']['flag'][] = 'flag_' . $flag->name;
-        $actions[$name]['hooks']['flag'][] = 'unflag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_flag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_unflag_' . $flag->name;
       }
     }
     if (strpos($name, 'comment') === 0) {
-      $actions[$name]['hooks']['flag'] = array('flag', 'unflag');
+      $actions[$name]['triggers'][] = 'flag_flag';
+      $actions[$name]['triggers'][] = 'flag_unflag';
       foreach ($comment_flags as $flag) {
-        $actions[$name]['hooks']['flag'][] = 'flag_' . $flag->name;
-        $actions[$name]['hooks']['flag'][] = 'unflag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_flag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_unflag_' . $flag->name;
       }
     }
     if (strpos($name, 'user') === 0) {
-      $actions[$name]['hooks']['flag'] = array('flag', 'unflag');
+      $actions[$name]['triggers'][] = 'flag_flag';
+      $actions[$name]['triggers'][] = 'flag_unflag';
       foreach ($user_flags as $flag) {
-        $actions[$name]['hooks']['flag'][] = 'flag_' . $flag->name;
-        $actions[$name]['hooks']['flag'][] = 'unflag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_flag_' . $flag->name;
+        $actions[$name]['triggers'][] = 'flag_unflag_' . $flag->name;
       }
     }
   }
@@ -194,7 +195,7 @@ function flag_action_form($context, $content_type) {
 
   $form['flag_action']['#tree'] = TRUE;
   $form['flag_action']['warning'] = array(
-    '#value' => '<div class="messages status">' . t("Note when setting a flag through actions, the selected flag will be flagged regardless of the user's permissions.") . '</div>',
+    '#markup' => '<div class="messages status">' . t("Note when setting a flag through actions, the selected flag will be flagged regardless of the user's permissions.") . '</div>',
   );
   $form['flag_action']['flag'] = array(
     '#title' => t('Flag to affect'),
@@ -216,7 +217,7 @@ function flag_action_form($context, $content_type) {
   if (empty($options)) {
     $error = t('There are no available %type flags. Before you can create an action of this type, you need to <a href="!url">create a %type flag</a>.', array('%type' => $content_type, '!url' => url(FLAG_ADMIN_PATH . '/add')));
     $form['flag_action']['flag']['#type'] = 'item';
-    $form['flag_action']['flag']['#children'] = $error;
+    $form['flag_action']['flag']['#markup'] = $error;
     $form['flag_action']['flag']['#element_validate'][] = 'flag_action_validate_flag';
     $form['flag_action']['flag']['#flag_error'] = $error;
   }
