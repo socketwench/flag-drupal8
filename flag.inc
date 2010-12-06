@@ -1095,6 +1095,7 @@ class flag_flag {
     db_delete('flag_content')->condition('fid', $this->fid)->execute();
     db_delete('flag_types')->condition('fid', $this->fid)->execute();
     db_delete('flag_counts')->condition('fid', $this->fid)->execute();
+    module_invoke_all('flag_delete', $this);
   }
 
   /**
