@@ -203,16 +203,16 @@ Drupal.flagCookie = function(name, value, options) {
 
 Drupal.behaviors.flagLink = {};
 Drupal.behaviors.flagLink.attach = function(context) {
-  // For all anonymous users, require JavaScript for flagging to prevent spiders
-  // from flagging things inadvertently.
-  if (Drupal.settings.flag && Drupal.settings.flag.anonymous) {
-    Drupal.flagAnonymousLinks(context);
-  }
-
   // For anonymous users with the page cache enabled, swap out links with their
   // current state for the user.
   if (Drupal.settings.flag && Drupal.settings.flag.templates) {
     Drupal.flagAnonymousLinkTemplates(context);
+  }
+
+  // For all anonymous users, require JavaScript for flagging to prevent spiders
+  // from flagging things inadvertently.
+  if (Drupal.settings.flag && Drupal.settings.flag.anonymous) {
+    Drupal.flagAnonymousLinks(context);
   }
 
   // On load, bind the click behavior for all links on the page.
