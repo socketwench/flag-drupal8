@@ -127,7 +127,7 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       var flagName = flagInfo[0];
       var contentId = flagInfo[1];
       // User flags always default to off and the JavaScript toggles them on.
-      $('.flag-' + flagName + '-' + contentId, context).after(Drupal.settings.flag.templates[flagName + '_' + contentId]).remove();
+      $('.flag-' + flagName + '-' + contentId, context).after(Drupal.settings.flag.templates[flagName + '_' + contentId] || '<span>[missing flag template]</span>').remove();
     }
   }
 
@@ -145,7 +145,7 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       // don't swap out the link when it's already in the correct state.
       $('.flag-' + flagName + '-' + contentId, context).each(function() {
         if ($(this).find('.' + flagState + '-action').size()) {
-          $(this).after(Drupal.settings.flag.templates[flagName + '_' + contentId]).remove();
+          $(this).after(Drupal.settings.flag.templates[flagName + '_' + contentId] || '<span>[missing flag template]</span>').remove();
         }
       });
     }
