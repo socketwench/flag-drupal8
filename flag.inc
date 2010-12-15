@@ -1143,19 +1143,30 @@ class flag_flag {
     static $js_added = array();
     global $user;
 
-    // If the flagging user is anonymous, set the global anonymous setting.
+    // If the flagging user is anonymous, set a boolean for the benefit of
+    // JavaScript code. Currently, only our "anti-crawlers" mechanism uses it.
     if ($user->uid == 0 && !isset($js_added['anonymous'])) {
       $js_added['anonymous'] = TRUE;
-      drupal_add_js(array('flag' => array('anonymous' => 1)), 'setting');
+      drupal_add_js(array('flag' => array('anonymous' => TRUE)), 'setting');
     }
 
-    // If the flagging user is anonymous and the page cache is enabled, always
-    // show the "flag" link, and then set the unflag link through JavaScript.
+    // If the flagging user is anonymous and the page cache is enabled, we
+    // update the links through JavaScript.
     if ($this->uses_anonymous_cookies() && !$after_flagging) {
-      $js_action = $this->global ? ($action == 'flag' ? 'unflag' : 'flag') : 'flag';
+      if ($this->global) {
+        // In case of global flags, the JavaScript template is to contain
+        // the opposite of the current state.
+        $js_action = ($action == 'flag' ? 'unflag' : 'flag');
+      }
+      else {
+        // In case of non-global flags, we always show the "flag!" link,
+        // and then replace it with the "unflag!" link through JavaScript.
+        $js_action = 'unflag';
+        $action = 'flag';
+      }
       if (!isset($js_added[$this->name . '_' . $content_id])) {
         $js_added[$this->name . '_' . $content_id] = TRUE;
-        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => 'unflag', 'content_id' => $content_id, 'after_flagging' => $after_flagging));
+        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'content_id' => $content_id, 'after_flagging' => $after_flagging));
         drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), array('type' => 'setting', 'scope' => JS_DEFAULT));
       }
     }
