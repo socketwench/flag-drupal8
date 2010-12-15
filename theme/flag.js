@@ -118,6 +118,8 @@ Drupal.flagAnonymousLinks = function(context) {
 Drupal.flagAnonymousLinkTemplates = function(context) {
   // Swap in current links. Cookies are set by PHP's setcookie() upon flagging.
 
+  var templates = Drupal.settings.flag.templates;
+
   // Build a list of user-flags.
   var userFlags = Drupal.flagCookie('flags');
   if (userFlags) {
@@ -127,7 +129,9 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       var flagName = flagInfo[0];
       var contentId = flagInfo[1];
       // User flags always default to off and the JavaScript toggles them on.
-      $('.flag-' + flagName + '-' + contentId, context).after(Drupal.settings.flag.templates[flagName + '_' + contentId] || '<span>[missing flag template]</span>').remove();
+      if (templates[flagName + '_' + contentId]) {
+        $('.flag-' + flagName + '-' + contentId, context).after(templates[flagName + '_' + contentId]).remove();
+      }
     }
   }
 
@@ -143,11 +147,13 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       // cache. The template always contains the opposite of the current state.
       // So when checking global flag cookies, we need to make sure that we
       // don't swap out the link when it's already in the correct state.
-      $('.flag-' + flagName + '-' + contentId, context).each(function() {
-        if ($(this).find('.' + flagState + '-action').size()) {
-          $(this).after(Drupal.settings.flag.templates[flagName + '_' + contentId] || '<span>[missing flag template]</span>').remove();
-        }
-      });
+      if (templates[flagName + '_' + contentId]) {
+        $('.flag-' + flagName + '-' + contentId, context).each(function() {
+          if ($(this).find('.' + flagState + '-action').size()) {
+            $(this).after(templates[flagName + '_' + contentId]).remove();
+          }
+        });
+      }
     }
   }
 }
