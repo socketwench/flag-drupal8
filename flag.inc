@@ -751,34 +751,8 @@ class flag_flag {
    * @private
    */
   function _flag_anonymous($content_id) {
-    // Global flags persist for the length of the minimum cache lifetime.
-    if ($this->global) {
-      $cookie_key = 'flag_global_' . str_replace('_', '-', $this->name) . '_' . $content_id;
-      $cookie_lifetime = (variable_get('cache', 0) > CACHE_DISABLED) ? variable_get('cache_lifetime', 0) : -1;
-      // Do not let the cookie lifetime be 0 (which is the no cache limit on
-      // anonymous page caching), since it would expire immediately. Usually
-      // the no cache limit means caches are cleared on cron, which usually runs
-      // at least once an hour.
-      if ($cookie_lifetime == 0) {
-        $cookie_lifetime = 3600;
-      }
-      setcookie($cookie_key, 1, REQUEST_TIME + $cookie_lifetime, base_path());
-      $_COOKIE[$cookie_key] = 1;
-    }
-    // The anonymous per-user flags are stored in a single cookie, so that all
-    // of them persist as long as the Drupal cookie lifetime.
-    else {
-      $cookie_flags = isset($_COOKIE['flags']) ? $_COOKIE['flags'] : '';
-      $cookie_flags = explode(' ', $cookie_flags);
-      $cookie_key = str_replace('_', '-', $this->name) . '_' . $content_id;
-      $cookie_lifetime = min((int) ini_get('session.cookie_lifetime'), (int) ini_get('session.gc_maxlifetime'));
-      if (array_search($cookie_key, $cookie_flags) === FALSE) {
-        $cookie_flags[] = $cookie_key;
-        $cookie_flags = implode(' ', array_filter($cookie_flags));
-        setcookie('flags', $cookie_flags, REQUEST_TIME + $cookie_lifetime, base_path());
-        $_COOKIE['flags'] = $cookie_flags;
-      }
-    }
+    $storage = FlagCookieStorage::factory($this);
+    $storage->flag($content_id);
   }
 
   /**
@@ -787,34 +761,8 @@ class flag_flag {
    * @private
    */
   function _unflag_anonymous($content_id) {
-    // Global flags are easy, just delete the global cookie.
-    if ($this->global) {
-      $cookie_key = 'flag_global_' . str_replace('_', '-', $this->name) . '_' . $content_id;
-      $cookie_lifetime = (variable_get('cache', 0) > CACHE_DISABLED) ? variable_get('cache_lifetime', 0) : -1;
-      // Do not let the cookie lifetime be 0 (which is the no cache limit on
-      // anonymous page caching), since it would expire immediately. Usually
-      // the no cache limit means caches are cleared on cron, which usually runs
-      // at least once an hour.
-      if ($cookie_lifetime == 0) {
-        $cookie_lifetime = 3600;
-      }
-      setcookie($cookie_key, 0, REQUEST_TIME + $cookie_lifetime, base_path());
-      $_COOKIE[$cookie_key] = 0;
-    }
-    // User flags, update the single cookie for all user-data.
-    else {
-      $cookie_flags = isset($_COOKIE['flags']) ? $_COOKIE['flags'] : '';
-      $cookie_flags = explode(' ', $cookie_flags);
-      $cookie_key = str_replace('_', '-', $this->name) . '_' . $content_id;
-      $cookie_lifetime = min((int) ini_get('session.cookie_lifetime'), (int) ini_get('session.gc_maxlifetime'));
-      $cookie_index = array_search($cookie_key, $cookie_flags);
-      if ($cookie_index !== FALSE) {
-        unset($cookie_flags[$cookie_index]);
-        $cookie_flags = implode(' ', $cookie_flags);
-        setcookie('flags', $cookie_flags, REQUEST_TIME + $cookie_lifetime, base_path());
-        $_COOKIE['flags'] = $cookie_flags;
-      }
-    }
+    $storage = FlagCookieStorage::factory($this);
+    $storage->unflag($content_id);
   }
 
   /**
@@ -1693,3 +1641,169 @@ class flag_broken extends flag_flag {
 function _flag_url($path, $fragment = NULL, $absolute = TRUE) {
   return url($path, array('fragment' => $fragment, 'absolute' => $absolute));
 }
+
+
+/**
+ * Utility class to handle cookies.
+ *
+ * Cookies are used to record flaggings for anonymous users on cached pages.
+ *
+ * This class contains only two instance methods. Usage example:
+ * @code
+ *   $storage = FlagCookieStorage::factory($flag);
+ *   $storage->flag(145);
+ *   $storage->unflag(17);
+ * @endcode
+ *
+ * You may delete all the cookies with <code>FlagCookieStorage::drop()</code>.
+ */
+abstract class FlagCookieStorage {
+
+  /**
+   * Returns the actual storage object compatible with the flag.
+   */
+  static function factory($flag) {
+    if ($flag->global) {
+      return new FlagGlobalCookieStorage($flag);
+    }
+    else {
+      return new FlagNonGlobalCookieStorage($flag);
+    }
+  }
+
+  function __construct($flag) {
+    $this->flag = $flag;
+  }
+
+  /**
+   * "Flags" an item.
+   *
+   * It just records this fact in a cookie.
+   */
+  abstract function flag($content_id);
+
+  /**
+   * "Unflags" an item.
+   *
+   * It just records this fact in a cookie.
+   */
+  abstract function unflag($content_id);
+
+  /**
+   * Deletes all the cookies.
+   *
+   * (Etymology: "drop" as in "drop database".)
+   */
+  static function drop() {
+    FlagGlobalCookieStorage::drop();
+    FlagNonGlobalCookieStorage::drop();
+  }
+}
+
+/**
+ * Storage handler for global flags.
+ */
+class FlagGlobalCookieStorage extends FlagCookieStorage {
+
+  function flag($content_id) {
+    $cookie_key = $this->cookie_key($content_id);
+    setcookie($cookie_key, 1, REQUEST_TIME + $this->get_lifetime(), base_path());
+    $_COOKIE[$cookie_key] = 1;
+  }
+
+  function unflag($content_id) {
+    $cookie_key = $this->cookie_key($content_id);
+    setcookie($cookie_key, 0, REQUEST_TIME + $this->get_lifetime(), base_path());
+    $_COOKIE[$cookie_key] = 0;
+  }
+
+  // Global flags persist for the length of the minimum cache lifetime.
+  protected function get_lifetime() {
+    $cookie_lifetime = (variable_get('cache', 0) > CACHE_DISABLED) ? variable_get('cache_lifetime', 0) : -1;
+    // Do not let the cookie lifetime be 0 (which is the no cache limit on
+    // anonymous page caching), since it would expire immediately. Usually
+    // the no cache limit means caches are cleared on cron, which usually runs
+    // at least once an hour.
+    if ($cookie_lifetime == 0) {
+      $cookie_lifetime = 3600;
+    }
+    return $cookie_lifetime;
+  }
+
+  protected function cookie_key($content_id) {
+    return 'flag_global_' . str_replace('_', '-', $this->flag->name) . '_' . $content_id;
+  }
+
+  /**
+   * Deletes all the global cookies.
+   */
+  static function drop() {
+    foreach ($_COOKIE as $key => $value) {
+      if (strpos($key, 'flag_global_') === 0) {
+        setcookie($key, FALSE, 0, base_path());
+        unset($_COOKIE[$key]);
+      }
+    }
+  }
+}
+
+/**
+ * Storage handler for non-global flags.
+ */
+class FlagNonGlobalCookieStorage extends FlagCookieStorage {
+
+  // The anonymous per-user flaggings are stored in a single cookie, so that
+  // all of them persist as long as the Drupal cookie lifetime.
+
+  function __construct($flag) {
+    parent::__construct($flag);
+    $this->flaggings = isset($_COOKIE['flags']) ? explode(' ', $_COOKIE['flags']) : array();
+  }
+
+  function flag($content_id) {
+    if (!$this->is_flagged($content_id)) {
+      $this->flaggings[] = $this->cookie_key($content_id);
+      $this->write();
+    }
+  }
+
+  function unflag($content_id) {
+    if (($index = $this->index_of($content_id)) !== FALSE) {
+      unset($this->flaggings[$index]);
+      $this->write();
+    }
+  }
+
+  protected function get_lifetime() {
+    return min((int) ini_get('session.cookie_lifetime'), (int) ini_get('session.gc_maxlifetime'));
+  }
+
+  protected function cookie_key($content_id) {
+    return str_replace('_', '-', $this->flag->name) . '_' . $content_id;
+  }
+
+  protected function write() {
+    $serialized = implode(' ', array_filter($this->flaggings));
+    setcookie('flags', $serialized, REQUEST_TIME + $this->get_lifetime(), base_path());
+    $_COOKIE['flags'] = $serialized;
+  }
+
+  protected function is_flagged($content_id) {
+    return $this->index_of($content_id) !== FALSE;
+  }
+
+  protected function index_of($content_id) {
+    return array_search($this->cookie_key($content_id), $this->flaggings);
+  }
+
+  /**
+   * Deletes the cookie.
+   */
+  static function drop() {
+    if (isset($_COOKIE['flags'])) {
+      setcookie('flags', FALSE, 0, base_path());
+      unset($_COOKIE['flags']);
+    }
+  }
+}
+

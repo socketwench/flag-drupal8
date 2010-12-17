@@ -600,16 +600,7 @@ function flag_user_login(&$edit, &$account) {
       ->execute();
 
     // Clean up anonymous cookies.
-    if (isset($_COOKIE['flags'])) {
-      setcookie('flags', FALSE, 0, base_path());
-      unset($_COOKIE['flags']);
-    }
-    foreach ($_COOKIE as $key => $value) {
-      if (strpos($key, 'flag_global_') === 0) {
-        setcookie($key, FALSE, 0, base_path());
-        unset($_COOKIE[$key]);
-      }
-    }
+    FlagCookieStorage::drop();
   }
 }
 
