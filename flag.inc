@@ -513,7 +513,7 @@ class flag_flag {
    */
   function uses_anonymous_cookies() {
     global $user;
-    return $user->uid == 0 && variable_get('cache', CACHE_DISABLED) > 0;
+    return $user->uid == 0 && variable_get('cache', 0);
   }
 
   /**
@@ -1719,7 +1719,7 @@ class FlagGlobalCookieStorage extends FlagCookieStorage {
 
   // Global flags persist for the length of the minimum cache lifetime.
   protected function get_lifetime() {
-    $cookie_lifetime = (variable_get('cache', 0) > CACHE_DISABLED) ? variable_get('cache_lifetime', 0) : -1;
+    $cookie_lifetime = variable_get('cache', 0) ? variable_get('cache_lifetime', 0) : -1;
     // Do not let the cookie lifetime be 0 (which is the no cache limit on
     // anonymous page caching), since it would expire immediately. Usually
     // the no cache limit means caches are cleared on cron, which usually runs
