@@ -32,6 +32,6 @@ class flag_handler_filter_flagged extends views_handler_filter_boolean_operator 
 
   function query() {
     $operator = $this->value ? 'IS NOT' : 'IS';
-    $this->query->add_where($this->options['group'], $this->relationship .'.uid '. $operator .' NULL');
+    $this->query->add_where($this->options['group'], $this->relationship . '.uid', NULL, $operator . ' NULL');
   }
 }
