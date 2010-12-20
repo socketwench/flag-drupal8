@@ -93,7 +93,7 @@ class flag_handler_relationship_content extends views_handler_relationship {
         // Add in the SID from Session API for anonymous users.
         $this->definition['extra'][] = array(
           'field' => 'sid',
-          'value' => flag_get_sid(),
+          'value' => '***FLAG_CURRENT_USER_SID***',
           'numeric' => TRUE,
         );
       }

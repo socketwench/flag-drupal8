@@ -84,7 +84,7 @@ class flag_handler_field_ops extends views_handler_field {
       );
       $join->extra[] = array(
         'field' => 'sid',
-        'value' => flag_get_sid(),
+        'value' => '***FLAG_CURRENT_USER_SID***',
         'numeric' => TRUE,
       );
     }

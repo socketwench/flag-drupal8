@@ -207,6 +207,16 @@ function flag_views_data_alter(&$data) {
 }
 
 /**
+ * Implements hook_views_query_substitutions().
+ *
+ * Allow replacement of current user's session id so we can cache these queries.
+ */
+function flag_views_query_substitutions() {
+  return array(
+    '***FLAG_CURRENT_USER_SID***' => flag_get_sid(),
+  );
+}
+/**
  * A helper function that creates a radio list of available flags.
  *
  * This function is used to select the desired flag when setting up flag
