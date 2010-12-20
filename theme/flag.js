@@ -112,6 +112,10 @@ Drupal.flagAnonymousLinks = function(context) {
   });
 }
 
+String.prototype.flagNameToCSS = function() {
+  return this.replace(/_/g, '-');
+}
+
 /**
  * A behavior specifically for anonymous users. Update links to the proper state.
  */
@@ -125,21 +129,21 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
   if (userFlags) {
     userFlags = userFlags.split('+');
     for (var n in userFlags) {
-      var flagInfo = userFlags[n].split('_');
-      var flagName = flagInfo[0];
-      var contentId = flagInfo[1];
+      var flagInfo = userFlags[n].match(/(\w+)_(\d+)/);
+      var flagName = flagInfo[1];
+      var contentId = flagInfo[2];
       // User flags always default to off and the JavaScript toggles them on.
       if (templates[flagName + '_' + contentId]) {
-        $('.flag-' + flagName + '-' + contentId, context).after(templates[flagName + '_' + contentId]).remove();
+        $('.flag-' + flagName.flagNameToCSS() + '-' + contentId, context).after(templates[flagName + '_' + contentId]).remove();
       }
     }
   }
 
   // Build a list of global flags.
-  var globalFlags = document.cookie.match(/flag_global_([a-z0-9\-]+)_([0-9]+)=([01])/ig);
+  var globalFlags = document.cookie.match(/flag_global_(\w+)_(\d+)=([01])/g);
   if (globalFlags) {
     for (var n in globalFlags) {
-      var flagInfo = globalFlags[n].match(/flag_global_([a-z0-9\-]+)_([0-9]+)=([01])/i);
+      var flagInfo = globalFlags[n].match(/flag_global_(\w+)_(\d+)=([01])/);
       var flagName = flagInfo[1];
       var contentId = flagInfo[2];
       var flagState = (flagInfo[3] == '1') ? 'flag' : 'unflag';
@@ -148,7 +152,7 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       // So when checking global flag cookies, we need to make sure that we
       // don't swap out the link when it's already in the correct state.
       if (templates[flagName + '_' + contentId]) {
-        $('.flag-' + flagName + '-' + contentId, context).each(function() {
+        $('.flag-' + flagName.flagNameToCSS() + '-' + contentId, context).each(function() {
           if ($(this).find('.' + flagState + '-action').size()) {
             $(this).after(templates[flagName + '_' + contentId]).remove();
           }
