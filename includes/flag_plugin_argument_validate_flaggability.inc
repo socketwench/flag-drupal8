@@ -18,21 +18,23 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
     $this->flag_type = $this->definition['flag type'];
   }
 
-  function validate_form(&$form, &$form_state) {
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['flag_name'] = array('default' => '*relationship*');
+    $options['flag_test'] = array('default' => 'flaggable');
+    $options['flag_id_type'] = array('default' => 'id');
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
     $options = $this->flags_options();
 
     $form[$this->_option_name('flag_name')] = array(
       '#type' => 'radios',
-       // Add an ID to the surrounding div because radios don't get IDs
-       // as a whole group. This is needed for #dependency.
-      '#prefix' => '<div><div id="edit-options-' . views_css_safe($this->_option_name('flag_name')) . '">',
-      '#suffix' => '</div></div>',
       '#title' => t('Flag'),
       '#options' => $options,
       '#default_value' => $this->_get_option('flag_name', '*relationship*'),
       '#description' => t('Select the flag to validate against.'),
-      '#process' => array('expand_radios', 'views_process_dependency'),
-      '#dependency' => array('edit-options-validate-type' => array($this->id)),
     );
     if (!$options) {
       $form[$this->_option_name('flag_name')]['#description'] = '<p class="warning">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use one.', array('%type' => $this->flag_type, '@create-url' => FLAG_ADMIN_PATH)) . '</p>';
@@ -43,8 +45,6 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
       '#title' => t('Validate the @type only if', array('@type' => $this->flag_type)),
       '#options' => $this->tests_options(),
       '#default_value' => $this->_get_option('flag_test', 'flaggable'),
-      '#process' => array('views_process_dependency'),
-      '#dependency' => array('edit-options-validate-type' => array($this->id)),
     );
 
     // This validator supports the "multiple IDs" syntax. It may not be
@@ -58,8 +58,6 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
         'ids' => t('IDs separated by , or +'),
       ),
       '#default_value' => $this->_get_option('flag_id_type', 'id'),
-      '#process' => array('views_process_dependency'),
-      '#dependency' => array('edit-options-validate-type' => array($this->id)),
     );
   }
 
@@ -81,21 +79,28 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
     }
   }
 
-  /**
-   * Validator arguments are stored in the argument object, not here, so we
-   * define a convenience method for fetching them.
-   */
+  // This function seems useless, but in the Drupal 6 branch it allows for
+  // compatibility between Views 3 and Views 2.
   function _get_option($option, $default) {
-    $option = $this->_option_name($option);
-    return isset($this->argument->options[$option]) ? $this->argument->options[$option] : $default;
+    return $this->options[$option];
   }
 
+  // This function seems useless, but in the Drupal 6 branch it allows for
+  // compatibility between Views 3 and Views 2.
   function _option_name($option) {
-    // We must embed the flag type in the option name or else validators of
-    // different types will clash with each other. It's a trait of Views that all
-    // validators on the system get their settings lumped onto the argument.
-    // Examine the view's 'Export' output to understand.
-    return 'validate_argument_' . $this->flag_type . '_' . $option;
+    return $option;
+  }
+
+  /**
+   * Migrate existing Views 2 options to Views 3.
+   */
+  function convert_options(&$options) {
+    $prefix = 'validate_argument_' . $this->flag_type . '_';
+    if (!isset($options['flag_name']) && !empty($this->argument->options[$prefix . 'flag_name'])) {
+      $options['flag_name'] = $this->argument->options[$prefix . 'flag_name'];
+      $options['flag_test'] = $this->argument->options[$prefix . 'flag_test'];
+      $options['flag_id_type'] = $this->argument->options[$prefix . 'flag_id_type'];
+    }
   }
 
   /**
