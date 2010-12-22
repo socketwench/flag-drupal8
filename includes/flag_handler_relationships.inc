@@ -7,20 +7,78 @@
  */
 
 /**
+ * Base class for all our relationship classes.
+ *
+ * @ingroup views
+ */
+abstract class flag_handler_relationship extends views_handler_relationship {
+
+  /**
+   * Every relationship has a 'flag' option.
+   */
+  function option_definition() {
+    $options = parent::option_definition();
+    $options['flag'] = array('default' => flag_views_flag_default($this->get_flag_type()));
+    $options['required'] = array('default' => 1);
+    return $options;
+  }
+
+  /**
+   * Make sure the flag exists.
+   *
+   * When importing views, or when deleting flags, inconsistent views may
+   * result. This validator is called by Views before saving or previewing a
+   * view.
+   */
+  function validate() {
+    $errors = array();
+    $tokens = array(
+      '@relationship-name' => $this->ui_name() . ' ' . $this->admin_summary(),
+      '@flag-name' => $this->options['flag'],
+    );
+    if (!$this->options['flag']) {
+      $errors[] = t('You must pick a flag to use for the relationship "@relationship-name".', $tokens);
+    }
+    else if (!flag_get_flag($this->options['flag'])) {
+      $errors[] = t('This view is looking for a flag by the name "@flag-name", but there is no such flag. Perhaps it was deleted. Please update the relationship "@relationship-name" in this view to use an existing flag.', $tokens);
+    }
+    return $errors;
+  }
+
+  function get_flag_type() {
+    return isset($this->definition['flag type']) ? $this->definition['flag type'] : NULL;
+  }
+
+  /**
+   * Returns the flag object.
+   *
+   * The main purpose of this method is validation. Since validate() is called
+   * only when in Views's administrative UI, we need to do validation at "run
+   * time" separately.
+   */
+  function get_flag() {
+    if (($errors = $this->validate())) {
+      foreach ($errors as $error) {
+        drupal_set_message($error, 'error');
+      }
+    }
+    return flag_get_flag($this->options['flag']);
+  }
+
+  // @todo: It's logical that this class should also implement options_form(),
+  // to show the flag selector, and query(), to filter on the flag.
+}
+
+/**
  * Specialized relationship handler associating flags and content.
  *
  * @ingroup views
  */
-class flag_handler_relationship_content extends views_handler_relationship {
+class flag_handler_relationship_content extends flag_handler_relationship {
 
   function option_definition() {
     $options = parent::option_definition();
-
-    $content_type = $this->definition['flag type'];
-    $options['flag'] = array('default' => flag_views_flag_default($content_type));
     $options['user_scope'] = array('default' => 'current');
-    $options['required'] = array('default' => 1);
-
     return $options;
   }
 
@@ -74,7 +132,10 @@ class flag_handler_relationship_content extends views_handler_relationship {
    * Called to implement a relationship in a query.
    */
   function query() {
-    $flag = flag_get_flag($this->options['flag']);
+    if (!($flag = $this->get_flag())) {
+      return;
+    }
+
     $this->definition['extra'][] = array(
       'field' => 'fid',
       'value' => $flag->fid,
@@ -107,17 +168,7 @@ class flag_handler_relationship_content extends views_handler_relationship {
  *
  * @ingroup views
  */
-class flag_handler_relationship_counts extends views_handler_relationship {
-
-  function option_definition() {
-    $options = parent::option_definition();
-
-    $content_type = $this->definition['flag type'];
-    $options['flag'] = array('default' => flag_views_flag_default($content_type));
-    $options['required'] = array('default' => 1);
-
-    return $options;
-  }
+class flag_handler_relationship_counts extends flag_handler_relationship {
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
@@ -141,7 +192,10 @@ class flag_handler_relationship_counts extends views_handler_relationship {
    * Called to implement a relationship in a query.
    */
   function query() {
-    $flag = flag_get_flag($this->options['flag']);
+    if (!($flag = $this->get_flag())) {
+      return;
+    }
+
     $this->definition['extra'][] = array(
       'field' => 'fid',
       'value' => $flag->fid,
@@ -169,14 +223,7 @@ class flag_handler_relationship_counts extends views_handler_relationship {
  *
  * @ingroup views
  */
-class flag_handler_relationship_user_content extends views_handler_relationship {
-
-  function option_definition() {
-    $options = parent::option_definition();
-    $options['flag'] = array('default' => flag_views_flag_default(NULL));
-    $options['required'] = array('default' => 1);
-    return $options;
-  }
+class flag_handler_relationship_user_content extends flag_handler_relationship {
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
@@ -197,7 +244,10 @@ class flag_handler_relationship_user_content extends views_handler_relationship 
    * Called to implement a relationship in a query.
    */
   function query() {
-    $flag = flag_get_flag($this->options['flag']);
+    if (!($flag = $this->get_flag())) {
+      return;
+    }
+
     $this->definition['extra'][] = array(
       'field' => 'fid',
       'value' => $flag->fid,
