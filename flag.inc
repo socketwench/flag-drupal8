@@ -1111,7 +1111,7 @@ class flag_flag {
       if (!isset($js_added[$this->name . '_' . $content_id])) {
         $js_added[$this->name . '_' . $content_id] = TRUE;
         $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'content_id' => $content_id, 'after_flagging' => $after_flagging));
-        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), array('type' => 'setting', 'scope' => JS_DEFAULT));
+        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), 'setting');
       }
     }
 
