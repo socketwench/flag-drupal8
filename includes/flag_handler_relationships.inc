@@ -108,7 +108,7 @@ class flag_handler_relationship_content extends flag_handler_relationship {
     }
     if (module_exists('session_api')) {
       $form['session_warning'] = array(
-        '#markup' => '<p class="warning form-item">' . t('<strong>Warning</strong>: Adding this relationship for any flag that contains <strong>anonymous flagging access</strong> will disable page caching for anonymous users when this view is executed. It is recommended to create a dedicated page for views containing anonymous user data.', array('%type' => $content_type, '@create-url' => url(FLAG_ADMIN_PATH))) . '</p>',
+        '#markup' => '<p class="warning form-item">' . t('<strong>Warning</strong>: Adding this relationship for any flag that contains <strong>anonymous flagging access</strong> will disable page caching for anonymous users when this view is executed. (But this is only true when the relationship is constrained to "Curren user", not to "Any user".) It is recommended to create a dedicated page for views containing anonymous user data.') . '</p>',
       );
     }
   }
