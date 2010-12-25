@@ -46,7 +46,7 @@ function flag_features_export_options() {
  */
 function flag_features_export_render($module = 'foo', $data) {
   module_load_include('inc', 'flag', '/includes/flag.export');
-  $code = flag_export_flags($data, $module);
+  $code = flag_export_flags($data, $module, '  ');
   return array('flag_default_flags' => $code);
 }
 

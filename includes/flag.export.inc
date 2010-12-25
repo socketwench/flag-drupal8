@@ -15,9 +15,10 @@
  *   Optional. The name of the module that will be created if exporting to use
  *   in hook_flag_default_flags().
  */
-function flag_export_flags($flags = array(), $module = '') {
+function flag_export_flags($flags = array(), $module = '', $indent = '') {
+  module_load_include('inc', 'features', 'features.export'); // For features_var_export() (optional).
   $output = array();
-  $output = '$flags = array();'. "\n";
+  $output = $indent . '$flags = array();'. "\n";
   foreach ($flags as $flag) {
     if (!is_object($flag)) {
       // We got just the flag name, for example from the features
@@ -41,10 +42,10 @@ function flag_export_flags($flags = array(), $module = '') {
     // Remove the flag ID.
     unset($new_flag['fid']);
 
-    $output .= '// Exported flag: "'. check_plain($flag->get_title()) . '"' . ".\n";
-    $output .= '$flags[] = ' . var_export($new_flag, TRUE) . ";\n";
+    $output .= $indent . '// Exported flag: "'. check_plain($flag->get_title()) . '"' . ".\n";
+    $output .= $indent . '$flags[] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
   }
-  $output .= 'return $flags;';
+  $output .= $indent . 'return $flags;';
   return $output;
 }
 
