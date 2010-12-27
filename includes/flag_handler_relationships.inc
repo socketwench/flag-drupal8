@@ -18,7 +18,7 @@ abstract class flag_handler_relationship extends views_handler_relationship {
    */
   function option_definition() {
     $options = parent::option_definition();
-    $options['flag'] = array('default' => flag_views_flag_default($this->get_flag_type()));
+    $options['flag'] = array('default' => NULL);
     $options['required'] = array('default' => 1);
     return $options;
   }
@@ -51,17 +51,25 @@ abstract class flag_handler_relationship extends views_handler_relationship {
 
   /**
    * Returns the flag object.
-   *
-   * The main purpose of this method is validation. Since validate() is called
-   * only when in Views's administrative UI, we need to do validation at "run
-   * time" separately.
    */
   function get_flag() {
+
+    // Backward compatibility: There may exist old views on the system whose
+    // 'flag' option isn't set. (This happens if the admin had skippped
+    // clicking the 'Update' button.) When run, these views should behave as
+    // if the first flag was selected.
+    if (!isset($this->options['flag'])) {
+      $this->options['flag'] = flag_views_flag_default($this->get_flag_type());
+    }
+
+    // Validation: Since validate() is called only when in Views's
+    // administrative UI, we need to do validation at "run time" ourselves.
     if (($errors = $this->validate())) {
       foreach ($errors as $error) {
         drupal_set_message($error, 'error');
       }
     }
+
     return flag_get_flag($this->options['flag']);
   }
 
@@ -125,7 +133,7 @@ class flag_handler_relationship_content extends flag_handler_relationship {
 
   function ui_name() {
     // We put the bookmark name in the UI string to save space.
-    return t('!group: !title', array('!group' => $this->definition['group'], '!title' => $this->options['flag']));
+    return t('!group: !title', array('!group' => $this->definition['group'], '!title' => empty($this->options['flag']) ? t('(Please select a flag)') : $this->options['flag']));
   }
 
   /**
