@@ -62,10 +62,12 @@ function flag_features_revert($module = NULL) {
     module_load_include('inc', 'flag', '/includes/flag.admin');
     $default_flags = module_invoke($module, 'flag_default_flags');
 
-    // Delete flags that are defined in code.
+    // Revert flags that are defined in code.
     foreach ($default_flags as $default_flag) {
       $current_flag = flag_get_flag($default_flag['name']);
-      $current_flag->delete();
+      if ($current_flag->revert() === FALSE) {
+        drupal_set_message(t('Could not revert flag %flag-name to the state described in your code: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $current_flag->name)), 'error');
+      }
     }
     _flag_clear_cache();
   }

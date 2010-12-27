@@ -1066,6 +1066,47 @@ class flag_flag {
   }
 
   /**
+   * Finds the "default flag" corresponding to this flag.
+   *
+   * Flags defined in code ("default flags") can be overridden. This method
+   * returns the default flag that is being overridden by $this. Returns NULL
+   * if $this overrides no default flag.
+   */
+  function find_default_flag() {
+    if ($this->fid) {
+      $default_flags = flag_get_default_flags(TRUE);
+      if (isset($default_flags[$this->name])) {
+        return $default_flags[$this->name];
+      }
+    }
+  }
+
+  /**
+   * Reverts an overriding flag to its default state.
+   *
+   * Note that $this isn't altered. To see the reverted flag you'll have to
+   * call flag_get_flag($this->name) again.
+   *
+   * @return
+   *   TRUE if the flag was reverted successfully; FALSE if there was an error;
+   *   NULL if this flag overrides no default flag.
+   */
+  function revert() {
+    if (($default_flag = $this->find_default_flag())) {
+      if ($default_flag->is_compatible()) {
+        $default_flag = clone $default_flag;
+        $default_flag->fid = $this->fid;
+        $default_flag->save();
+        flag_get_flags(NULL, NULL, NULL, TRUE);
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
+  /**
    * Disable a flag provided by a module.
    */
   function disable() {
