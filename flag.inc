@@ -1043,6 +1043,29 @@ class flag_flag {
   }
 
   /**
+   * Returns TRUE if this flag's declared API version is compatible with this
+   * module.
+   *
+   * An "incompatible" flag is one exported (and now being imported or exposed
+   * via hook_flag_default_flags()) by a different version of the Flag module.
+   * An incompatible flag should be treated as a "black box": it should not be
+   * saved or exported because our code may not know to handle its internal
+   * structure.
+   */
+  function is_compatible() {
+    if (isset($this->fid)) {
+      // Database flags are always compatible.
+      return TRUE;
+    }
+    else {
+      if (!isset($this->api_version)) {
+        $this->api_version = 1;
+      }
+      return $this->api_version == FLAG_API_VERSION;
+    }
+  }
+
+  /**
    * Disable a flag provided by a module.
    */
   function disable() {

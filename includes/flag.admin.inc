@@ -55,7 +55,7 @@ function theme_flag_admin_page($variables) {
   foreach ($default_flags as $name => $flag) {
     if (!isset($flags[$name])) {
       $ops = array();
-      if ($flag->api_version < FLAG_API_VERSION) {
+      if (!$flag->is_compatible()) {
         $flag_updates_needed = TRUE;
         $ops['flags_update'] = array('title' => '<strong>' . t('update code') . '</strong>', 'href' => $flag->admin_path('update'), 'html' => TRUE);
       }

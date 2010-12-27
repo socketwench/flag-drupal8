@@ -1630,9 +1630,8 @@ function flag_get_default_flags($include_disabled = FALSE) {
       $flag->module = $module;
 
       // Disable flags that are not at the current API version.
-      if (!isset($flag->api_version) || $flag->api_version < FLAG_API_VERSION) {
+      if (!$flag->is_compatible()) {
         $flag->status = FALSE;
-        $flag->api_version = isset($flag->api_version) ? $flag->api_version : 1;
       }
 
       // Add flags that have been enabled.
