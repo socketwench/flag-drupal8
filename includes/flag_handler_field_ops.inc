@@ -20,7 +20,12 @@ class flag_handler_field_ops extends views_handler_field {
    * relationship and reads its 'flag' option, which holds the flag name.
    */
   function get_flag() {
-    return $this->view->relationship[$this->options['relationship']]->get_flag();
+    // When editing a view it's possible to delete the relationship (either by
+    // error or to later recreate it), so we have to guard against a missing
+    // one.
+    if (isset($this->view->relationship[$this->options['relationship']])) {
+      return $this->view->relationship[$this->options['relationship']]->get_flag();
+    }
   }
 
   /**
