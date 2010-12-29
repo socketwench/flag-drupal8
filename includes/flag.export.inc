@@ -17,14 +17,23 @@
  */
 function flag_export_flags($flags = array(), $module = '', $indent = '') {
   module_load_include('inc', 'features', 'features.export'); // For features_var_export() (optional).
-  $output = array();
   $output = $indent . '$flags = array();'. "\n";
-  foreach ($flags as $flag) {
-    if (!is_object($flag)) {
+  foreach ($flags as $item) {
+    if (is_object($item)) {
+      $flag = $item;
+    }
+    else {
       // We got just the flag name, for example from the features
       // implementation.
-      $flag = flag_get_flag($flag);
+      if (!($flag = flag_load($item, TRUE))) {
+        continue;
+      }
     }
+    if (!$flag->is_compatible()) {
+      drupal_set_message(t('Could not export flag %flag-name: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $flag->name)), 'error');
+      continue;
+    }
+
     $flag->api_version = FLAG_API_VERSION;
     $new_flag = (array) $flag;
 
