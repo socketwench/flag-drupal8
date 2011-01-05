@@ -5,27 +5,12 @@ core = 7.x
 package = Flags
 configure = admin/structure/flags
 
-; Flag core.
+; Files that contain classes.
 files[] = flag.inc
-files[] = flag.install
-files[] = flag.module
-files[] = includes/flag.actions.inc
-files[] = includes/flag.admin.inc
-files[] = includes/flag.export.inc
-files[] = includes/flag.token.inc
-
-; 3rd party modules.
-files[] = includes/flag.activity.inc
-files[] = includes/flag.features.inc
-files[] = includes/flag.rules_forms.inc
 files[] = includes/flag.rules.inc
-files[] = includes/flag.services.inc
-files[] = includes/flag.views_default.inc
-files[] = includes/flag.views.inc
-
-; Views handlers.
 files[] = includes/flag_handler_argument_content_id.inc
 files[] = includes/flag_handler_field_ops.inc
 files[] = includes/flag_handler_filter_flagged.inc
 files[] = includes/flag_handler_relationships.inc
 files[] = includes/flag_plugin_argument_validate_flaggability.inc
+files[] = tests/flag.test
