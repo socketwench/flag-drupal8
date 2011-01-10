@@ -1625,9 +1625,14 @@ function flag_get_default_flags($include_disabled = FALSE) {
 
   foreach (module_implements('flag_default_flags') as $module) {
     $function = $module . '_flag_default_flags';
-    foreach ($function() as $config) {
-      $flag = flag_flag::factory_by_array($config);
-      $flag->module = $module;
+    foreach ($function() as $flag_name => $flag_info) {
+      // Backward compatibility: old exported default flags have their names
+      // in $flag_info instead, so we use the += operator to not overwrite it.
+      $flag_info += array(
+        'name' => $flag_name,
+        'module' => $module,
+      );
+      $flag = flag_flag::factory_by_array($flag_info);
 
       // Disable flags that are not at the current API version.
       if (!$flag->is_compatible()) {

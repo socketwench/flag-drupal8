@@ -64,10 +64,14 @@ function flag_features_revert($module = NULL) {
     $default_flags = module_invoke($module, 'flag_default_flags');
 
     // Revert flags that are defined in code.
-    foreach ($default_flags as $default_flag) {
-      $current_flag = flag_load($default_flag['name'], TRUE);
-      if ($current_flag && $current_flag->revert() === FALSE) {
-        drupal_set_message(t('Could not revert flag %flag-name to the state described in your code: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $current_flag->name)), 'error');
+    foreach ($default_flags as $flag_name => $flag_info) {
+      if (is_numeric($flag_name)) {
+        // Backward compatibility.
+        $flag_name = $flag_info['name'];
+      }
+      $flag = flag_load($flag_name, TRUE);
+      if ($flag && $flag->revert() === FALSE) {
+        drupal_set_message(t('Could not revert flag %flag-name to the state described in your code: Your flag was created by a different version of the Flag module than is now being used.', array('%flag-name' => $flag->name)), 'error');
       }
     }
     _flag_clear_cache();

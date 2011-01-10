@@ -50,9 +50,11 @@ function flag_export_flags($flags = array(), $module = '', $indent = '') {
 
     // Remove the flag ID.
     unset($new_flag['fid']);
+    // The name is emitted as the key for the array.
+    unset($new_flag['name']);
 
     $output .= $indent . '// Exported flag: "'. check_plain($flag->get_title()) . '"' . ".\n";
-    $output .= $indent . '$flags[] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
+    $output .= $indent . '$flags[\'' . $flag->name . '\'] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
   }
   $output .= $indent . 'return $flags;';
   return $output;
