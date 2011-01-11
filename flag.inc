@@ -1456,7 +1456,7 @@ class flag_comment extends flag_flag {
 
     // Ensure node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_content_id().
-    $query = db_select('comments', 'c');
+    $query = db_select('comment', 'c');
     $query->innerJoin('node', 'n', 'c.nid = n.nid');
     $result = $query
       ->fields('c', array('cid'))
@@ -1532,7 +1532,7 @@ class flag_comment extends flag_flag {
 
   function get_views_info() {
     return array(
-      'views table' => 'comments',
+      'views table' => 'comment',
       'join field' => 'cid',
       'title field' => 'subject',
       'title' => t('Comment flag'),

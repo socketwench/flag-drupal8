@@ -964,7 +964,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
 
   if ($flag->content_type == 'comment') {
     // Restrict access by comment ownership.
-    $query = db_select('comments', 'c');
+    $query = db_select('comment', 'c');
     $query->leftJoin('node', 'n', 'c.nid = n.nid');
     $result = $query
       ->fields('c', array('cid', 'nid'))
