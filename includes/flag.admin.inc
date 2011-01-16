@@ -136,7 +136,7 @@ function flag_add_form($form, &$form_state) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Flag name'),
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and my only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
     '#maxlength' => 32,
     '#required' => TRUE,
   );
@@ -188,7 +188,7 @@ function flag_form($form, &$form_state, $flag) {
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#default_value' => $flag->name,
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and my only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
     '#maxlength' => 32,
     '#required' => TRUE,
     '#access' => empty($flag->locked['name']),

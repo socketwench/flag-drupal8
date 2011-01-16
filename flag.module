@@ -22,7 +22,7 @@ function flag_menu() {
     'page callback' => 'flag_admin_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
-    'description' => 'Configure flags for marking content with arbitary information (such as <em>offensive</em> or <em>bookmarked</em>).',
+    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
