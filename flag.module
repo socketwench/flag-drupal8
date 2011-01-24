@@ -701,32 +701,6 @@ function flag_node_type_delete($info) {
 }
 
 /**
- * Implements hook_activity_info().
- */
-function flag_activity_info() {
-  $info = new stdClass();
-  $info->api = 2;
-  $info->name = 'flag';
-  // The order of objects here matters. If a user is both the author and the
-  // flagging user, the flagging user message takes precedence.
-  $info->objects = array('node author' => 'node', 'flagging user' => 'account', 'comment author' => 'comment');
-  $info->hooks = array('flag' => array('flag', 'unflag'));
-
-  // Figure out the activity access control realms and the types.
-  $flags = flag_get_flags();
-  foreach ($flags as $fid => $flag) {
-    $info->realms["flag_" . $flag->fid] = $flag->title;
-    // Currently, flagging a user cannot be recorded.
-    if ($flag->content_type != 'user') {
-      $info->type_options[$flag->fid] = $flag->title;
-    }
-  }
-  $info->object_type = 'flag';
-  $info->path = drupal_get_path('module', 'flag') . '/includes';
-  return $info;
-}
-
-/**
  * Menu callback for (un)flagging a node.
  *
  * Used both for the regular callback as well as the JS version.
