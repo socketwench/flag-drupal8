@@ -122,10 +122,8 @@ class flag_flag {
    * is because the class to instantiate changes according to the 'content_type'
    * database column. This design pattern is known as the "Single Table
    * Inheritance".
-   *
-   * @static
    */
-  function factory_by_row($row) {
+  static function factory_by_row($row) {
     $flag = flag_create_handler($row->content_type);
 
     // Lump all data unto the object...
@@ -155,7 +153,7 @@ class flag_flag {
   /**
    * Create a complete flag (except an FID) from an array definition.
    */
-  function factory_by_array($config) {
+  static function factory_by_array($config) {
     $flag = flag_create_handler($config['content_type']);
 
     foreach ($config as $option => $value) {
@@ -172,10 +170,8 @@ class flag_flag {
   /**
    * Another factory method. Returns a new, "empty" flag; e.g., one suitable for
    * the "Add new flag" page.
-   *
-   * @static
    */
-  function factory_by_content_type($content_type) {
+  static function factory_by_content_type($content_type) {
     return flag_create_handler($content_type);
   }
 
