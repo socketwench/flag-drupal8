@@ -97,8 +97,9 @@ function flag_import_form_validate($form, &$form_state) {
   }
 
   // Create the flag object.
-  foreach ($flags as $config) {
-    $new_flag = flag_flag::factory_by_array($config);
+  foreach ($flags as $flag_name => $flag_info) {
+    $flag_info['name'] = $flag_name;
+    $new_flag = flag_flag::factory_by_array($flag_info);
 
     // Give new flags with the same name a matching FID, which tells Flag to
     // update the existing flag, rather than creating a new one.
