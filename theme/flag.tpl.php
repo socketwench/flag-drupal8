@@ -27,18 +27,10 @@
  *   flagged. If displaying to the user immediately after flagging, this value
  *   will be boolean TRUE. This is usually used in conjunction with immedate
  *   JavaScript-based toggling of flags.
- * - $setup: TRUE when this template is parsed for the first time; Use this
- *   flag to carry out procedures that are needed only once; e.g., linking to CSS
- *   and JS files.
  *
  * NOTE: This template spaces out the <span> tags for clarity only. When doing some
  * advanced theming you may have to remove all the whitespace.
  */
-
-  if ($setup) {
-    drupal_add_css(drupal_get_path('module', 'flag') .'/theme/flag.css');
-    drupal_add_js(drupal_get_path('module', 'flag') .'/theme/flag.js');
-  }
 ?>
 <span class="<?php print $flag_wrapper_classes; ?>">
   <?php if ($link_href): ?>

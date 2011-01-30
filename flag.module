@@ -327,10 +327,14 @@ function flag_flag_link_types() {
     'toggle' => array(
       'title' => t('JavaScript toggle'),
       'description' => t('An AJAX request will be made and degrades to type "Normal link" if JavaScript is not available.'),
+      'uses standard js' => TRUE,
+      'uses standard css' => TRUE,
     ),
     'normal' => array(
       'title' => t('Normal link'),
       'description' => t('A normal non-JavaScript request will be made and the current page will be reloaded.'),
+      'uses standard js' => FALSE,
+      'uses standard css' => FALSE,
     ),
     'confirm' => array(
       'title' => t('Confirmation form'),
@@ -339,6 +343,8 @@ function flag_flag_link_types() {
         'flag_confirmation' => '',
         'unflag_confirmation' => '',
       ),
+      'uses standard js' => FALSE,
+      'uses standard css' => FALSE,
     ),
   );
 }
@@ -1237,7 +1243,7 @@ function flag_theme() {
  */
 function template_preprocess_flag(&$variables) {
   global $user;
-  static $first_time = TRUE;
+  static $initialized = array();
 
   // Some typing shotcuts:
   $flag =& $variables['flag'];
@@ -1258,14 +1264,20 @@ function template_preprocess_flag(&$variables) {
     unset($link['href']);
   }
 
-  // Tell the template file to add JavaScript/CSS if using the toggle link type.
   // Anonymous users always need the JavaScript to maintain their flag state.
-  if (($flag->link_type == 'toggle' || $user->uid == 0) && $first_time) {
-    $variables['setup'] = $first_time;
-    $first_time = FALSE;
+  if ($user->uid == 0) {
+    $link_type['uses standard js'] = TRUE;
   }
-  else {
-    $variables['setup'] = FALSE;
+
+  // Load the JavaScript/CSS, if the link type requires it.
+  if (!isset($initialized[$link_type['name']])) {
+    if ($link_type['uses standard css']) {
+      drupal_add_css(drupal_get_path('module', 'flag') . '/theme/flag.css');
+    }
+    if ($link_type['uses standard js']) {
+      drupal_add_js(drupal_get_path('module', 'flag') . '/theme/flag.js');
+    }
+    $initialized[$link_type['name']] = TRUE;
   }
 
   $variables['link_href'] = isset($link['href']) ? check_url(url($link['href'], $link)) : FALSE;
@@ -1292,6 +1304,11 @@ function template_preprocess_flag(&$variables) {
     $variables['flag_classes_array'][] = $variables['last_action'];
   }
   $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
+
+  // Backward compatibility: The following section preserves some deprecated
+  // variables either to make old flag.tpl.php files continue to work, or to
+  // prevent PHP from generating E_NOTICEs there. @todo: Remove these sometime.
+  $variables['setup'] = FALSE;
 }
 
 /**
@@ -1823,12 +1840,14 @@ function flag_get_link_types($reset = FALSE) {
     foreach (module_implements('flag_link_types') as $module) {
       $module_types = module_invoke($module, 'flag_link_types');
       foreach ($module_types as $type_name => $info) {
-        $link_types[$type_name] = $info;
-        $link_types[$type_name]['module'] = $module;
-        $link_types[$type_name] += array(
+        $link_types[$type_name] = $info + array(
+          'module' => $module,
+          'name' => $type_name,
           'title' => '',
           'description' => '',
           'options' => array(),
+          'uses standard js' => TRUE,
+          'uses standard css' => TRUE,
         );
       }
     }
