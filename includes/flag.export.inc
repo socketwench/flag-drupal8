@@ -98,7 +98,11 @@ function flag_import_form_validate($form, &$form_state) {
 
   // Create the flag object.
   foreach ($flags as $flag_name => $flag_info) {
-    $flag_info['name'] = $flag_name;
+    // Backward compatibility: old exported flags have their names in $flag_info
+    // instead, so we use the += operator to not overwrite it.
+    $flag_info += array(
+      'name' => $flag_name,
+    );
     $new_flag = flag_flag::factory_by_array($flag_info);
 
     // Give new flags with the same name a matching FID, which tells Flag to
