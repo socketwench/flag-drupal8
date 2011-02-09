@@ -225,34 +225,6 @@ function flag_permission() {
 }
 
 /**
- * Access checking to check an account for flagging ability.
- *
- * See documentation for $flag->user_access().
- */
-function flag_access($flag, $account = NULL) {
-  return $flag->user_access('flag', $account);
-}
-
-/**
- * Content type checking to see if a flag applies to a certain type of data.
- *
- * @param $flag
- *   The flag object whose available types are being checked.
- * @param $content_type
- *   The type of content being checked, usually "node".
- * @param $content_subtype
- *   The subtype (node type) being checked.
- *
- * @return
- *   Boolean TRUE if the flag is enabled for this type and subtype.
- *   FALSE otherwise.
- */
-function flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
-  $return = $flag->content_type == $content_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
-  return $return;
-}
-
-/**
  * Implements hook_link().
  *
  * This hook does not exist in Drupal 7, it is called from flag_node_view() and
@@ -1313,61 +1285,6 @@ function template_preprocess_flag(&$variables) {
 }
 
 /**
- * Format a string containing a count of items.
- *
- * _flag_format_plural() is a version of format_plural() which
- * accepts the format string as a single argument, where the singular and
- * plural forms are separated by pipe. A 'zero' form is allowed as well.
- *
- * _flag_format_plural() is used where we want the admin, not the
- * programmer, to be able to nicely and easily format a number.
- *
- * If three forms are provided, separated by pipes, then the first is
- * considered the zero form and is used if $count is 0. The zero form may
- * well be an empty string.
- *
- * @param $count
- *   The item count to display.
- * @param $format
- *   The singular, plural, and optionally the zero, forms separated
- *   by pipe characters.
- * @return
- *   A formatted, translated string.
- *
- * Examples for $format:
- *
- * @code
- *   "@count"
- *   "1 vote|@count votes"
- *   "needs voting|1 vote|@count votes"
- *   "|1 vote|@count votes"
- *   "|@count|@count"
- * @endcode
- */
-function _flag_format_plural($count, $format) {
-  $elements = explode('|', $format ? $format : '@count', 3);
-
-  if (count($elements) == 3) {
-    list($zero, $singular, $plural) = $elements;
-  }
-  elseif (count($elements) == 2) {
-    list($singular, $plural) = $elements;
-    $zero = NULL;
-  }
-  else { // count($elements) == 1
-    $singular = $plural = $elements[0];
-    $zero = NULL;
-  }
-
-  if (isset($zero) && intval($count) == 0) {
-    return $zero;
-  }
-  else {
-    return format_plural(intval($count), $singular, $plural);
-  }
-}
-
-/**
  * Return an array of flag names keyed by fid.
  */
 function _flag_get_flag_names() {
@@ -1584,7 +1501,7 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on type and subtype.
   if (isset($content_type) || isset($content_subtype)) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!flag_content_enabled($flag, $content_type, $content_subtype)) {
+      if (!_flag_content_enabled($flag, $content_type, $content_subtype)) {
         unset($filtered_flags[$name]);
       }
     }
@@ -1593,13 +1510,32 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   // Filter out flags based on account permissions.
   if (isset($account) && $account->uid != 1) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!flag_access($flag, $account)) {
+      // We test against the 'flag' action, which is the minimum permission to
+      // use a flag.
+      if (!$flag->user_access('flag', $account)) {
         unset($filtered_flags[$name]);
       }
     }
   }
 
   return $filtered_flags;
+}
+
+/**
+ * Utility function: Checks whether a flag applies to a certain type, and
+ * possibly subtype, of content.
+ *
+ * @param $content_type
+ *   The type of content being checked, usually "node".
+ * @param $content_subtype
+ *   The subtype (node type) being checked.
+ *
+ * @return
+ *   TRUE if the flag is enabled for this type and subtype.
+ */
+function _flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
+  $return = $flag->content_type == $content_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
+  return $return;
 }
 
 /**
