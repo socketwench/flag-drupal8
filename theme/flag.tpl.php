@@ -15,8 +15,7 @@
  * - $flag_classes: A space-separated list of CSS classes that should be applied to the link.
  *
  * - $action: The action the link is about to carry out, either "flag" or "unflag".
- * - $last_action: The action, as a passive English verb, either "flagged" or
- *   "unflagged", that led to the current status of the flag.
+ * - $status: The status of the item; either "flagged" or "unflagged".
  *
  * - $link_href: The URL for the flag link.
  * - $link_text: The text to show for the link.
@@ -39,7 +38,7 @@
     <span class="<?php print $flag_classes ?>"><?php print $link_text; ?></span>
   <?php endif; ?>
   <?php if ($after_flagging): ?>
-    <span class="flag-message flag-<?php print $last_action; ?>-message">
+    <span class="flag-message flag-<?php print $status; ?>-message">
       <?php print $message_text; ?>
     </span>
   <?php endif; ?>

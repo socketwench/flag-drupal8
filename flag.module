@@ -1283,7 +1283,7 @@ function template_preprocess_flag(&$variables) {
   $variables['link_href'] = isset($link['href']) ? check_url(url($link['href'], $link)) : FALSE;
   $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $content_id);
   $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $content_id)));
-  $variables['last_action'] = ($action == 'flag' ? 'unflagged' : 'flagged');
+  $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
 
   $variables['flag_wrapper_classes_array'] = array();
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
@@ -1301,7 +1301,7 @@ function template_preprocess_flag(&$variables) {
   if ($variables['after_flagging']) {
     $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
     $variables['message_text'] = $flag->get_label($inverse_action . '_message', $content_id);
-    $variables['flag_classes_array'][] = $variables['last_action'];
+    $variables['flag_classes_array'][] = $variables['status'];
   }
   $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
 
@@ -1309,6 +1309,7 @@ function template_preprocess_flag(&$variables) {
   // variables either to make old flag.tpl.php files continue to work, or to
   // prevent PHP from generating E_NOTICEs there. @todo: Remove these sometime.
   $variables['setup'] = FALSE;
+  $variables['last_action'] = $variables['status'];
 }
 
 /**
