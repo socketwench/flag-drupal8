@@ -1,4 +1,3 @@
-// $Id$
 
 Theming instructions
 ====================

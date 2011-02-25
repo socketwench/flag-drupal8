@@ -1,5 +1,4 @@
 <?php
-//$Id$
 /**
  * @file
  * Update Views 1 views provided by both views_bookmark and flag modules.

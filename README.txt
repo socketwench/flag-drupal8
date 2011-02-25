@@ -1,4 +1,3 @@
-// $Id$
 
 You may want to visit the handbook of this module, at:
 

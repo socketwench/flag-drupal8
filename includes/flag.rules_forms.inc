@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file flag.rules_form.inc

@@ -1,4 +1,3 @@
-; $Id$
 name = Flag
 description = Create customized flags that users can set on content.
 core = 7.x
