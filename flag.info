@@ -6,7 +6,7 @@ configure = admin/structure/flags
 
 ; Files that contain classes.
 files[] = flag.inc
-files[] = includes/flag.rules.inc
+files[] = flag.rules.inc
 files[] = includes/flag_handler_argument_content_id.inc
 files[] = includes/flag_handler_field_ops.inc
 files[] = includes/flag_handler_filter_flagged.inc

@@ -837,8 +837,11 @@ function flag_flag($action, $flag, $content_id, $account) {
 
   if (module_exists('rules')) {
     $event_name = ($action == 'flag' ? 'flag_flagged_' : 'flag_unflagged_') . $flag->name;
-    $arguments = array('flag' => $flag, 'flag_content_id' => $content_id, 'flagging_user' => $account);
-    rules_invoke_event($event_name, $arguments);
+    // We only support flags on entities.
+    if (entity_get_info($flag->content_type)) {
+      $variables = array('flag' => $flag, 'flagged_' . $flag->content_type => $content_id, 'flagging_user' => $account);
+      rules_invoke_event_by_args($event_name, $variables);
+    }
   }
 }
 
@@ -1195,7 +1198,7 @@ function flag_theme() {
     ),
     'flag_rules_radios' => array(
       'render element' => 'element',
-      'file' => 'includes/flag.rules_forms.inc',
+      'file' => 'flag.rules.inc',
     ),
   );
 }

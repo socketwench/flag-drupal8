@@ -913,31 +913,6 @@ class flag_flag {
    */
 
   /**
-   * Methods that can be overridden to support the Rules module.
-   *
-   * @addtogroup rules
-   * @{
-   */
-
-  /**
-   * Defines the Rules arguments involved in a flag event.
-   */
-  function rules_get_event_arguments_definition() {
-    return array();
-  }
-
-  /**
-   * Defines the Rules argument for flag actions or conditions
-   */
-  function rules_get_element_argument_definition() {
-    return array();
-  }
-
-  /**
-   * @} End of "addtogroup rules".
-   */
-
-  /**
    * @addtogroup views
    * @{
    * Methods that can be overridden to support the Views module.
@@ -1369,20 +1344,6 @@ class flag_node extends flag_flag {
     );
   }
 
-  function rules_get_event_arguments_definition() {
-    return array(
-      'node' => array(
-        'type' => 'node',
-        'label' => t('flagged content'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'node', 'label' => t('Flagged content'));
-  }
-
   function get_views_info() {
     return array(
       'views table' => 'node',
@@ -1504,25 +1465,6 @@ class flag_comment extends flag_flag {
       'comment' => $comment,
       'node' => node_load($comment->nid),
     );
-  }
-
-  function rules_get_event_arguments_definition() {
-    return array(
-      'comment' => array(
-        'type' => 'comment',
-        'label' => t('flagged comment'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-      'node' => array(
-        'type' => 'node',
-        'label' => t("the flagged comment's content"),
-        'handler' => 'flag_rules_get_comment_content',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'comment', 'label' => t('Flagged comment'));
   }
 
   function get_views_info() {
@@ -1656,20 +1598,6 @@ class flag_user extends flag_flag {
     return array(
       'user' => $this->fetch_content($content_id),
     );
-  }
-
-  function rules_get_event_arguments_definition() {
-    return array(
-      'account' => array(
-        'type' => 'user',
-        'label' => t('flagged user'),
-        'handler' => 'flag_rules_get_event_argument',
-      ),
-    );
-  }
-
-  function rules_get_element_argument_definition() {
-    return array('type' => 'user', 'label' => t('Flagged user'));
   }
 
   function get_views_info() {
