@@ -1196,10 +1196,6 @@ function flag_theme() {
       'render element' => 'element',
       'file' => 'includes/flag.admin.inc',
     ),
-    'flag_rules_radios' => array(
-      'render element' => 'element',
-      'file' => 'flag.rules.inc',
-    ),
   );
 }
 
