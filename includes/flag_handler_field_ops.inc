@@ -109,7 +109,7 @@ class flag_handler_field_ops extends views_handler_field {
    * separate DB query to to avoid complexity and to make 'many to one' tests
    * (e.g. checking user roles) possible without causing duplicate rows.
    */
-  function pre_render($values) {
+  function pre_render(&$values) {
     if (!($flag = $this->get_flag())) {
       return; // Error message is printed in render().
     }
