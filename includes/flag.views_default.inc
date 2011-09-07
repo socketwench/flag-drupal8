@@ -37,6 +37,7 @@ function flag_views_default_views() {
       'id' => 'name',
       'table' => 'users',
       'field' => 'name',
+      'relationship' => 'uid_1',
     ),
   );
 
@@ -97,6 +98,13 @@ function flag_views_default_views() {
       'override' => array(
         'button' => 'Override',
       ),
+    ),
+    'uid_1' => array(
+      'label' => 'author',
+      'required' => 0,
+      'id' => 'uid_1',
+      'table' => 'node',
+      'field' => 'uid',
     ),
   );
 
