@@ -917,7 +917,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     // want to deny access, or use the current access value provided by Flag.
     $result = db_select('node', 'n')
       ->fields('n', array('nid', 'uid'))
-      ->condition('nid', $content_ids, 'IN')
+      ->condition('nid', array_keys($content_ids), 'IN')
       ->condition('type', $flag->types, 'IN')
       ->execute();
     foreach ($result as $row) {
