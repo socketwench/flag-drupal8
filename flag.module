@@ -178,9 +178,8 @@ function flag_help($path, $arg) {
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
   include_once $path .'/includes/flag.token.inc';
-  if (module_exists('trigger')) {
-    include_once $path .'/includes/flag.actions.inc';
-  }
+  include_once $path .'/includes/flag.actions.inc';
+
   if (module_exists('session_api')) {
     // Set the anonymous user SID immediately, in case the user logs in.
     flag_set_sid();
