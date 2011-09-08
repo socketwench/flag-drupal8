@@ -325,24 +325,27 @@ function flag_flag_link_types() {
  */
 function flag_field_extra_fields() {
   $extra = array();
-  $flags = flag_get_flags('node');
 
-  // Filter out flags which need to be included on the node form.
-  foreach ($flags as $name => $flag) {
-    if (!$flag->show_on_form) {
-      unset($flags[$name]);
+  foreach (node_type_get_types() as $type) {
+    $flags = flag_get_flags('node', $type->type);
+
+    // Filter out flags which need to be included on the node form.
+    $flag_names = array();
+    foreach ($flags as $name => $flag) {
+      if ($flag->show_on_form) {
+        $flag_names[] = $flag->get_label('title');
+      }
     }
-  }
 
-  if (!empty($flags)) {
-    foreach (node_type_get_types() as $type) {
-      $extra['node'][$type->type]['flag'] = array(
+    if ($flag_names) {
+      $extra['node'][$type->type]['form']['flag'] = array(
         'label' => t('Flags'),
-        'description' => t('Flags fieldset.'),
-        'weight' => 0
+        'description' => t('Checkboxes for toggling flags (i.e. @flag_names)', array('@flag_names' => implode(', ', $flag_names))),
+        'weight' => 1
       );
     }
   }
+
   return $extra;
 }
 
@@ -427,7 +430,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
     }
     if ($flags_in_form) {
       $form['flag'] += array(
-        '#weight' => module_exists('content') ? content_extra_field_weight($form['#node']->type, 'flags') : 1,
+        '#weight' => 1,
         '#tree' => TRUE,
       );
     }
