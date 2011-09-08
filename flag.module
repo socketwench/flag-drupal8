@@ -177,7 +177,6 @@ function flag_help($path, $arg) {
  */
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
-  include_once $path .'/includes/flag.token.inc';
   include_once $path .'/includes/flag.actions.inc';
 
   if (module_exists('session_api')) {
@@ -1202,7 +1201,7 @@ function flag_theme() {
     ),
     'flag_tokens_browser' => array(
       'variables' => array('types' => array('all'), 'global_types' => TRUE),
-      'file' => 'includes/flag.token.inc',
+      'file' => 'flag.tokens.inc',
     ),
     'flag_admin_page' => array(
       'variables' => array('flags' => NULL, 'default_flags' => NULL),
