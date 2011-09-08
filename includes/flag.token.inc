@@ -131,7 +131,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
     foreach ($flags as $flag) {
       foreach ($tokens as $name => $original) {
         $flag_count_token = 'flag-'. str_replace('_', '-', $flag->name) .'-count';
-        $flag_link_token = 'flag-'. str_replace('_', '-', $flag->name) .'-count';
+        $flag_link_token = 'flag-'. str_replace('_', '-', $flag->name) .'-link';
         if ($name == $flag_count_token) {
           $replacements[$original] = $flag->get_count($flag->get_content_id($object));
         }
