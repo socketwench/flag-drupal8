@@ -585,6 +585,20 @@ function flag_user_login(&$edit, &$account) {
  * Implements hook_user_cancel().
  */
 function flag_user_cancel($edit, $account, $method) {
+  flag_user_account_removal($account);
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function flag_user_delete($account) {
+  flag_user_account_removal($account);
+}
+
+/**
+ * Callback function for user account cancellation or deletion.
+ */
+function flag_user_account_removal($account) {
   // Remove flags by this user.
   $query = db_select('flag_content', 'fc');
   $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.content_type = c.content_type');
