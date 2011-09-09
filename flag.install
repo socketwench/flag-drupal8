@@ -250,9 +250,9 @@ function flag_schema() {
     'primary key' => array('fcid'),
     'unique keys' => array(
       'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
+      'content_type_content_id_uid_sid' => array('content_type', 'content_id', 'uid', 'sid'),
     ),
     'indexes' => array(
-      'content_type_content_id' => array('content_type', 'content_id'),
       'content_type_uid_sid' => array('content_type', 'uid', 'sid'),
     ),
   );
@@ -402,4 +402,12 @@ function flag_update_6203() {
 function flag_update_6204() {
   db_drop_primary_key('flag_counts');
   db_add_primary_key('flag_counts', array('fid', 'content_id'));
+}
+
+/**
+ * Provide a better index on the flag_content table including 'uid' and 'sid'.
+ */
+function flag_update_6205() {
+  db_drop_index('flag_content', 'content_type_content_id');
+  db_add_unique_key('flag_content', 'content_type_content_id_uid_sid', array('content_type', 'content_id', 'uid', 'sid'));
 }
