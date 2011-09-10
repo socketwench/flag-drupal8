@@ -1121,8 +1121,16 @@ function flag_theme() {
       'variables' => array('types' => array('all'), 'global_types' => TRUE),
       'file' => 'flag.tokens.inc',
     ),
-    'flag_admin_page' => array(
+    'flag_admin_listing' => array(
+      'render element' => 'form',
+      'file' => 'includes/flag.admin.inc',
+    ),
+    'flag_admin_listing_disabled' => array(
       'variables' => array('flags' => NULL, 'default_flags' => NULL),
+      'file' => 'includes/flag.admin.inc',
+    ),
+    'flag_admin_page' => array(
+      'variables' => array('flags' => NULL, 'default_flags' => NULL, 'flag_admin_listing' => NULL),
       'file' => 'includes/flag.admin.inc',
     ),
     'flag_form_roles' => array(
@@ -1420,6 +1428,9 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
       }
     }
 
+    // Sort the list of flags by weight.
+    uasort($flags, '_flag_compare_weight');
+
     // Allow modules implementing hook_flag_alter(&$flag) to modify each flag.
     foreach ($flags as $flag) {
       drupal_alter('flag', $flag);
@@ -1450,6 +1461,16 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   }
 
   return $filtered_flags;
+}
+
+/**
+ * Comparison function for uasort().
+ */
+function _flag_compare_weight($flag1, $flag2) {
+  if ($flag1->weight == $flag2->weight) {
+    return 0;
+  }
+  return $flag1->weight < $flag2->weight ? -1 : 1;
 }
 
 /**
