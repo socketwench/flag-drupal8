@@ -493,9 +493,10 @@ function flag_node_update($node) {
  * Shared saving routine between flag_node_insert() and flag_node_update().
  */
 function flag_node_save($node) {
+  global $user;
+
   // Response to the flag checkboxes added to the form in flag_form_alter().
   $remembered = FALSE;
-  $account = user_load($node->uid);
   if (isset($node->flag)) {
     foreach ($node->flag as $name => $state) {
       $flag = flag_get_flag($name);
@@ -507,7 +508,7 @@ function flag_node_save($node) {
         // modification:
         $remembered = TRUE;
       }
-      flag($state ? 'flag' : 'unflag', $name, $node->nid, $account, TRUE);
+      flag($state ? 'flag' : 'unflag', $name, $node->nid, $user);
     }
   }
 }
