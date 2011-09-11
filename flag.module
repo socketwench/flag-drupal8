@@ -936,13 +936,13 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     // Restrict access by comment ownership.
     $query = db_select('comment', 'c');
     $query->leftJoin('node', 'n', 'c.nid = n.nid');
-    $result = $query
-      ->fields('c', array('cid', 'nid'))
-      ->addField('c', 'uid', 'comment_uid')
-      ->addField('n', 'uid', 'node_uid')
-      ->condition('c.cid', $content_ids, 'IN')
-      ->execute();
-    while ($row = db_fetch_object($result)) {
+    $query
+      ->fields('c', array('cid', 'nid', 'uid'))
+      ->condition('c.cid', $content_ids, 'IN');
+    $query->addField('c', 'uid', 'comment_uid');
+    $result = $query->execute();
+
+    foreach ($result as $row) {
       if ($flag->access_author == 'node_own') {
         $access[$row->cid] = $row->node_uid != $account->uid ? FALSE : NULL;
       }
