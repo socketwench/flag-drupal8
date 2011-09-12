@@ -768,14 +768,11 @@ class flag_flag {
     }
     else {
       db_merge('flag_counts')
+        ->key(array('fid' => $this->fid, 'content_id' => $content_id))
         ->fields(array(
-          'fid' => $this->fid,
           'content_type' => $this->content_type,
-          'content_id' => $content_id,
           'count' => $count
         ))
-        ->condition('fid', $this->fid)
-        ->condition('content_id', $content_id)
         ->execute();
     }
   }
