@@ -561,21 +561,37 @@ function flag_node_translation_change($node) {
 function flag_user_login(&$edit, &$account) {
   // Migrate anonymous flags to this user's account.
   if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
-    // The @ symbol suppresses errors if the user flags a piece of content
-    // they have already flagged as a logged-in user.
-    @db_update('flag_content')
-      ->fields(array(
-        'uid' => $account->uid,
-        'sid' => 0,
-      ))
+    // Get a list of flag_content IDs that will be moved over.
+    $fcids = db_select('flag_content', 'fc')
+      ->fields('fc', array('fcid'))
       ->condition('uid', 0)
       ->condition('sid', $sid)
-      ->execute();
+      ->execute()
+      ->fetchCol('fcid');
+
+    // Convert anonymous flaggings to their authenticated account.
+    foreach ($fcids as $fcid) {
+      // Each update is wrapped in a try block to prevent unique key errors.
+      // Any duplicate content that was flagged as anonoymous is deleted in the
+      // subsequent db_delete() call.
+      try {
+        db_update('flag_content')
+          ->fields(array(
+            'uid' => $account->uid,
+            'sid' => 0,
+          ))
+          ->condition('fcid', $fcid)
+          ->execute();
+      }
+      catch (Exception $e) {
+        NULL;
+      }
+    }
 
     // Delete any remaining flags this user had as an anonymous user.
     db_delete('flag_content')
       ->condition('uid', 0)
-      ->condition('sid', flag_get_sid(0))
+      ->condition('sid', $sid)
       ->execute();
 
     // Clean up anonymous cookies.
@@ -1005,7 +1021,7 @@ function flag_reset_flag($flag, $content_id = NULL) {
     $query->condition('content_id', $content_id);
   }
 
-  $result = $query->execute()->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);;
+  $result = $query->execute()->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);
   $rows = array();
   foreach ($result as $row) {
     $rows[] = $row;
