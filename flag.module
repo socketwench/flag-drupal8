@@ -881,6 +881,11 @@ function flag_flag($action, $flag, $content_id, $account) {
  * Implements hook_flag_access().
  */
 function flag_flag_access($flag, $content_id, $action, $account) {
+  // Do nothing if there is no restriction by authorship.
+  if (empty($flag->access_author)) {
+    return;
+  }
+
   // Restrict access by authorship. It's important that TRUE is never returned
   // here, otherwise we'd grant permission even if other modules denied access.
   if ($flag->content_type == 'node') {
@@ -927,6 +932,11 @@ function flag_flag_access($flag, $content_id, $action, $account) {
  */
 function flag_flag_access_multiple($flag, $content_ids, $account) {
   $access = array();
+
+  // Do nothing if there is no restriction by authorship.
+  if (empty($flag->access_author)) {
+    return $access;
+  }
 
   if ($flag->content_type == 'node') {
     // Restrict access by authorship. This is similar to flag_flag_access()
