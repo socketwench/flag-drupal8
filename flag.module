@@ -1221,6 +1221,7 @@ function template_preprocess_flag(&$variables) {
   $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $content_id);
   $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $content_id)));
   $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
+  $variables['flag_name_css'] = $flag_css_name;
 
   $variables['flag_wrapper_classes_array'] = array();
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
