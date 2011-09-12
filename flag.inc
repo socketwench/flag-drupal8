@@ -767,18 +767,16 @@ class flag_flag {
       db_delete('flag_counts')->condition('fid', $this->fid)->condition('content_id', $content_id)->execute();
     }
     else {
-      $num_updated = db_update('flag_counts')->fields(array('count' => $count))
-        ->condition('fid', $this->fid)
-        ->condition('content_id', $content_id)
-        ->execute();
-      if (!$num_updated) {
-        db_insert('flag_counts')->fields(array(
+      db_merge('flag_counts')
+        ->fields(array(
           'fid' => $this->fid,
           'content_type' => $this->content_type,
           'content_id' => $content_id,
-          'count' => $count))
-          ->execute();
-      }
+          'count' => $count
+        ))
+        ->condition('fid', $this->fid)
+        ->condition('content_id', $content_id)
+        ->execute();
     }
   }
 
