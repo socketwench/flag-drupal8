@@ -178,11 +178,6 @@ function flag_help($path, $arg) {
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
   include_once $path .'/includes/flag.actions.inc';
-
-  if (module_exists('session_api')) {
-    // Set the anonymous user SID immediately, in case the user logs in.
-    flag_set_sid();
-  }
 }
 
 /**
@@ -1647,6 +1642,11 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
   $uid = !isset($uid) ? $GLOBALS['user']->uid : $uid;
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
 
+  // If the user is anonymous and doesn't have a session, return an empty list.
+  if ($uid == 0 && empty($sid)) {
+    return array();
+  }
+
   if (isset($content_id)) {
     if (!isset($flagged_content[$uid][$sid][$content_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
@@ -1803,11 +1803,8 @@ function flag_check_token($token, $content_id) {
 
 /**
  * Set the Session ID for a user. Utilizes the Session API module.
- *
- * This function is only called in flag_init(), to set the current user's
- * SID in case the user logs in during this request.
  */
-function flag_set_sid($uid = NULL) {
+function flag_set_sid($uid = NULL, $create = TRUE) {
   static $sids = array();
 
   if (!isset($uid)) {
@@ -1816,7 +1813,7 @@ function flag_set_sid($uid = NULL) {
 
   if (!isset($sids[$uid])) {
     if (module_exists('session_api') && session_api_available() && $uid == 0) {
-      $sids[$uid] = session_api_get_sid();
+      $sids[$uid] = session_api_get_sid($create);
     }
     else {
       $sids[$uid] = 0;
@@ -1828,7 +1825,14 @@ function flag_set_sid($uid = NULL) {
 
 /**
  * Get the Session ID for a user. Utilizes the Session API module.
+ *
+ * @param $uid
+ *   The user ID. If the UID is 0 (anonymous users), then a SID will be
+ *   returned. SID will always be 0 for any authenticated user.
+ * @param $create
+ *   If the user doesn't yet have a session, should one be created? Defaults
+ *   to FALSE.
  */
-function flag_get_sid($uid = NULL) {
-  return flag_set_sid($uid);
+function flag_get_sid($uid = NULL, $create = FALSE) {
+  return flag_set_sid($uid, $create);
 }

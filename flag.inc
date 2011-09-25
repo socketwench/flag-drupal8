@@ -602,7 +602,7 @@ class flag_flag {
       $sid = 0;
     }
     else {
-      $sid = flag_get_sid($uid);
+      $sid = flag_get_sid($uid, TRUE);
       // Anonymous users must always have a session id.
       if ($sid == 0 && $account->uid == 0) {
         return FALSE;
