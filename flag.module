@@ -639,6 +639,17 @@ function flag_user_account_removal($account) {
   db_delete('flag_content')
     ->condition('uid', $account->uid)
     ->execute();
+
+  // Remove flags that have been done to this user.
+  db_delete('flag_content')
+    ->condition('content_type', 'user')
+    ->condition('content_id', $account->uid)
+    ->execute();
+
+  db_delete('flag_counts')
+    ->condition('content_type', 'user')
+    ->condition('content_id', $account->uid)
+    ->execute();
 }
 
 /**
