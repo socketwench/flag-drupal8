@@ -147,6 +147,24 @@ function flag_views_data() {
     ),
   );
 
+  $data['flag_counts']['last_updated'] = array(
+    'title' => t('Time last flagged'),
+    'help' => t('The time a piece of content was most recently flagged by any user.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_date',
+    ),
+  );
+
   return $data;
 }
 

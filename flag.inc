@@ -771,7 +771,8 @@ class flag_flag {
         ->key(array('fid' => $this->fid, 'content_id' => $content_id))
         ->fields(array(
           'content_type' => $this->content_type,
-          'count' => $count
+          'count' => $count,
+          'last_updated' => REQUEST_TIME,
         ))
         ->execute();
     }
