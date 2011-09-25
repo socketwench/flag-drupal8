@@ -313,6 +313,14 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => 0,
         'disp-width' => '10',
+      ),
+      'last_updated' => array(
+        'description' => 'The UNIX time stamp representing when the flag was last updated.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'disp-size' => 11,
       )
     ),
     'primary key' => array('fid', 'content_id'),
@@ -320,6 +328,7 @@ function flag_schema() {
       'fid_content_type' => array('fid', 'content_type'),
       'content_type_content_id' => array('content_type', 'content_id'),
       'count' => array('count'),
+      'last_updated' => array('last_updated'),
     ),
   );
 
@@ -427,4 +436,11 @@ function flag_update_6206() {
   }
 
   db_add_index('flag_content', 'content_type_content_id_uid_sid', array('content_type', 'content_id', 'uid', 'sid'));
+}
+
+/**
+ * Adds column last_updated to flag_counts table.
+ */
+function flag_update_6207() {
+  db_add_field('flag_counts', 'last_updated', array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-size' => 11), array('indexes' => array('last_updated' => array('last_updated'))));
 }
