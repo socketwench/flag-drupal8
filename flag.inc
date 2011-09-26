@@ -788,17 +788,18 @@ class flag_flag {
    * @private
   */
   function _decrease_count($content_id, $number = 1) {
-    db_update('flag_counts')
-      ->expression('count', 'count - :inc', array(':inc' => $number))
+    // Delete rows with count 0, for data consistency and space-saving.
+    $deleted = db_delete('flag_counts')
       ->condition('fid', $this->fid)
       ->condition('content_id', $content_id)
+      ->condition('count', $number, '<=')
       ->execute();
 
-    // Delete rows with count 0, for data consistency and space-saving.
-    db_delete('flag_counts')
+    // Update the count with the new value otherwise.
+    db_update('flag_counts')
+      ->expression('count', 'count + :inc', array(':inc' => $number))
       ->condition('fid', $this->fid)
       ->condition('content_id', $content_id)
-      ->condition('count', 0)
       ->execute();
   }
 
