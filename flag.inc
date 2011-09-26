@@ -789,7 +789,8 @@ class flag_flag {
   */
   function _decrease_count($content_id, $number = 1) {
     // Delete rows with count 0, for data consistency and space-saving.
-    $deleted = db_delete('flag_counts')
+    // Done before the db_update() to prevent out-of-bounds errors on "count".
+    db_delete('flag_counts')
       ->condition('fid', $this->fid)
       ->condition('content_id', $content_id)
       ->condition('count', $number, '<=')
