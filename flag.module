@@ -557,15 +557,16 @@ function flag_user_login(&$edit, &$account) {
   // Migrate anonymous flags to this user's account.
   if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
     // Get a list of flag_content IDs that will be moved over.
-    $fcids = db_select('flag_content', 'fc')
-      ->fields('fc', array('fcid'))
+    $duplicate_flaggings = array();
+    $flaggings = db_select('flag_content', 'fc')
+      ->fields('fc', array('fcid', 'fid', 'content_id'))
       ->condition('uid', 0)
       ->condition('sid', $sid)
       ->execute()
-      ->fetchCol('fcid');
+      ->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);
 
     // Convert anonymous flaggings to their authenticated account.
-    foreach ($fcids as $fcid) {
+    foreach ($flaggings as $fcid => $flagging) {
       // Each update is wrapped in a try block to prevent unique key errors.
       // Any duplicate content that was flagged as anonoymous is deleted in the
       // subsequent db_delete() call.
@@ -579,15 +580,18 @@ function flag_user_login(&$edit, &$account) {
           ->execute();
       }
       catch (Exception $e) {
-        NULL;
+        $duplicate_flaggings[$fcid] = $flagging;
       }
     }
 
-    // Delete any remaining flags this user had as an anonymous user.
-    db_delete('flag_content')
-      ->condition('uid', 0)
-      ->condition('sid', $sid)
-      ->execute();
+    // Delete any remaining flags this user had as an anonymous user. We use the
+    // proper unflag action here to make sure the count gets decremented again
+    // and so that other modules can clean up their tables if needed.
+    $anonymous_user = drupal_anonymous_user();
+    foreach ($duplicate_flaggings as $fcid => $flagging) {
+      $flag = flag_get_flag(NULL, $flagging['fid']);
+      $flag->flag('unflag', $flagging['content_id'], $anonymous_user, TRUE);
+    }
 
     // Clean up anonymous cookies.
     FlagCookieStorage::drop();

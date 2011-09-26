@@ -721,7 +721,7 @@ class flag_flag {
         'timestamp' => REQUEST_TIME,
       ))
       ->execute();
-    $this->_update_count($content_id);
+    $this->_increase_count($content_id);
     return $fcid;
   }
 
@@ -748,34 +748,58 @@ class flag_flag {
       ->fetchField();
     if ($fcid) {
       db_delete('flag_content')->condition('fcid', $fcid)->execute();
-      $this->_update_count($content_id);
+      $this->_decrease_count($content_id);
     }
     return $fcid;
   }
 
   /**
-   * Updates the flag count for this content
+   * Increases the flag count for a piece of content.
+   *
+   * @param $content_id
+   *   For which item should the count be increased.
+   * @param $number
+   *   The amount of counts to increasing. Defaults to 1.
    *
    * @private
-   */
-  function _update_count($content_id) {
-    $count = db_select('flag_content', 'fc')->fields('fc', array('fcid'))
+  */
+  function _increase_count($content_id, $number = 1) {
+    db_merge('flag_counts')
+      ->key(array(
+        'fid' => $this->fid,
+        'content_id' => $content_id,
+      ))
+      ->fields(array(
+        'content_type' => $this->content_type,
+        'count' => $number,
+      ))
+      ->expression('count', 'count + :inc', array(':inc' => $number))
+      ->execute();
+  }
+
+  /**
+   * Decreases the flag count for a piece of content.
+   *
+   * @param $content_id
+   *   For which item should the count be descreased.
+   * @param $number
+   *   The amount of counts to decrease. Defaults to 1.
+   *
+   * @private
+  */
+  function _decrease_count($content_id, $number = 1) {
+    db_update('flag_counts')
+      ->expression('count', 'count - :inc', array(':inc' => $number))
       ->condition('fid', $this->fid)
       ->condition('content_id', $content_id)
-      ->countQuery()->execute()->fetchField();
-    if ($count == 0) {
-      db_delete('flag_counts')->condition('fid', $this->fid)->condition('content_id', $content_id)->execute();
-    }
-    else {
-      db_merge('flag_counts')
-        ->key(array('fid' => $this->fid, 'content_id' => $content_id))
-        ->fields(array(
-          'content_type' => $this->content_type,
-          'count' => $count,
-          'last_updated' => REQUEST_TIME,
-        ))
-        ->execute();
-    }
+      ->execute();
+
+    // Delete rows with count 0, for data consistency and space-saving.
+    db_delete('flag_counts')
+      ->condition('fid', $this->fid)
+      ->condition('content_id', $content_id)
+      ->condition('count', 0)
+      ->execute();
   }
 
   /**
