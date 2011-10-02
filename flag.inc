@@ -772,6 +772,10 @@ class flag_flag {
       ->fields(array(
         'content_type' => $this->content_type,
         'count' => $number,
+        'last_updated' => REQUEST_TIME,
+      ))
+      ->updateFields(array(
+        'last_updated' => REQUEST_TIME,
       ))
       ->expression('count', 'count + :inc', array(':inc' => $number))
       ->execute();
@@ -798,7 +802,10 @@ class flag_flag {
 
     // Update the count with the new value otherwise.
     db_update('flag_counts')
-      ->expression('count', 'count + :inc', array(':inc' => $number))
+      ->expression('count', 'count - :inc', array(':inc' => $number))
+      ->fields(array(
+        'last_updated' => REQUEST_TIME,
+      ))
       ->condition('fid', $this->fid)
       ->condition('content_id', $content_id)
       ->execute();
