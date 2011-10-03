@@ -1646,11 +1646,6 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
   $uid = !isset($uid) ? $GLOBALS['user']->uid : $uid;
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
 
-  // If the user is anonymous and doesn't have a session, return an empty list.
-  if ($uid == 0 && empty($sid)) {
-    return array();
-  }
-
   if (isset($content_id)) {
     if (!isset($flagged_content[$uid][$sid][$content_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
