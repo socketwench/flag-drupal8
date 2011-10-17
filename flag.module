@@ -1245,7 +1245,8 @@ function template_preprocess_flag(&$variables) {
   $variables['flag_classes_array'][] = $variables['action'] . '-action';
   $variables['flag_classes_array'][] = 'flag-link-' . $flag->link_type;
   if (isset($link['attributes']['class'])) {
-    $variables['flag_classes_array'][] = $link['attributes']['class'];
+    $link['attributes']['class'] = is_string($link['attributes']['class']) ? array_filter(explode(' ', $link['attributes']['class'])) : $link['attributes']['class'];
+    $variables['flag_classes_array'] = array_merge($variables['flag_classes_array'], $link['attributes']['class']);
   }
   if ($variables['after_flagging']) {
     $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
