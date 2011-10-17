@@ -39,23 +39,24 @@ function flag_flag_definitions() {
  * Returns a flag definition.
  */
 function flag_fetch_definition($content_type = NULL) {
-  static $cache;
-  if (!isset($cache)) {
-    $cache = module_invoke_all('flag_definitions');
-    if (!isset($cache['node'])) {
+  static $defintions;
+  if (!isset($defintions)) {
+    $defintions = module_invoke_all('flag_definitions');
+    drupal_alter('flag_definitions', $defintions);
+    if (!isset($defintions['node'])) {
       // We want our API to be available in hook_install, but our module is not
       // enabled by then, so let's load our implementation directly:
-      $cache += flag_flag_definitions();
+      $defintions += flag_flag_definitions();
     }
   }
 
   if (isset($content_type)) {
-    if (isset($cache[$content_type])) {
-      return $cache[$content_type];
+    if (isset($defintions[$content_type])) {
+      return $defintions[$content_type];
     }
   }
   else {
-    return $cache;
+    return $defintions;
   }
 }
 
