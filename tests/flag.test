@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Tests for the Flag module.
+ */
+
 class FlagTestCase extends DrupalWebTestCase {
   var $_flag = FALSE;
 
   /**
-   * Implementation of getInfo().
+   * Implements getInfo().
    */
   public static function getInfo() {
     return array(
@@ -15,7 +20,7 @@ class FlagTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Implementation of setUp().
+   * Implements setUp().
    */
   function setUp() {
     parent::setUp('flag');

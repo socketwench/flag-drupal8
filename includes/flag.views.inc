@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_views_handlers().
+ * Implements hook_views_handlers().
  */
 function flag_views_handlers() {
   return array(
@@ -40,7 +40,7 @@ function flag_views_handlers() {
 }
 
 /**
- * Implementation of hook_views_plugins().
+ * Implements hook_views_plugins().
  */
 function flag_views_plugins() {
   return array(
@@ -64,7 +64,7 @@ function flag_views_plugins() {
   );
 }
 /**
- * Implementation of hook_views_data().
+ * Implements hook_views_data().
  */
 function flag_views_data() {
   $data = array();
@@ -169,7 +169,7 @@ function flag_views_data() {
 }
 
 /**
- * Implementation of hook_views_data_alter().
+ * Implements hook_views_data_alter().
  */
 function flag_views_data_alter(&$data) {
 
@@ -177,7 +177,7 @@ function flag_views_data_alter(&$data) {
     $flag = flag_flag::factory_by_content_type($flag_type);
     $info = $flag->get_views_info();
 
-    if(!empty($info['join field'])) {
+    if (!empty($info['join field'])) {
       // Add the flag relationship.
       $data[$info['views table']]['flag_content_rel'] = array(
         'group' => t('Flags'),

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file flag.rules.inc
+ * @file
  * Rules integration for the Flag module.
  */
 
@@ -194,7 +194,7 @@ function flag_rules_action_info() {
     $flag = flag_create_handler($type);
     $entity_info = entity_get_info($type);
     $items += array(
-      'flag_flag'. $type => array(
+      'flag_flag' . $type => array(
         'label' => t('Flag a @type', array('@type' => $type)),
         'base' => 'flag_rules_action_flag',
         'parameter' => array(
@@ -212,7 +212,7 @@ function flag_rules_action_info() {
         'group' => t('Flag'),
         'access callback' => 'flag_rules_integration_access',
       ),
-      'flag_unflag'. $type => array(
+      'flag_unflag' . $type => array(
         'label' => t('Unflag a @type', array('@type' => $type)),
         'base' => 'flag_rules_action_unflag',
         'parameter' => array(
@@ -305,7 +305,7 @@ function flag_rules_condition_info() {
     $entity_info = entity_get_info($type);
     $label = isset($entity_info[$type]['label']) ? $entity_info[$type]['label'] : $type;
     $items += array(
-      'flag_threshold_'. $type => array(
+      'flag_threshold_' . $type => array(
         'label' => drupal_ucfirst(t('@type has flagging count', array('@type' => $label))),
         'base' => 'flag_rules_condition_threshold',
         'parameter' => array(
@@ -315,28 +315,28 @@ function flag_rules_condition_info() {
             'flag_type' => $type,
             'description' => t('The flag to check for.')
           ),
-           $type => array(
-             'type' => $type,
-             'label' => $label,
-           ),
-           'number' => array(
-             'type' => 'integer',
-             'label' => t('Number'),
-             'description' => t('The number against which to test the number of times the object is flagged. For example, if you type "3" here, and choose "Greater than" for the operator, then this condition will return TRUE if the object is flagged more than three times.'),
-           ),
-           'operator' => array(
-             'type' => 'text',
-             'label' => t('Comparison operator'),
-             'options list' => 'flag_rules_condition_threshold_operator_options',
-             'restriction' => 'input',
-             'default value' => '=',
-             'optional' => TRUE,
-           ),
+          $type => array(
+            'type' => $type,
+            'label' => $label,
+          ),
+          'number' => array(
+            'type' => 'integer',
+            'label' => t('Number'),
+            'description' => t('The number against which to test the number of times the object is flagged. For example, if you type "3" here, and choose "Greater than" for the operator, then this condition will return TRUE if the object is flagged more than three times.'),
+          ),
+          'operator' => array(
+            'type' => 'text',
+            'label' => t('Comparison operator'),
+            'options list' => 'flag_rules_condition_threshold_operator_options',
+            'restriction' => 'input',
+            'default value' => '=',
+            'optional' => TRUE,
+          ),
         ),
         'group' => t('Flag'),
         'access callback' => 'flag_rules_integration_access',
       ),
-      'flag_flagged_'. $type => array(
+      'flag_flagged_' . $type => array(
         'label' => drupal_ucfirst(t('@type is flagged', array('@type' => $label))),
         'base' => 'flag_rules_condition_flagged',
         'parameter' => array(
@@ -346,10 +346,10 @@ function flag_rules_condition_info() {
             'flag_type' => $type,
             'description' => t('The flag to check for.')
           ),
-           $type => array(
-             'type' => $type,
-             'label' => $label,
-           ),
+          $type => array(
+            'type' => $type,
+            'label' => $label,
+          ),
           'user' => array(
             'type' => 'user',
             'label' => t('User on whose behalf to check'),

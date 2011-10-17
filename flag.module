@@ -10,7 +10,7 @@ define('FLAG_API_VERSION', 2);
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
-include_once dirname(__FILE__) .'/flag.inc';
+include_once dirname(__FILE__) . '/flag.inc';
 
 /**
  * Implements hook_menu().
@@ -177,7 +177,7 @@ function flag_help($path, $arg) {
  */
 function flag_init() {
   $path = drupal_get_path('module', 'flag');
-  include_once $path .'/includes/flag.actions.inc';
+  include_once $path . '/includes/flag.actions.inc';
 }
 
 /**
@@ -247,7 +247,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
 
     // The flag links are actually fully rendered theme functions.
     // The HTML attribute is set to TRUE to allow whatever the themer desires.
-    $links['flag-'. $flag->name] = array(
+    $links['flag-' . $flag->name] = array(
       'title' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id),
       'html' => TRUE,
     );
@@ -278,7 +278,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
 function flag_flag_link($flag, $action, $content_id) {
   $token = flag_get_token($content_id);
   return array(
-    'href' => 'flag/'. ($flag->link_type == 'confirm' ? 'confirm/' : '') ."$action/$flag->name/$content_id",
+    'href' => 'flag/' . ($flag->link_type == 'confirm' ? 'confirm/' : '') . "$action/$flag->name/$content_id",
     'query' => drupal_get_destination() + ($flag->link_type == 'confirm' ? array() : array('token' => $token)),
   );
 }
@@ -352,11 +352,11 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
     $flags = flag_get_flags('node', $form['#node_type']->type, $user);
     foreach ($flags as $flag) {
       if ($flag->show_on_form) {
-        $var = 'flag_'. $flag->name .'_default';
+        $var = 'flag_' . $flag->name . '_default';
         $form['workflow']['flag'][$var] = array(
           '#type' => 'checkbox',
           '#title' => $flag->get_label('flag_short', $form['#node_type']->type),
-          '#default_value' => variable_get($var .'_'. $form['#node_type']->type, 0),
+          '#default_value' => variable_get($var . '_' . $form['#node_type']->type, 0),
           '#return_value' => 1,
         );
       }
@@ -373,7 +373,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
       );
     }
   }
-  elseif (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] .'_node_form')) {
+  elseif (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] . '_node_form')) {
     $nid = !empty($form['nid']['#value']) ? $form['nid']['#value'] : NULL;
     $flags = flag_get_flags('node', $form['type']['#value'], $user);
 
@@ -662,7 +662,7 @@ function flag_user_view($account, $view_mode) {
       // User has no permission to use this flag.
       continue;
     }
-    if (!$flag->uses_hook_link(array())){
+    if (!$flag->uses_hook_link(array())) {
       // Flag not set to appear on profile.
       continue;
     }
@@ -809,9 +809,9 @@ function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
     '#value' => $content_id,
   );
 
-  $question = $flag->get_label($action .'_confirmation', $content_id);
+  $question = $flag->get_label($action . '_confirmation', $content_id);
   $path = isset($_GET['destination']) ? $_GET['destination'] : '<front>';
-  $yes = $flag->get_label($action .'_short', $content_id);
+  $yes = $flag->get_label($action . '_short', $content_id);
 
   return confirm_form($form, $question, $path, '', $yes);
 }
@@ -1120,8 +1120,8 @@ function flag_user_operations() {
   return $operations;
 }
 /**
-* Callback function for hook_user_operations().
-*/
+ * Callback function for hook_user_operations().
+ */
 function flag_users($users, $action, $flag_name) {
   foreach ($users as $uid) {
     flag($action, $flag_name, $uid);
@@ -1144,7 +1144,7 @@ function flag_mail($key, &$message, $params) {
  * Implements hook_theme().
  */
 function flag_theme() {
-  $path = drupal_get_path('module', 'flag') .'/theme';
+  $path = drupal_get_path('module', 'flag') . '/theme';
 
   return array(
     'flag' => array(
@@ -1242,8 +1242,8 @@ function template_preprocess_flag(&$variables) {
 
   $variables['flag_classes_array'] = array();
   $variables['flag_classes_array'][] = 'flag';
-  $variables['flag_classes_array'][] = $variables['action'] .'-action';
-  $variables['flag_classes_array'][] = 'flag-link-'. $flag->link_type;
+  $variables['flag_classes_array'][] = $variables['action'] . '-action';
+  $variables['flag_classes_array'][] = 'flag-link-' . $flag->link_type;
   if (isset($link['attributes']['class'])) {
     $variables['flag_classes_array'][] = $link['attributes']['class'];
   }

@@ -506,7 +506,7 @@ class flag_flag {
   }
 
   /**
-   * An implementation of access() implemented by each child class.
+   * Implements access() implemented by each child class.
    *
    * @abstract
    */
@@ -515,7 +515,7 @@ class flag_flag {
   }
 
   /**
-   * An implementation of access_multiple() implemented by each child class.
+   * Implements access_multiple() implemented by each child class.
    *
    * @abstract
    */
