@@ -12,7 +12,7 @@ function flag_install() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function flag_uninstall() {
   $result = db_select('variable', 'v')
@@ -27,14 +27,14 @@ function flag_uninstall() {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_enable().
  *
  * We create the demonstration flag on enable, so hook implementations in flag
  * module will fire correctly, as the APIs are not available on install.
  */
 function flag_enable() {
   // Load the flag API in case we want to use it when enabling.
-  include_once(drupal_get_path('module', 'flag') .'/flag.module');
+  include_once(drupal_get_path('module', 'flag') . '/flag.module');
 
   if (!flag_get_flags()) {
     // Install a demonstration flag only if no flag exists. This is to prevent
@@ -78,7 +78,7 @@ function _flag_install_get_suggested_node_types() {
 }
 
 /**
- * Implementation of hook_requirements().
+ * Implements hook_requirements().
  *
  * Prevent installing this module if the "Flag content" module is installed as well.
  */
@@ -138,7 +138,7 @@ function _flag_flag_content_message() {
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function flag_schema() {
   $schema = array();

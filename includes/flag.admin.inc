@@ -95,7 +95,7 @@ function theme_flag_admin_listing($variables) {
     drupal_add_tabledrag('flag-admin-listing-table', 'order', 'sibling', 'flag-weight');
   }
 
-  $header = array(t('Flag'),t('Weight'), t('Flag type'), t('Roles'), t('Node types'), t('Global?'), t('Operations'));
+  $header = array(t('Flag'), t('Weight'), t('Flag type'), t('Roles'), t('Node types'), t('Global?'), t('Operations'));
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'flag-admin-listing-table')));
   $output .= drupal_render_children($form);
 
@@ -275,7 +275,7 @@ function flag_form($form, &$form_state, $flag) {
   );
 
   if (!empty($flag->fid)) {
-    $form['name']['#description'] .= ' <strong>'. t('Change this value only with great care.') .'</strong>';
+    $form['name']['#description'] .= ' <strong>' . t('Change this value only with great care.') . '</strong>';
   }
 
   $form['title'] = array(
