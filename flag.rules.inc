@@ -350,7 +350,7 @@ function flag_rules_condition_info() {
             'type' => $type,
             'label' => $label,
           ),
-          'user' => array(
+          'flagging_user' => array(
             'type' => 'user',
             'label' => t('User on whose behalf to check'),
             'description' => t('For non-global flags, this is the user on whose behalf the flag is checked.'),
