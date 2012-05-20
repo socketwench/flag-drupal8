@@ -13,6 +13,15 @@
   position: relative;
 }
 
+/* Better contextual link support, prevent line wrapping. */
+ul.contextual-links li .flag-wrapper a {
+  display: inline-block;
+}
+
+ul.contextual-links li .flag-wrapper {
+  display: block;
+}
+
 /* The rest deals with indicating the waiting state. */
 
 .flag-waiting a {
