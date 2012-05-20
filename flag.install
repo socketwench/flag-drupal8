@@ -455,3 +455,10 @@ function flag_update_6208() {
   db_add_index('flag_counts', 'fid_count', array('fid', 'count'));
   db_add_index('flag_counts', 'fid_last_updated', array('fid', 'last_updated'));
 }
+
+/**
+ * Clear caches.
+ */
+function flag_update_7201() {
+  // Do nothing. Update.php is going to clear caches for us.
+}
