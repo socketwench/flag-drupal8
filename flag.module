@@ -446,6 +446,39 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/*
+ * Implements hook_contextual_links_view_alter().
+ */
+function flag_contextual_links_view_alter(&$element, $items) {
+
+  // Check if we have a node link to process
+  if (isset($element['#element']['#node']->nid)) {
+    $node = $element['#element']['#node'];
+
+    // Get all possible flags for this content-type.
+    $flags = flag_get_flags('node');
+
+    foreach ($flags as $name => $flag) {
+      if (!$flag->show_contextual_link) {
+        continue;
+      }
+
+      $content_id = $flag->get_content_id($node);
+      if (!$flag->access($content_id) && (!$flag->is_flagged($content_id) || !$flag->access($content_id, 'flag'))) {
+        // User has no permission to use this flag or flag does not apply to this
+        // content. The link is not skipped if the user has "flag" access but
+        // not "unflag" access (this way the unflag denied message is shown).
+        continue;
+      }
+
+      $element['#links']['flag-'. $name] = array(
+        'title' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id),
+        'html' => TRUE,
+      );
+    }
+  }
+}
+
 /**
  * Implements hook_comment_view().
  */
