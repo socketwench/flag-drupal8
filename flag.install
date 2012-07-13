@@ -113,7 +113,7 @@ function flag_requirements($phase) {
           $requirements['flag_robots'] = array(
             'title' => $t('Flag robots.txt problem'),
             'severity' => REQUIREMENT_WARNING,
-            'description' => $t('Flag module may currently be used with anonymous users, however the robots.txt file does not exlude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
+            'description' => $t('Flag module may currently be used with anonymous users, however the robots.txt file does not exclude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
             'value' => $t('Search engines flagging content'),
           );
         }
