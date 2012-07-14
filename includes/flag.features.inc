@@ -74,12 +74,12 @@ function flag_features_revert($module = NULL) {
       }
     }
     _flag_clear_cache();
+    return TRUE;
   }
   else {
-    drupal_set_message(t('Could not load default flag.'), 'error');
+    // No flags were found.
     return FALSE;
   }
-  return TRUE;
 }
 
 /**
