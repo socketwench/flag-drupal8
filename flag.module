@@ -1792,6 +1792,19 @@ function flag_create_link($flag_name, $content_id) {
 
 /**
  * Return an array of link types provided by modules.
+ *
+ * @param $reset
+ *  (Optional) Whether to reset the static cache.
+ *
+ * @return
+ *  An array of link types as defined by hook_flag_link_types(). These are keyed
+ *  by the type name, and each value is an array of properties. In addition to
+ *  those defined in hook_flag_link_types(), the following properties are set:
+ *  - 'module': The providing module.
+ *  - 'name': The machine name of the type.
+ *
+ * @see hook_flag_link_types()
+ * @see hook_flag_link_types_alter()
  */
 function flag_get_link_types($reset = FALSE) {
   static $link_types;
