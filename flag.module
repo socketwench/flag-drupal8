@@ -792,7 +792,7 @@ function flag_page($action, $flag, $content_id) {
         'status' => FALSE,
         'errorMessage' => $error,
       ));
-      exit;
+      drupal_exit();
     }
     else {
       drupal_set_message($error);
@@ -814,7 +814,7 @@ function flag_page($action, $flag, $content_id) {
       'flagName' => $flag->name,
       'flagStatus' => $flag->is_flagged($content_id) ? 'flagged' : 'unflagged',
     ));
-    exit;
+    drupal_exit();
   }
   else {
     drupal_set_message($flag->get_label($action . '_message', $content_id));
