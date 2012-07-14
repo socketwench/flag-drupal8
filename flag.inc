@@ -182,13 +182,18 @@ class flag_flag {
    */
   function options() {
     $options = array(
+      // The text for the "flag this" link for this flag.
       'flag_short' => '',
+      // The description of the "flag this" link.
       'flag_long' => '',
+      // Message displayed after flagging content.
       'flag_message' => '',
+      // Likewise but for unflagged.
       'unflag_short' => '',
       'unflag_long' => '',
       'unflag_message' => '',
       'unflag_denied_text' => '',
+      // The link type used by the flag, as defined in hook_flag_link_types().
       'link_type' => 'toggle',
       'roles' => array(
         'flag' => array(DRUPAL_AUTHENTICATED_RID),
