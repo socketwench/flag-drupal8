@@ -9,7 +9,7 @@
 /**
  * Implements hook_flag_definitions().
  *
- * Defines the flags this module implements.
+ * Defines the flag types this module implements.
  *
  * @return
  *   An "array of arrays", keyed by content-types. The 'handler' slot
