@@ -41,14 +41,39 @@ function hook_flag_definitions() {
  *  An array of flag definitions returned by hook_flag_definitions().
  */
 function hook_flag_definitions_alter(&$definitions) {
-  
+
 }
 
 /**
- * TODO
+ * Define one or more flag link types.
+ *
+ * @see flag_get_link_types()
+ * @see hook_flag_link_types_alter()
+ *
+ * @return
+ *  An array of one or more types, keyed by the machine name of the type, and
+ *  where each value is a link type definition as an array with the following
+ *  properties:
+ *  - 'title': The human-readable name of the type.
+ *  - 'description': The description of the link type.
+ *  - 'options': An array of extra options for the link type.
+ *  - 'uses standard js': Boolean, indicates whether the link requires Flag
+ *    module's own JS file for links.
+ *  - 'uses standard css': Boolean, indicates whether the link requires Flag
+ *    module's own CSS file for links.
  */
-function hook_flag_options_alter() {
-  
+function hook_flag_link_types() {
+
+}
+
+/**
+ * Alter other modules' definitions of flag link types.
+ *
+ * @see flag_get_link_types()
+ * @see hook_flag_link_types()
+ */
+function hook_flag_link_types_alter(&$link_types) {
+
 }
 
 /**
@@ -64,6 +89,21 @@ function hook_flag_default_flags() {
  * @see flag_get_flags().
  */
 function hook_flag_alter(&$flag) {
+
+}
+
+/**
+ * Alter a flag's default options.
+ *
+ * @param $options
+ *  The array of default options for the flag type, with the options for the
+ *  flag's link type merged in.
+ * @param $flag
+ *  The flag object.
+ *
+ * @see flag_flag::options()
+ */
+function hook_flag_options_alter(&$options, $flag) {
 
 }
 
@@ -103,13 +143,6 @@ function hook_flag_access_multiple() {
  *
  */
 function hook_flag_link() {
-
-}
-
-/**
- * TODO
- */
-function hook_flag_link_types() {
 
 }
 
