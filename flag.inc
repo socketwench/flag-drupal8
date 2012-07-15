@@ -859,7 +859,7 @@ class flag_flag {
     }
     return db_select('flag_content', 'fc')->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)->condition('uid', $uid)->condition('sid', $sid)
-      ->countQuery()->execute();
+      ->countQuery()->execute()->fetchField();
   }
 
   /**
