@@ -550,12 +550,7 @@ function flag_node_delete($node) {
     // of a translation set, don't delete the flagging record.
     // Instead, data will be updated in the 'translation_change' op, below.
     if (!$flag->i18n || empty($node->tnid)) {
-      db_delete('flag_content')
-        ->condition('fid', $flag->fid)
-        ->condition('content_id', $node->nid);
-      db_delete('flag_counts')
-        ->condition('fid', $flag->fid)
-        ->condition('content_id', $node->nid);
+      _flag_content_delete('node', $node->nid, $flag->fid);
     }
   }
 }
@@ -581,6 +576,38 @@ function flag_node_translation_change($node) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_comment_delete().
+ */
+function flag_comment_delete($comment) {
+  _flag_content_delete('comment', $comment->cid);
+}
+
+/**
+ * Deletes flagging records for the entity.
+ *
+ * @param $entity_type
+ *   The type of the entity being deleted; e.g. 'node' or 'comment'.
+ * @param $entity_id
+ *   The ID of the entity being deleted.
+ * @param $fid
+ *   The flag id
+ */
+function _flag_content_delete($entity_type, $entity_id, $fid = NULL) {
+  $query_content = db_delete('flag_content')
+    ->condition('content_type', $entity_type)
+    ->condition('content_id', $entity_id);
+  $query_counts = db_delete('flag_counts')
+    ->condition('content_type', $entity_type)
+    ->condition('content_id', $entity_id);
+  if (isset($fid)) {
+    $query_content->condition('fid', $fid);
+    $query_counts->condition('fid', $fid);
+  }
+  $query_content->execute();
+  $query_counts->execute();
 }
 
 /**
@@ -673,15 +700,7 @@ function flag_user_account_removal($account) {
     ->execute();
 
   // Remove flags that have been done to this user.
-  db_delete('flag_content')
-    ->condition('content_type', 'user')
-    ->condition('content_id', $account->uid)
-    ->execute();
-
-  db_delete('flag_counts')
-    ->condition('content_type', 'user')
-    ->condition('content_id', $account->uid)
-    ->execute();
+  _flag_content_delete('user', $account->uid);
 }
 
 /**
