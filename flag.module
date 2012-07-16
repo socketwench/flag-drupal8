@@ -548,7 +548,7 @@ function flag_node_delete($node) {
   foreach (flag_get_flags('node') as $flag) {
     // If the flag is being tracked by translation set and the node is part
     // of a translation set, don't delete the flagging record.
-    // Instead, data will be updated in the 'translation_change' op, below.
+    // Instead, data will be updated in hook_node_translation_change(), below.
     if (!$flag->i18n || empty($node->tnid)) {
       _flag_content_delete('node', $node->nid, $flag->fid);
     }
@@ -556,7 +556,9 @@ function flag_node_delete($node) {
 }
 
 /**
- * Implements hook_translation_change().
+ * Implements hook_node_translation_change().
+ *
+ * (Hook provided by translation_helpers module.)
  */
 function flag_node_translation_change($node) {
   if (isset($node->translation_change)) {
