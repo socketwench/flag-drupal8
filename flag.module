@@ -766,7 +766,7 @@ function flag_session_api_cleanup($arg = 'run') {
 }
 
 /**
- * Implements hook_node_type().
+ * Implements hook_node_type_delete().
  */
 function flag_node_type_delete($info) {
   // Remove entry from flaggable content types.
