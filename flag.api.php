@@ -23,6 +23,8 @@
  *  - 'description': A longer description shown in the UI when creating a new
  *    flag.
  *  - 'handler': The name of the class implementing this flag type.
+ *
+ * @see flag_fetch_definition()
  */
 function hook_flag_definitions() {
   return array(
