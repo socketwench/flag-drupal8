@@ -3,6 +3,14 @@
 /**
  * @file
  * The Flag module.
+ *
+ * A note on terminology: due to the 7.x-2.x branch of flag being a reasonably
+ * straight port of 6.x-2.x, the Drupal 6 term 'content type' persists in
+ * function names, database fields, and variables.
+ * Thus:
+ *  'content type'  -> 'entity type'
+ *  'content'       -> 'entity'
+ *  'sub-type'      -> 'bundle' ('type' is also used sometimes!)
  */
 
 define('FLAG_API_VERSION', 2);
