@@ -351,37 +351,42 @@ function flag_field_extra_fields() {
 }
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter(): node_type_form.
  */
-function flag_form_alter(&$form, &$form_state, $form_id) {
+function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
   global $user;
-
-  if ($form_id == 'node_type_form') {
-    $flags = flag_get_flags('node', $form['#node_type']->type, $user);
-    foreach ($flags as $flag) {
-      if ($flag->show_on_form) {
-        $var = 'flag_' . $flag->name . '_default';
-        $form['workflow']['flag'][$var] = array(
-          '#type' => 'checkbox',
-          '#title' => $flag->get_label('flag_short', $form['#node_type']->type),
-          '#default_value' => variable_get($var . '_' . $form['#node_type']->type, 0),
-          '#return_value' => 1,
-        );
-      }
-    }
-
-    if (isset($form['workflow']['flag'])) {
-      $form['workflow']['flag'] += array(
-        '#type' => 'item',
-        '#title' => t('Default flags'),
-        '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', array('@flag-url' => url(FLAG_ADMIN_PATH))),
-        // Make the spacing a bit more compact:
-        '#prefix' => '<div class="form-checkboxes">',
-        '#suffix' => '</div>',
+  $flags = flag_get_flags('node', $form['#node_type']->type, $user);
+  foreach ($flags as $flag) {
+    if ($flag->show_on_form) {
+      $var = 'flag_' . $flag->name . '_default';
+      $form['workflow']['flag'][$var] = array(
+        '#type' => 'checkbox',
+        '#title' => $flag->get_label('flag_short', $form['#node_type']->type),
+        '#default_value' => variable_get($var . '_' . $form['#node_type']->type, 0),
+        '#return_value' => 1,
       );
     }
   }
-  elseif (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] . '_node_form')) {
+
+  if (isset($form['workflow']['flag'])) {
+    $form['workflow']['flag'] += array(
+      '#type' => 'item',
+      '#title' => t('Default flags'),
+      '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', array('@flag-url' => url(FLAG_ADMIN_PATH))),
+      // Make the spacing a bit more compact:
+      '#prefix' => '<div class="form-checkboxes">',
+      '#suffix' => '</div>',
+    );
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function flag_form_alter(&$form, &$form_state, $form_id) {
+  // Alter node forms.
+  if (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] . '_node_form')) {
+    global $user;
     $nid = !empty($form['nid']['#value']) ? $form['nid']['#value'] : NULL;
     $flags = flag_get_flags('node', $form['type']['#value'], $user);
 
