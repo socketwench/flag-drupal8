@@ -185,8 +185,8 @@ function flag_rules_action_info() {
     ),
     'permission_check' => array(
       'type' => 'boolean',
-      'label' => t('Permission check'),
-      'description' => t('Whether to check access permissions against the user on whose behalf to flag.'),
+      'label' => t('Skip permission check'),
+      'description' => t('Whether to ignore permissions of the user on whose behalf to flag.'),
       'restriction' => 'input',
     ),
   );
