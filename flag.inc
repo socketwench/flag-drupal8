@@ -417,12 +417,12 @@ class flag_flag {
    *
    * @param $content_id
    *   The content ID to flag/unflag.
-   * @param $account
-   *   The user on whose behalf to test the flagging action. Leave NULL for the
-   *   current user.
    * @param $action
    *   The action to test. Either 'flag' or 'unflag'. Leave NULL to determine
    *   by flag status.
+   * @param $account
+   *   The user on whose behalf to test the flagging action. Leave NULL for the
+   *   current user.
    */
   function access($content_id, $action = NULL, $account = NULL) {
     if (!isset($account)) {
