@@ -74,11 +74,6 @@ function flag_features_revert($module = NULL) {
       }
     }
     _flag_clear_cache();
-    return TRUE;
-  }
-  else {
-    // No flags were found.
-    return FALSE;
   }
 }
 
