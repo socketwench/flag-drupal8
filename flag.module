@@ -218,7 +218,7 @@ function flag_features_api() {
 function flag_permission() {
   return array(
     'administer flags' => array(
-      'title' => t('administer flags'),
+      'title' => t('Administer flags'),
       'description' => t('Create and edit site-wide flags.'),
     ),
   );
