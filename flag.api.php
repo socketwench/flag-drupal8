@@ -128,9 +128,20 @@ function hook_flag($op, $flag, $content_id, $account, $fcid) {
 }
 
 /**
- * TODO
+ * Allow modules to allow or deny access to flagging.
+ *
+ * @param $flag
+ *  The flag object.
+ * @param $content_id
+ *  The id of the entity in question.
+ * @param $action
+ *  The action to test. Either 'flag' or 'unflag'.
+ * @param $account
+ *  The user on whose behalf to test the flagging action.
+ *
+ * @see flag_flag:access()
  */
-function hook_flag_access() {
+function hook_flag_access($flag, $content_id, $action, $account) {
 
 }
 
