@@ -51,7 +51,7 @@ function flag_menu() {
     'title' => 'Import',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_import_form'),
-    'access arguments' => array('administer flags'),
+    'access arguments' => array('use flag import'),
     'file' => 'includes/flag.export.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
@@ -220,6 +220,11 @@ function flag_permission() {
     'administer flags' => array(
       'title' => t('Administer flags'),
       'description' => t('Create and edit site-wide flags.'),
+    ),
+    'use flag import' => array(
+      'title' => t('Use flag importer'),
+      'description' => t('Access the flag import functionality.'),
+      'restrict access' => TRUE,
     ),
   );
 }
