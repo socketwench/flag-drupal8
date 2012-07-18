@@ -8,7 +8,8 @@
  * straight port of 6.x-2.x, the Drupal 6 term 'content type' persists in
  * function names, database fields, and variables.
  * Thus:
- *  'content type'  -> 'entity type'
+ *  'content type'  -> 'entity type' (though not exclusively, as a flag type
+ *                      may be defined for any kind of object)
  *  'content'       -> 'entity'
  *  'sub-type'      -> 'bundle' ('type' is also used sometimes!)
  */
