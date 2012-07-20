@@ -1581,9 +1581,12 @@ function flag_get_flag_counts($flag_name, $reset = FALSE) {
  * Load a single flag either by name or by flag ID.
  *
  * @param $name
- *   The the flag name.
+ *  (optional) The flag name.
  * @param $fid
- *   The the flag id.
+ *  (optional) The the flag id.
+ *
+ * @return
+ *  The flag object, or FALSE if no matching flag was found.
  */
 function flag_get_flag($name = NULL, $fid = NULL) {
   $flags = flag_get_flags();
