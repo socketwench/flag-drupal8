@@ -233,8 +233,7 @@ function flag_permission() {
 /**
  * Implements hook_link().
  *
- * This hook does not exist in Drupal 7, it is called from flag_node_view() and
- * flag_comment_view() functions.
+ * This hook does not exist in Drupal 7, it is called from flag_entity_view().
  */
 function flag_link($type, $object = NULL, $teaser = FALSE) {
   if (!isset($object) || !flag_fetch_definition($type)) {
@@ -333,23 +332,19 @@ function flag_flag_link_types() {
 function flag_field_extra_fields() {
   $extra = array();
 
-  foreach (node_type_get_types() as $type) {
-    $flags = flag_get_flags('node', $type->type);
-
-    // Filter out flags which need to be included on the node form.
-    $flag_names = array();
-    foreach ($flags as $name => $flag) {
+  $flags = flag_get_flags();
+  foreach ($flags as $name => $flag) {
+    // In order to make sense with this hook's structure, we use D7 lingo, hence
+    // some translation is required...
+    $entity_type = $flag->content_type;
+    foreach ($flag->types as $bundle_name) {
       if ($flag->show_on_form) {
-        $flag_names[] = $flag->get_label('title');
+        $extra[$entity_type][$bundle_name]['form']['flag'] = array(
+          'label' => t('Flags'),
+          'description' => t('Checkboxes for toggling flags'),
+          'weight' => 10
+        );
       }
-    }
-
-    if ($flag_names) {
-      $extra['node'][$type->type]['form']['flag'] = array(
-        'label' => t('Flags'),
-        'description' => t('Checkboxes for toggling flags (i.e. @flag_names)', array('@flag_names' => implode(', ', $flag_names))),
-        'weight' => 1
-      );
     }
   }
 
@@ -383,6 +378,131 @@ function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
       '#prefix' => '<div class="form-checkboxes">',
       '#suffix' => '</div>',
     );
+  }
+}
+
+/**
+ * Implements hook_field_attach_form().
+ *
+ * Handles the 'show_on_form' flag option.
+ *
+ * Warning: will not work on entity types that are not fieldable, as this relies
+ * on a field module hook.
+ *
+ * @see flag_field_attach_submit().
+ */
+function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // Nodes have their own special form handling: see flag_form_alter().
+  if ($entity_type == 'node') {
+    return;
+  }
+
+  list($id) = entity_extract_ids($entity_type, $entity);
+  // Some modules are being stupid here. Commerce!
+  if (empty($id)) {
+    $id = NULL;
+  }
+
+  // Get all possible flags for this content-type.
+  $flags = flag_get_flags($entity_type);
+
+  // Filter out flags which need to be included on the node form.
+  $flags_in_form = 0;
+  $flags_visible = 0;
+  foreach ($flags as $flag) {
+    if (!$flag->show_on_form) {
+      continue;
+    }
+
+    // Get the flag status.
+    // We don't have per-bundle defaults on general entities yet.
+    $flag_status = $id ? $flag->is_flagged($id) : FALSE;
+
+    // If the flag is not global and the user doesn't have access, skip it.
+    // Global flags have their value set even if the user doesn't have access
+    // to it, similar to the way "published" and "promote" keep the default
+    // values even if the user doesn't have "administer nodes" permission.
+    global $user;
+    $access = $flag->access($id, $flag_status ? 'unflag' : 'flag');
+    if (!$access && !$flag->global) {
+      continue;
+    }
+
+    $form['flag'][$flag->name] = array(
+      '#type' => 'checkbox',
+      '#title' => $flag->get_label('flag_short', $id),
+      '#description' => $flag->get_label('flag_long', $id),
+      '#default_value' => $flag_status,
+      '#return_value' => 1,
+    );
+
+    // If the user does not have access to the flag, set as a value.
+    if (!$access) {
+      $form['flag'][$flag->name]['#type'] = 'value';
+      $form['flag'][$flag->name]['#value'] = $flag_status;
+    }
+    else {
+      $flags_visible++;
+    }
+    $flags_in_form++;
+  }
+
+  if ($flags_in_form) {
+    $form['flag'] += array(
+      '#weight' => 1,
+      '#tree' => TRUE,
+    );
+  }
+  if ($flags_visible) {
+    $form['flag'] += array(
+      '#type' => 'fieldset',
+      '#title' => t('Flags'),
+      '#collapsible' => TRUE,
+    );
+  }
+}
+
+/**
+ * Implements hook_field_attach_submit().
+ *
+ * @see flag_field_attach_form().
+ */
+function flag_field_attach_submit($entity_type, $entity, $form, &$form_state) {
+  // Put the form values in the entity so flag_field_attach_save() can find
+  // them. We can't call flag() here as new entities have no id yet.
+  if (isset($form_state['values']['flag'])) {
+    $entity->flag = $form_state['values']['flag'];
+  }
+}
+
+/**
+ * Implements hook_field_attach_insert().
+ */
+function flag_field_attach_insert($entity_type, $entity) {
+  if (isset($entity->flag)) {
+    flag_field_attach_save($entity_type, $entity);
+  }
+}
+
+/**
+ * Implements hook_field_attach_update().
+ */
+function flag_field_attach_update($entity_type, $entity) {
+  if (isset($entity->flag)) {
+    flag_field_attach_save($entity_type, $entity);
+  }
+}
+
+/**
+ * Shared saving routine between flag_field_attach_insert/update().
+ *
+ * @see flag_field_attach_form().
+ */
+function flag_field_attach_save($entity_type, $entity) {
+  list($id) = entity_extract_ids($entity_type, $entity);
+  // Get the flag values we stashed in the entity in flag_field_attach_submit().
+  foreach ($entity->flag as $flag_name => $state) {
+    flag($state ? 'flag' : 'unflag', $flag_name, $id);
   }
 }
 
@@ -499,27 +619,21 @@ function flag_contextual_links_view_alter(&$element, $items) {
 }
 
 /**
- * Implements hook_comment_view().
+ * Implements hook_entity_view().
+ *
+ * Handles the 'show_on_entity' flag option.
+ *
+ * Note this is broken for taxonomy terms. @see http://drupal.org/node/1067120
  */
-function flag_comment_view($comment) {
-  $links = flag_link('comment', $comment);
-  $comment->content['links']['flag'] = array(
-    '#theme' => 'links',
-    '#links' => $links,
-    '#attributes' => array('class' => array('links', 'inline')),
-  );
-}
-
-/**
- * Implements hook_node_view().
- */
-function flag_node_view($node, $view_mode) {
-  $links = flag_link('node', $node, $view_mode == 'teaser');
-  $node->content['links']['flag'] = array(
-    '#theme' => 'links__node__flag',
-    '#links' => $links,
-    '#attributes' => array('class' => array('links', 'inline')),
-  );
+function flag_entity_view($entity, $type, $view_mode, $langcode) {
+  $links = flag_link($type, $entity, $view_mode == 'teaser');
+  if (isset($links)) {
+    $entity->content['links']['flag'] = array(
+      '#theme' => 'links',
+      '#links' => $links,
+      '#attributes' => array('class' => array('links', 'inline')),
+    );
+  }
 }
 
 /**
@@ -561,6 +675,20 @@ function flag_node_save($node) {
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function flag_entity_delete($entity, $type) {
+  // Node and user flags handle things through the entity type delete hooks.
+  // @todo: make this configurable in the flag type definition?
+  if ($type == 'node' || $type == 'user') {
+    return;
+  }
+
+  list($id) = entity_extract_ids($type, $entity);
+  _flag_content_delete($type, $id);
+}
+
+/**
  * Implements hook_node_delete().
  */
 function flag_node_delete($node) {
@@ -597,13 +725,6 @@ function flag_node_translation_change($node) {
       }
     }
   }
-}
-
-/**
- * Implements hook_comment_delete().
- */
-function flag_comment_delete($comment) {
-  _flag_content_delete('comment', $comment->cid);
 }
 
 /**
