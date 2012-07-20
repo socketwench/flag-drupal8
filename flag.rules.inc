@@ -83,6 +83,11 @@ class FlagRulesUIClass extends RulesDataUI implements RulesDataDirectInputFormIn
 
   public static function render($value) {
     $flag = flag_get_flag($value);
+
+    if ($flag === FALSE) {
+      return array();
+    }
+
     return array(
       'content' => array('#markup' => check_plain($flag->get_title())),
       '#attributes' => array('class' => array('rules-parameter-flag')),
