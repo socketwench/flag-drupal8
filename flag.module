@@ -906,11 +906,17 @@ function flag_session_api_cleanup($arg = 'run') {
 }
 
 /**
- * Implements hook_node_type_delete().
+ * Implements hook_field_attach_delete_bundle().
+ *
+ * Delete any flags' applicability to the deleted bundle.
  */
-function flag_node_type_delete($info) {
-  // Remove entry from flaggable content types.
-  db_delete('flag_types')->condition('type', $info->type)->execute();
+function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
+  // This query can't use db_delete() because that doesn't support a
+  // subquery: see http://drupal.org/node/1267508.
+  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM flags WHERE content_type = :entity_type)", array(
+    ':bundle' => $bundle,
+    ':entity_type' => $entity_type,
+  ));
 }
 
 /**
