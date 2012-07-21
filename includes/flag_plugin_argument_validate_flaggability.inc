@@ -219,7 +219,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
     global $user;
     if (!$user->uid) {
       // Anonymous user
-      return FALSE;
+      return array();
     }
     $flattened_ids = implode(',', $ids);
     return $this->_test_by_sql("SELECT content_id FROM {flag_content} WHERE fid = :fid AND content_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
