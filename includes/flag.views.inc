@@ -39,12 +39,23 @@ function flag_views_data() {
   $data['flag_counts']['table']['group'] = t('Flags');
 
   $data['flag_content']['uid'] = array(
-    'title' => t('User'),
-    'help' => t('The user that flagged an item.'),
+    'title' => t('User uid'),
+    'help' => t('The user that flagged an item. If you need more fields than the uid add the "Flags: User" relationship.'),
     'relationship' => array(
       'base' => 'users',
+      'title' => t('User'),
+      'help' => t('Relate an item to the user that flagged it.'),
       'handler' => 'views_handler_relationship',
       'label' => t('Flag user'),
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_user_name',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    'field' => array(
+      'handler' => 'views_handler_field_user',
     ),
   );
 
