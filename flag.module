@@ -828,14 +828,23 @@ function flag_user_account_removal($account) {
     ->execute();
 
   foreach ($result as $flag_data) {
-    $flag_data->count--;
-    db_update('flag_counts')
-      ->fields(array(
-        'count' => $flag_data->count,
-      ))
-      ->condition('fid', $flag_data->fid)
-      ->condition('content_id', $flag_data->content_id)
-      ->execute();
+    // Only decrement the flag count table if it's greater than 1.
+    if ($flag_data->count > 0) {
+      $flag_data->count--;
+      db_update('flag_counts')
+        ->fields(array(
+          'count' => $flag_data->count,
+        ))
+        ->condition('fid', $flag_data->fid)
+        ->condition('content_id', $flag_data->content_id)
+        ->execute();
+    }
+    elseif ($flag_data->count == 0) {
+      db_delete('flag_counts')
+        ->condition('fid', $flag_data->fid)
+        ->condition('content_id', $flag_data->content_id)
+        ->execute();
+    }
   }
   db_delete('flag_content')
     ->condition('uid', $account->uid)
