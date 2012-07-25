@@ -1003,6 +1003,12 @@ function flag_page($action, $flag, $content_id) {
  *
  * @param $action
  *   Either 'flag' or 'unflag'.
+ * @param $flag
+ *   A loaded flag object.
+ * @param $content_id
+ *   The id of the content to operate on. The type is implicit in the flag.
+ *
+ * @see flag_confirm_submit()
  */
 function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
   $form['action'] = array(
@@ -1025,6 +1031,14 @@ function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
   return confirm_form($form, $question, $path, '', $yes);
 }
 
+/**
+ * Submit handler for the flag confirm form.
+ *
+ * Note that validating whether the user may perform the action is done here,
+ * rather than in a form validation handler.
+ *
+ * @see flag_confirm()
+ */
 function flag_confirm_submit(&$form, &$form_state) {
   $action = $form_state['values']['action'];
   $flag_name = $form_state['values']['flag_name'];
