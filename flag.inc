@@ -1272,21 +1272,6 @@ class flag_flag {
  */
 class flag_entity extends flag_flag {
   /**
-   * The entity info for this flag's entity type.
-   */
-  var $entity_info;
-
-  /**
-   * Default contructor that furthermore loads the entity info for the current
-   * content_type. (Note content_type is used as synonym for entity_type in this
-   * handler.)
-   */
-  function construct() {
-    parent::construct();
-    $this->entity_info = entity_get_info($this->content_type);
-  }
-
-  /**
    * Adds additional options that are common for all entity types.
    */
   function options() {
@@ -1308,7 +1293,8 @@ class flag_entity extends flag_flag {
    */
   function options_form(&$form) {
     $bundles = array();
-    foreach ($this->entity_info['bundles'] as $bundle_key => $bundle) {
+    $entity_info = entity_get_info($this->content_type);
+    foreach ($entity_info['bundles'] as $bundle_key => $bundle) {
       $bundles[$bundle_key] = check_plain($bundle['label']);
     }
     $form['access']['types'] = array(
@@ -1350,7 +1336,8 @@ class flag_entity extends flag_flag {
    * Checks whether the flag applies for the current entity bundle.
    */
   function applies_to_content_object($entity) {
-    if (empty($this->entity_info['entity keys']['bundle']) || in_array($entity->{$this->entity_info['entity keys']['bundle']}, $this->types)) {
+    $entity_info = entity_get_info($this->content_type);
+    if (empty($entity_info['entity keys']['bundle']) || in_array($entity->{$entity_info['entity keys']['bundle']}, $this->types)) {
       return TRUE;
     }
     return FALSE;
@@ -1360,8 +1347,9 @@ class flag_entity extends flag_flag {
    * Returns the entity id, if it already exists.
    */
   function get_content_id($entity) {
-    if ($entity && isset($entity->{$this->entity_info['entity keys']['id']})) {
-      return $entity->{$this->entity_info['entity keys']['id']};
+    $entity_info = entity_get_info($this->content_type);
+    if ($entity && isset($entity->{$entity_info['entity keys']['id']})) {
+      return $entity->{$entity_info['entity keys']['id']};
     }
   }
 
@@ -1418,13 +1406,14 @@ class flag_entity extends flag_flag {
    * Returns information for the Views integration.
    */
   function get_views_info() {
+    $entity_info = entity_get_info($this->content_type);
     return array(
-      'views table' => $this->entity_info['base table'],
-      'join field' => $this->entity_info['entity keys']['id'],
-      'title field' => isset($this->entity_info['entity keys']['label']) ? $this->entity_info['entity keys']['label'] : '',
-      'title' => t('@entity_label flag', array('@entity_label' => $this->entity_info['label'])),
+      'views table' => $entity_info['base table'],
+      'join field' => $entity_info['entity keys']['id'],
+      'title field' => isset($entity_info['entity keys']['label']) ? $entity_info['entity keys']['label'] : '',
+      'title' => t('@entity_label flag', array('@entity_label' => $entity_info['label'])),
       'help' => t('Limit results to only those entity flagged by a certain flag; Or display information about the flag set on a entity.'),
-      'counter title' => t('@entity_label flag counter', array('@entity_label' => $this->entity_info['label'])),
+      'counter title' => t('@entity_label flag counter', array('@entity_label' => $entity_info['label'])),
       'counter help' => t('Include this to gain access to the flag counter field.'),
     );
   }
