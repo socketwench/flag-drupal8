@@ -139,6 +139,10 @@ function hook_flag($op, $flag, $content_id, $account, $fcid) {
  * @param $account
  *  The user on whose behalf to test the flagging action.
  *
+ * @return
+ *   Boolean TRUE if the user is allowed to flag/unflag the given content.
+ *   FALSE otherwise.
+ *
  * @see flag_flag:access()
  */
 function hook_flag_access($flag, $content_id, $action, $account) {
@@ -146,9 +150,23 @@ function hook_flag_access($flag, $content_id, $action, $account) {
 }
 
 /**
- * TODO
+ * Allow modules to allow or deny access to flagging.
+ *
+ * @param $flag
+ *  The flag object.
+ * @param $content_ids
+ *  An array of object ids to check access.
+ * @param $account
+ *  The user on whose behalf to test the flagging action.
+ *
+ * @return
+ *   An array whose keys are the object IDs and values are booleans indicating
+ *   access.
+ *
+ * @see hook_flag_access()
+ * @see flag_flag:access_multiple()
  */
-function hook_flag_access_multiple() {
+function hook_flag_access_multiple($flag, $content_ids, $account) {
 
 }
 
