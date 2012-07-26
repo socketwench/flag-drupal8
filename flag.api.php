@@ -97,6 +97,10 @@ function hook_flag_alter(&$flag) {
 /**
  * Alter a flag's default options.
  *
+ * Modules that wish to extend flags and provide additional options must declare
+ * them here so that their additions to the flag admin form are saved into the
+ * flag object.
+ *
  * @param $options
  *  The array of default options for the flag type, with the options for the
  *  flag's link type merged in.
