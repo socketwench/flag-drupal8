@@ -221,3 +221,16 @@ function hook_flag_reset() {
 
 }
 
+/**
+ * Alter the javascript structure that describes the flag operation.
+ *
+ * @param $flag
+ *   The full flag object.
+ * @param $content_id
+ *   The ID of the node, comment, user or other object being flagged.
+ *
+ * @see flag_build_javascript_info()
+ */
+function hook_flag_javascript_info_alter() {
+
+}
