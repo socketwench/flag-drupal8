@@ -2044,18 +2044,17 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
  *   The content ID to check for flagging.
  * @param $flag_name
  *   Optional. The name of a flag if wanting a list specific to a single flag.
- * @param $reset
- *   Reset the internal cache of flagged content.
+ *
  * @return
  *   If no flag name is given, an array of flagged content, keyed by the user
  *   ID that flagged the content. Each flagged content array is structured as
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
  */
-function flag_get_content_flags($content_type, $content_id, $flag_name = NULL, $reset = FALSE) {
-  static $content_flags;
+function flag_get_content_flags($content_type, $content_id, $flag_name = NULL) {
+  $content_flags = &drupal_static(__FUNCTION__, array());
 
-  if (!isset($content_flags[$content_type][$content_id]) || $reset) {
+  if (!isset($content_flags[$content_type][$content_id])) {
     $flag_names = _flag_get_flag_names();
     $result = db_select('flag_content', 'fc')
       ->fields('fc')
