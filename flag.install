@@ -254,6 +254,7 @@ function flag_schema() {
     'indexes' => array(
       'content_type_uid_sid' => array('content_type', 'uid', 'sid'),
       'content_type_content_id_uid_sid' => array('content_type', 'content_id', 'uid', 'sid'),
+      'content_id_fid' => array('content_id', 'fid'),
     ),
   );
 
@@ -478,4 +479,11 @@ function flag_update_7202() {
     db_query("DELETE FROM {flag_content} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
     db_query("DELETE FROM {flag_counts} WHERE content_type = 'comment' AND NOT EXISTS (SELECT 1 FROM {comment} c WHERE content_id = c.cid)");
   }
+}
+
+/**
+ * Add an index to help with view's flag_handler_relationship when not required.
+ */
+function flag_update_7203() {
+  db_add_index('flag_content', 'content_id_fid', array('content_id', 'fid'));
 }
