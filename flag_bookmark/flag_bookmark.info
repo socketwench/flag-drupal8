@@ -1,0 +1,5 @@
+name = Flag Bookmark
+description = Provides an example bookmark flag and supporting views.
+core = 7.x
+dependencies[] = flag
+package = Flags
