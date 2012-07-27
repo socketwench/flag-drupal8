@@ -646,6 +646,7 @@ class flag_flag {
     // wrong counts or false flaggings.
     flag_get_counts(NULL, NULL, TRUE);
     flag_get_user_flags(NULL, NULL, NULL, NULL, TRUE);
+    drupal_static_reset('flag_get_content_flags');
 
     // Find out which user id to use.
     $uid = $this->global ? 0 : $account->uid;
