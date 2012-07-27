@@ -17,6 +17,11 @@ function flag_rules_data_info() {
       'wrapper class' => 'FlagRulesDataWrapper',
       'wrap' => TRUE,
     ),
+    'flagging' => array(
+      'label' => t('flagging'),
+      'parent' => 'entity',
+      'group' => t('flag'),
+    ),
   );
 }
 
@@ -133,6 +138,10 @@ function flag_rules_event_info() {
         'flagging_user' => array(
           'type' => 'user',
           'label' => t('flagging user'),
+        ),
+        'flagging' => array(
+          'type' => 'flagging',
+          'label' => t('flagging'),
         ),
       );
 

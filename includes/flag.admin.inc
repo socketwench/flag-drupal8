@@ -67,10 +67,13 @@ function theme_flag_admin_listing($variables) {
   foreach ($flags as $flag) {
     $ops = array(
       'flags_edit' =>  array('title' => t('edit'), 'href' => $flag->admin_path('edit')),
+      'flags_fields' =>  array('title' => t('manage fields'), 'href' => $flag->admin_path('fields')),
       'flags_delete' =>  array('title' => t('delete'), 'href' => $flag->admin_path('delete')),
       'flags_export' =>  array('title' => t('export'), 'href' => $flag->admin_path('export')),
     );
-
+    if (!module_exists('field_ui')) {
+      unset($ops['flags_fields']);
+    }
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
     $row = array(
       $flag->name,

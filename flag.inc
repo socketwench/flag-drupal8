@@ -610,11 +610,15 @@ class flag_flag {
    *   The user on whose behalf to flag. Leave empty for the current user.
    * @param $skip_permission_check
    *   Flag the item even if the $account user don't have permission to do so.
+   * @param $flagging
+   *   Optional. This method works in tandem with Drupal's Field subsystem.
+   *   Pass in a flagging entity if you want operate on it as well.
+   *
    * @return
    *   FALSE if some error occured (e.g., user has no permission, flag isn't
    *   applicable to the item, etc.), TRUE otherwise.
    */
-  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE) {
+  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
      // Get the user.
     if (!isset($account)) {
       $account = $GLOBALS['user'];
@@ -658,15 +662,31 @@ class flag_flag {
       }
     }
 
+    // Set our uid and sid to the flagging object.
+    if (isset($flagging)) {
+      $flagging->uid = $uid;
+      $flagging->sid = $sid;
+    }
+
+    // @todo: Discuss: Should we call field_attach_validate()? None of the
+    // entities in core does this (fields entered through forms are already
+    // validated).
+    //
+    // @todo: Discuss: Core wraps everything in a try { }, should we?
+
     // Perform the flagging or unflagging of this flag.
-    $flagged = $this->_is_flagged($content_id, $uid, $sid);
+    $existing_fcid = $this->_is_flagged($content_id, $uid, $sid);
+    $flagged = (bool) $existing_fcid;
     if ($action == 'unflag') {
       if ($this->uses_anonymous_cookies()) {
         $this->_unflag_anonymous($content_id);
       }
       if ($flagged) {
-        $fcid = $this->_unflag($content_id, $uid, $sid);
-        module_invoke_all('flag', 'unflag', $this, $content_id, $account, $fcid);
+        // Note the order: We delete the entity before calling _unflag() to
+        // delete the {flag_content} record.
+        $this->_delete_flagging($existing_fcid);
+        $this->_unflag($content_id, $uid, $sid);
+        module_invoke_all('flag', 'unflag', $this, $content_id, $account, $existing_fcid);
       }
     }
     elseif ($action == 'flag') {
@@ -674,12 +694,83 @@ class flag_flag {
         $this->_flag_anonymous($content_id);
       }
       if (!$flagged) {
+        if (!isset($flagging)) {
+          // Construct a new flagging object if we don't have one.
+          $flagging = $this->new_flagging($content_id, $uid, $sid);
+        }
         $fcid = $this->_flag($content_id, $uid, $sid);
+        // We're writing out a flagging entity even when we aren't passed one
+        // (e.g., when flagging via JavaScript toggle links); in this case
+        // Field API will assign the fields their default values.
+        $this->_insert_flagging($flagging, $content_id, $fcid);
         module_invoke_all('flag', 'flag', $this, $content_id, $account, $fcid);
+      }
+      else {
+        // Nothing to do. Item is already flagged.
+        //
+        // Except in the case a $flagging object is passed in: in this case
+        // we're, for example, arriving from an editing form and need to update
+        // the entity.
+        if ($flagging) {
+          $this->_update_flagging($flagging);
+        }
       }
     }
 
     return TRUE;
+  }
+
+  /**
+   * The entity CRUD methods _{insert,update,delete}_flagging() are for private
+   * use by the flag() method.
+   *
+   * The reason programmers should not call them directly is because a flagging
+   * operation is also accompanied by some bookkeeping (calling hooks, updating
+   * counters) or access control. These tasks are handled by the flag() method.
+   */
+  private function _insert_flagging($flagging, $content_id, $fcid) {
+    $flagging->fcid = $fcid;
+    field_attach_presave('flagging', $flagging);
+    field_attach_insert('flagging', $flagging);
+  }
+  private function _update_flagging($flagging) {
+    field_attach_presave('flagging', $flagging);
+    field_attach_update('flagging', $flagging);
+    // Update the cache.
+    flagging_load($flagging->fcid, TRUE);
+  }
+  private function _delete_flagging($fcid) {
+    if (($flagging = flagging_load($fcid))) {
+      field_attach_delete('flagging', $flagging);
+      // Remove from the cache.
+      flagging_load($fcid, TRUE);
+    }
+  }
+
+  /**
+   * Construct a new, empty flagging entity object.
+   *
+   * @param mixed $content_id
+   *   The unique identifier of the content being flagged.
+   * @param int $uid
+   *   Optional. The user id of the user doing the flagging.
+   * @param mixed $sid
+   *   Optional. The user SID (provided by Session API) who is doing the
+   *   flagging. The SID is 0 for logged in users.
+   *
+   * @return stdClass
+   *   The returned object has at least the 'flag_name' property set, which
+   *   enables Field API to figure out the bundle, but it's your responsibility
+   *   to eventually populate 'content_id' and 'fcid'.
+   */
+  function new_flagging($content_id = NULL, $uid = NULL, $sid = NULL) {
+    return (object) array(
+      'fcid' => NULL,
+      'flag_name' => $this->name,
+      'content_id' => $content_id,
+      'uid' => $uid,
+      'sid' => $sid,
+    );
   }
 
   /**
@@ -719,6 +810,15 @@ class flag_flag {
     // flag_get_user_flags() does caching.
     $user_flags = flag_get_user_flags($this->content_type, $content_id, $uid, $sid);
     return isset($user_flags[$this->name]) ? $user_flags[$this->name] : NULL;
+  }
+
+  /**
+   * Similar to is_flagged() excepts it returns the flagging entity.
+   */
+  function get_flagging($content_id, $uid = NULL, $sid = NULL) {
+    if (($record = $this->get_flagging_record($content_id, $uid, $sid))) {
+      return flagging_load($record->fcid);
+    }
   }
 
   /**
@@ -946,6 +1046,11 @@ class flag_flag {
    * token contexts they understand.
    */
   function replace_tokens($label, $contexts, $options, $content_id) {
+    if (strpos($label , 'flagging:') !== FALSE) {
+      if (($flagging = $this->get_flagging($content_id))) {
+        $contexts['flagging'] = $flagging;
+      }
+    }
     return token_replace($label, $contexts, $options);
   }
 
@@ -957,7 +1062,7 @@ class flag_flag {
    * Derived classes should override this.
    */
   function get_labels_token_types() {
-    return array();
+    return array('flagging');
   }
 
   /**
@@ -1557,9 +1662,9 @@ class flag_node extends flag_entity {
     return FALSE;
   }
 
-  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE) {
+  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
     $content_id = $this->get_translation_id($content_id);
-    return parent::flag($action, $content_id, $account, $skip_permission_check);
+    return parent::flag($action, $content_id, $account, $skip_permission_check, $flagging);
   }
 
   // Instead of overriding is_flagged() we override get_flagging_record(),
