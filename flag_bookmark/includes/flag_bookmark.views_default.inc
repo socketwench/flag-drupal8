@@ -8,7 +8,7 @@
 /**
  * Implements hook_views_default_views().
  */
-function flag_views_default_views() {
+function flag_bookmark_views_default_views() {
   // Only setup views for the "bookmarks" flag.
   // If it's been deleted, don't create any views.
   $flag = flag_get_flag('bookmarks');
