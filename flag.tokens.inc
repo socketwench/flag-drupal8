@@ -27,6 +27,22 @@ function flag_token_info() {
     'description' => t('The human-readable flag title.'),
   );
 
+  // Flagging tokens.
+  //
+  // Attached fields are exposed as tokens via some contrib module, but we
+  // need to expose other fields ourselves. Currently, 'date' is the only such
+  // field we expose.
+  $types['flagging'] = array(
+    'name' => t('Flaggings'),
+    'description' => t('Tokens related to flaggings.'),
+    'needs-data' => 'flagging',
+  );
+  $tokens['flagging']['date'] = array(
+    'name' => t('Flagging date'),
+    'description' => t('The date an item was flagged.'),
+    'type' => 'date',
+  );
+
   // Flage action tokens.
   $types['flag-action'] = array(
     'name' => t('Flag actions'),
@@ -85,6 +101,7 @@ function flag_token_info() {
 function flag_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
   $sanitize = !empty($options['sanitize']);
+  $langcode = isset($options['language']) ? $options['language']->language : NULL;
 
   if ($type == 'flag' && !empty($data['flag'])) {
     $flag = $data['flag'];
@@ -97,6 +114,19 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
           $replacements[$original] = $sanitize ? check_plain($flag->get_title()) : $flag->get_title();
           break;
       }
+    }
+  }
+  elseif ($type == 'flagging' && !empty($data['flagging'])) {
+    $flagging = $data['flagging'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'date':
+          $replacements[$original] = format_date($flagging->timestamp, 'medium', '', NULL, $langcode);
+          break;
+      }
+    }
+    if ($date_tokens = token_find_with_prefix($tokens, 'date')) {
+      $replacements += token_generate('date', $date_tokens, array('date' => $flagging->timestamp), $options);
     }
   }
   elseif ($type == 'flag-action' && !empty($data['flag-action'])) {

@@ -22,6 +22,84 @@ define('FLAG_ADMIN_PATH_START', 3);
 include_once dirname(__FILE__) . '/flag.inc';
 
 /**
+ * Implements hook_entity_info().
+ */
+function flag_entity_info() {
+  $return = array(
+    'flagging' => array(
+      'label' => t('Flagging'),
+      'controller class' => 'FlaggingController',
+      'base table' => 'flag_content',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'fcid',
+        'bundle' => 'flag_name',
+      ),
+      // The following tells Field UI how to extract the bundle name from a
+      // $flag object when we're visiting ?q=admin/.../manage/%flag/fields.
+      'bundle keys' => array(
+        'bundle' => 'name',
+      ),
+      'bundles' => array(),
+    ),
+  );
+
+  foreach (flag_get_flags(NULL, NULL, NULL, TRUE) as $flag) {
+    $return['flagging']['bundles'][$flag->name] = array(
+      'label' => $flag->title,
+      'admin' => array(
+        'path' => FLAG_ADMIN_PATH . '/manage/%flag',
+        'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag->name,
+        'bundle argument' => FLAG_ADMIN_PATH_START + 1,
+        'access arguments' => array('administer flags'),
+      ),
+    );
+  }
+
+  return $return;
+}
+
+/**
+ * Loads a flagging entity.
+ *
+ * @param $fcid
+ *   The 'fcid' database serial column.
+ * @param $reset
+ *   Whether to reset the DrupalDefaultEntityController cache.
+ *
+ * @return
+ *   The entity object, or FALSE if it can't be found.
+ */
+function flagging_load($fcid, $reset = FALSE) {
+  $result = entity_load('flagging', array($fcid), array(), $reset);
+  return reset($result);
+}
+
+// @todo: Implement flagging_save(). It's not required but other modules may expect it.
+
+// @todo: Implement flagging_view(). Not extremely useful. I already have it.
+
+// @todo: When renaming a flag: Call field_attach_rename_bundle().
+
+// @todo: When creating a flag: Call field_attach_create_bundle().
+
+// @todo: When deleting a flag: Call field_attach_delete_bundle().
+
+// @tood: Discuss: Should flag deleting call flag_reset_flag()? No.
+
+// @todo: flag_reset_flag():
+// - it should delete the flaggings.
+// - (it has other issues; see http://drupal.org/node/894992.)
+// - (is problematic: it might not be possible to delete all data in a single page request.)
+
+// @todo: Discuss: Note that almost all functions/identifiers dealing with
+// flaggings *aren't* prefixed by "flag_". For example:
+//  - The menu argument is %flagging, not %flag_flagging.
+//  - The entity type is "flagging", not "flag_flagging".
+// On the one hand this succinct version is readable and nice. On the other hand, it isn't
+// very "correct".
+
+/**
  * Implements hook_menu().
  */
 function flag_menu() {
@@ -177,6 +255,23 @@ function flag_help($path, $arg) {
   switch ($path) {
     case FLAG_ADMIN_PATH:
       $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system.') . '</p>';
+      return $output;
+    case FLAG_ADMIN_PATH . '/manage/%/fields':
+      $output  = '<p>' . t('Flags can have fields added to them. For example, a "Spam" flag could have a <em>Reason</em> field where a user could type in why he believes the item flagged is spam. A "Bookmarks" flag could have a <em>Folder</em> field into which a user could arrange her bookmarks.') . '</p>';
+      $output .= '<p>' . t('On this page you can add fields to flags, delete them, and otherwise manage them.') . '</p>';
+      $output .= '<p>';
+      $output .=   t('You will also want to pick either the "Confirmation form" or the "Form" <a href="@form-link-type-url">link type</a> for your flag, or else users won\'t have a means to enter values for the fields. (In case a form isn\'t used, the fields are assigned their default values.)', array(
+        '@form-link-type-url' => url('admin/structure/flags/manage/' . $arg[4], array('fragment' => 'edit-link-type')),
+      ));
+      if (!module_exists('flag_form')) {
+        $output .= ' <strong>'
+          . t("Note: You don't have the <em><a href='@flagging-form-url'>Flagging Form</a></em> module enabled. You'll have to <a href='@enable-url'>enable it</a> to have the \"Form\" link-type.", array(
+            '@enable-url' => url('admin/modules'),
+            '@flagging-form-url' => 'http://drupal.org/project/flagging_form',
+          ))
+          . '</strong>';
+      }
+      $output .= '</p>';
       return $output;
   }
 }
@@ -1028,6 +1123,14 @@ function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
   $path = isset($_GET['destination']) ? $_GET['destination'] : '<front>';
   $yes = $flag->get_label($action . '_short', $content_id);
 
+  if ($action == 'flag') {
+    // If the action 'flag', we're potentially about to create a new
+    // flagging entity. We need an empty new entity to pass to FieldAPI.
+    $flagging = $flag->new_flagging($content_id);
+    field_attach_form('flagging', $flagging, $form, $form_state);
+    $form['#flagging'] = $flagging;
+  }
+
   return confirm_form($form, $question, $path, '', $yes);
 }
 
@@ -1044,12 +1147,23 @@ function flag_confirm_submit(&$form, &$form_state) {
   $flag_name = $form_state['values']['flag_name'];
   $content_id = $form_state['values']['content_id'];
 
-  $result = flag($action, $flag_name, $content_id);
+  $flag = flag_get_flag($flag_name);
+
+  if ($action == 'flag') {
+    // If the action 'flag', further build up the new entity from form values.
+    $flagging = $form['#flagging'];
+    entity_form_submit_build_entity('flagging', $flagging, $form, $form_state);
+
+    $result = $flag->flag($action, $content_id, NULL, FALSE, $flagging);
+  }
+  else {
+    $result = $flag->flag($action, $content_id, NULL, FALSE);
+  }
+
   if (!$result) {
     drupal_set_message(t('You are not allowed to flag, or unflag, this content.'));
   }
   else {
-    $flag = flag_get_flag($flag_name);
     drupal_set_message($flag->get_label($action . '_message', $content_id));
   }
 }
@@ -1104,7 +1218,12 @@ function flag_flag($action, $flag, $content_id, $account) {
     $event_name = ($action == 'flag' ? 'flag_flagged_' : 'flag_unflagged_') . $flag->name;
     // We only support flags on entities.
     if (entity_get_info($flag->content_type)) {
-      $variables = array('flag' => $flag, 'flagged_' . $flag->content_type => $content_id, 'flagging_user' => $account);
+      $variables = array(
+        'flag' => $flag,
+        'flagged_' . $flag->content_type => $content_id,
+        'flagging_user' => $account,
+        'flagging' => $flag->get_flagging($content_id,$account->uid),
+      );
       rules_invoke_event_by_args($event_name, $variables);
     }
   }
