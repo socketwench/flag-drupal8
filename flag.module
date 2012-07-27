@@ -368,20 +368,6 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
 
 /**
  * Implements hook_flag_link().
- *
- * When Flag uses a link type provided by this module, it will call this
- * implementation of hook_flag_link(). It returns a single link's attributes,
- * using the same structure as hook_link(). Note that "title" is provided by
- * the Flag configuration if not specified here.
- *
- * @param $flag
- *   The full flag object of for the flag link being generated.
- * @param $action
- *   The action this link will perform. Either 'flag' or 'unflag'.
- * @param $content_id
- *   The ID of the node, comment, user, or other object being flagged.
- * @return
- *   An array defining properties of the link.
  */
 function flag_flag_link($flag, $action, $content_id) {
   $token = flag_get_token($content_id);
