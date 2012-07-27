@@ -1386,9 +1386,13 @@ function flag_reset_flag($flag, $content_id = NULL) {
   module_invoke_all('flag_reset', $flag, $content_id, $rows);
 
   $query = db_delete('flag_content')->condition('fid' , $flag->fid);
+  // Update the flag_counts table.
+  $count_query = db_delete('flag_counts')->condition('fid', $flag->fid);
   if ($content_id) {
     $query->condition('content_id', $content_id);
+    $count_query->condition('content_id', $content_id);
   }
+  $count_query->execute();
   return $query->execute();
 }
 
