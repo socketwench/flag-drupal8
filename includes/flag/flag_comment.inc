@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * @file
+ *   Contains the flag_comment class.
+ */
+
+/**
+ * Implements a comment flag.
+ */
+class flag_comment extends flag_entity {
+  function options() {
+    $options = parent::options();
+    // Use own display settings in the meanwhile.
+    unset($options['show_on_entity']);
+    $options += array(
+      'access_author' => '',
+      'show_on_comment' => TRUE,
+    );
+    return $options;
+  }
+
+  /**
+   * Options form extras for comment flags.
+   */
+  function options_form(&$form) {
+    parent::options_form($form);
+
+    $form['access']['access_author'] = array(
+      '#type' => 'radios',
+      '#title' => t('Flag access by content authorship'),
+      '#options' => array(
+        '' => t('No additional restrictions'),
+        'comment_own' => t('Users may only flag own comments'),
+        'comment_others' => t('Users may only flag comments by others'),
+        'node_own' => t('Users may only flag comments of nodes they own'),
+        'node_others' => t('Users may only flag comments of nodes by others'),
+      ),
+      '#default_value' => $this->access_author,
+      '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
+    );
+
+    $form['display']['show_on_comment'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display link under comment'),
+      '#default_value' => $this->show_on_comment,
+      '#access' => empty($this->locked['show_on_comment']),
+    );
+
+    unset($form['display']['show_on_entity']);
+  }
+
+  function type_access_multiple($content_ids, $account) {
+    $access = array();
+
+    // Ensure node types are granted access. This avoids a
+    // node_load() on every type, usually done by applies_to_content_id().
+    $query = db_select('comment', 'c');
+    $query->innerJoin('node', 'n', 'c.nid = n.nid');
+    $result = $query
+      ->fields('c', array('cid'))
+      ->condition('c.cid', $content_ids, 'IN')
+      ->condition('n.type', $this->types, 'NOT IN')
+      ->execute();
+    foreach ($result as $row) {
+      $access[$row->nid] = FALSE;
+    }
+
+    return $access;
+  }
+
+  function get_content_id($comment) {
+    // Store the comment object in the static cache, to avoid getting it
+    // again unneedlessly.
+    $this->remember_content($comment->cid, $comment);
+    return $comment->cid;
+  }
+
+  function uses_hook_link($teaser) {
+    return $this->show_on_comment;
+  }
+
+  function get_labels_token_types() {
+    return array_merge(array('comment', 'node'), parent::get_labels_token_types());
+  }
+
+  function replace_tokens($label, $contexts, $options, $content_id) {
+    if ($content_id) {
+      if (($comment = $this->fetch_content($content_id)) && ($node = node_load($comment->nid))) {
+        $contexts['node'] = $node;
+        $contexts['comment'] = $comment;
+      }
+    }
+    return parent::replace_tokens($label, $contexts, $options, $content_id);
+  }
+
+  function get_flag_action($content_id) {
+    $flag_action = parent::get_flag_action($content_id);
+    $comment = $this->fetch_content($content_id);
+    $flag_action->content_title = $comment->subject;
+    $flag_action->content_url = _flag_url("comment/$comment->cid", "comment-$comment->cid");
+    return $flag_action;
+  }
+
+  function get_relevant_action_objects($content_id) {
+    $comment = $this->fetch_content($content_id);
+    return array(
+      'comment' => $comment,
+      'node' => node_load($comment->nid),
+    );
+  }
+}
