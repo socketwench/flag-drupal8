@@ -439,3 +439,10 @@ function flag_update_7203() {
     db_add_index('flag_content', 'content_id_fid', array('content_id', 'fid'));
   }
 }
+
+/**
+ * Rebuild the class registry due to classes moving files.
+ */
+function flag_update_7300() {
+  registry_rebuild();
+}
