@@ -434,5 +434,8 @@ function flag_update_7202() {
  * Add an index to help with view's flag_handler_relationship when not required.
  */
 function flag_update_7203() {
-  db_add_index('flag_content', 'content_id_fid', array('content_id', 'fid'));
+  // Skip if this index was also added by the 6.x-2.x branch.
+  if (!db_index_exists('flag_content', 'content_id_fid')) {
+    db_add_index('flag_content', 'content_id_fid', array('content_id', 'fid'));
+  }
 }
