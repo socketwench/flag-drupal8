@@ -104,10 +104,10 @@ function _flag_rules_flags_options($flag_type = NULL) {
   $flags = flag_get_flags();
   $options = array();
   foreach ($flags as $flag) {
-    if (!isset($flag_type) || $flag->content_type == $flag_type) {
+    if (!isset($flag_type) || $flag->entity_type == $flag_type) {
       $options[$flag->name] = array(
         'title' => $flag->get_title(),
-        'type' => $flag->content_type,
+        'type' => $flag->entity_type,
         'global' => $flag->global ? t('Yes') : t('No'),
       );
     }
@@ -124,15 +124,15 @@ function flag_rules_event_info() {
   $flags = flag_get_flags();
   foreach ($flags as $flag) {
     // We only support flags on entities.
-    if ($info = entity_get_info($flag->content_type)) {
+    if ($info = entity_get_info($flag->entity_type)) {
       $variables = array(
         'flag' => array(
           'type' => 'flag',
           'label' => t('flag'),
-          'flag_type' => $flag->content_type,
+          'flag_type' => $flag->entity_type,
         ),
-        'flagged_' . $flag->content_type => array(
-          'type' => $flag->content_type,
+        'flagged_' . $flag->entity_type => array(
+          'type' => $flag->entity_type,
           'label' => $info['label'],
         ),
         'flagging_user' => array(
@@ -148,13 +148,13 @@ function flag_rules_event_info() {
       // For each flag we define two events.
       $items['flag_flagged_' . $flag->name] = array(
         'group' => t('Flag'),
-        'label' => t('A @flag-type has been flagged, under "@flag-title"', array('@flag-title' => $flag->get_title(), '@flag-type' => t($flag->content_type))),
+        'label' => t('A @flag-type has been flagged, under "@flag-title"', array('@flag-title' => $flag->get_title(), '@flag-type' => t($flag->entity_type))),
         'variables' => $variables,
         'access callback' => 'flag_rules_integration_access',
       );
       $items['flag_unflagged_' . $flag->name] = array(
         'group' => t('Flag'),
-        'label' => t('A @flag-type has been unflagged, under "@flag-title"', array('@flag-title' => $flag->get_title(), '@flag-type' => t($flag->content_type))),
+        'label' => t('A @flag-type has been unflagged, under "@flag-title"', array('@flag-title' => $flag->get_title(), '@flag-type' => t($flag->entity_type))),
         'variables' => $variables,
         'access callback' => 'flag_rules_integration_access',
       );
@@ -323,7 +323,7 @@ function flag_rules_action_trim($flag, $flagging_user, $cutoff_size) {
 function flag_rules_action_fetch_users($flag, $entity) {
   $result = db_select('flagging', 'fc')
     ->fields('fc', array('uid'))
-    ->condition('content_type', $flag->content_type)
+    ->condition('entity_type', $flag->entity_type)
     ->condition('content_id', $flag->get_content_id($entity))
     ->condition('fid', $flag->fid)
     ->execute();
@@ -338,7 +338,7 @@ function flag_rules_action_fetch_users($flag, $entity) {
 function flag_rules_action_fetch_entity_by_user($flag, $user) {
   $result = db_select('flagging', 'fc')
     ->fields('fc', array('content_id'))
-    ->condition('content_type', $flag->content_type)
+    ->condition('entity_type', $flag->entity_type)
     ->condition('uid', $user->uid)
     ->condition('fid', $flag->fid)
     ->execute();

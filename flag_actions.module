@@ -241,7 +241,7 @@ function flag_actions_do($event, $flag, $content_id, $account) {
           $callback($relevant_objects['node'], $context);
         }
         else {
-          $callback($relevant_objects[$flag->content_type], $context);
+          $callback($relevant_objects[$flag->entity_type], $context);
         }
       }
 
@@ -659,7 +659,7 @@ function flag_actions_system_send_email_action_form(&$form, &$flag, $context) {
   }
 
   if (!isset($context['message'])) {
-    $form['message']['#default_value'] = t("The @flag_content_type [flag-action:content-title] has been flagged [flag-action:count] times with the @flag_title flag.\n\nView this @flag_content_type at [flag-action:content-url].", array('@flag_content_type' => $flag->content_type, '@flag_title' => $flag->get_title()));
+    $form['message']['#default_value'] = t("The @flag_entity_type [flag-action:content-title] has been flagged [flag-action:count] times with the @flag_title flag.\n\nView this @flag_entity_type at [flag-action:content-url].", array('@flag_entity_type' => $flag->entity_type, '@flag_title' => $flag->get_title()));
   }
 
   $form['help'] = array(

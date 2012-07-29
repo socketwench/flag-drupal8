@@ -422,7 +422,7 @@ function flag_field_extra_fields() {
 
     // In order to make sense with this hook's structure, we use D7 lingo, hence
     // some translation is required...
-    $entity_type = $flag->content_type;
+    $entity_type = $flag->entity_type;
     foreach ($flag->types as $bundle_name) {
       if ($flag->show_on_form) {
         $extra[$entity_type][$bundle_name]['form']['flag'] = array(
@@ -825,10 +825,10 @@ function flag_node_translation_change($node) {
  */
 function _flag_content_delete($entity_type, $entity_id, $fid = NULL) {
   $query_content = db_delete('flagging')
-    ->condition('content_type', $entity_type)
+    ->condition('entity_type', $entity_type)
     ->condition('content_id', $entity_id);
   $query_counts = db_delete('flag_counts')
-    ->condition('content_type', $entity_type)
+    ->condition('entity_type', $entity_type)
     ->condition('content_id', $entity_id);
   if (isset($fid)) {
     $query_content->condition('fid', $fid);
@@ -906,7 +906,7 @@ function flag_user_delete($account) {
 function flag_user_account_removal($account) {
   // Remove flags by this user.
   $query = db_select('flagging', 'fc');
-  $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.content_type = c.content_type');
+  $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.entity_type = c.entity_type');
   $result = $query
     ->fields('fc', array('fid', 'content_id'))
     ->fields('c', array('count'))
@@ -1008,7 +1008,7 @@ function flag_session_api_cleanup($arg = 'run') {
 function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
   // This query can't use db_delete() because that doesn't support a
   // subquery: see http://drupal.org/node/1267508.
-  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flag} WHERE content_type = :entity_type)", array(
+  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flag} WHERE entity_type = :entity_type)", array(
     ':bundle' => $bundle,
     ':entity_type' => $entity_type,
   ));
@@ -1085,7 +1085,7 @@ function flag_build_javascript_info($flag, $content_id) {
     'newLink' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id, TRUE),
     // Further information for the benefit of custom JavaScript event handlers:
     'contentId' => $content_id,
-    'contentType' => $flag->content_type,
+    'contentType' => $flag->entity_type,
     'flagName' => $flag->name,
     'flagStatus' => $flag->is_flagged($content_id) ? 'flagged' : 'unflagged',
   );
@@ -1217,10 +1217,10 @@ function flag_flag($action, $flag, $content_id, $account) {
   if (module_exists('rules')) {
     $event_name = ($action == 'flag' ? 'flag_flagged_' : 'flag_unflagged_') . $flag->name;
     // We only support flags on entities.
-    if (entity_get_info($flag->content_type)) {
+    if (entity_get_info($flag->entity_type)) {
       $variables = array(
         'flag' => $flag,
-        'flagged_' . $flag->content_type => $content_id,
+        'flagged_' . $flag->entity_type => $content_id,
         'flagging_user' => $account,
         'flagging' => $flag->get_flagging($content_id,$account->uid),
       );
@@ -1240,7 +1240,7 @@ function flag_flag_access($flag, $content_id, $action, $account) {
 
   // Restrict access by authorship. It's important that TRUE is never returned
   // here, otherwise we'd grant permission even if other modules denied access.
-  if ($flag->content_type == 'node') {
+  if ($flag->entity_type == 'node') {
     // For non-existent nodes (such as on the node add form), assume that the
     // current user is creating the content.
     if (empty($content_id) || !($node = node_load($content_id))) {
@@ -1256,7 +1256,7 @@ function flag_flag_access($flag, $content_id, $action, $account) {
   }
 
   // Restrict access by comment authorship.
-  if ($flag->content_type == 'comment') {
+  if ($flag->entity_type == 'comment') {
     // For non-existent comments (such as on the comment add form), assume that
     // the current user is creating the content.
     if (empty($content_id) || !($comment = $flag->fetch_content($content_id))) {
@@ -1290,7 +1290,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     return $access;
   }
 
-  if ($flag->content_type == 'node') {
+  if ($flag->entity_type == 'node') {
     // Restrict access by authorship. This is similar to flag_flag_access()
     // above, but returns an array of 'nid' => $access values. Similarly, we
     // should never return TRUE in any of these access values, only FALSE if we
@@ -1310,7 +1310,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     }
   }
 
-  if ($flag->content_type == 'comment') {
+  if ($flag->entity_type == 'comment') {
     // Restrict access by comment ownership.
     $query = db_select('comment', 'c');
     $query->leftJoin('node', 'n', 'c.nid = n.nid');
@@ -1689,7 +1689,7 @@ function flag_get_counts($entity_type, $content_id, $reset = FALSE) {
     $result = $query
       ->fields('f', array('name'))
       ->fields('fc', array('count'))
-      ->condition('fc.content_type', $entity_type)
+      ->condition('fc.entity_type', $entity_type)
       ->condition('fc.content_id', $content_id)
       ->execute();
     foreach ($result as $row) {
@@ -1781,7 +1781,7 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
     $query = db_select('flag', 'f');
     $query->leftJoin('flag_types', 'fn', 'fn.fid = f.fid');
     $result = $query
-      ->fields('f', array('fid', 'content_type', 'name', 'title', 'global', 'options'))
+      ->fields('f', array('fid', 'entity_type', 'name', 'title', 'global', 'options'))
       ->fields('fn', array('type'))
       ->execute();
     foreach ($result as $row) {
@@ -1874,7 +1874,7 @@ function _flag_compare_weight($flag1, $flag2) {
  *   TRUE if the flag is enabled for this type and subtype.
  */
 function _flag_content_enabled($flag, $entity_type, $content_subtype = NULL) {
-  $return = $flag->content_type == $entity_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
+  $return = $flag->entity_type == $entity_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
   return $return;
 }
 
@@ -2002,7 +2002,7 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
       $flagged_content[$uid][$sid][$entity_type][$content_id] = array();
       $result = db_select('flagging', 'fc')
         ->fields('fc')
-        ->condition('content_type', $entity_type)
+        ->condition('entity_type', $entity_type)
         ->condition('content_id', $content_id)
         ->condition(db_or()
           ->condition('uid', $uid)
@@ -2024,7 +2024,7 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
       $flagged_content[$uid][$sid][$entity_type]['all'] = array();
       $result = db_select('flagging', 'fc')
         ->fields('fc')
-        ->condition('content_type', $entity_type)
+        ->condition('entity_type', $entity_type)
         ->condition(db_or()
           ->condition('uid', $uid)
           ->condition('uid', 0)
@@ -2063,7 +2063,7 @@ function flag_get_content_flags($entity_type, $content_id, $flag_name = NULL) {
     $flag_names = _flag_get_flag_names();
     $result = db_select('flagging', 'fc')
       ->fields('fc')
-      ->condition('content_type', $entity_type)
+      ->condition('entity_type', $entity_type)
       ->condition('content_id', $content_id)
       ->orderBy('timestamp', 'DESC')
       ->execute();

@@ -37,12 +37,12 @@ class flag_flag {
    * This is static method.
    *
    * The reason this isn't a non-static instance method --like Views's init()--
-   * is because the class to instantiate changes according to the 'content_type'
+   * is because the class to instantiate changes according to the 'entity_type'
    * database column. This design pattern is known as the "Single Table
    * Inheritance".
    */
   static function factory_by_row($row) {
-    $flag = flag_create_handler($row->content_type);
+    $flag = flag_create_handler($row->entity_type);
 
     // Lump all data unto the object...
     foreach ($row as $field => $value) {
@@ -72,7 +72,7 @@ class flag_flag {
    * Create a complete flag (except an FID) from an array definition.
    */
   static function factory_by_array($config) {
-    $flag = flag_create_handler($config['content_type']);
+    $flag = flag_create_handler($config['entity_type']);
 
     foreach ($config as $option => $value) {
       $flag->$option = $value;
@@ -703,7 +703,7 @@ class flag_flag {
     $sid = $this->global ? 0 : (!isset($sid) ? flag_get_sid($uid) : $sid);
 
     // flag_get_user_flags() does caching.
-    $user_flags = flag_get_user_flags($this->content_type, $content_id, $uid, $sid);
+    $user_flags = flag_get_user_flags($this->entity_type, $content_id, $uid, $sid);
     return isset($user_flags[$this->name]) ? $user_flags[$this->name] : NULL;
   }
 
@@ -758,7 +758,7 @@ class flag_flag {
     $fcid = db_insert('flagging')
       ->fields(array(
         'fid' => $this->fid,
-        'content_type' => $this->content_type,
+        'entity_type' => $this->entity_type,
         'content_id' => $content_id,
         'uid' => $uid,
         'sid' => $sid,
@@ -814,7 +814,7 @@ class flag_flag {
         'content_id' => $content_id,
       ))
       ->fields(array(
-        'content_type' => $this->content_type,
+        'entity_type' => $this->entity_type,
         'count' => $number,
         'last_updated' => REQUEST_TIME,
       ))
@@ -882,7 +882,7 @@ class flag_flag {
    * item results in only one SQL query.
    */
   function get_count($content_id) {
-    $counts = flag_get_counts($this->content_type, $content_id);
+    $counts = flag_get_counts($this->entity_type, $content_id);
     return isset($counts[$this->name]) ? $counts[$this->name] : 0;
   }
 
@@ -987,7 +987,7 @@ class flag_flag {
   function get_flag_action($content_id) {
     $flag_action = new stdClass();
     $flag_action->flag = $this->name;
-    $flag_action->content_type = $this->content_type;
+    $flag_action->entity_type = $this->entity_type;
     $flag_action->content_id = $content_id;
     return $flag_action;
   }
@@ -1004,7 +1004,7 @@ class flag_flag {
   function get_valid_actions() {
     $actions = module_invoke_all('action_info');
     foreach ($actions as $callback => $action) {
-      if ($action['type'] != $this->content_type && !in_array('any', $action['triggers'])) {
+      if ($action['type'] != $this->entity_type && !in_array('any', $action['triggers'])) {
         unset($actions[$callback]);
       }
     }
@@ -1095,7 +1095,7 @@ class flag_flag {
   function insert() {
     $this->fid = db_insert('flag')
       ->fields(array(
-        'content_type' => $this->content_type,
+        'entity_type' => $this->entity_type,
         'name' => $this->name,
         'title' => $this->title,
         'global' => $this->global,
@@ -1293,7 +1293,7 @@ class flag_broken extends flag_flag {
   function options_form(&$form) {
     $form = array();
     $form['error'] = array(
-      '#markup' => '<div class="error">' . t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->content_type)) . '</div>',
+      '#markup' => '<div class="error">' . t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->entity_type)) . '</div>',
     );
   }
 }

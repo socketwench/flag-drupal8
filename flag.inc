@@ -102,7 +102,7 @@ function flag_create_handler($entity_type) {
   else {
     $handler = new flag_broken;
   }
-  $handler->content_type = $entity_type;
+  $handler->entity_type = $entity_type;
   $handler->construct();
   return $handler;
 }

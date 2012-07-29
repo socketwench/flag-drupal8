@@ -145,7 +145,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
         // Note: we can't do $handler->field, because the relationship handler's init() may overwrite it.
         if (strpos($handler->options['field'], 'flag') !== FALSE && !empty($handler->options['flag'])) {
           $flag = flag_get_flag($handler->options['flag']);
-          if ($flag && $flag->content_type == $this->flag_type) {
+          if ($flag && $flag->entity_type == $this->flag_type) {
             return $flag;
           }
         }

@@ -21,8 +21,8 @@ function flag_trigger_info() {
   );
 
   foreach (flag_get_flags() as $flag) {
-    $hooks['flag']['flag_flag_' . $flag->name]['label'] = t('A %type has been flagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
-    $hooks['flag']['flag_unflag_' . $flag->name]['label'] = t('A %type has been unflagged with %name', array('%type' => $flag->content_type, '%name' => $flag->name));
+    $hooks['flag']['flag_flag_' . $flag->name]['label'] = t('A %type has been flagged with %name', array('%type' => $flag->entity_type, '%name' => $flag->name));
+    $hooks['flag']['flag_unflag_' . $flag->name]['label'] = t('A %type has been unflagged with %name', array('%type' => $flag->entity_type, '%name' => $flag->name));
   }
 
   return $hooks;
