@@ -102,7 +102,7 @@ function flag_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'content_type' => array(
+      'entity_type' => array(
         'description' => 'The flag type, such as one of "node", "comment", or "user".',
         'type' => 'varchar',
         'length' => '128',
@@ -159,7 +159,7 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'content_type' => array(
+      'entity_type' => array(
         'description' => 'The flag type, one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
@@ -201,8 +201,8 @@ function flag_schema() {
       'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
     ),
     'indexes' => array(
-      'content_type_uid_sid' => array('content_type', 'uid', 'sid'),
-      'content_type_content_id_uid_sid' => array('content_type', 'content_id', 'uid', 'sid'),
+      'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
+      'entity_type_content_id_uid_sid' => array('entity_type', 'content_id', 'uid', 'sid'),
       'content_id_fid' => array('content_id', 'fid'),
     ),
   );
@@ -241,7 +241,7 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'content_type' => array(
+      'entity_type' => array(
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
@@ -275,8 +275,8 @@ function flag_schema() {
     ),
     'primary key' => array('fid', 'content_id'),
     'indexes' => array(
-      'fid_content_type' => array('fid', 'content_type'),
-      'content_type_content_id' => array('content_type', 'content_id'),
+      'fid_entity_type' => array('fid', 'entity_type'),
+      'entity_type_content_id' => array('entity_type', 'content_id'),
       'fid_count' => array('fid', 'count'),
       'fid_last_updated' => array('fid', 'last_updated'),
     ),

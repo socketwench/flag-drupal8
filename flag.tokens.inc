@@ -143,7 +143,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
           $replacements[$original] = $sanitize ? check_plain($action->content_title) : $action->content_title;
           break;
         case 'content-type':
-          $replacements[$original] = $action->content_type;
+          $replacements[$original] = $action->entity_type;
           break;
         case 'content-id':
           $replacements[$original] = $action->content_id;

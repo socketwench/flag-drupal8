@@ -78,7 +78,7 @@ function theme_flag_admin_listing($variables) {
     $row = array(
       $flag->name,
       drupal_render($form['flags'][$flag->name]['weight']),
-      $flag->content_type,
+      $flag->entity_type,
       empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles),
       $flag->types ? implode(', ', $flag->types) : '-',
       $flag->global ? t('Yes') : t('No'),
@@ -130,7 +130,7 @@ function theme_flag_admin_listing_disabled($variables) {
       $rows[] = array(
         $flag->name,
         $flag->module,
-        $flag->content_type,
+        $flag->entity_type,
         theme('links', array('links' => $ops)),
       );
     }
