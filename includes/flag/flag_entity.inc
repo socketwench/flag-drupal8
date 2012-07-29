@@ -73,7 +73,7 @@ class flag_entity extends flag_flag {
   /**
    * Checks whether the flag applies for the current entity bundle.
    */
-  function applies_to_content_object($entity) {
+  function applies_to_entity($entity) {
     $entity_info = entity_get_info($this->entity_type);
     if (empty($entity_info['entity keys']['bundle']) || in_array($entity->{$entity_info['entity keys']['bundle']}, $this->types)) {
       return TRUE;
