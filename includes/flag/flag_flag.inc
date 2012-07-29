@@ -18,7 +18,7 @@ class flag_flag {
   // The database ID. Null for flags that haven't been saved to the database yet.
   var $fid = NULL;
 
-  // The content-type this flag works with.
+  // The entity type this flag works with.
   var $entity_type = NULL;
 
   // The flag's "machine readable" name.
@@ -104,7 +104,7 @@ class flag_flag {
       'flag_short' => '',
       // The description of the "flag this" link.
       'flag_long' => '',
-      // Message displayed after flagging content.
+      // Message displayed after flagging an entity.
       'flag_message' => '',
       // Likewise but for unflagged.
       'unflag_short' => '',
@@ -240,7 +240,7 @@ class flag_flag {
   }
 
   /**
-   * Fetches, possibly from some cache, a content object this flag works with.
+   * Fetches, possibly from some cache, an entity this flag works with.
    */
   function fetch_content($entity_id, $object_to_remember = NULL) {
     static $cache = array();
@@ -255,7 +255,7 @@ class flag_flag {
   }
 
   /**
-   * Loads a content object this flag works with.
+   * Loads an entity this flag works with.
    * Derived classes must implement this.
    *
    * @abstract
@@ -284,7 +284,7 @@ class flag_flag {
    */
 
   /**
-   * Returns TRUE if the flag applies to the given content.
+   * Returns TRUE if the flag applies to the given entity.
    *
    * Derived classes must implement this.
    *
@@ -295,7 +295,7 @@ class flag_flag {
   }
 
   /**
-   * Returns TRUE if the flag applies to the content with the given ID.
+   * Returns TRUE if the flag applies to the entity with the given ID.
    *
    * This is a convenience method that simply loads the object and calls
    * applies_to_content_object(). If you already have the object, don't call
@@ -332,13 +332,13 @@ class flag_flag {
   }
 
   /**
-   * Determines whether the user may flag, or unflag, the given content.
+   * Determines whether the user may flag, or unflag, the given entity.
    *
    * This method typically should not be overridden by child classes. Instead
    * they should implement type_access(), which is called by this method.
    *
    * @param $entity_id
-   *   The content ID to flag/unflag.
+   *   The entity ID to flag/unflag.
    * @param $action
    *   The action to test. Either 'flag' or 'unflag'. Leave NULL to determine
    *   by flag status.
@@ -347,7 +347,7 @@ class flag_flag {
    *   current user.
    *
    * @return
-   *   Boolean TRUE if the user is allowed to flag/unflag the given content.
+   *   Boolean TRUE if the user is allowed to flag/unflag the given entity.
    *   FALSE otherwise.
    */
   function access($entity_id, $action = NULL, $account = NULL) {
@@ -356,7 +356,7 @@ class flag_flag {
     }
 
     if (isset($entity_id) && !$this->applies_to_entity_id($entity_id)) {
-      // Flag does not apply to this content.
+      // Flag does not apply to this entity.
       return FALSE;
     }
 
@@ -401,7 +401,7 @@ class flag_flag {
    * method.
    *
    * @param $entity_ids
-   *   The array of content IDs to check. The keys are the content IDs, the
+   *   The array of entity IDs to check. The keys are the entity IDs, the
    *   values are the actions to test: either 'flag' or 'unflag'.
    * @param $account
    *   Optional. The account for which the actions will be compared against.
@@ -468,7 +468,7 @@ class flag_flag {
    */
 
   /**
-   * Given a content object, returns its ID.
+   * Given an entity, returns its ID.
    * Derived classes must implement this.
    *
    * @abstract
@@ -530,7 +530,7 @@ class flag_flag {
     }
     else {
       // We are skipping permission checks. However, at a minimum we must make
-      // sure the flag applies to this content type:
+      // sure the flag applies to this entity type:
       if (!$this->applies_to_entity_id($entity_id)) {
         return FALSE;
       }
@@ -646,7 +646,7 @@ class flag_flag {
    * Construct a new, empty flagging entity object.
    *
    * @param mixed $entity_id
-   *   The unique identifier of the content being flagged.
+   *   The unique identifier of the object being flagged.
    * @param int $uid
    *   Optional. The user id of the user doing the flagging.
    * @param mixed $sid
@@ -669,7 +669,7 @@ class flag_flag {
   }
 
   /**
-   * Determines if a certain user has flagged this content.
+   * Determines if a certain user has flagged this object.
    *
    * Thanks to using a cache, inquiring several different flags about the same
    * item results in only one SQL query.
@@ -679,7 +679,7 @@ class flag_flag {
    *   current user will be used.
    *
    * @return
-   *   TRUE if the content is flagged, FALSE otherwise.
+   *   TRUE if the object is flagged, FALSE otherwise.
    */
   function is_flagged($entity_id, $uid = NULL, $sid = NULL) {
     return (bool) $this->get_flagging_record($entity_id, $uid, $sid);
@@ -717,7 +717,7 @@ class flag_flag {
   }
 
   /**
-   * Determines if a certain user has flagged this content.
+   * Determines if a certain user has flagged this object.
    *
    * You probably shouldn't call this raw private method: call the
    * is_flagged() method instead.
@@ -727,7 +727,7 @@ class flag_flag {
    * bypass it.
    *
    * @return
-   *   If the content is flagged, returns the value of the 'fcid' column.
+   *   If the object is flagged, returns the value of the 'fcid' column.
    *   Else, returns FALSE.
    *
    * @private
@@ -744,7 +744,7 @@ class flag_flag {
   }
 
   /**
-   * A low-level method to flag content.
+   * A low-level method to flag an object.
    *
    * You probably shouldn't call this raw private method: call the flag()
    * function instead.
@@ -770,13 +770,13 @@ class flag_flag {
   }
 
   /**
-   * A low-level method to unflag content.
+   * A low-level method to unflag an object.
    *
    * You probably shouldn't call this raw private method: call the flag()
    * function instead.
    *
    * @return
-   *   If the content was flagged, returns the value of the now deleted 'fcid'
+   *   If the object was flagged, returns the value of the now deleted 'fcid'
    *   column. Else, returns FALSE.
    *
    * @private
@@ -798,7 +798,7 @@ class flag_flag {
   }
 
   /**
-   * Increases the flag count for a piece of content.
+   * Increases the flag count for an object.
    *
    * @param $entity_id
    *   For which item should the count be increased.
@@ -826,7 +826,7 @@ class flag_flag {
   }
 
   /**
-   * Decreases the flag count for a piece of content.
+   * Decreases the flag count for an object.
    *
    * @param $entity_id
    *   For which item should the count be descreased.
@@ -1040,7 +1040,7 @@ class flag_flag {
 
   /**
    * Returns information needed for Views integration. E.g., the Views table
-   * holding the flagged content, its primary key, and various labels. See
+   * holding the flagged object, its primary key, and various labels. See
    * derived classes for examples.
    *
    * @static
