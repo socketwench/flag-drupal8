@@ -54,7 +54,7 @@ class flag_comment extends flag_entity {
     $access = array();
 
     // Ensure node types are granted access. This avoids a
-    // node_load() on every type, usually done by applies_to_content_id().
+    // node_load() on every type, usually done by applies_to_entity_id().
     $query = db_select('comment', 'c');
     $query->innerJoin('node', 'n', 'c.nid = n.nid');
     $result = $query

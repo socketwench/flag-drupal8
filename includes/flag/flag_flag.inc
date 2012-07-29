@@ -301,7 +301,7 @@ class flag_flag {
    * applies_to_content_object(). If you already have the object, don't call
    * this function: call applies_to_content_object() directly.
    */
-  function applies_to_content_id($entity_id) {
+  function applies_to_entity_id($entity_id) {
     return $this->applies_to_content_object($this->fetch_content($entity_id));
   }
 
@@ -355,7 +355,7 @@ class flag_flag {
       $account = $GLOBALS['user'];
     }
 
-    if (isset($entity_id) && !$this->applies_to_content_id($entity_id)) {
+    if (isset($entity_id) && !$this->applies_to_entity_id($entity_id)) {
       // Flag does not apply to this content.
       return FALSE;
     }
@@ -531,7 +531,7 @@ class flag_flag {
     else {
       // We are skipping permission checks. However, at a minimum we must make
       // sure the flag applies to this content type:
-      if (!$this->applies_to_content_id($entity_id)) {
+      if (!$this->applies_to_entity_id($entity_id)) {
         return FALSE;
       }
     }
