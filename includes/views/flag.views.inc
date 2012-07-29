@@ -35,10 +35,13 @@ function flag_views_plugins() {
 function flag_views_data() {
   $data = array();
 
-  $data['flag_content']['table']['group'] = t('Flags');
+  $data['flagging']['table']['group'] = t('Flags');
   $data['flag_counts']['table']['group'] = t('Flags');
 
-  $data['flag_content']['uid'] = array(
+  // Notify views from flag 2.x of our changes to views data.
+  // @see flag_update_7301().
+  $data['flag_content']['moved to'] = 'flagging';
+  $data['flagging']['uid'] = array(
     'title' => t('User uid'),
     'help' => t('The user that flagged an item. If you need more fields than the uid add the "Flags: User" relationship.'),
     'relationship' => array(
@@ -59,7 +62,7 @@ function flag_views_data() {
     ),
   );
 
-  $data['flag_content']['timestamp'] = array(
+  $data['flagging']['timestamp'] = array(
     'title' => t('Flagged time'),
     'help' => t('Display the time the content was flagged by a user.'),
     'field' => array(
@@ -78,7 +81,7 @@ function flag_views_data() {
   );
 
   // Argument for content ID, used for "Who's flagged this" views.
-  $data['flag_content']['content_id'] = array(
+  $data['flagging']['content_id'] = array(
     'title' => t('Content ID'),
     'help' => t('The unique ID of the object that has been flagged.'),
     'argument' => array(
@@ -87,7 +90,7 @@ function flag_views_data() {
   );
 
   // Specialized is null/is not null filter.
-  $data['flag_content']['flagged'] = array(
+  $data['flagging']['flagged'] = array(
     'title' => t('Flagged'),
     'help' => t('Filter to ensure content has or has not been flagged.'),
     'real field' => 'uid',
@@ -98,7 +101,7 @@ function flag_views_data() {
   );
 
   // Flag content links.
-  $data['flag_content']['ops'] = array(
+  $data['flagging']['ops'] = array(
     'title' => t('Flag link'),
     'help' => t('Display flag/unflag link.'),
     'field' => array(
@@ -164,7 +167,7 @@ function flag_views_data_alter(&$data) {
           'flag type' => $flag_type,
           'handler' => 'flag_handler_relationship_content',
           'label' => t('flag'),
-          'base' => 'flag_content',
+          'base' => 'flagging',
           'base field' => 'content_id',
           'relationship field' => $info['join field'],
         ),
@@ -193,7 +196,7 @@ function flag_views_data_alter(&$data) {
     'title' => t("User's flagged content"),
     'help' => t('Limit results to users that have flagged certain content.'),
     'relationship' => array(
-      'base' => 'flag_content',
+      'base' => 'flagging',
       'base field' => 'uid',
       'relationship field' => 'uid',
       'handler' => 'flag_handler_relationship_user_content',

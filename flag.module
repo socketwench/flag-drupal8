@@ -29,7 +29,7 @@ function flag_entity_info() {
     'flagging' => array(
       'label' => t('Flagging'),
       'controller class' => 'FlaggingController',
-      'base table' => 'flag_content',
+      'base table' => 'flagging',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'fcid',
@@ -800,7 +800,7 @@ function flag_node_translation_change($node) {
     $content_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
     foreach (flag_get_flags('node') as $flag) {
       if ($flag->i18n) {
-        db_update('flag_content')->fields(array('content_id' => $content_id))
+        db_update('flagging')->fields(array('content_id' => $content_id))
           ->condition('fid', $flag->fid)
           ->condition('content_id', $node->translation_change['old_tnid'])
           ->execute();
@@ -824,7 +824,7 @@ function flag_node_translation_change($node) {
  *   The flag id
  */
 function _flag_content_delete($entity_type, $entity_id, $fid = NULL) {
-  $query_content = db_delete('flag_content')
+  $query_content = db_delete('flagging')
     ->condition('content_type', $entity_type)
     ->condition('content_id', $entity_id);
   $query_counts = db_delete('flag_counts')
@@ -844,9 +844,9 @@ function _flag_content_delete($entity_type, $entity_id, $fid = NULL) {
 function flag_user_login(&$edit, &$account) {
   // Migrate anonymous flags to this user's account.
   if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
-    // Get a list of flag_content IDs that will be moved over.
+    // Get a list of flagging IDs that will be moved over.
     $duplicate_flaggings = array();
-    $flaggings = db_select('flag_content', 'fc')
+    $flaggings = db_select('flagging', 'fc')
       ->fields('fc', array('fcid', 'fid', 'content_id'))
       ->condition('uid', 0)
       ->condition('sid', $sid)
@@ -859,7 +859,7 @@ function flag_user_login(&$edit, &$account) {
       // Any duplicate content that was flagged as anonoymous is deleted in the
       // subsequent db_delete() call.
       try {
-        db_update('flag_content')
+        db_update('flagging')
           ->fields(array(
             'uid' => $account->uid,
             'sid' => 0,
@@ -905,7 +905,7 @@ function flag_user_delete($account) {
  */
 function flag_user_account_removal($account) {
   // Remove flags by this user.
-  $query = db_select('flag_content', 'fc');
+  $query = db_select('flagging', 'fc');
   $query->leftJoin('flag_counts', 'c', 'fc.content_id = c.content_id AND fc.content_type = c.content_type');
   $result = $query
     ->fields('fc', array('fid', 'content_id'))
@@ -932,7 +932,7 @@ function flag_user_account_removal($account) {
         ->execute();
     }
   }
-  db_delete('flag_content')
+  db_delete('flagging')
     ->condition('uid', $account->uid)
     ->execute();
 
@@ -980,7 +980,7 @@ function flag_user_view($account, $view_mode) {
 function flag_session_api_cleanup($arg = 'run') {
   // Session API 1.1 version:
   if ($arg == 'run') {
-    $query = db_select('flag_content', 'fc');
+    $query = db_select('flagging', 'fc');
     $query->leftJoin('session_api', 's', 'fc.sid = s.sid');
     $result = $query
       ->fields('fc', array('sid'))
@@ -988,7 +988,7 @@ function flag_session_api_cleanup($arg = 'run') {
       ->isNull('s.sid')
       ->execute();
     foreach ($result as $row) {
-      db_delete('flag_content')
+      db_delete('flagging')
         ->condition('sid', $row->sid)
         ->execute();
     }
@@ -996,7 +996,7 @@ function flag_session_api_cleanup($arg = 'run') {
   // Session API 1.2+ version.
   elseif (is_array($arg)) {
     $outdated_sids = $arg;
-    db_delete('flag_content')->condition('sid', $outdated_sids, 'IN')->execute();
+    db_delete('flagging')->condition('sid', $outdated_sids, 'IN')->execute();
   }
 }
 
@@ -1351,7 +1351,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
  *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
  */
 function flag_trim_flag($flag, $account, $cutoff_size) {
-  $result = db_select('flag_content', 'fc')
+  $result = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
@@ -1375,7 +1375,7 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
  *   empty, this will remove all of this flag's content.
  */
 function flag_reset_flag($flag, $content_id = NULL) {
-  $query = db_select('flag_content', 'fc')
+  $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid);
 
@@ -1390,7 +1390,7 @@ function flag_reset_flag($flag, $content_id = NULL) {
   }
   module_invoke_all('flag_reset', $flag, $content_id, $rows);
 
-  $query = db_delete('flag_content')->condition('fid' , $flag->fid);
+  $query = db_delete('flagging')->condition('fid' , $flag->fid);
   // Update the flag_counts table.
   $count_query = db_delete('flag_counts')->condition('fid', $flag->fid);
   if ($content_id) {
@@ -1932,7 +1932,7 @@ function flag_get_default_flags($include_disabled = FALSE) {
 function flag_get_flagged_content($flag_name) {
   $return = array();
   $flag = flag_get_flag($flag_name);
-  $result = db_select('flag_content', 'fc')
+  $result = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->execute();
@@ -1949,7 +1949,7 @@ function flag_get_flagged_content($flag_name) {
  *   The flag content ID for which to look up the content ID.
  */
 function flag_get_content_id($fcid) {
-  return db_select('flag_content', 'fc')
+  return db_select('flagging', 'fc')
     ->fields('fc', array('content_id'))
     ->condition('fcid', $fcid)
     ->execute()
@@ -2000,7 +2000,7 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
     if (!isset($flagged_content[$uid][$sid][$content_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
       $flagged_content[$uid][$sid][$content_type][$content_id] = array();
-      $result = db_select('flag_content', 'fc')
+      $result = db_select('flagging', 'fc')
         ->fields('fc')
         ->condition('content_type', $content_type)
         ->condition('content_id', $content_id)
@@ -2022,7 +2022,7 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
     if (!isset($flagged_content[$uid][$sid][$content_type]['all'])) {
       $flag_names = _flag_get_flag_names();
       $flagged_content[$uid][$sid][$content_type]['all'] = array();
-      $result = db_select('flag_content', 'fc')
+      $result = db_select('flagging', 'fc')
         ->fields('fc')
         ->condition('content_type', $content_type)
         ->condition(db_or()
@@ -2061,7 +2061,7 @@ function flag_get_content_flags($content_type, $content_id, $flag_name = NULL) {
 
   if (!isset($content_flags[$content_type][$content_id])) {
     $flag_names = _flag_get_flag_names();
-    $result = db_select('flag_content', 'fc')
+    $result = db_select('flagging', 'fc')
       ->fields('fc')
       ->condition('content_type', $content_type)
       ->condition('content_id', $content_id)

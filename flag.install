@@ -142,7 +142,7 @@ function flag_schema() {
     ),
   );
 
-  $schema['flag_content'] = array(
+  $schema['flagging'] = array(
     'description' => 'Content that has been flagged.',
     'fields' => array(
       'fcid' => array(

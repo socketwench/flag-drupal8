@@ -578,7 +578,7 @@ class flag_flag {
       }
       if ($flagged) {
         // Note the order: We delete the entity before calling _unflag() to
-        // delete the {flag_content} record.
+        // delete the {flagging} record.
         $this->_delete_flagging($existing_fcid);
         $this->_unflag($content_id, $uid, $sid);
         module_invoke_all('flag', 'unflag', $this, $content_id, $account, $existing_fcid);
@@ -688,7 +688,7 @@ class flag_flag {
   /**
    * Returns the flagging record.
    *
-   * This method returns the "flagging record": the {flag_content} record that
+   * This method returns the "flagging record": the {flagging} record that
    * exists for each flagged item (for a certain user). If the item isn't
    * flagged, returns NULL. This method could be useful, for example, when you
    * want to find out the 'fcid' or 'timestamp' values.
@@ -733,7 +733,7 @@ class flag_flag {
    * @private
    */
   function _is_flagged($content_id, $uid, $sid) {
-    return db_select('flag_content', 'fc')
+    return db_select('flagging', 'fc')
       ->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
@@ -750,12 +750,12 @@ class flag_flag {
    * function instead.
    *
    * @return
-   *   The 'fcid' column of the new {flag_content} record.
+   *   The 'fcid' column of the new {flagging} record.
    *
    * @private
    */
   function _flag($content_id, $uid, $sid) {
-    $fcid = db_insert('flag_content')
+    $fcid = db_insert('flagging')
       ->fields(array(
         'fid' => $this->fid,
         'content_type' => $this->content_type,
@@ -782,7 +782,7 @@ class flag_flag {
    * @private
    */
   function _unflag($content_id, $uid, $sid) {
-    $fcid = db_select('flag_content', 'fc')
+    $fcid = db_select('flagging', 'fc')
       ->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
@@ -791,7 +791,7 @@ class flag_flag {
       ->execute()
       ->fetchField();
     if ($fcid) {
-      db_delete('flag_content')->condition('fcid', $fcid)->execute();
+      db_delete('flagging')->condition('fcid', $fcid)->execute();
       $this->_decrease_count($content_id);
     }
     return $fcid;
@@ -895,7 +895,7 @@ class flag_flag {
     if (!isset($sid)) {
       $sid = flag_get_sid($uid);
     }
-    return db_select('flag_content', 'fc')->fields('fc', array('fcid'))
+    return db_select('flagging', 'fc')->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)->condition('uid', $uid)->condition('sid', $sid)
       ->countQuery()->execute()->fetchField();
   }
@@ -1129,7 +1129,7 @@ class flag_flag {
    */
   function delete() {
     db_delete('flags')->condition('fid', $this->fid)->execute();
-    db_delete('flag_content')->condition('fid', $this->fid)->execute();
+    db_delete('flagging')->condition('fid', $this->fid)->execute();
     db_delete('flag_types')->condition('fid', $this->fid)->execute();
     db_delete('flag_counts')->condition('fid', $this->fid)->execute();
     module_invoke_all('flag_delete', $this);
