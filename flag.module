@@ -1282,7 +1282,7 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
 /**
  * Implements hook_flag_access_multiple().
  */
-function flag_flag_access_multiple($flag, $content_ids, $account) {
+function flag_flag_access_multiple($flag, $entity_ids, $account) {
   $access = array();
 
   // Do nothing if there is no restriction by authorship.
@@ -1297,7 +1297,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     // want to deny access, or use the current access value provided by Flag.
     $result = db_select('node', 'n')
       ->fields('n', array('nid', 'uid'))
-      ->condition('nid', array_keys($content_ids), 'IN')
+      ->condition('nid', array_keys($entity_ids), 'IN')
       ->condition('type', $flag->types, 'IN')
       ->execute();
     foreach ($result as $row) {
@@ -1316,7 +1316,7 @@ function flag_flag_access_multiple($flag, $content_ids, $account) {
     $query->leftJoin('node', 'n', 'c.nid = n.nid');
     $query
       ->fields('c', array('cid', 'nid', 'uid'))
-      ->condition('c.cid', $content_ids, 'IN');
+      ->condition('c.cid', $entity_ids, 'IN');
     $query->addField('c', 'uid', 'comment_uid');
     $result = $query->execute();
 

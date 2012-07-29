@@ -400,7 +400,7 @@ class flag_flag {
    * they should implement type_access_multiple(), which is called by this
    * method.
    *
-   * @param $content_ids
+   * @param $entity_ids
    *   The array of content IDs to check. The keys are the content IDs, the
    *   values are the actions to test: either 'flag' or 'unflag'.
    * @param $account
@@ -413,17 +413,17 @@ class flag_flag {
    *
    * @see hook_flag_access_multiple()
    */
-  function access_multiple($content_ids, $account = NULL) {
+  function access_multiple($entity_ids, $account = NULL) {
     $account = isset($account) ? $account : $GLOBALS['user'];
     $access = array();
 
     // First check basic user access for this action.
-    foreach ($content_ids as $entity_id => $action) {
-      $access[$entity_id] = $this->user_access($content_ids[$entity_id], $account);
+    foreach ($entity_ids as $entity_id => $action) {
+      $access[$entity_id] = $this->user_access($entity_ids[$entity_id], $account);
     }
 
     // Check for additional access rules provided by sub-classes.
-    $child_access = $this->type_access_multiple($content_ids, $account);
+    $child_access = $this->type_access_multiple($entity_ids, $account);
     if (isset($child_access)) {
       foreach ($child_access as $entity_id => $content_access) {
         if (isset($content_access)) {
@@ -434,7 +434,7 @@ class flag_flag {
 
     // Merge in module-defined access.
     foreach (module_implements('flag_access_multiple') as $module) {
-      $module_access = module_invoke($module, 'flag_access_multiple', $this, $content_ids, $account);
+      $module_access = module_invoke($module, 'flag_access_multiple', $this, $entity_ids, $account);
       foreach ($module_access as $entity_id => $content_access) {
         if (isset($content_access)) {
           $access[$entity_id] = $content_access;
@@ -459,7 +459,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function type_access_multiple($content_ids, $account) {
+  function type_access_multiple($entity_ids, $account) {
     return array();
   }
 

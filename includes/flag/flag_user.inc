@@ -61,16 +61,16 @@ class flag_user extends flag_entity {
     }
   }
 
-  function type_access_multiple($content_ids, $account) {
+  function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // Exclude anonymous.
-    if (array_key_exists(0, $content_ids)) {
+    if (array_key_exists(0, $entity_ids)) {
       $access[0] = FALSE;
     }
 
     // Prevent users from flagging themselves.
-    if ($this->access_uid == 'others' && array_key_exists($account->uid, $content_ids)) {
+    if ($this->access_uid == 'others' && array_key_exists($account->uid, $entity_ids)) {
       $access[$account->uid] = FALSE;
     }
 
