@@ -88,14 +88,14 @@ function hook_flag_options_alter(&$options, $flag) {
  *  The operation being performed: one of 'flag' or 'unflag'.
  * @param $flag
  *  The flag object.
- * @param $content_id
+ * @param $entity_id
  *  The id of the content (aka entity) the flag is on.
  * @param $account
  *  The user account performing the action.
  * @param $fcid
  *  The id of the flagging in the {flagging} table.
  */
-function hook_flag($op, $flag, $content_id, $account, $fcid) {
+function hook_flag($op, $flag, $entity_id, $account, $fcid) {
 
 }
 
@@ -104,7 +104,7 @@ function hook_flag($op, $flag, $content_id, $account, $fcid) {
  *
  * @param $flag
  *  The flag object.
- * @param $content_id
+ * @param $entity_id
  *  The id of the entity in question.
  * @param $action
  *  The action to test. Either 'flag' or 'unflag'.
@@ -117,7 +117,7 @@ function hook_flag($op, $flag, $content_id, $account, $fcid) {
  *
  * @see flag_flag:access()
  */
-function hook_flag_access($flag, $content_id, $action, $account) {
+function hook_flag_access($flag, $entity_id, $action, $account) {
 
 }
 
@@ -193,7 +193,7 @@ function hook_flag_link_types_alter(&$link_types) {
  *   The full flag object for the flag link being generated.
  * @param $action
  *   The action this link should perform. Either 'flag' or 'unflag'.
- * @param $content_id
+ * @param $entity_id
  *   The ID of the node, comment, user, or other object being flagged. The type
  *   of the object can be deduced from the flag type.
  *
@@ -226,7 +226,7 @@ function hook_flag_reset() {
  *
  * @param $flag
  *   The full flag object.
- * @param $content_id
+ * @param $entity_id
  *   The ID of the node, comment, user or other object being flagged.
  *
  * @see flag_build_javascript_info()

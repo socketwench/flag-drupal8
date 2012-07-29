@@ -116,10 +116,10 @@ class flag_handler_field_ops extends views_handler_field {
 
     $ids = array();
     foreach ($values as $row) {
-      $content_id = $row->{$this->aliases['content_id']};
+      $entity_id = $row->{$this->aliases['content_id']};
       $is_flagged = $row->{$this->aliases['is_flagged']};
-      if (isset($content_id)) {
-        $ids[$content_id] = $is_flagged ? 'unflag' : 'flag';
+      if (isset($entity_id)) {
+        $ids[$entity_id] = $is_flagged ? 'unflag' : 'flag';
       }
     }
     $this->flag_applies = $ids ? $flag->access_multiple($ids) : array();
@@ -130,10 +130,10 @@ class flag_handler_field_ops extends views_handler_field {
       return t('Missing flag'); // get_flag() itself will print a more detailed message.
     }
 
-    $content_id = $values->{$this->aliases['content_id']};
+    $entity_id = $values->{$this->aliases['content_id']};
     $is_flagged = $values->{$this->aliases['is_flagged']};
 
-    if (empty($this->flag_applies[$content_id])) {
+    if (empty($this->flag_applies[$entity_id])) {
       // Flag does not apply to this content.
       return;
     }
@@ -141,6 +141,6 @@ class flag_handler_field_ops extends views_handler_field {
     if (!empty($this->options['link_type'])) {
       $flag->link_type = $this->options['link_type'];
     }
-    return $flag->theme($is_flagged ? 'unflag' : 'flag', $content_id);
+    return $flag->theme($is_flagged ? 'unflag' : 'flag', $entity_id);
   }
 }

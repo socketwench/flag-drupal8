@@ -8,8 +8,8 @@
 /**
  * Implements hook_flag(). Trigger actions if any are available.
  */
-function flag_actions_flag($event, $flag, $content_id, $account) {
-  flag_actions_do($event, $flag, $content_id, $account);
+function flag_actions_flag($event, $flag, $entity_id, $account) {
+  flag_actions_do($event, $flag, $entity_id, $account);
 }
 
 /**
@@ -195,16 +195,16 @@ function flag_actions_delete_action($aid) {
 /**
  * Perform flag actions.
  */
-function flag_actions_do($event, $flag, $content_id, $account) {
+function flag_actions_do($event, $flag, $entity_id, $account) {
   $actions = flag_actions_get_actions($flag->name);
   if (!$actions) {
     return;
   }
 
-  $flag_action = $flag->get_flag_action($content_id);
+  $flag_action = $flag->get_flag_action($entity_id);
   $flag_action->action = $event;
-  $flag_action->count = $count = $flag->get_count($content_id);
-  $relevant_objects = $flag->get_relevant_action_objects($content_id);
+  $flag_action->count = $count = $flag->get_count($entity_id);
+  $relevant_objects = $flag->get_relevant_action_objects($entity_id);
   $object_changed = FALSE;
   foreach ($actions as $aid => $action) {
     if ($action->event == 'flag') {

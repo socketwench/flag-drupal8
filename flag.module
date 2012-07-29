@@ -340,13 +340,13 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
   $flags = flag_get_flags($type);
 
   foreach ($flags as $flag) {
-    $content_id = $flag->get_content_id($object);
+    $entity_id = $flag->get_content_id($object);
 
     if (!$flag->uses_hook_link($teaser)) {
       // Flag is not configured to show its link here.
       continue;
     }
-    if (!$flag->access($content_id) && (!$flag->is_flagged($content_id) || !$flag->access($content_id, 'flag'))) {
+    if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
       // User has no permission to use this flag or flag does not apply to this
       // content. The link is not skipped if the user has "flag" access but
       // not "unflag" access (this way the unflag denied message is shown).
@@ -356,7 +356,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
     // The flag links are actually fully rendered theme functions.
     // The HTML attribute is set to TRUE to allow whatever the themer desires.
     $links['flag-' . $flag->name] = array(
-      'title' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id),
+      'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
       'html' => TRUE,
     );
   }
@@ -369,10 +369,10 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
 /**
  * Implements hook_flag_link().
  */
-function flag_flag_link($flag, $action, $content_id) {
-  $token = flag_get_token($content_id);
+function flag_flag_link($flag, $action, $entity_id) {
+  $token = flag_get_token($entity_id);
   return array(
-    'href' => 'flag/' . ($flag->link_type == 'confirm' ? 'confirm/' : '') . "$action/$flag->name/$content_id",
+    'href' => 'flag/' . ($flag->link_type == 'confirm' ? 'confirm/' : '') . "$action/$flag->name/$entity_id",
     'query' => drupal_get_destination() + ($flag->link_type == 'confirm' ? array() : array('token' => $token)),
   );
 }
@@ -688,8 +688,8 @@ function flag_contextual_links_view_alter(&$element, $items) {
         continue;
       }
 
-      $content_id = $flag->get_content_id($node);
-      if (!$flag->access($content_id) && (!$flag->is_flagged($content_id) || !$flag->access($content_id, 'flag'))) {
+      $entity_id = $flag->get_content_id($node);
+      if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
         // User has no permission to use this flag or flag does not apply to this
         // content. The link is not skipped if the user has "flag" access but
         // not "unflag" access (this way the unflag denied message is shown).
@@ -697,7 +697,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
       }
 
       $element['#links']['flag-'. $name] = array(
-        'title' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id),
+        'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
         'html' => TRUE,
       );
     }
@@ -797,14 +797,14 @@ function flag_node_translation_change($node) {
   if (isset($node->translation_change)) {
     // If there is only one node remaining, track by nid rather than tnid.
     // Otherwise, use the new tnid.
-    $content_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
+    $entity_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
     foreach (flag_get_flags('node') as $flag) {
       if ($flag->i18n) {
-        db_update('flagging')->fields(array('content_id' => $content_id))
+        db_update('flagging')->fields(array('content_id' => $entity_id))
           ->condition('fid', $flag->fid)
           ->condition('content_id', $node->translation_change['old_tnid'])
           ->execute();
-        db_update('flag_counts')->fields(array('content_id' => $content_id))
+        db_update('flag_counts')->fields(array('content_id' => $entity_id))
           ->condition('fid', $flag->fid)
           ->condition('content_id', $node->translation_change['old_tnid'])
           ->execute();
@@ -1022,7 +1022,7 @@ function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
  * @param $action
  *   Either 'flag' or 'unflag'.
  */
-function flag_page($action, $flag, $content_id) {
+function flag_page($action, $flag, $entity_id) {
   global $user;
 
   // Shorten up the variables that affect the behavior of this page.
@@ -1033,14 +1033,14 @@ function flag_page($action, $flag, $content_id) {
   $has_js = isset($_GET['has_js']);
 
   // Check the flag token, then perform the flagging.
-  if (!flag_check_token($token, $content_id)) {
+  if (!flag_check_token($token, $entity_id)) {
     $error = t('Bad token. You seem to have followed an invalid link.');
   }
   elseif ($user->uid == 0 && !$has_js) {
     $error = t('You must have JavaScript and cookies enabled in your browser to flag content.');
   }
   else {
-    $result = $flag->flag($action, $content_id);
+    $result = $flag->flag($action, $entity_id);
     if (!$result) {
       $error = t('You are not allowed to flag, or unflag, this content.');
     }
@@ -1067,11 +1067,11 @@ function flag_page($action, $flag, $content_id) {
   if ($js) {
     drupal_add_http_header('Content-Type', 'text/javascript; charset=utf-8');
     $flag->link_type = 'toggle';
-    print drupal_json_encode(flag_build_javascript_info($flag, $content_id));
+    print drupal_json_encode(flag_build_javascript_info($flag, $entity_id));
     drupal_exit();
   }
   else {
-    drupal_set_message($flag->get_label($action . '_message', $content_id));
+    drupal_set_message($flag->get_label($action . '_message', $entity_id));
     drupal_goto();
   }
 }
@@ -1079,15 +1079,15 @@ function flag_page($action, $flag, $content_id) {
 /**
  * Builds the JavaScript structure describing the flagging operation.
  */
-function flag_build_javascript_info($flag, $content_id) {
+function flag_build_javascript_info($flag, $entity_id) {
   $info = array(
     'status' => TRUE,
-    'newLink' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id, TRUE),
+    'newLink' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, TRUE),
     // Further information for the benefit of custom JavaScript event handlers:
-    'contentId' => $content_id,
+    'contentId' => $entity_id,
     'entityType' => $flag->entity_type,
     'flagName' => $flag->name,
-    'flagStatus' => $flag->is_flagged($content_id) ? 'flagged' : 'unflagged',
+    'flagStatus' => $flag->is_flagged($entity_id) ? 'flagged' : 'unflagged',
   );
   drupal_alter('flag_javascript_info', $info);
   return $info;
@@ -1100,12 +1100,12 @@ function flag_build_javascript_info($flag, $content_id) {
  *   Either 'flag' or 'unflag'.
  * @param $flag
  *   A loaded flag object.
- * @param $content_id
+ * @param $entity_id
  *   The id of the content to operate on. The type is implicit in the flag.
  *
  * @see flag_confirm_submit()
  */
-function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
+function flag_confirm($form, &$form_state, $action, $flag, $entity_id) {
   $form['action'] = array(
     '#type' => 'value',
     '#value' => $action,
@@ -1116,17 +1116,17 @@ function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
   );
   $form['content_id'] = array(
     '#type' => 'value',
-    '#value' => $content_id,
+    '#value' => $entity_id,
   );
 
-  $question = $flag->get_label($action . '_confirmation', $content_id);
+  $question = $flag->get_label($action . '_confirmation', $entity_id);
   $path = isset($_GET['destination']) ? $_GET['destination'] : '<front>';
-  $yes = $flag->get_label($action . '_short', $content_id);
+  $yes = $flag->get_label($action . '_short', $entity_id);
 
   if ($action == 'flag') {
     // If the action 'flag', we're potentially about to create a new
     // flagging entity. We need an empty new entity to pass to FieldAPI.
-    $flagging = $flag->new_flagging($content_id);
+    $flagging = $flag->new_flagging($entity_id);
     field_attach_form('flagging', $flagging, $form, $form_state);
     $form['#flagging'] = $flagging;
   }
@@ -1145,7 +1145,7 @@ function flag_confirm($form, &$form_state, $action, $flag, $content_id) {
 function flag_confirm_submit(&$form, &$form_state) {
   $action = $form_state['values']['action'];
   $flag_name = $form_state['values']['flag_name'];
-  $content_id = $form_state['values']['content_id'];
+  $entity_id = $form_state['values']['content_id'];
 
   $flag = flag_get_flag($flag_name);
 
@@ -1154,17 +1154,17 @@ function flag_confirm_submit(&$form, &$form_state) {
     $flagging = $form['#flagging'];
     entity_form_submit_build_entity('flagging', $flagging, $form, $form_state);
 
-    $result = $flag->flag($action, $content_id, NULL, FALSE, $flagging);
+    $result = $flag->flag($action, $entity_id, NULL, FALSE, $flagging);
   }
   else {
-    $result = $flag->flag($action, $content_id, NULL, FALSE);
+    $result = $flag->flag($action, $entity_id, NULL, FALSE);
   }
 
   if (!$result) {
     drupal_set_message(t('You are not allowed to flag, or unflag, this content.'));
   }
   else {
-    drupal_set_message($flag->get_label($action . '_message', $content_id));
+    drupal_set_message($flag->get_label($action . '_message', $entity_id));
   }
 }
 
@@ -1177,27 +1177,27 @@ function flag_confirm_submit(&$form, &$form_state) {
  *   FALSE if some error occured (e.g., user has no permission, flag isn't
  *   applicable to the item, etc.), TRUE otherwise.
  */
-function flag($action, $flag_name, $content_id, $account = NULL) {
+function flag($action, $flag_name, $entity_id, $account = NULL) {
   if (!($flag = flag_get_flag($flag_name))) {
     // Flag does not exist.
     return FALSE;
   }
-  return $flag->flag($action, $content_id, $account);
+  return $flag->flag($action, $entity_id, $account);
 }
 
 /**
  * Implements hook_flag(). Trigger actions if any are available.
  */
-function flag_flag($action, $flag, $content_id, $account) {
+function flag_flag($action, $flag, $entity_id, $account) {
   if (module_exists('trigger')) {
     $context['hook'] = 'flag';
     $context['account'] = $account;
     $context['flag'] = $flag;
     $context['op'] = $action;
     // We add to the $context all the objects we know about:
-    $context = array_merge($flag->get_relevant_action_objects($content_id), $context);
+    $context = array_merge($flag->get_relevant_action_objects($entity_id), $context);
     // The primary object the actions work on.
-    $object = $flag->fetch_content($content_id);
+    $object = $flag->fetch_content($entity_id);
 
     // Generic "all flags" actions.
     foreach (trigger_get_assigned_actions('flag_' . $action)  as $aid => $action_info) {
@@ -1220,9 +1220,9 @@ function flag_flag($action, $flag, $content_id, $account) {
     if (entity_get_info($flag->entity_type)) {
       $variables = array(
         'flag' => $flag,
-        'flagged_' . $flag->entity_type => $content_id,
+        'flagged_' . $flag->entity_type => $entity_id,
         'flagging_user' => $account,
-        'flagging' => $flag->get_flagging($content_id,$account->uid),
+        'flagging' => $flag->get_flagging($entity_id,$account->uid),
       );
       rules_invoke_event_by_args($event_name, $variables);
     }
@@ -1232,7 +1232,7 @@ function flag_flag($action, $flag, $content_id, $account) {
 /**
  * Implements hook_flag_access().
  */
-function flag_flag_access($flag, $content_id, $action, $account) {
+function flag_flag_access($flag, $entity_id, $action, $account) {
   // Do nothing if there is no restriction by authorship.
   if (empty($flag->access_author)) {
     return;
@@ -1243,7 +1243,7 @@ function flag_flag_access($flag, $content_id, $action, $account) {
   if ($flag->entity_type == 'node') {
     // For non-existent nodes (such as on the node add form), assume that the
     // current user is creating the content.
-    if (empty($content_id) || !($node = node_load($content_id))) {
+    if (empty($entity_id) || !($node = node_load($entity_id))) {
       return $flag->access_author == 'others' ? FALSE : NULL;
     }
 
@@ -1259,7 +1259,7 @@ function flag_flag_access($flag, $content_id, $action, $account) {
   if ($flag->entity_type == 'comment') {
     // For non-existent comments (such as on the comment add form), assume that
     // the current user is creating the content.
-    if (empty($content_id) || !($comment = $flag->fetch_content($content_id))) {
+    if (empty($entity_id) || !($comment = $flag->fetch_content($entity_id))) {
       return $flag->access_author == 'comment_others' ? FALSE : NULL;
     }
 
@@ -1370,17 +1370,17 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
  *
  * @param $flag
  *   The flag object.
- * @param $content_id
+ * @param $entity_id
  *   Optional. The content ID on which all flaggings will be removed. If left
  *   empty, this will remove all of this flag's content.
  */
-function flag_reset_flag($flag, $content_id = NULL) {
+function flag_reset_flag($flag, $entity_id = NULL) {
   $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid);
 
-  if ($content_id) {
-    $query->condition('content_id', $content_id);
+  if ($entity_id) {
+    $query->condition('content_id', $entity_id);
   }
 
   $result = $query->execute()->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);
@@ -1388,14 +1388,14 @@ function flag_reset_flag($flag, $content_id = NULL) {
   foreach ($result as $row) {
     $rows[] = $row;
   }
-  module_invoke_all('flag_reset', $flag, $content_id, $rows);
+  module_invoke_all('flag_reset', $flag, $entity_id, $rows);
 
   $query = db_delete('flagging')->condition('fid' , $flag->fid);
   // Update the flag_counts table.
   $count_query = db_delete('flag_counts')->condition('fid', $flag->fid);
-  if ($content_id) {
-    $query->condition('content_id', $content_id);
-    $count_query->condition('content_id', $content_id);
+  if ($entity_id) {
+    $query->condition('content_id', $entity_id);
+    $count_query->condition('content_id', $entity_id);
   }
   $count_query->execute();
   return $query->execute();
@@ -1529,7 +1529,7 @@ function flag_theme() {
  * The $variables array initially contains the following arguments:
  * - $flag
  * - $action
- * - $content_id
+ * - $entity_id
  * - $after_flagging
  *
  * See 'flag.tpl.php' for their documentation.
@@ -1541,19 +1541,19 @@ function template_preprocess_flag(&$variables) {
   // Some typing shotcuts:
   $flag =& $variables['flag'];
   $action = $variables['action'];
-  $content_id = $variables['content_id'];
+  $entity_id = $variables['content_id'];
   $flag_css_name = str_replace('_', '-', $flag->name);
 
   // Generate the link URL.
   $link_type = $flag->get_link_type();
-  $link = module_invoke($link_type['module'], 'flag_link', $flag, $action, $content_id);
+  $link = module_invoke($link_type['module'], 'flag_link', $flag, $action, $entity_id);
   if (isset($link['title']) && empty($link['html'])) {
     $link['title'] = check_plain($link['title']);
   }
 
   // Replace the link with the access denied text if unable to flag.
-  if ($action == 'unflag' && !$flag->access($content_id, 'unflag')) {
-    $link['title'] = $flag->get_label('unflag_denied_text', $content_id);
+  if ($action == 'unflag' && !$flag->access($entity_id, 'unflag')) {
+    $link['title'] = $flag->get_label('unflag_denied_text', $entity_id);
     unset($link['href']);
   }
 
@@ -1575,15 +1575,15 @@ function template_preprocess_flag(&$variables) {
 
   $variables['link'] = $link;
   $variables['link_href'] = isset($link['href']) ? check_url(url($link['href'], $link)) : FALSE;
-  $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $content_id);
-  $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $content_id)));
+  $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $entity_id);
+  $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $entity_id)));
   $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
   $variables['flag_name_css'] = $flag_css_name;
 
   $variables['flag_wrapper_classes_array'] = array();
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
   $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name;
-  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name . '-' . $content_id;
+  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name . '-' . $entity_id;
   $variables['flag_wrapper_classes'] = implode(' ', $variables['flag_wrapper_classes_array']);
 
   $variables['flag_classes_array'] = array();
@@ -1596,7 +1596,7 @@ function template_preprocess_flag(&$variables) {
   }
   if ($variables['after_flagging']) {
     $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
-    $variables['message_text'] = $flag->get_label($inverse_action . '_message', $content_id);
+    $variables['message_text'] = $flag->get_label($inverse_action . '_message', $entity_id);
     $variables['flag_classes_array'][] = $variables['status'];
   }
   $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
@@ -1664,7 +1664,7 @@ function _flag_link_type_fields() {
  *
  * @param $entity_type
  *   The content type (usually 'node').
- * @param $content_id
+ * @param $entity_id
  *   The content ID (usually the node ID).
  * @param $reset
  *   Reset the internal cache and execute the SQL query another time.
@@ -1672,7 +1672,7 @@ function _flag_link_type_fields() {
  * @return $flags
  *   An array of the structure [name] => [number of flags].
  */
-function flag_get_counts($entity_type, $content_id, $reset = FALSE) {
+function flag_get_counts($entity_type, $entity_id, $reset = FALSE) {
   static $counts;
 
   if ($reset) {
@@ -1682,22 +1682,22 @@ function flag_get_counts($entity_type, $content_id, $reset = FALSE) {
     }
   }
 
-  if (!isset($counts[$entity_type][$content_id])) {
-    $counts[$entity_type][$content_id] = array();
+  if (!isset($counts[$entity_type][$entity_id])) {
+    $counts[$entity_type][$entity_id] = array();
     $query = db_select('flag', 'f');
     $query->leftJoin('flag_counts', 'fc', 'f.fid = fc.fid');
     $result = $query
       ->fields('f', array('name'))
       ->fields('fc', array('count'))
       ->condition('fc.entity_type', $entity_type)
-      ->condition('fc.content_id', $content_id)
+      ->condition('fc.content_id', $entity_id)
       ->execute();
     foreach ($result as $row) {
-      $counts[$entity_type][$content_id][$row->name] = $row->count;
+      $counts[$entity_type][$entity_id][$row->name] = $row->count;
     }
   }
 
-  return $counts[$entity_type][$content_id];
+  return $counts[$entity_type][$entity_id];
 }
 
 /**
@@ -1961,7 +1961,7 @@ function flag_get_content_id($fcid) {
  *
  * @param $entity_type
  *   The type of content that will be retrieved. Usually 'node'.
- * @param $content_id
+ * @param $entity_id
  *   Optional. The content ID to check for flagging. If none given, all
  *   content flagged by this user will be returned.
  * @param $uid
@@ -1975,7 +1975,7 @@ function flag_get_content_id($fcid) {
  *   Reset the internal cache and execute the SQL query another time.
  *
  * @return $flags
- *   If returning a single item's flags (that is, when $content_id isn't NULL),
+ *   If returning a single item's flags (that is, when $entity_id isn't NULL),
  *   an array of the structure
  *   [flag_name] => (fcid => [fcid], uid => [uid], content_id => [content_id], timestamp => [timestamp], ...)
  *
@@ -1983,7 +1983,7 @@ function flag_get_content_id($fcid) {
  *   [flag_name] => [content_id] => Object from above.
  *
  */
-function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
+function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
   static $flagged_content;
 
   if ($reset) {
@@ -1996,14 +1996,14 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
   $uid = !isset($uid) ? $GLOBALS['user']->uid : $uid;
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
 
-  if (isset($content_id)) {
-    if (!isset($flagged_content[$uid][$sid][$entity_type][$content_id])) {
+  if (isset($entity_id)) {
+    if (!isset($flagged_content[$uid][$sid][$entity_type][$entity_id])) {
       $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid][$entity_type][$content_id] = array();
+      $flagged_content[$uid][$sid][$entity_type][$entity_id] = array();
       $result = db_select('flagging', 'fc')
         ->fields('fc')
         ->condition('entity_type', $entity_type)
-        ->condition('content_id', $content_id)
+        ->condition('content_id', $entity_id)
         ->condition(db_or()
           ->condition('uid', $uid)
           ->condition('uid', 0)
@@ -2012,10 +2012,10 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
         ->execute();
 
       foreach ($result as $flag_content) {
-        $flagged_content[$uid][$sid][$entity_type][$content_id][$flag_names[$flag_content->fid]] = $flag_content;
+        $flagged_content[$uid][$sid][$entity_type][$entity_id][$flag_names[$flag_content->fid]] = $flag_content;
       }
     }
-    return $flagged_content[$uid][$sid][$entity_type][$content_id];
+    return $flagged_content[$uid][$sid][$entity_type][$entity_id];
   }
 
   else {
@@ -2045,7 +2045,7 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
  *
  * @param $entity_type
  *   The type of content that will be retrieved. Usually 'node'.
- * @param $content_id
+ * @param $entity_id
  *   The content ID to check for flagging.
  * @param $flag_name
  *   Optional. The name of a flag if wanting a list specific to a single flag.
@@ -2056,26 +2056,26 @@ function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
  */
-function flag_get_content_flags($entity_type, $content_id, $flag_name = NULL) {
+function flag_get_content_flags($entity_type, $entity_id, $flag_name = NULL) {
   $content_flags = &drupal_static(__FUNCTION__, array());
 
-  if (!isset($content_flags[$entity_type][$content_id])) {
+  if (!isset($content_flags[$entity_type][$entity_id])) {
     $flag_names = _flag_get_flag_names();
     $result = db_select('flagging', 'fc')
       ->fields('fc')
       ->condition('entity_type', $entity_type)
-      ->condition('content_id', $content_id)
+      ->condition('content_id', $entity_id)
       ->orderBy('timestamp', 'DESC')
       ->execute();
     foreach ($result as $flag_content) {
       // Build a list of flaggings for all flags by user.
-      $content_flags[$entity_type][$content_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
+      $content_flags[$entity_type][$entity_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
       // Build a list of flaggings for each individual flag.
-      $content_flags[$entity_type][$content_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
+      $content_flags[$entity_type][$entity_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
     }
   }
 
-  return isset($flag_name) ? $content_flags[$entity_type][$content_id]['flags'][$flag_name] : $content_flags[$entity_type][$content_id]['users'];
+  return isset($flag_name) ? $content_flags[$entity_type][$entity_id]['flags'][$flag_name] : $content_flags[$entity_type][$entity_id]['users'];
 }
 
 /**
@@ -2089,20 +2089,20 @@ function flag_get_content_flags($entity_type, $content_id, $flag_name = NULL) {
  *
  * @param $flag_name
  *   The "machine readable" name of the flag; e.g. 'bookmarks'.
- * @param $content_id
+ * @param $entity_id
  *   The content ID to check for flagging. This is usually a node ID.
  */
-function flag_create_link($flag_name, $content_id) {
+function flag_create_link($flag_name, $entity_id) {
   $flag = flag_get_flag($flag_name);
   if (!$flag) {
     // Flag does not exist.
     return;
   }
-  if (!$flag->access($content_id) && (!$flag->is_flagged($content_id) || !$flag->access($content_id, 'flag'))) {
+  if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
     // User has no permission to use this flag.
     return;
   }
-  return $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id);
+  return $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id);
 }
 
 /**
@@ -2149,17 +2149,17 @@ function flag_get_link_types($reset = FALSE) {
 /**
  * Get a private token used to protect links from spoofing - CSRF.
  */
-function flag_get_token($content_id) {
+function flag_get_token($entity_id) {
   // Anonymous users get a less secure token, since it must be the same for all
   // anonymous users on the entire site to work with page caching.
-  return ($GLOBALS['user']->uid) ? drupal_get_token($content_id) : md5(drupal_get_private_key() . $content_id);
+  return ($GLOBALS['user']->uid) ? drupal_get_token($entity_id) : md5(drupal_get_private_key() . $entity_id);
 }
 
 /**
  * Check to see if a token value matches the specified node.
  */
-function flag_check_token($token, $content_id) {
-  return flag_get_token($content_id) == $token;
+function flag_check_token($token, $entity_id) {
+  return flag_get_token($entity_id) == $token;
 }
 
 /**
