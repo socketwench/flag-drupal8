@@ -425,9 +425,9 @@ class flag_flag {
     // Check for additional access rules provided by sub-classes.
     $child_access = $this->type_access_multiple($entity_ids, $account);
     if (isset($child_access)) {
-      foreach ($child_access as $entity_id => $content_access) {
-        if (isset($content_access)) {
-          $access[$entity_id] = $content_access;
+      foreach ($child_access as $entity_id => $entity_access) {
+        if (isset($entity_access)) {
+          $access[$entity_id] = $entity_access;
         }
       }
     }
@@ -435,9 +435,9 @@ class flag_flag {
     // Merge in module-defined access.
     foreach (module_implements('flag_access_multiple') as $module) {
       $module_access = module_invoke($module, 'flag_access_multiple', $this, $entity_ids, $account);
-      foreach ($module_access as $entity_id => $content_access) {
-        if (isset($content_access)) {
-          $access[$entity_id] = $content_access;
+      foreach ($module_access as $entity_id => $entity_access) {
+        if (isset($entity_access)) {
+          $access[$entity_id] = $entity_access;
         }
       }
     }
