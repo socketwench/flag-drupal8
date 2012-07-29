@@ -146,7 +146,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
           $replacements[$original] = $action->entity_type;
           break;
         case 'content-id':
-          $replacements[$original] = $action->content_id;
+          $replacements[$original] = $action->entity_id;
           break;
         case 'count':
           $replacements[$original] = $action->count;

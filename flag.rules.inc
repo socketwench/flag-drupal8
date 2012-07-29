@@ -337,7 +337,7 @@ function flag_rules_action_fetch_users($flag, $entity) {
  */
 function flag_rules_action_fetch_entity_by_user($flag, $user) {
   $result = db_select('flagging', 'fc')
-    ->fields('fc', array('content_id'))
+    ->fields('fc', array('entity_id'))
     ->condition('entity_type', $flag->entity_type)
     ->condition('uid', $user->uid)
     ->condition('fid', $flag->fid)

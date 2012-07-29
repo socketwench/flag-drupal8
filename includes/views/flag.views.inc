@@ -41,6 +41,9 @@ function flag_views_data() {
   // Notify views from flag 2.x of our changes to views data.
   // @see flag_update_7301().
   $data['flag_content']['moved to'] = 'flagging';
+  // @see flag_update_7303().
+  $data['flag_content']['content_id']['moved to'] = array('flagging', 'entity_id');
+
   $data['flagging']['uid'] = array(
     'title' => t('User uid'),
     'help' => t('The user that flagged an item. If you need more fields than the uid add the "Flags: User" relationship.'),
@@ -81,7 +84,7 @@ function flag_views_data() {
   );
 
   // Argument for content ID, used for "Who's flagged this" views.
-  $data['flagging']['content_id'] = array(
+  $data['flagging']['entity_id'] = array(
     'title' => t('Content ID'),
     'help' => t('The unique ID of the object that has been flagged.'),
     'argument' => array(
@@ -168,7 +171,7 @@ function flag_views_data_alter(&$data) {
           'handler' => 'flag_handler_relationship_content',
           'label' => t('flag'),
           'base' => 'flagging',
-          'base field' => 'content_id',
+          'base field' => 'entity_id',
           'relationship field' => $info['join field'],
         ),
       );
@@ -183,7 +186,7 @@ function flag_views_data_alter(&$data) {
           'handler' => 'flag_handler_relationship_counts',
           'label' => t('counter'),
           'base' => 'flag_counts',
-          'base field' => 'content_id',
+          'base field' => 'entity_id',
           'relationship field' => $info['join field'],
         ),
       );

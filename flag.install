@@ -166,7 +166,7 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'content_id' => array(
+      'entity_id' => array(
         'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
@@ -198,12 +198,12 @@ function flag_schema() {
     ),
     'primary key' => array('fcid'),
     'unique keys' => array(
-      'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
+      'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
     ),
     'indexes' => array(
       'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
-      'entity_type_content_id_uid_sid' => array('entity_type', 'content_id', 'uid', 'sid'),
-      'content_id_fid' => array('content_id', 'fid'),
+      'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
+      'entity_id_fid' => array('entity_id', 'fid'),
     ),
   );
 
@@ -248,7 +248,7 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'content_id' => array(
+      'entity_id' => array(
         'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
@@ -273,10 +273,10 @@ function flag_schema() {
         'disp-size' => 11,
       )
     ),
-    'primary key' => array('fid', 'content_id'),
+    'primary key' => array('fid', 'entity_id'),
     'indexes' => array(
       'fid_entity_type' => array('fid', 'entity_type'),
-      'entity_type_content_id' => array('entity_type', 'content_id'),
+      'entity_type_entity_id' => array('entity_type', 'entity_id'),
       'fid_count' => array('fid', 'count'),
       'fid_last_updated' => array('fid', 'last_updated'),
     ),
