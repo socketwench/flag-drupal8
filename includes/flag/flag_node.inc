@@ -109,7 +109,7 @@ class flag_node extends flag_entity {
    */
   function get_translation_id($entity_id) {
     if ($this->i18n) {
-      $node = $this->fetch_content($entity_id);
+      $node = $this->fetch_entity($entity_id);
       if (!empty($node->tnid)) {
         $entity_id = $node->tnid;
       }
@@ -137,7 +137,7 @@ class flag_node extends flag_entity {
   }
 
   function replace_tokens($label, $contexts, $options, $entity_id) {
-    if (is_numeric($entity_id) && ($node = $this->fetch_content($entity_id))) {
+    if (is_numeric($entity_id) && ($node = $this->fetch_entity($entity_id))) {
       $contexts['node'] = $node;
     }
     // Nodes accept the node-type as a $entity_id in the case that a new node
