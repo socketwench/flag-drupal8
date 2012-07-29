@@ -248,7 +248,7 @@ class flag_flag {
       $cache[$entity_id] = $object_to_remember;
     }
     if (!array_key_exists($entity_id, $cache)) {
-      $content = $this->_load_content($entity_id);
+      $content = $this->_load_entity($entity_id);
       $cache[$entity_id] = $content ? $content : NULL;
     }
     return $cache[$entity_id];
@@ -262,7 +262,7 @@ class flag_flag {
    * @private
    * @static
    */
-  function _load_content($entity_id) {
+  function _load_entity($entity_id) {
     return NULL;
   }
 
@@ -271,7 +271,7 @@ class flag_flag {
    * fetch_entity() return it.
    *
    * This is needed because otherwise fetch_object() loads the object from the
-   * database (by calling _load_content()), whereas sometimes we want to fetch
+   * database (by calling _load_entity()), whereas sometimes we want to fetch
    * an object that hasn't yet been saved to the database. See flag_nodeapi().
    */
   function remember_content($entity_id, $object) {

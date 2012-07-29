@@ -62,7 +62,7 @@ class flag_entity extends flag_flag {
   /**
    * Loads the entity object.
    */
-  function _load_content($entity_id) {
+  function _load_entity($entity_id) {
     if (is_numeric($entity_id)) {
       $entity = entity_load($this->entity_type, array($entity_id));
       return reset($entity);
