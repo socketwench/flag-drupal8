@@ -72,7 +72,7 @@ class flag_comment extends flag_entity {
   function get_entity_id($comment) {
     // Store the comment object in the static cache, to avoid getting it
     // again unneedlessly.
-    $this->remember_content($comment->cid, $comment);
+    $this->remember_entity($comment->cid, $comment);
     return $comment->cid;
   }
 

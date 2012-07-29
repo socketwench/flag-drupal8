@@ -274,7 +274,7 @@ class flag_flag {
    * database (by calling _load_entity()), whereas sometimes we want to fetch
    * an object that hasn't yet been saved to the database. See flag_nodeapi().
    */
-  function remember_content($entity_id, $object) {
+  function remember_entity($entity_id, $object) {
     $this->fetch_entity($entity_id, $object);
   }
 
