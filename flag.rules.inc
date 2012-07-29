@@ -321,7 +321,7 @@ function flag_rules_action_trim($flag, $flagging_user, $cutoff_size) {
  * Base action implementation: Fetch users who flagged an entity.
  */
 function flag_rules_action_fetch_users($flag, $entity) {
-  $result = db_select('flag_content', 'fc')
+  $result = db_select('flagging', 'fc')
     ->fields('fc', array('uid'))
     ->condition('content_type', $flag->content_type)
     ->condition('content_id', $flag->get_content_id($entity))
@@ -336,7 +336,7 @@ function flag_rules_action_fetch_users($flag, $entity) {
  * Base action implementation: Fetch entities who were flagged a user.
  */
 function flag_rules_action_fetch_entity_by_user($flag, $user) {
-  $result = db_select('flag_content', 'fc')
+  $result = db_select('flagging', 'fc')
     ->fields('fc', array('content_id'))
     ->condition('content_type', $flag->content_type)
     ->condition('uid', $user->uid)

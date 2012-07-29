@@ -93,7 +93,7 @@ function hook_flag_options_alter(&$options, $flag) {
  * @param $account
  *  The user account performing the action.
  * @param $fcid
- *  The id of the flagging in the {flag_content} table.
+ *  The id of the flagging in the {flagging} table.
  */
 function hook_flag($op, $flag, $content_id, $account, $fcid) {
 

@@ -222,7 +222,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
       return array();
     }
     $flattened_ids = implode(',', $ids);
-    return $this->_test_by_sql("SELECT content_id FROM {flag_content} WHERE fid = :fid AND content_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
+    return $this->_test_by_sql("SELECT content_id FROM {flagging} WHERE fid = :fid AND content_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
   }
 
   // Helper: executes an SQL query and returns all the content_id's.

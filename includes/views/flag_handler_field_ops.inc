@@ -73,9 +73,9 @@ class flag_handler_field_ops extends views_handler_field {
 
     // Find out if the content is flagged. We can't just peek at some field in
     // our loaded table because it doesn't always reflect the user browsing the
-    // page. So we explicitly add the flag_content table to find this out.
+    // page. So we explicitly add the flagging table to find this out.
     $join = new views_join();
-    $join->construct('flag_content', $info['views table'], $info['join field'], 'content_id');
+    $join->construct('flagging', $info['views table'], $info['join field'], 'content_id');
     $join->extra[] = array(
       'field' => 'fid',
       'value' => $flag->fid,
@@ -93,11 +93,11 @@ class flag_handler_field_ops extends views_handler_field {
         'numeric' => TRUE,
       );
     }
-    $flag_table = $this->query->add_table('flag_content', $parent, $join);
+    $flag_table = $this->query->add_table('flagging', $parent, $join);
     $this->aliases['is_flagged'] = $this->query->add_field($flag_table, 'content_id');
 
     // Next, find out the content ID. We can't add_field() on this table
-    // (flag_content), because its content_id may be NULL (in case no user has
+    // (flagging), because its content_id may be NULL (in case no user has
     // flagged this content, and it's a LEFT JOIN). So we reach to the parent
     // relationship and add_field() *its* content ID column.
     $left_table = $this->view->relationship[$this->options['relationship']]->table_alias;
