@@ -198,7 +198,7 @@ function theme_flag_admin_page($variables) {
 function flag_add_page($type = NULL, $name = NULL) {
   drupal_set_title(t('Add new flag'));
   if (isset($type) && isset($name)) {
-    $flag = flag_flag::factory_by_content_type($type);
+    $flag = flag_flag::factory_by_entity_type($type);
     $flag->name = $name;
     return drupal_get_form('flag_form', $flag);
   }
@@ -246,7 +246,7 @@ function flag_add_form($form, &$form_state) {
 }
 
 function flag_add_form_validate($form, &$form_state) {
-  $flag = flag_flag::factory_by_content_type($form_state['values']['type']);
+  $flag = flag_flag::factory_by_entity_type($form_state['values']['type']);
   $flag->name = $form_state['values']['name'];
   $errors = $flag->validate_name();
   foreach ($errors as $field => $field_errors) {
