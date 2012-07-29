@@ -126,7 +126,7 @@ function hook_flag_access($flag, $entity_id, $action, $account) {
  *
  * @param $flag
  *  The flag object.
- * @param $content_ids
+ * @param $entity_ids
  *  An array of object ids to check access.
  * @param $account
  *  The user on whose behalf to test the flagging action.
@@ -138,7 +138,7 @@ function hook_flag_access($flag, $entity_id, $action, $account) {
  * @see hook_flag_access()
  * @see flag_flag:access_multiple()
  */
-function hook_flag_access_multiple($flag, $content_ids, $account) {
+function hook_flag_access_multiple($flag, $entity_ids, $account) {
 
 }
 

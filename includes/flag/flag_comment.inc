@@ -50,7 +50,7 @@ class flag_comment extends flag_entity {
     unset($form['display']['show_on_entity']);
   }
 
-  function type_access_multiple($content_ids, $account) {
+  function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // Ensure node types are granted access. This avoids a
@@ -59,7 +59,7 @@ class flag_comment extends flag_entity {
     $query->innerJoin('node', 'n', 'c.nid = n.nid');
     $result = $query
       ->fields('c', array('cid'))
-      ->condition('c.cid', $content_ids, 'IN')
+      ->condition('c.cid', $entity_ids, 'IN')
       ->condition('n.type', $this->types, 'NOT IN')
       ->execute();
     foreach ($result as $row) {
