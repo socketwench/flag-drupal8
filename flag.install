@@ -446,3 +446,12 @@ function flag_update_7203() {
 function flag_update_7300() {
   registry_rebuild();
 }
+
+/**
+ * Rename {flag_content} table to {flagging}.
+ */
+function flag_update_7301() {
+  db_rename_table('flag_content', 'flagging');
+  // A second cache clear appears to be required here.
+  cache_clear_all();
+}
