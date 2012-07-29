@@ -248,8 +248,8 @@ class flag_flag {
       $cache[$entity_id] = $object_to_remember;
     }
     if (!array_key_exists($entity_id, $cache)) {
-      $content = $this->_load_entity($entity_id);
-      $cache[$entity_id] = $content ? $content : NULL;
+      $entity = $this->_load_entity($entity_id);
+      $cache[$entity_id] = $entity ? $entity : NULL;
     }
     return $cache[$entity_id];
   }
@@ -290,7 +290,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function applies_to_entity($content) {
+  function applies_to_entity($entity) {
     return FALSE;
   }
 
@@ -473,7 +473,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function get_entity_id($content) {
+  function get_entity_id($entity) {
     return NULL;
   }
 
