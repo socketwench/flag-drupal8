@@ -206,7 +206,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
   //
 
   function test_flaggable($ids, $flag) {
-    return array_filter($ids, array($flag, 'applies_to_content_id'));
+    return array_filter($ids, array($flag, 'applies_to_entity_id'));
   }
 
   function test_flagged($ids, $flag) {
