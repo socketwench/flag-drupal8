@@ -340,7 +340,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
   $flags = flag_get_flags($type);
 
   foreach ($flags as $flag) {
-    $entity_id = $flag->get_content_id($object);
+    $entity_id = $flag->get_entity_id($object);
 
     if (!$flag->uses_hook_link($teaser)) {
       // Flag is not configured to show its link here.
@@ -688,7 +688,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
         continue;
       }
 
-      $entity_id = $flag->get_content_id($node);
+      $entity_id = $flag->get_entity_id($node);
       if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
         // User has no permission to use this flag or flag does not apply to this
         // content. The link is not skipped if the user has "flag" access but
@@ -1948,7 +1948,7 @@ function flag_get_flagged_content($flag_name) {
  * @param $fcid
  *   The flag content ID for which to look up the content ID.
  */
-function flag_get_content_id($fcid) {
+function flag_get_entity_id($fcid) {
   return db_select('flagging', 'fc')
     ->fields('fc', array('content_id'))
     ->condition('fcid', $fcid)

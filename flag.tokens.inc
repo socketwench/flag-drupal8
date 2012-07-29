@@ -163,10 +163,10 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
         $flag_count_token = 'flag-' . str_replace('_', '-', $flag->name) . '-count';
         $flag_link_token = 'flag-' . str_replace('_', '-', $flag->name) . '-link';
         if ($name == $flag_count_token) {
-          $replacements[$original] = $flag->get_count($flag->get_content_id($object));
+          $replacements[$original] = $flag->get_count($flag->get_entity_id($object));
         }
         elseif ($name == $flag_link_token) {
-          $replacements[$original] = flag_create_link($flag->name, $flag->get_content_id($object));
+          $replacements[$original] = flag_create_link($flag->name, $flag->get_entity_id($object));
         }
       }
     }

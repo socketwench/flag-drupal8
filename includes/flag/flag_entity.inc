@@ -84,7 +84,7 @@ class flag_entity extends flag_flag {
   /**
    * Returns the entity id, if it already exists.
    */
-  function get_content_id($entity) {
+  function get_entity_id($entity) {
     $entity_info = entity_get_info($this->entity_type);
     if ($entity && isset($entity->{$entity_info['entity keys']['id']})) {
       return $entity->{$entity_info['entity keys']['id']};
@@ -127,7 +127,7 @@ class flag_entity extends flag_flag {
     $flag_action = parent::get_flag_action($entity_id);
     $entity = $this->fetch_content($entity_id);
     $flag_action->content_title = entity_label($this->entity_type, $entity);
-    $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_content_id($entity));
+    $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_entity_id($entity));
     return $flag_action;
   }
 
