@@ -15,9 +15,11 @@ files[] = includes/flag.cookie_storage.inc
 
 files[] = includes/flag.entity.inc
 files[] = flag.rules.inc
-files[] = includes/flag_handler_argument_content_id.inc
-files[] = includes/flag_handler_field_ops.inc
-files[] = includes/flag_handler_filter_flagged.inc
-files[] = includes/flag_handler_relationships.inc
-files[] = includes/flag_plugin_argument_validate_flaggability.inc
+
+; Views
+files[] = includes/views/flag_handler_argument_content_id.inc
+files[] = includes/views/flag_handler_field_ops.inc
+files[] = includes/views/flag_handler_filter_flagged.inc
+files[] = includes/views/flag_handler_relationships.inc
+files[] = includes/views/flag_plugin_argument_validate_flaggability.inc
 files[] = tests/flag.test
