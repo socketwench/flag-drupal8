@@ -154,7 +154,7 @@ function flag_views_data() {
 function flag_views_data_alter(&$data) {
 
   foreach (array_keys(flag_fetch_definition()) as $flag_type) {
-    $flag = flag_flag::factory_by_content_type($flag_type);
+    $flag = flag_flag::factory_by_entity_type($flag_type);
     $info = $flag->get_views_info();
 
     if (!empty($info['join field'])) {

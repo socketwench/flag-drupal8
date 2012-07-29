@@ -89,7 +89,7 @@ class flag_flag {
    * Another factory method. Returns a new, "empty" flag; e.g., one suitable for
    * the "Add new flag" page.
    */
-  static function factory_by_content_type($entity_type) {
+  static function factory_by_entity_type($entity_type) {
     return flag_create_handler($entity_type);
   }
 
