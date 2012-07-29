@@ -290,7 +290,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function applies_to_content_object($content) {
+  function applies_to_entity($content) {
     return FALSE;
   }
 
@@ -298,11 +298,11 @@ class flag_flag {
    * Returns TRUE if the flag applies to the entity with the given ID.
    *
    * This is a convenience method that simply loads the object and calls
-   * applies_to_content_object(). If you already have the object, don't call
-   * this function: call applies_to_content_object() directly.
+   * applies_to_entity(). If you already have the object, don't call
+   * this function: call applies_to_entity() directly.
    */
   function applies_to_entity_id($entity_id) {
-    return $this->applies_to_content_object($this->fetch_entity($entity_id));
+    return $this->applies_to_entity($this->fetch_entity($entity_id));
   }
 
   /**
