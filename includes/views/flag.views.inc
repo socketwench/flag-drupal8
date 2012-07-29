@@ -221,8 +221,8 @@ function flag_views_query_substitutions() {
  * This function is used to select the desired flag when setting up flag
  * relationships and fields.
  */
-function flag_views_flag_config_form($form_type, $content_type, $current_flag) {
-  $flags = flag_get_flags($content_type);
+function flag_views_flag_config_form($form_type, $entity_type, $current_flag) {
+  $flags = flag_get_flags($entity_type);
 
   $options = array();
   foreach ($flags as $flag) {
@@ -243,13 +243,13 @@ function flag_views_flag_config_form($form_type, $content_type, $current_flag) {
 /**
  * Helper function that gets the first defined flag and returns its name.
  */
-function flag_views_flag_default($content_type) {
+function flag_views_flag_default($entity_type) {
   static $default_flag = array();
 
-  if (!array_key_exists($content_type, $default_flag)) {
-    $flag = array_shift(flag_get_flags($content_type));
-    $default_flag[$content_type] = $flag ? $flag->name : NULL;
+  if (!array_key_exists($entity_type, $default_flag)) {
+    $flag = array_shift(flag_get_flags($entity_type));
+    $default_flag[$entity_type] = $flag ? $flag->name : NULL;
   }
 
-  return $default_flag[$content_type];
+  return $default_flag[$entity_type];
 }
