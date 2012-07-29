@@ -750,7 +750,7 @@ function flag_node_save($node) {
       // Flagging may trigger actions. We want actions to get the current
       // node, not a stale database-loaded one:
       if (!$remembered) {
-        $flag->remember_content($node->nid, $node);
+        $flag->remember_entity($node->nid, $node);
         // Actions may modify a node, and we don't want to overwrite this
         // modification:
         $remembered = TRUE;
