@@ -12,10 +12,10 @@ function flag_trigger_info() {
   $hooks = array(
     'flag' => array(
       'flag_flag' => array(
-        'label' => t('Content has been flagged with any flag'),
+        'label' => t('Object has been flagged with any flag'),
       ),
       'flag_unflag' => array(
-        'label' => t('Content has been unflagged with any flag')
+        'label' => t('Object has been unflagged with any flag')
       ),
     ),
   );
