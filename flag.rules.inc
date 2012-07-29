@@ -300,14 +300,14 @@ function flag_rules_action_info() {
  * Base action implementation: Flag.
  */
 function flag_rules_action_flag($flag, $entity, $flagging_user, $permissions_check) {
-  $flag->flag('flag', $flag->get_content_id($entity), $flagging_user, $permissions_check);
+  $flag->flag('flag', $flag->get_entity_id($entity), $flagging_user, $permissions_check);
 }
 
 /**
  * Base action implementation: Unflag.
  */
 function flag_rules_action_unflag($flag, $entity, $flagging_user, $permissions_check) {
-  $flag->flag('unflag', $flag->get_content_id($entity), $flagging_user, $permissions_check);
+  $flag->flag('unflag', $flag->get_entity_id($entity), $flagging_user, $permissions_check);
 }
 
 /**
@@ -324,7 +324,7 @@ function flag_rules_action_fetch_users($flag, $entity) {
   $result = db_select('flagging', 'fc')
     ->fields('fc', array('uid'))
     ->condition('entity_type', $flag->entity_type)
-    ->condition('content_id', $flag->get_content_id($entity))
+    ->condition('entity_id', $flag->get_entity_id($entity))
     ->condition('fid', $flag->fid)
     ->execute();
   $uids = $result->fetchCol();
@@ -433,7 +433,7 @@ function flag_rules_condition_threshold_operator_options() {
  * Condition: Check flagging count.
  */
 function flag_rules_condition_threshold($flag, $entity, $number, $operator = '=') {
-  $count = $flag->get_count($flag->get_content_id($entity));
+  $count = $flag->get_count($flag->get_entity_id($entity));
 
   switch ($operator) {
     case '>' : return $count >  $number;
@@ -448,7 +448,7 @@ function flag_rules_condition_threshold($flag, $entity, $number, $operator = '='
  * Condition: Flag is flagged.
  */
 function flag_rules_condition_flagged($flag, $entity, $account) {
-  return $flag->is_flagged($flag->get_content_id($entity), $account->uid);
+  return $flag->is_flagged($flag->get_entity_id($entity), $account->uid);
 }
 
 /**

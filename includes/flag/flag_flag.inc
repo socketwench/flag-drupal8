@@ -473,7 +473,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function get_content_id($content) {
+  function get_entity_id($content) {
     return NULL;
   }
 
