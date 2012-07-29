@@ -1085,7 +1085,7 @@ function flag_build_javascript_info($flag, $content_id) {
     'newLink' => $flag->theme($flag->is_flagged($content_id) ? 'unflag' : 'flag', $content_id, TRUE),
     // Further information for the benefit of custom JavaScript event handlers:
     'contentId' => $content_id,
-    'contentType' => $flag->entity_type,
+    'entityType' => $flag->entity_type,
     'flagName' => $flag->name,
     'flagStatus' => $flag->is_flagged($content_id) ? 'flagged' : 'unflagged',
   );
