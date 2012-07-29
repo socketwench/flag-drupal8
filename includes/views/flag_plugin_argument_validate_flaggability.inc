@@ -212,7 +212,7 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
   function test_flagged($ids, $flag) {
     // view_break_phrase() is guaranteed to return only integers, so this is SQL safe.
     $flattened_ids = implode(',', $ids);
-    return $this->_test_by_sql("SELECT content_id FROM {flag_counts} WHERE fid = :fid AND content_id IN ($flattened_ids) AND count > 0", array(':fid' => $flag->fid));
+    return $this->_test_by_sql("SELECT entity_id FROM {flag_counts} WHERE fid = :fid AND entity_id IN ($flattened_ids) AND count > 0", array(':fid' => $flag->fid));
   }
 
   function test_flagged_by_current_user($ids, $flag) {
@@ -222,15 +222,15 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
       return array();
     }
     $flattened_ids = implode(',', $ids);
-    return $this->_test_by_sql("SELECT content_id FROM {flagging} WHERE fid = :fid AND content_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
+    return $this->_test_by_sql("SELECT entity_id FROM {flagging} WHERE fid = :fid AND entity_id IN ($flattened_ids) AND uid = :uid", array(':fid' => $flag->fid, ':uid' => $user->uid));
   }
 
-  // Helper: executes an SQL query and returns all the content_id's.
+  // Helper: executes an SQL query and returns all the entity_id's.
   function _test_by_sql($sql, $args) {
     $passed = array();
     $result = db_query($sql, $args);
     foreach ($result as $row) {
-      $passed[] = $row->content_id;
+      $passed[] = $row->entity_id;
     }
     return $passed;
   }

@@ -656,13 +656,13 @@ class flag_flag {
    * @return stdClass
    *   The returned object has at least the 'flag_name' property set, which
    *   enables Field API to figure out the bundle, but it's your responsibility
-   *   to eventually populate 'content_id' and 'fcid'.
+   *   to eventually populate 'entity_id' and 'fcid'.
    */
   function new_flagging($entity_id = NULL, $uid = NULL, $sid = NULL) {
     return (object) array(
       'fcid' => NULL,
       'flag_name' => $this->name,
-      'content_id' => $entity_id,
+      'entity_id' => $entity_id,
       'uid' => $uid,
       'sid' => $sid,
     );
@@ -738,7 +738,7 @@ class flag_flag {
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
-      ->condition('content_id', $entity_id)
+      ->condition('entity_id', $entity_id)
       ->execute()
       ->fetchField();
   }
@@ -759,7 +759,7 @@ class flag_flag {
       ->fields(array(
         'fid' => $this->fid,
         'entity_type' => $this->entity_type,
-        'content_id' => $entity_id,
+        'entity_id' => $entity_id,
         'uid' => $uid,
         'sid' => $sid,
         'timestamp' => REQUEST_TIME,
@@ -787,7 +787,7 @@ class flag_flag {
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
-      ->condition('content_id', $entity_id)
+      ->condition('entity_id', $entity_id)
       ->execute()
       ->fetchField();
     if ($fcid) {
@@ -811,7 +811,7 @@ class flag_flag {
     db_merge('flag_counts')
       ->key(array(
         'fid' => $this->fid,
-        'content_id' => $entity_id,
+        'entity_id' => $entity_id,
       ))
       ->fields(array(
         'entity_type' => $this->entity_type,
@@ -840,7 +840,7 @@ class flag_flag {
     // Done before the db_update() to prevent out-of-bounds errors on "count".
     db_delete('flag_counts')
       ->condition('fid', $this->fid)
-      ->condition('content_id', $entity_id)
+      ->condition('entity_id', $entity_id)
       ->condition('count', $number, '<=')
       ->execute();
 
@@ -851,7 +851,7 @@ class flag_flag {
         'last_updated' => REQUEST_TIME,
       ))
       ->condition('fid', $this->fid)
-      ->condition('content_id', $entity_id)
+      ->condition('entity_id', $entity_id)
       ->execute();
   }
 
@@ -988,7 +988,7 @@ class flag_flag {
     $flag_action = new stdClass();
     $flag_action->flag = $this->name;
     $flag_action->entity_type = $this->entity_type;
-    $flag_action->content_id = $entity_id;
+    $flag_action->entity_id = $entity_id;
     return $flag_action;
   }
 
@@ -1267,12 +1267,12 @@ class flag_flag {
       }
       if (!isset($js_added[$this->name . '_' . $entity_id])) {
         $js_added[$this->name . '_' . $entity_id] = TRUE;
-        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'content_id' => $entity_id, 'after_flagging' => $after_flagging));
+        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'entity_id' => $entity_id, 'after_flagging' => $after_flagging));
         drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $entity_id => $js_template))), 'setting');
       }
     }
 
-    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'content_id' => $entity_id, 'after_flagging' => $after_flagging));
+    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'entity_id' => $entity_id, 'after_flagging' => $after_flagging));
   }
 
   /**
