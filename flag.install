@@ -92,7 +92,7 @@ function _flag_flag_content_message() {
 function flag_schema() {
   $schema = array();
 
-  $schema['flags'] = array(
+  $schema['flag'] = array(
     'description' => 'All available flags in the system.',
     'fields' => array(
       'fid' => array(

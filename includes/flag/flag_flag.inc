@@ -1073,7 +1073,7 @@ class flag_flag {
    * Saves an existing flag to the database. Better use save().
    */
   function update() {
-    db_update('flags')->fields(array(
+    db_update('flag')->fields(array(
       'name' => $this->name,
       'title' => $this->title,
       'global' => $this->global,
@@ -1093,7 +1093,7 @@ class flag_flag {
    * Saves a new flag to the database. Better use save().
    */
   function insert() {
-    $this->fid = db_insert('flags')
+    $this->fid = db_insert('flag')
       ->fields(array(
         'content_type' => $this->content_type,
         'name' => $this->name,
@@ -1128,7 +1128,7 @@ class flag_flag {
    * Deletes a flag from the database.
    */
   function delete() {
-    db_delete('flags')->condition('fid', $this->fid)->execute();
+    db_delete('flag')->condition('fid', $this->fid)->execute();
     db_delete('flagging')->condition('fid', $this->fid)->execute();
     db_delete('flag_types')->condition('fid', $this->fid)->execute();
     db_delete('flag_counts')->condition('fid', $this->fid)->execute();
