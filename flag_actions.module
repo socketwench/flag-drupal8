@@ -86,7 +86,7 @@ function flag_actions_get_actions($flag_name = NULL, $reset = FALSE) {
   if (!isset($flag_actions) || $reset) {
     $flag_actions = array();
     $query = db_select('flag_actions', 'a');
-    $query->innerJoin('flags', 'f', 'a.fid = f.fid');
+    $query->innerJoin('flag', 'f', 'a.fid = f.fid');
     $query->addField('f', 'name', 'flag');
     $result = $query
       ->fields('a')
