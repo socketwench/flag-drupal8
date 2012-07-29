@@ -19,7 +19,7 @@ class flag_flag {
   var $fid = NULL;
 
   // The content-type this flag works with.
-  var $content_type = NULL;
+  var $entity_type = NULL;
 
   // The flag's "machine readable" name.
   var $name = '';
@@ -89,8 +89,8 @@ class flag_flag {
    * Another factory method. Returns a new, "empty" flag; e.g., one suitable for
    * the "Add new flag" page.
    */
-  static function factory_by_content_type($content_type) {
-    return flag_create_handler($content_type);
+  static function factory_by_content_type($entity_type) {
+    return flag_create_handler($entity_type);
   }
 
   /**

@@ -1662,7 +1662,7 @@ function _flag_link_type_fields() {
 /**
  * Get flag counts for all flags on a node.
  *
- * @param $content_type
+ * @param $entity_type
  *   The content type (usually 'node').
  * @param $content_id
  *   The content ID (usually the node ID).
@@ -1672,32 +1672,32 @@ function _flag_link_type_fields() {
  * @return $flags
  *   An array of the structure [name] => [number of flags].
  */
-function flag_get_counts($content_type, $content_id, $reset = FALSE) {
+function flag_get_counts($entity_type, $content_id, $reset = FALSE) {
   static $counts;
 
   if ($reset) {
     $counts = array();
-    if (!isset($content_type)) {
+    if (!isset($entity_type)) {
       return;
     }
   }
 
-  if (!isset($counts[$content_type][$content_id])) {
-    $counts[$content_type][$content_id] = array();
+  if (!isset($counts[$entity_type][$content_id])) {
+    $counts[$entity_type][$content_id] = array();
     $query = db_select('flag', 'f');
     $query->leftJoin('flag_counts', 'fc', 'f.fid = fc.fid');
     $result = $query
       ->fields('f', array('name'))
       ->fields('fc', array('count'))
-      ->condition('fc.content_type', $content_type)
+      ->condition('fc.content_type', $entity_type)
       ->condition('fc.content_id', $content_id)
       ->execute();
     foreach ($result as $row) {
-      $counts[$content_type][$content_id][$row->name] = $row->count;
+      $counts[$entity_type][$content_id][$row->name] = $row->count;
     }
   }
 
-  return $counts[$content_type][$content_id];
+  return $counts[$entity_type][$content_id];
 }
 
 /**
@@ -1757,7 +1757,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * If node type or account are entered, a list of all possible flags will be
  * returned.
  *
- * @param $content_type
+ * @param $entity_type
  *   Optional. The type of content for which to load the flags. Usually 'node'.
  * @param $content_subtype
  *   Optional. The node type for which to load the flags.
@@ -1770,7 +1770,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * @return $flags
  *   An array of the structure [fid] = flag_object.
  */
-function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account = NULL, $reset = FALSE) {
+function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL, $reset = FALSE) {
   static $flags;
 
   // Retrieve a list of all flags, regardless of the parameters.
@@ -1829,9 +1829,9 @@ function flag_get_flags($content_type = NULL, $content_subtype = NULL, $account 
   $filtered_flags = $flags;
 
   // Filter out flags based on type and subtype.
-  if (isset($content_type) || isset($content_subtype)) {
+  if (isset($entity_type) || isset($content_subtype)) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!_flag_content_enabled($flag, $content_type, $content_subtype)) {
+      if (!_flag_content_enabled($flag, $entity_type, $content_subtype)) {
         unset($filtered_flags[$name]);
       }
     }
@@ -1865,7 +1865,7 @@ function _flag_compare_weight($flag1, $flag2) {
  * Utility function: Checks whether a flag applies to a certain type, and
  * possibly subtype, of content.
  *
- * @param $content_type
+ * @param $entity_type
  *   The type of content being checked, usually "node".
  * @param $content_subtype
  *   The subtype (node type) being checked.
@@ -1873,8 +1873,8 @@ function _flag_compare_weight($flag1, $flag2) {
  * @return
  *   TRUE if the flag is enabled for this type and subtype.
  */
-function _flag_content_enabled($flag, $content_type, $content_subtype = NULL) {
-  $return = $flag->content_type == $content_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
+function _flag_content_enabled($flag, $entity_type, $content_subtype = NULL) {
+  $return = $flag->content_type == $entity_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
   return $return;
 }
 
@@ -1959,7 +1959,7 @@ function flag_get_content_id($fcid) {
 /**
  * Find what a user has flagged, either a single node or on the entire site.
  *
- * @param $content_type
+ * @param $entity_type
  *   The type of content that will be retrieved. Usually 'node'.
  * @param $content_id
  *   Optional. The content ID to check for flagging. If none given, all
@@ -1983,12 +1983,12 @@ function flag_get_content_id($fcid) {
  *   [flag_name] => [content_id] => Object from above.
  *
  */
-function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
+function flag_get_user_flags($entity_type, $content_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
   static $flagged_content;
 
   if ($reset) {
     $flagged_content = array();
-    if (!isset($content_type)) {
+    if (!isset($entity_type)) {
       return;
     }
   }
@@ -1997,12 +1997,12 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
 
   if (isset($content_id)) {
-    if (!isset($flagged_content[$uid][$sid][$content_type][$content_id])) {
+    if (!isset($flagged_content[$uid][$sid][$entity_type][$content_id])) {
       $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid][$content_type][$content_id] = array();
+      $flagged_content[$uid][$sid][$entity_type][$content_id] = array();
       $result = db_select('flagging', 'fc')
         ->fields('fc')
-        ->condition('content_type', $content_type)
+        ->condition('content_type', $entity_type)
         ->condition('content_id', $content_id)
         ->condition(db_or()
           ->condition('uid', $uid)
@@ -2012,19 +2012,19 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
         ->execute();
 
       foreach ($result as $flag_content) {
-        $flagged_content[$uid][$sid][$content_type][$content_id][$flag_names[$flag_content->fid]] = $flag_content;
+        $flagged_content[$uid][$sid][$entity_type][$content_id][$flag_names[$flag_content->fid]] = $flag_content;
       }
     }
-    return $flagged_content[$uid][$sid][$content_type][$content_id];
+    return $flagged_content[$uid][$sid][$entity_type][$content_id];
   }
 
   else {
-    if (!isset($flagged_content[$uid][$sid][$content_type]['all'])) {
+    if (!isset($flagged_content[$uid][$sid][$entity_type]['all'])) {
       $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid][$content_type]['all'] = array();
+      $flagged_content[$uid][$sid][$entity_type]['all'] = array();
       $result = db_select('flagging', 'fc')
         ->fields('fc')
-        ->condition('content_type', $content_type)
+        ->condition('content_type', $entity_type)
         ->condition(db_or()
           ->condition('uid', $uid)
           ->condition('uid', 0)
@@ -2032,10 +2032,10 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
         ->condition('sid', $sid)
         ->execute();
       foreach ($result as $flag_content) {
-        $flagged_content[$uid][$sid][$content_type]['all'][$flag_names[$flag_content->fid]][$flag_content->content_id] = $flag_content;
+        $flagged_content[$uid][$sid][$entity_type]['all'][$flag_names[$flag_content->fid]][$flag_content->content_id] = $flag_content;
       }
     }
-    return $flagged_content[$uid][$sid][$content_type]['all'];
+    return $flagged_content[$uid][$sid][$entity_type]['all'];
   }
 
 }
@@ -2043,7 +2043,7 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
 /**
  * Return a list of users who have flagged a piece of content.
  *
- * @param $content_type
+ * @param $entity_type
  *   The type of content that will be retrieved. Usually 'node'.
  * @param $content_id
  *   The content ID to check for flagging.
@@ -2056,26 +2056,26 @@ function flag_get_user_flags($content_type, $content_id = NULL, $uid = NULL, $si
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
  */
-function flag_get_content_flags($content_type, $content_id, $flag_name = NULL) {
+function flag_get_content_flags($entity_type, $content_id, $flag_name = NULL) {
   $content_flags = &drupal_static(__FUNCTION__, array());
 
-  if (!isset($content_flags[$content_type][$content_id])) {
+  if (!isset($content_flags[$entity_type][$content_id])) {
     $flag_names = _flag_get_flag_names();
     $result = db_select('flagging', 'fc')
       ->fields('fc')
-      ->condition('content_type', $content_type)
+      ->condition('content_type', $entity_type)
       ->condition('content_id', $content_id)
       ->orderBy('timestamp', 'DESC')
       ->execute();
     foreach ($result as $flag_content) {
       // Build a list of flaggings for all flags by user.
-      $content_flags[$content_type][$content_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
+      $content_flags[$entity_type][$content_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
       // Build a list of flaggings for each individual flag.
-      $content_flags[$content_type][$content_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
+      $content_flags[$entity_type][$content_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
     }
   }
 
-  return isset($flag_name) ? $content_flags[$content_type][$content_id]['flags'][$flag_name] : $content_flags[$content_type][$content_id]['users'];
+  return isset($flag_name) ? $content_flags[$entity_type][$content_id]['flags'][$flag_name] : $content_flags[$entity_type][$content_id]['users'];
 }
 
 /**
