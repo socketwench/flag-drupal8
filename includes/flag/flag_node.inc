@@ -102,19 +102,19 @@ class flag_node extends flag_entity {
   /**
    * Adjust the Content ID to find the translation parent if i18n-enabled.
    *
-   * @param $content_id
+   * @param $entity_id
    *   The nid for the content.
    * @return
    *   The tnid if available, the nid otherwise.
    */
-  function get_translation_id($content_id) {
+  function get_translation_id($entity_id) {
     if ($this->i18n) {
-      $node = $this->fetch_content($content_id);
+      $node = $this->fetch_content($entity_id);
       if (!empty($node->tnid)) {
-        $content_id = $node->tnid;
+        $entity_id = $node->tnid;
       }
     }
-    return $content_id;
+    return $entity_id;
   }
 
   function uses_hook_link($teaser) {
@@ -124,32 +124,32 @@ class flag_node extends flag_entity {
     return FALSE;
   }
 
-  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
-    $content_id = $this->get_translation_id($content_id);
-    return parent::flag($action, $content_id, $account, $skip_permission_check, $flagging);
+  function flag($action, $entity_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
+    $entity_id = $this->get_translation_id($entity_id);
+    return parent::flag($action, $entity_id, $account, $skip_permission_check, $flagging);
   }
 
   // Instead of overriding is_flagged() we override get_flagging_record(),
   // which is the underlying method.
-  function get_flagging_record($content_id, $uid = NULL, $sid = NULL) {
-    $content_id = $this->get_translation_id($content_id);
-    return parent::get_flagging_record($content_id, $uid, $sid);
+  function get_flagging_record($entity_id, $uid = NULL, $sid = NULL) {
+    $entity_id = $this->get_translation_id($entity_id);
+    return parent::get_flagging_record($entity_id, $uid, $sid);
   }
 
-  function replace_tokens($label, $contexts, $options, $content_id) {
-    if (is_numeric($content_id) && ($node = $this->fetch_content($content_id))) {
+  function replace_tokens($label, $contexts, $options, $entity_id) {
+    if (is_numeric($entity_id) && ($node = $this->fetch_content($entity_id))) {
       $contexts['node'] = $node;
     }
-    // Nodes accept the node-type as a $content_id in the case that a new node
+    // Nodes accept the node-type as a $entity_id in the case that a new node
     // is being created and a full node object does not yet exist.
-    elseif (!empty($content_id) && ($type = node_type_get_type($content_id))) {
-      $content_id = NULL;
+    elseif (!empty($entity_id) && ($type = node_type_get_type($entity_id))) {
+      $entity_id = NULL;
       $contexts['node'] = (object) array(
         'nid' => NULL,
         'type' => $type->type,
         'title' => '',
       );
     }
-    return parent::replace_tokens($label, $contexts, $options, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $entity_id);
   }
 }

@@ -242,16 +242,16 @@ class flag_flag {
   /**
    * Fetches, possibly from some cache, a content object this flag works with.
    */
-  function fetch_content($content_id, $object_to_remember = NULL) {
+  function fetch_content($entity_id, $object_to_remember = NULL) {
     static $cache = array();
     if (isset($object_to_remember)) {
-      $cache[$content_id] = $object_to_remember;
+      $cache[$entity_id] = $object_to_remember;
     }
-    if (!array_key_exists($content_id, $cache)) {
-      $content = $this->_load_content($content_id);
-      $cache[$content_id] = $content ? $content : NULL;
+    if (!array_key_exists($entity_id, $cache)) {
+      $content = $this->_load_content($entity_id);
+      $cache[$entity_id] = $content ? $content : NULL;
     }
-    return $cache[$content_id];
+    return $cache[$entity_id];
   }
 
   /**
@@ -262,7 +262,7 @@ class flag_flag {
    * @private
    * @static
    */
-  function _load_content($content_id) {
+  function _load_content($entity_id) {
     return NULL;
   }
 
@@ -274,8 +274,8 @@ class flag_flag {
    * database (by calling _load_content()), whereas sometimes we want to fetch
    * an object that hasn't yet been saved to the database. See flag_nodeapi().
    */
-  function remember_content($content_id, $object) {
-    $this->fetch_content($content_id, $object);
+  function remember_content($entity_id, $object) {
+    $this->fetch_content($entity_id, $object);
   }
 
   /**
@@ -301,8 +301,8 @@ class flag_flag {
    * applies_to_content_object(). If you already have the object, don't call
    * this function: call applies_to_content_object() directly.
    */
-  function applies_to_content_id($content_id) {
-    return $this->applies_to_content_object($this->fetch_content($content_id));
+  function applies_to_content_id($entity_id) {
+    return $this->applies_to_content_object($this->fetch_content($entity_id));
   }
 
   /**
@@ -337,7 +337,7 @@ class flag_flag {
    * This method typically should not be overridden by child classes. Instead
    * they should implement type_access(), which is called by this method.
    *
-   * @param $content_id
+   * @param $entity_id
    *   The content ID to flag/unflag.
    * @param $action
    *   The action to test. Either 'flag' or 'unflag'. Leave NULL to determine
@@ -350,12 +350,12 @@ class flag_flag {
    *   Boolean TRUE if the user is allowed to flag/unflag the given content.
    *   FALSE otherwise.
    */
-  function access($content_id, $action = NULL, $account = NULL) {
+  function access($entity_id, $action = NULL, $account = NULL) {
     if (!isset($account)) {
       $account = $GLOBALS['user'];
     }
 
-    if (isset($content_id) && !$this->applies_to_content_id($content_id)) {
+    if (isset($entity_id) && !$this->applies_to_content_id($entity_id)) {
       // Flag does not apply to this content.
       return FALSE;
     }
@@ -363,20 +363,20 @@ class flag_flag {
     if (!isset($action)) {
       $uid = $account->uid;
       $sid = flag_get_sid($uid);
-      $action = $this->is_flagged($content_id, $uid, $sid) ? 'unflag' : 'flag';
+      $action = $this->is_flagged($entity_id, $uid, $sid) ? 'unflag' : 'flag';
     }
 
     // Base initial access on the user's basic permission to use this flag.
     $access = $this->user_access($action, $account);
 
     // Check for additional access rules provided by sub-classes.
-    $child_access = $this->type_access($content_id, $action, $account);
+    $child_access = $this->type_access($entity_id, $action, $account);
     if (isset($child_access)) {
       $access = $child_access;
     }
 
     // Allow modules to disallow (or allow) access to flagging.
-    $access_array = module_invoke_all('flag_access', $this, $content_id, $action, $account);
+    $access_array = module_invoke_all('flag_access', $this, $entity_id, $action, $account);
 
     foreach ($access_array as $set_access) {
       if (isset($set_access)) {
@@ -418,16 +418,16 @@ class flag_flag {
     $access = array();
 
     // First check basic user access for this action.
-    foreach ($content_ids as $content_id => $action) {
-      $access[$content_id] = $this->user_access($content_ids[$content_id], $account);
+    foreach ($content_ids as $entity_id => $action) {
+      $access[$entity_id] = $this->user_access($content_ids[$entity_id], $account);
     }
 
     // Check for additional access rules provided by sub-classes.
     $child_access = $this->type_access_multiple($content_ids, $account);
     if (isset($child_access)) {
-      foreach ($child_access as $content_id => $content_access) {
+      foreach ($child_access as $entity_id => $content_access) {
         if (isset($content_access)) {
-          $access[$content_id] = $content_access;
+          $access[$entity_id] = $content_access;
         }
       }
     }
@@ -435,9 +435,9 @@ class flag_flag {
     // Merge in module-defined access.
     foreach (module_implements('flag_access_multiple') as $module) {
       $module_access = module_invoke($module, 'flag_access_multiple', $this, $content_ids, $account);
-      foreach ($module_access as $content_id => $content_access) {
+      foreach ($module_access as $entity_id => $content_access) {
         if (isset($content_access)) {
-          $access[$content_id] = $content_access;
+          $access[$entity_id] = $content_access;
         }
       }
     }
@@ -450,7 +450,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function type_access($content_id, $action, $account) {
+  function type_access($entity_id, $action, $account) {
     return NULL;
   }
 
@@ -498,7 +498,7 @@ class flag_flag {
    *
    * @param $action
    *   Either 'flag' or 'unflag'.
-   * @param $content_id
+   * @param $entity_id
    *   The ID of the item to flag or unflag.
    * @param $account
    *   The user on whose behalf to flag. Leave empty for the current user.
@@ -512,7 +512,7 @@ class flag_flag {
    *   FALSE if some error occured (e.g., user has no permission, flag isn't
    *   applicable to the item, etc.), TRUE otherwise.
    */
-  function flag($action, $content_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
+  function flag($action, $entity_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
      // Get the user.
     if (!isset($account)) {
       $account = $GLOBALS['user'];
@@ -523,7 +523,7 @@ class flag_flag {
 
     // Check access and applicability.
     if (!$skip_permission_check) {
-      if (!$this->access($content_id, $action, $account)) {
+      if (!$this->access($entity_id, $action, $account)) {
         // User has no permission to flag/unflag this object.
         return FALSE;
       }
@@ -531,7 +531,7 @@ class flag_flag {
     else {
       // We are skipping permission checks. However, at a minimum we must make
       // sure the flag applies to this content type:
-      if (!$this->applies_to_content_id($content_id)) {
+      if (!$this->applies_to_content_id($entity_id)) {
         return FALSE;
       }
     }
@@ -570,35 +570,35 @@ class flag_flag {
     // @todo: Discuss: Core wraps everything in a try { }, should we?
 
     // Perform the flagging or unflagging of this flag.
-    $existing_fcid = $this->_is_flagged($content_id, $uid, $sid);
+    $existing_fcid = $this->_is_flagged($entity_id, $uid, $sid);
     $flagged = (bool) $existing_fcid;
     if ($action == 'unflag') {
       if ($this->uses_anonymous_cookies()) {
-        $this->_unflag_anonymous($content_id);
+        $this->_unflag_anonymous($entity_id);
       }
       if ($flagged) {
         // Note the order: We delete the entity before calling _unflag() to
         // delete the {flagging} record.
         $this->_delete_flagging($existing_fcid);
-        $this->_unflag($content_id, $uid, $sid);
-        module_invoke_all('flag', 'unflag', $this, $content_id, $account, $existing_fcid);
+        $this->_unflag($entity_id, $uid, $sid);
+        module_invoke_all('flag', 'unflag', $this, $entity_id, $account, $existing_fcid);
       }
     }
     elseif ($action == 'flag') {
       if ($this->uses_anonymous_cookies()) {
-        $this->_flag_anonymous($content_id);
+        $this->_flag_anonymous($entity_id);
       }
       if (!$flagged) {
         if (!isset($flagging)) {
           // Construct a new flagging object if we don't have one.
-          $flagging = $this->new_flagging($content_id, $uid, $sid);
+          $flagging = $this->new_flagging($entity_id, $uid, $sid);
         }
-        $fcid = $this->_flag($content_id, $uid, $sid);
+        $fcid = $this->_flag($entity_id, $uid, $sid);
         // We're writing out a flagging entity even when we aren't passed one
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
-        $this->_insert_flagging($flagging, $content_id, $fcid);
-        module_invoke_all('flag', 'flag', $this, $content_id, $account, $fcid);
+        $this->_insert_flagging($flagging, $entity_id, $fcid);
+        module_invoke_all('flag', 'flag', $this, $entity_id, $account, $fcid);
       }
       else {
         // Nothing to do. Item is already flagged.
@@ -623,7 +623,7 @@ class flag_flag {
    * operation is also accompanied by some bookkeeping (calling hooks, updating
    * counters) or access control. These tasks are handled by the flag() method.
    */
-  private function _insert_flagging($flagging, $content_id, $fcid) {
+  private function _insert_flagging($flagging, $entity_id, $fcid) {
     $flagging->fcid = $fcid;
     field_attach_presave('flagging', $flagging);
     field_attach_insert('flagging', $flagging);
@@ -645,7 +645,7 @@ class flag_flag {
   /**
    * Construct a new, empty flagging entity object.
    *
-   * @param mixed $content_id
+   * @param mixed $entity_id
    *   The unique identifier of the content being flagged.
    * @param int $uid
    *   Optional. The user id of the user doing the flagging.
@@ -658,11 +658,11 @@ class flag_flag {
    *   enables Field API to figure out the bundle, but it's your responsibility
    *   to eventually populate 'content_id' and 'fcid'.
    */
-  function new_flagging($content_id = NULL, $uid = NULL, $sid = NULL) {
+  function new_flagging($entity_id = NULL, $uid = NULL, $sid = NULL) {
     return (object) array(
       'fcid' => NULL,
       'flag_name' => $this->name,
-      'content_id' => $content_id,
+      'content_id' => $entity_id,
       'uid' => $uid,
       'sid' => $sid,
     );
@@ -681,8 +681,8 @@ class flag_flag {
    * @return
    *   TRUE if the content is flagged, FALSE otherwise.
    */
-  function is_flagged($content_id, $uid = NULL, $sid = NULL) {
-    return (bool) $this->get_flagging_record($content_id, $uid, $sid);
+  function is_flagged($entity_id, $uid = NULL, $sid = NULL) {
+    return (bool) $this->get_flagging_record($entity_id, $uid, $sid);
   }
 
   /**
@@ -698,20 +698,20 @@ class flag_flag {
    *
    * Parameters are the same as is_flagged()'s.
    */
-  function get_flagging_record($content_id, $uid = NULL, $sid = NULL) {
+  function get_flagging_record($entity_id, $uid = NULL, $sid = NULL) {
     $uid = $this->global ? 0 : (!isset($uid) ? $GLOBALS['user']->uid : $uid);
     $sid = $this->global ? 0 : (!isset($sid) ? flag_get_sid($uid) : $sid);
 
     // flag_get_user_flags() does caching.
-    $user_flags = flag_get_user_flags($this->entity_type, $content_id, $uid, $sid);
+    $user_flags = flag_get_user_flags($this->entity_type, $entity_id, $uid, $sid);
     return isset($user_flags[$this->name]) ? $user_flags[$this->name] : NULL;
   }
 
   /**
    * Similar to is_flagged() excepts it returns the flagging entity.
    */
-  function get_flagging($content_id, $uid = NULL, $sid = NULL) {
-    if (($record = $this->get_flagging_record($content_id, $uid, $sid))) {
+  function get_flagging($entity_id, $uid = NULL, $sid = NULL) {
+    if (($record = $this->get_flagging_record($entity_id, $uid, $sid))) {
       return flagging_load($record->fcid);
     }
   }
@@ -732,13 +732,13 @@ class flag_flag {
    *
    * @private
    */
-  function _is_flagged($content_id, $uid, $sid) {
+  function _is_flagged($entity_id, $uid, $sid) {
     return db_select('flagging', 'fc')
       ->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
-      ->condition('content_id', $content_id)
+      ->condition('content_id', $entity_id)
       ->execute()
       ->fetchField();
   }
@@ -754,18 +754,18 @@ class flag_flag {
    *
    * @private
    */
-  function _flag($content_id, $uid, $sid) {
+  function _flag($entity_id, $uid, $sid) {
     $fcid = db_insert('flagging')
       ->fields(array(
         'fid' => $this->fid,
         'entity_type' => $this->entity_type,
-        'content_id' => $content_id,
+        'content_id' => $entity_id,
         'uid' => $uid,
         'sid' => $sid,
         'timestamp' => REQUEST_TIME,
       ))
       ->execute();
-    $this->_increase_count($content_id);
+    $this->_increase_count($entity_id);
     return $fcid;
   }
 
@@ -781,18 +781,18 @@ class flag_flag {
    *
    * @private
    */
-  function _unflag($content_id, $uid, $sid) {
+  function _unflag($entity_id, $uid, $sid) {
     $fcid = db_select('flagging', 'fc')
       ->fields('fc', array('fcid'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
-      ->condition('content_id', $content_id)
+      ->condition('content_id', $entity_id)
       ->execute()
       ->fetchField();
     if ($fcid) {
       db_delete('flagging')->condition('fcid', $fcid)->execute();
-      $this->_decrease_count($content_id);
+      $this->_decrease_count($entity_id);
     }
     return $fcid;
   }
@@ -800,18 +800,18 @@ class flag_flag {
   /**
    * Increases the flag count for a piece of content.
    *
-   * @param $content_id
+   * @param $entity_id
    *   For which item should the count be increased.
    * @param $number
    *   The amount of counts to increasing. Defaults to 1.
    *
    * @private
   */
-  function _increase_count($content_id, $number = 1) {
+  function _increase_count($entity_id, $number = 1) {
     db_merge('flag_counts')
       ->key(array(
         'fid' => $this->fid,
-        'content_id' => $content_id,
+        'content_id' => $entity_id,
       ))
       ->fields(array(
         'entity_type' => $this->entity_type,
@@ -828,19 +828,19 @@ class flag_flag {
   /**
    * Decreases the flag count for a piece of content.
    *
-   * @param $content_id
+   * @param $entity_id
    *   For which item should the count be descreased.
    * @param $number
    *   The amount of counts to decrease. Defaults to 1.
    *
    * @private
   */
-  function _decrease_count($content_id, $number = 1) {
+  function _decrease_count($entity_id, $number = 1) {
     // Delete rows with count 0, for data consistency and space-saving.
     // Done before the db_update() to prevent out-of-bounds errors on "count".
     db_delete('flag_counts')
       ->condition('fid', $this->fid)
-      ->condition('content_id', $content_id)
+      ->condition('content_id', $entity_id)
       ->condition('count', $number, '<=')
       ->execute();
 
@@ -851,7 +851,7 @@ class flag_flag {
         'last_updated' => REQUEST_TIME,
       ))
       ->condition('fid', $this->fid)
-      ->condition('content_id', $content_id)
+      ->condition('content_id', $entity_id)
       ->execute();
   }
 
@@ -860,9 +860,9 @@ class flag_flag {
    *
    * @private
    */
-  function _flag_anonymous($content_id) {
+  function _flag_anonymous($entity_id) {
     $storage = FlagCookieStorage::factory($this);
-    $storage->flag($content_id);
+    $storage->flag($entity_id);
   }
 
   /**
@@ -870,9 +870,9 @@ class flag_flag {
    *
    * @private
    */
-  function _unflag_anonymous($content_id) {
+  function _unflag_anonymous($entity_id) {
     $storage = FlagCookieStorage::factory($this);
-    $storage->unflag($content_id);
+    $storage->unflag($entity_id);
   }
 
   /**
@@ -881,8 +881,8 @@ class flag_flag {
    * Thanks to using a cache, inquiring several different flags about the same
    * item results in only one SQL query.
    */
-  function get_count($content_id) {
-    $counts = flag_get_counts($this->entity_type, $content_id);
+  function get_count($entity_id) {
+    $counts = flag_get_counts($this->entity_type, $entity_id);
     return isset($counts[$this->name]) ? $counts[$this->name] : 0;
   }
 
@@ -910,19 +910,19 @@ class flag_flag {
    *
    * @param $label
    *   The label to get, e.g. 'title', 'flag_short', 'unflag_short', etc.
-   * @param $content_id
+   * @param $entity_id
    *   The ID in whose context to interpret tokens. If not given, only global
    *   tokens will be substituted.
    * @return
    *   The processed label.
    */
-  function get_label($label, $content_id = NULL) {
+  function get_label($label, $entity_id = NULL) {
     if (!isset($this->$label)) {
       return;
     }
     $label = t($this->$label);
     if (strpos($label, '[') !== FALSE) {
-      $label = $this->replace_tokens($label, array(), array('sanitize' => FALSE), $content_id);
+      $label = $this->replace_tokens($label, array(), array('sanitize' => FALSE), $entity_id);
     }
     return filter_xss_admin($label);
   }
@@ -940,9 +940,9 @@ class flag_flag {
    * by default, so derived classes should override this method to add all
    * token contexts they understand.
    */
-  function replace_tokens($label, $contexts, $options, $content_id) {
+  function replace_tokens($label, $contexts, $options, $entity_id) {
     if (strpos($label , 'flagging:') !== FALSE) {
-      if (($flagging = $this->get_flagging($content_id))) {
+      if (($flagging = $this->get_flagging($entity_id))) {
         $contexts['flagging'] = $flagging;
       }
     }
@@ -965,14 +965,14 @@ class flag_flag {
    *
    * `$flag->get_title()` is shorthand for `$flag->get_label('title')`.
    */
-  function get_title($content_id = NULL, $reset = FALSE) {
+  function get_title($entity_id = NULL, $reset = FALSE) {
     static $titles = array();
     if ($reset) {
       $titles = array();
     }
-    $slot = intval($content_id); // Convert NULL to 0.
+    $slot = intval($entity_id); // Convert NULL to 0.
     if (!isset($titles[$this->fid][$slot])) {
-      $titles[$this->fid][$slot] = $this->get_label('title', $content_id);
+      $titles[$this->fid][$slot] = $this->get_label('title', $entity_id);
     }
     return $titles[$this->fid][$slot];
   }
@@ -984,11 +984,11 @@ class flag_flag {
    * Derived classes should populate the 'content_title' and 'content_url'
    * slots.
    */
-  function get_flag_action($content_id) {
+  function get_flag_action($entity_id) {
     $flag_action = new stdClass();
     $flag_action->flag = $this->name;
     $flag_action->entity_type = $this->entity_type;
-    $flag_action->content_id = $content_id;
+    $flag_action->content_id = $entity_id;
     return $flag_action;
   }
 
@@ -1024,7 +1024,7 @@ class flag_flag {
    *
    * @abstract
    */
-  function get_relevant_action_objects($content_id) {
+  function get_relevant_action_objects($entity_id) {
     return array();
   }
 
@@ -1240,7 +1240,7 @@ class flag_flag {
    *
    * For parameters docmentation, see theme_flag().
    */
-  function theme($action, $content_id, $after_flagging = FALSE) {
+  function theme($action, $entity_id, $after_flagging = FALSE) {
     static $js_added = array();
     global $user;
 
@@ -1265,14 +1265,14 @@ class flag_flag {
         $js_action = 'unflag';
         $action = 'flag';
       }
-      if (!isset($js_added[$this->name . '_' . $content_id])) {
-        $js_added[$this->name . '_' . $content_id] = TRUE;
-        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'content_id' => $content_id, 'after_flagging' => $after_flagging));
-        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $content_id => $js_template))), 'setting');
+      if (!isset($js_added[$this->name . '_' . $entity_id])) {
+        $js_added[$this->name . '_' . $entity_id] = TRUE;
+        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'content_id' => $entity_id, 'after_flagging' => $after_flagging));
+        drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $entity_id => $js_template))), 'setting');
       }
     }
 
-    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'content_id' => $content_id, 'after_flagging' => $after_flagging));
+    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'content_id' => $entity_id, 'after_flagging' => $after_flagging));
   }
 
   /**

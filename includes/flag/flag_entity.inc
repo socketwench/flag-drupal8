@@ -62,9 +62,9 @@ class flag_entity extends flag_flag {
   /**
    * Loads the entity object.
    */
-  function _load_content($content_id) {
-    if (is_numeric($content_id)) {
-      $entity = entity_load($this->entity_type, array($content_id));
+  function _load_content($entity_id) {
+    if (is_numeric($entity_id)) {
+      $entity = entity_load($this->entity_type, array($entity_id));
       return reset($entity);
     }
     return NULL;
@@ -113,19 +113,19 @@ class flag_entity extends flag_flag {
   /**
    * Replaces tokens.
    */
-  function replace_tokens($label, $contexts, $options, $content_id) {
-    if ($content_id && ($entity = $this->fetch_content($content_id))) {
+  function replace_tokens($label, $contexts, $options, $entity_id) {
+    if ($entity_id && ($entity = $this->fetch_content($entity_id))) {
       $contexts[$this->entity_type] = $entity;
     }
-    return parent::replace_tokens($label, $contexts, $options, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $entity_id);
   }
 
   /**
    * Returns a 'flag action' object.
    */
-  function get_flag_action($content_id) {
-    $flag_action = parent::get_flag_action($content_id);
-    $entity = $this->fetch_content($content_id);
+  function get_flag_action($entity_id) {
+    $flag_action = parent::get_flag_action($entity_id);
+    $entity = $this->fetch_content($entity_id);
     $flag_action->content_title = entity_label($this->entity_type, $entity);
     $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_content_id($entity));
     return $flag_action;
@@ -134,9 +134,9 @@ class flag_entity extends flag_flag {
   /**
    * Returns objects the action may possible need.
    */
-  function get_relevant_action_objects($content_id) {
+  function get_relevant_action_objects($entity_id) {
     return array(
-      $this->entity_type => $this->fetch_content($content_id),
+      $this->entity_type => $this->fetch_content($entity_id),
     );
   }
 
