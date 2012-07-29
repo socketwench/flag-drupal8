@@ -6,7 +6,7 @@
  * Defines the flag types this module implements.
  *
  * @return
- *   An "array of arrays", keyed by content-types. The 'handler' slot
+ *   An "array of arrays", keyed by object type. The 'handler' slot
  *   should point to the PHP class implementing this flag.
  */
 function flag_flag_definitions() {

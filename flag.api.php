@@ -16,8 +16,8 @@
  * @return
  *  An array whose keys are flag type names and whose values are properties of
  *  the flag type.
- *  Flag type names must match the content type (in the rest of Drupal: entity
- *  type) a flag type works with.
+ *  When a flag type is for an entity, the flag type name must match the entity
+ *  type.
  *  Properties for flag types are as follows:
  *  - 'title': The main label of the flag type.
  *  - 'description': A longer description shown in the UI when creating a new
@@ -89,7 +89,7 @@ function hook_flag_options_alter(&$options, $flag) {
  * @param $flag
  *  The flag object.
  * @param $entity_id
- *  The id of the content (aka entity) the flag is on.
+ *  The id of the entity the flag is on.
  * @param $account
  *  The user account performing the action.
  * @param $fcid
@@ -112,7 +112,7 @@ function hook_flag($op, $flag, $entity_id, $account, $fcid) {
  *  The user on whose behalf to test the flagging action.
  *
  * @return
- *   Boolean TRUE if the user is allowed to flag/unflag the given content.
+ *   Boolean TRUE if the user is allowed to flag/unflag the given entity.
  *   FALSE otherwise.
  *
  * @see flag_flag:access()
