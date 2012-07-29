@@ -242,7 +242,7 @@ class flag_flag {
   /**
    * Fetches, possibly from some cache, an entity this flag works with.
    */
-  function fetch_content($entity_id, $object_to_remember = NULL) {
+  function fetch_entity($entity_id, $object_to_remember = NULL) {
     static $cache = array();
     if (isset($object_to_remember)) {
       $cache[$entity_id] = $object_to_remember;
@@ -267,15 +267,15 @@ class flag_flag {
   }
 
   /**
-   * Stores some object in fetch_content()'s cache, so subsequenet calls to
-   * fetch_content() return it.
+   * Stores some object in fetch_entity()'s cache, so subsequenet calls to
+   * fetch_entity() return it.
    *
    * This is needed because otherwise fetch_object() loads the object from the
    * database (by calling _load_content()), whereas sometimes we want to fetch
    * an object that hasn't yet been saved to the database. See flag_nodeapi().
    */
   function remember_content($entity_id, $object) {
-    $this->fetch_content($entity_id, $object);
+    $this->fetch_entity($entity_id, $object);
   }
 
   /**
@@ -302,7 +302,7 @@ class flag_flag {
    * this function: call applies_to_content_object() directly.
    */
   function applies_to_entity_id($entity_id) {
-    return $this->applies_to_content_object($this->fetch_content($entity_id));
+    return $this->applies_to_content_object($this->fetch_entity($entity_id));
   }
 
   /**

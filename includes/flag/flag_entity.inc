@@ -114,7 +114,7 @@ class flag_entity extends flag_flag {
    * Replaces tokens.
    */
   function replace_tokens($label, $contexts, $options, $entity_id) {
-    if ($entity_id && ($entity = $this->fetch_content($entity_id))) {
+    if ($entity_id && ($entity = $this->fetch_entity($entity_id))) {
       $contexts[$this->entity_type] = $entity;
     }
     return parent::replace_tokens($label, $contexts, $options, $entity_id);
@@ -125,7 +125,7 @@ class flag_entity extends flag_flag {
    */
   function get_flag_action($entity_id) {
     $flag_action = parent::get_flag_action($entity_id);
-    $entity = $this->fetch_content($entity_id);
+    $entity = $this->fetch_entity($entity_id);
     $flag_action->content_title = entity_label($this->entity_type, $entity);
     $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_entity_id($entity));
     return $flag_action;
@@ -136,7 +136,7 @@ class flag_entity extends flag_flag {
    */
   function get_relevant_action_objects($entity_id) {
     return array(
-      $this->entity_type => $this->fetch_content($entity_id),
+      $this->entity_type => $this->fetch_entity($entity_id),
     );
   }
 

@@ -1197,7 +1197,7 @@ function flag_flag($action, $flag, $entity_id, $account) {
     // We add to the $context all the objects we know about:
     $context = array_merge($flag->get_relevant_action_objects($entity_id), $context);
     // The primary object the actions work on.
-    $object = $flag->fetch_content($entity_id);
+    $object = $flag->fetch_entity($entity_id);
 
     // Generic "all flags" actions.
     foreach (trigger_get_assigned_actions('flag_' . $action)  as $aid => $action_info) {
@@ -1259,7 +1259,7 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
   if ($flag->entity_type == 'comment') {
     // For non-existent comments (such as on the comment add form), assume that
     // the current user is creating the content.
-    if (empty($entity_id) || !($comment = $flag->fetch_content($entity_id))) {
+    if (empty($entity_id) || !($comment = $flag->fetch_entity($entity_id))) {
       return $flag->access_author == 'comment_others' ? FALSE : NULL;
     }
 
