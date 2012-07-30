@@ -1822,7 +1822,7 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
   // Filter out flags based on type and subtype.
   if (isset($entity_type) || isset($content_subtype)) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!_flag_content_enabled($flag, $entity_type, $content_subtype)) {
+      if (!_flag_entity_enabled($flag, $entity_type, $content_subtype)) {
         unset($filtered_flags[$name]);
       }
     }
@@ -1864,7 +1864,7 @@ function _flag_compare_weight($flag1, $flag2) {
  * @return
  *   TRUE if the flag is enabled for this type and subtype.
  */
-function _flag_content_enabled($flag, $entity_type, $content_subtype = NULL) {
+function _flag_entity_enabled($flag, $entity_type, $content_subtype = NULL) {
   $return = $flag->entity_type == $entity_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
   return $return;
 }
