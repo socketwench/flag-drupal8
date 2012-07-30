@@ -327,7 +327,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
   }
   global $user;
 
-  // Get all possible flags for this content-type.
+  // Get all possible flags for this entity type.
   $flags = flag_get_flags($type);
 
   foreach ($flags as $flag) {
@@ -339,7 +339,7 @@ function flag_link($type, $object = NULL, $teaser = FALSE) {
     }
     if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
       // User has no permission to use this flag or flag does not apply to this
-      // content. The link is not skipped if the user has "flag" access but
+      // entity. The link is not skipped if the user has "flag" access but
       // not "unflag" access (this way the unflag denied message is shown).
       continue;
     }
@@ -480,7 +480,7 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
     $id = NULL;
   }
 
-  // Get all possible flags for this content-type.
+  // Get all possible flags for this entity type.
   $flags = flag_get_flags($entity_type);
 
   // Filter out flags which need to be included on the node form.
@@ -671,7 +671,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
   if (isset($element['#element']['#node']->nid)) {
     $node = $element['#element']['#node'];
 
-    // Get all possible flags for this content-type.
+    // Get all possible flags for this entity type.
     $flags = flag_get_flags('node');
 
     foreach ($flags as $name => $flag) {
@@ -682,7 +682,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
       $entity_id = $flag->get_entity_id($node);
       if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
         // User has no permission to use this flag or flag does not apply to this
-        // content. The link is not skipped if the user has "flag" access but
+        // object. The link is not skipped if the user has "flag" access but
         // not "unflag" access (this way the unflag denied message is shown).
         continue;
       }
@@ -847,7 +847,7 @@ function flag_user_login(&$edit, &$account) {
     // Convert anonymous flaggings to their authenticated account.
     foreach ($flaggings as $fcid => $flagging) {
       // Each update is wrapped in a try block to prevent unique key errors.
-      // Any duplicate content that was flagged as anonoymous is deleted in the
+      // Any duplicate object that was flagged as anonoymous is deleted in the
       // subsequent db_delete() call.
       try {
         db_update('flagging')
@@ -1085,14 +1085,14 @@ function flag_build_javascript_info($flag, $entity_id) {
 }
 
 /**
- * Form for confirming the (un)flagging of a piece of content.
+ * Form for confirming the (un)flagging of an entity.
  *
  * @param $action
  *   Either 'flag' or 'unflag'.
  * @param $flag
  *   A loaded flag object.
  * @param $entity_id
- *   The id of the content to operate on. The type is implicit in the flag.
+ *   The id of the entity to operate on. The type is implicit in the flag.
  *
  * @see flag_confirm_submit()
  */
@@ -1357,13 +1357,13 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
 }
 
 /**
- * Remove all flagged content from a flag.
+ * Remove all flagged entities from a flag.
  *
  * @param $flag
  *   The flag object.
  * @param $entity_id
- *   Optional. The content ID on which all flaggings will be removed. If left
- *   empty, this will remove all of this flag's content.
+ *   Optional. The entity ID on which all flaggings will be removed. If left
+ *   empty, this will remove all of this flag's entities.
  */
 function flag_reset_flag($flag, $entity_id = NULL) {
   $query = db_select('flagging', 'fc')
@@ -1654,9 +1654,9 @@ function _flag_link_type_fields() {
  * Get flag counts for all flags on a node.
  *
  * @param $entity_type
- *   The content type (usually 'node').
+ *   The entity type (usually 'node').
  * @param $entity_id
- *   The content ID (usually the node ID).
+ *   The entity ID (usually the node ID).
  * @param $reset
  *   Reset the internal cache and execute the SQL query another time.
  *
@@ -1749,7 +1749,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * returned.
  *
  * @param $entity_type
- *   Optional. The type of content for which to load the flags. Usually 'node'.
+ *   Optional. The type of entity for which to load the flags. Usually 'node'.
  * @param $content_subtype
  *   Optional. The node type for which to load the flags.
  * @param $account
@@ -1854,10 +1854,10 @@ function _flag_compare_weight($flag1, $flag2) {
 
 /**
  * Utility function: Checks whether a flag applies to a certain type, and
- * possibly subtype, of content.
+ * possibly subtype, of entity.
  *
  * @param $entity_type
- *   The type of content being checked, usually "node".
+ *   The type of entity being checked, usually "node".
  * @param $content_subtype
  *   The subtype (node type) being checked.
  *
@@ -1915,10 +1915,10 @@ function flag_get_default_flags($include_disabled = FALSE) {
 }
 
 /**
- * Get all flagged content in a flag.
+ * Get all flagged entities in a flag.
  *
  * @param
- *   The flag name for which to retrieve flagged content.
+ *   The flag name for which to retrieve flagged entites.
  */
 function flag_get_flagged_content($flag_name) {
   $return = array();
@@ -1934,10 +1934,10 @@ function flag_get_flagged_content($flag_name) {
 }
 
 /**
- * Get content ID from a flag content ID.
+ * Get entity ID from a flag content ID.
  *
  * @param $fcid
- *   The flag content ID for which to look up the content ID.
+ *   The flag content ID for which to look up the entity ID.
  */
 function flag_get_entity_id($fcid) {
   return db_select('flagging', 'fc')
@@ -1951,10 +1951,10 @@ function flag_get_entity_id($fcid) {
  * Find what a user has flagged, either a single node or on the entire site.
  *
  * @param $entity_type
- *   The type of content that will be retrieved. Usually 'node'.
+ *   The type of entity that will be retrieved. Usually 'node'.
  * @param $entity_id
- *   Optional. The content ID to check for flagging. If none given, all
- *   content flagged by this user will be returned.
+ *   Optional. The entity ID to check for flagging. If none given, all
+ *   entities flagged by this user will be returned.
  * @param $uid
  *   Optional. The user ID whose flags we're checking. If none given, the
  *   current user will be used.
@@ -2032,18 +2032,18 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
 }
 
 /**
- * Return a list of users who have flagged a piece of content.
+ * Return a list of users who have flagged an entity.
  *
  * @param $entity_type
- *   The type of content that will be retrieved. Usually 'node'.
+ *   The type of entity that will be retrieved. Usually 'node'.
  * @param $entity_id
- *   The content ID to check for flagging.
+ *   The entity ID to check for flagging.
  * @param $flag_name
  *   Optional. The name of a flag if wanting a list specific to a single flag.
  *
  * @return
- *   If no flag name is given, an array of flagged content, keyed by the user
- *   ID that flagged the content. Each flagged content array is structured as
+ *   If no flag name is given, an array of flaging data, keyed by the user
+ *   ID that flagged the entity. Each flagging array is structured as
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
  */
@@ -2081,7 +2081,7 @@ function flag_get_content_flags($entity_type, $entity_id, $flag_name = NULL) {
  * @param $flag_name
  *   The "machine readable" name of the flag; e.g. 'bookmarks'.
  * @param $entity_id
- *   The content ID to check for flagging. This is usually a node ID.
+ *   The entity ID to check for flagging, for example a node ID.
  */
 function flag_create_link($flag_name, $entity_id) {
   $flag = flag_get_flag($flag_name);
