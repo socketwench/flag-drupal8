@@ -762,7 +762,7 @@ function flag_entity_delete($entity, $type) {
   }
 
   list($id) = entity_extract_ids($type, $entity);
-  _flag_content_delete($type, $id);
+  _flag_entity_delete($type, $id);
 }
 
 /**
@@ -774,7 +774,7 @@ function flag_node_delete($node) {
     // of a translation set, don't delete the flagging record.
     // Instead, data will be updated in hook_node_translation_change(), below.
     if (!$flag->i18n || empty($node->tnid)) {
-      _flag_content_delete('node', $node->nid, $flag->fid);
+      _flag_entity_delete('node', $node->nid, $flag->fid);
     }
   }
 }
@@ -814,7 +814,7 @@ function flag_node_translation_change($node) {
  * @param $fid
  *   The flag id
  */
-function _flag_content_delete($entity_type, $entity_id, $fid = NULL) {
+function _flag_entity_delete($entity_type, $entity_id, $fid = NULL) {
   $query_content = db_delete('flagging')
     ->condition('entity_type', $entity_type)
     ->condition('entity_id', $entity_id);
@@ -928,7 +928,7 @@ function flag_user_account_removal($account) {
     ->execute();
 
   // Remove flags that have been done to this user.
-  _flag_content_delete('user', $account->uid);
+  _flag_entity_delete('user', $account->uid);
 }
 
 /**
