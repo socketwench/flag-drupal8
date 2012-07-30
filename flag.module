@@ -290,7 +290,7 @@ function flag_init() {
 function flag_views_api() {
   return array(
     'api' => 2.0,
-    'path' => drupal_get_path('module', 'flag') . '/includes',
+    'path' => drupal_get_path('module', 'flag') . '/includes/views',
   );
 }
 
