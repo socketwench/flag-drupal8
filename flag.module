@@ -1920,7 +1920,7 @@ function flag_get_default_flags($include_disabled = FALSE) {
  * @param
  *   The flag name for which to retrieve flagged entites.
  */
-function flag_get_flagged_content($flag_name) {
+function flag_get_flagged_entities($flag_name) {
   $return = array();
   $flag = flag_get_flag($flag_name);
   $result = db_select('flagging', 'fc')
