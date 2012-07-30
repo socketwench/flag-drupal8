@@ -2048,9 +2048,9 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
  *   a flag name is specified, only the information for that flag is returned.
  */
 function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
-  $content_flags = &drupal_static(__FUNCTION__, array());
+  $entity_flags = &drupal_static(__FUNCTION__, array());
 
-  if (!isset($content_flags[$entity_type][$entity_id])) {
+  if (!isset($entity_flags[$entity_type][$entity_id])) {
     $flag_names = _flag_get_flag_names();
     $result = db_select('flagging', 'fc')
       ->fields('fc')
@@ -2060,13 +2060,13 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
       ->execute();
     foreach ($result as $flag_content) {
       // Build a list of flaggings for all flags by user.
-      $content_flags[$entity_type][$entity_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
+      $entity_flags[$entity_type][$entity_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
       // Build a list of flaggings for each individual flag.
-      $content_flags[$entity_type][$entity_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
+      $entity_flags[$entity_type][$entity_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
     }
   }
 
-  return isset($flag_name) ? $content_flags[$entity_type][$entity_id]['flags'][$flag_name] : $content_flags[$entity_type][$entity_id]['users'];
+  return isset($flag_name) ? $entity_flags[$entity_type][$entity_id]['flags'][$flag_name] : $entity_flags[$entity_type][$entity_id]['users'];
 }
 
 /**
