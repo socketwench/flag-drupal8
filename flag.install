@@ -456,3 +456,23 @@ function flag_update_7301() {
   // A second cache clear appears to be required here.
   cache_clear_all();
 }
+
+/**
+ * Rename database columns on the {flag} table.
+ */
+function flag_update_7302() {
+  // No keys or indexes are affected.
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flag', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, such as one of "node", "comment", or "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    )
+    // No keys to re-add.
+  );
+}
