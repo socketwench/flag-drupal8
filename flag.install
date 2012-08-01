@@ -542,3 +542,58 @@ function flag_update_7303() {
 
   cache_clear_all();
 }
+
+/**
+ * Rename database columns on the {flag_counts} table.
+ */
+function flag_update_7304() {
+  // Drop keys and indexes using 'content_type'.
+  db_drop_index('flag_counts', 'fid_content_type');
+  db_drop_index('flag_counts', 'content_type_content_id');
+
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flag_counts', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, usually one of "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    // Keys spec. Some are short-lived, as they are about to be dropped again.
+    // Note the hybrid names refer to 'content_id' still.
+    array(
+      'indexes' => array(
+        'fid_entity_type' => array('fid', 'entity_type'),
+        'entity_type_content_id' => array('entity_type', 'content_id'),
+      )
+    )
+  );
+
+  // Now drop keys and indexes using 'content_id'.
+  db_drop_primary_key('flag_counts');
+  db_drop_index('flag_counts', 'entity_type_content_id');
+
+  // Change field 'content_id' to 'entity_id'.
+  db_change_field('flag_counts', 'content_id', 'entity_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+      'disp-width' => '10',
+    ),
+    // Keys spec. Identical to current hook_schema() now we're finished.
+    array(
+      'primary key' => array('fid', 'entity_id'),
+      'indexes' => array(
+        'entity_type_entity_id' => array('entity_type', 'entity_id'),
+      ),
+    )
+  );
+}
