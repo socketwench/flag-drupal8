@@ -143,7 +143,7 @@ function flag_schema() {
   );
 
   $schema['flagging'] = array(
-    'description' => 'Content that has been flagged.',
+    'description' => 'Objects that have been flagged.',
     'fields' => array(
       'fcid' => array(
         'description' => 'The unique ID for this particular tag.',
@@ -152,7 +152,7 @@ function flag_schema() {
         'not null' => TRUE,
       ),
       'fid' => array(
-        'description' => 'The unqiue flag ID this content has been flagged with, from {flags}.',
+        'description' => 'The unique flag ID this object has been flagged with, from {flags}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
@@ -160,21 +160,21 @@ function flag_schema() {
         'default' => 0,
       ),
       'entity_type' => array(
-        'description' => 'The flag type, one of "node", "comment", "user".',
+        'description' => 'The flag type, eg "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
       'entity_id' => array(
-        'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
+        'description' => 'The unique ID of the object, such as either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'uid' => array(
-        'description' => 'The user ID by which this content was created.',
+        'description' => 'The user ID by whom this object was flagged.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -257,7 +257,7 @@ function flag_schema() {
         'disp-width' => '10',
       ),
       'count' => array(
-        'description' => 'The number of times this content has been flagged for this flag.',
+        'description' => 'The number of times this object has been flagged for this flag.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
