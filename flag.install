@@ -476,3 +476,69 @@ function flag_update_7302() {
     // No keys to re-add.
   );
 }
+
+/**
+ * Rename database columns on the {flagging} table.
+ */
+function flag_update_7303() {
+  // Drop affected keys and indexes.
+  db_drop_unique_key('flagging', 'fid_content_id_uid_sid');
+  db_drop_index('flagging', 'content_type_uid_sid');
+  db_drop_index('flagging', 'content_type_content_id_uid_sid');
+  db_drop_index('flagging', 'content_id_fid');
+
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flagging', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, eg "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    // Keys spec. Some are short-lived, as they are about to be dropped again
+    // and have hybrid names that refer to 'content_id' still.
+    array(
+      'unique keys' => array(
+        'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
+      ),
+      'indexes' => array(
+        'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
+        'entity_type_content_id_uid_sid' => array('entity_type', 'content_id', 'uid', 'sid'),
+        'content_id_fid' => array('content_id', 'fid'),
+      ),
+    )
+  );
+
+  // Now we have to drop keys and indexes all over again!
+  db_drop_unique_key('flagging', 'fid_content_id_uid_sid');
+  db_drop_index('flagging', 'entity_type_content_id_uid_sid');
+  db_drop_index('flagging', 'content_id_fid');
+
+  // Change field 'content_id' to 'entity_id'.
+  db_change_field('flagging', 'content_id', 'entity_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    // Keys spec. Identical to current hook_schema() now we're finished.
+    array(
+      'unique keys' => array(
+        'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
+      ),
+      'indexes' => array(
+        'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
+        'entity_id_fid' => array('entity_id', 'fid'),
+      ),
+    )
+  );
+
+  cache_clear_all();
+}
