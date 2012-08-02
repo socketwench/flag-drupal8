@@ -1008,7 +1008,7 @@ function flag_session_api_cleanup($arg = 'run') {
 function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
   // This query can't use db_delete() because that doesn't support a
   // subquery: see http://drupal.org/node/1267508.
-  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM flags WHERE content_type = :entity_type)", array(
+  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flags} WHERE content_type = :entity_type)", array(
     ':bundle' => $bundle,
     ':entity_type' => $entity_type,
   ));
