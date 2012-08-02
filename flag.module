@@ -411,12 +411,9 @@ function flag_field_extra_fields() {
       continue;
     }
 
-    // In order to make sense with this hook's structure, we use D7 lingo, hence
-    // some translation is required...
-    $entity_type = $flag->entity_type;
     foreach ($flag->types as $bundle_name) {
       if ($flag->show_on_form) {
-        $extra[$entity_type][$bundle_name]['form']['flag'] = array(
+        $extra[$flag->entity_type][$bundle_name]['form']['flag'] = array(
           'label' => t('Flags'),
           'description' => t('Checkboxes for toggling flags'),
           'weight' => 10
