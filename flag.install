@@ -105,7 +105,7 @@ function flag_schema() {
       'content_type' => array(
         'description' => 'The flag type, such as one of "node", "comment", or "user".',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -162,7 +162,7 @@ function flag_schema() {
       'content_type' => array(
         'description' => 'The flag type, one of "node", "comment", "user".',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -221,7 +221,7 @@ function flag_schema() {
       'type' => array(
         'description' => 'The types (usually from {node_type}) that can be flagged by this fid.',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
@@ -244,7 +244,7 @@ function flag_schema() {
       'content_type' => array(
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
