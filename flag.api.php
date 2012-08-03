@@ -92,10 +92,10 @@ function hook_flag_options_alter(&$options, $flag) {
  *  The id of the entity the flag is on.
  * @param $account
  *  The user account performing the action.
- * @param $fcid
+ * @param $flagging_id
  *  The id of the flagging in the {flagging} table.
  */
-function hook_flag($op, $flag, $entity_id, $account, $fcid) {
+function hook_flag($op, $flag, $entity_id, $account, $flagging_id) {
 
 }
 

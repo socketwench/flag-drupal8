@@ -145,7 +145,7 @@ function flag_schema() {
   $schema['flagging'] = array(
     'description' => 'Objects that have been flagged.',
     'fields' => array(
-      'fcid' => array(
+      'flagging_id' => array(
         'description' => 'The unique ID for this particular tag.',
         'type' => 'serial',
         'unsigned' => TRUE,
@@ -196,7 +196,7 @@ function flag_schema() {
         'disp-size' => 11,
       )
     ),
-    'primary key' => array('fcid'),
+    'primary key' => array('flagging_id'),
     'unique keys' => array(
       'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
     ),
