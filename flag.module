@@ -23,7 +23,7 @@ function flag_entity_info() {
       'base table' => 'flagging',
       'fieldable' => TRUE,
       'entity keys' => array(
-        'id' => 'fcid',
+        'id' => 'flagging_id',
         'bundle' => 'flag_name',
       ),
       // The following tells Field UI how to extract the bundle name from a
@@ -53,16 +53,16 @@ function flag_entity_info() {
 /**
  * Loads a flagging entity.
  *
- * @param $fcid
- *   The 'fcid' database serial column.
+ * @param $flagging_id
+ *   The 'flagging_id' database serial column.
  * @param $reset
  *   Whether to reset the DrupalDefaultEntityController cache.
  *
  * @return
  *   The entity object, or FALSE if it can't be found.
  */
-function flagging_load($fcid, $reset = FALSE) {
-  $result = entity_load('flagging', array($fcid), array(), $reset);
+function flagging_load($flagging_id, $reset = FALSE) {
+  $result = entity_load('flagging', array($flagging_id), array(), $reset);
   return reset($result);
 }
 
@@ -835,14 +835,14 @@ function flag_user_login(&$edit, &$account) {
     // Get a list of flagging IDs that will be moved over.
     $duplicate_flaggings = array();
     $flaggings = db_select('flagging', 'fc')
-      ->fields('fc', array('fcid', 'fid', 'entity_id'))
+      ->fields('fc', array('flagging_id', 'fid', 'entity_id'))
       ->condition('uid', 0)
       ->condition('sid', $sid)
       ->execute()
-      ->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);
+      ->fetchAllAssoc('flagging_id', PDO::FETCH_ASSOC);
 
     // Convert anonymous flaggings to their authenticated account.
-    foreach ($flaggings as $fcid => $flagging) {
+    foreach ($flaggings as $flagging_id => $flagging) {
       // Each update is wrapped in a try block to prevent unique key errors.
       // Any duplicate object that was flagged as anonoymous is deleted in the
       // subsequent db_delete() call.
@@ -852,11 +852,11 @@ function flag_user_login(&$edit, &$account) {
             'uid' => $account->uid,
             'sid' => 0,
           ))
-          ->condition('fcid', $fcid)
+          ->condition('flagging_id', $flagging_id)
           ->execute();
       }
       catch (Exception $e) {
-        $duplicate_flaggings[$fcid] = $flagging;
+        $duplicate_flaggings[$flagging_id] = $flagging;
       }
     }
 
@@ -864,7 +864,7 @@ function flag_user_login(&$edit, &$account) {
     // proper unflag action here to make sure the count gets decremented again
     // and so that other modules can clean up their tables if needed.
     $anonymous_user = drupal_anonymous_user();
-    foreach ($duplicate_flaggings as $fcid => $flagging) {
+    foreach ($duplicate_flaggings as $flagging_id => $flagging) {
       $flag = flag_get_flag(NULL, $flagging['fid']);
       $flag->flag('unflag', $flagging['entity_id'], $anonymous_user, TRUE);
     }
@@ -1371,7 +1371,7 @@ function flag_reset_flag($flag, $entity_id = NULL) {
     $query->condition('entity_id', $entity_id);
   }
 
-  $result = $query->execute()->fetchAllAssoc('fcid', PDO::FETCH_ASSOC);
+  $result = $query->execute()->fetchAllAssoc('flagging_id', PDO::FETCH_ASSOC);
   $rows = array();
   foreach ($result as $row) {
     $rows[] = $row;
@@ -1704,7 +1704,7 @@ function flag_get_flag_counts($flag_name, $reset = FALSE) {
   }
   if (!isset($counts[$flag_name])) {
     $flag = flag_get_flag($flag_name);
-    $counts[$flag_name] = db_select('flag_counts', 'fc')->fields('fc', array('fcid'))
+    $counts[$flag_name] = db_select('flag_counts', 'fc')->fields('fc', array('flagging_id'))
       ->condition('fid', $flag->fid)->countQuery()->execute()->fetchField();
   }
 
@@ -1933,13 +1933,13 @@ function flag_get_flagged_entities($flag_name) {
 /**
  * Get entity ID from a flag content ID.
  *
- * @param $fcid
+ * @param $flagging_id
  *   The flag content ID for which to look up the entity ID.
  */
-function flag_get_entity_id($fcid) {
+function flag_get_entity_id($flagging_id) {
   return db_select('flagging', 'fc')
     ->fields('fc', array('entity_id'))
-    ->condition('fcid', $fcid)
+    ->condition('flagging_id', $flagging_id)
     ->execute()
     ->fetchField();
 }
@@ -1965,7 +1965,7 @@ function flag_get_entity_id($fcid) {
  * @return $flags
  *   If returning a single item's flags (that is, when $entity_id isn't NULL),
  *   an array of the structure
- *   [flag_name] => (fcid => [fcid], uid => [uid], entity_id => [entity_id], timestamp => [timestamp], ...)
+ *   [flag_name] => (flagging_id => [flagging_id], uid => [uid], entity_id => [entity_id], timestamp => [timestamp], ...)
  *
  *   If returning all items' flags, an array of arrays for each flag:
  *   [flag_name] => [entity_id] => Object from above.

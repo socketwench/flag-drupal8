@@ -570,8 +570,8 @@ class flag_flag {
     // @todo: Discuss: Core wraps everything in a try { }, should we?
 
     // Perform the flagging or unflagging of this flag.
-    $existing_fcid = $this->_is_flagged($entity_id, $uid, $sid);
-    $flagged = (bool) $existing_fcid;
+    $existing_flagging_id = $this->_is_flagged($entity_id, $uid, $sid);
+    $flagged = (bool) $existing_flagging_id;
     if ($action == 'unflag') {
       if ($this->uses_anonymous_cookies()) {
         $this->_unflag_anonymous($entity_id);
@@ -579,9 +579,9 @@ class flag_flag {
       if ($flagged) {
         // Note the order: We delete the entity before calling _unflag() to
         // delete the {flagging} record.
-        $this->_delete_flagging($existing_fcid);
+        $this->_delete_flagging($existing_flagging_id);
         $this->_unflag($entity_id, $uid, $sid);
-        module_invoke_all('flag', 'unflag', $this, $entity_id, $account, $existing_fcid);
+        module_invoke_all('flag', 'unflag', $this, $entity_id, $account, $existing_flagging_id);
       }
     }
     elseif ($action == 'flag') {
@@ -593,12 +593,12 @@ class flag_flag {
           // Construct a new flagging object if we don't have one.
           $flagging = $this->new_flagging($entity_id, $uid, $sid);
         }
-        $fcid = $this->_flag($entity_id, $uid, $sid);
+        $flagging_id = $this->_flag($entity_id, $uid, $sid);
         // We're writing out a flagging entity even when we aren't passed one
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
-        $this->_insert_flagging($flagging, $entity_id, $fcid);
-        module_invoke_all('flag', 'flag', $this, $entity_id, $account, $fcid);
+        $this->_insert_flagging($flagging, $entity_id, $flagging_id);
+        module_invoke_all('flag', 'flag', $this, $entity_id, $account, $flagging_id);
       }
       else {
         // Nothing to do. Item is already flagged.
@@ -623,8 +623,8 @@ class flag_flag {
    * operation is also accompanied by some bookkeeping (calling hooks, updating
    * counters) or access control. These tasks are handled by the flag() method.
    */
-  private function _insert_flagging($flagging, $entity_id, $fcid) {
-    $flagging->fcid = $fcid;
+  private function _insert_flagging($flagging, $entity_id, $flagging_id) {
+    $flagging->flagging_id = $flagging_id;
     field_attach_presave('flagging', $flagging);
     field_attach_insert('flagging', $flagging);
   }
@@ -632,13 +632,13 @@ class flag_flag {
     field_attach_presave('flagging', $flagging);
     field_attach_update('flagging', $flagging);
     // Update the cache.
-    flagging_load($flagging->fcid, TRUE);
+    flagging_load($flagging->flagging_id, TRUE);
   }
-  private function _delete_flagging($fcid) {
-    if (($flagging = flagging_load($fcid))) {
+  private function _delete_flagging($flagging_id) {
+    if (($flagging = flagging_load($flagging_id))) {
       field_attach_delete('flagging', $flagging);
       // Remove from the cache.
-      flagging_load($fcid, TRUE);
+      flagging_load($flagging_id, TRUE);
     }
   }
 
@@ -656,11 +656,11 @@ class flag_flag {
    * @return stdClass
    *   The returned object has at least the 'flag_name' property set, which
    *   enables Field API to figure out the bundle, but it's your responsibility
-   *   to eventually populate 'entity_id' and 'fcid'.
+   *   to eventually populate 'entity_id' and 'flagging_id'.
    */
   function new_flagging($entity_id = NULL, $uid = NULL, $sid = NULL) {
     return (object) array(
-      'fcid' => NULL,
+      'flagging_id' => NULL,
       'flag_name' => $this->name,
       'entity_id' => $entity_id,
       'uid' => $uid,
@@ -691,7 +691,7 @@ class flag_flag {
    * This method returns the "flagging record": the {flagging} record that
    * exists for each flagged item (for a certain user). If the item isn't
    * flagged, returns NULL. This method could be useful, for example, when you
-   * want to find out the 'fcid' or 'timestamp' values.
+   * want to find out the 'flagging_id' or 'timestamp' values.
    *
    * Thanks to using a cache, inquiring several different flags about the same
    * item results in only one SQL query.
@@ -712,7 +712,7 @@ class flag_flag {
    */
   function get_flagging($entity_id, $uid = NULL, $sid = NULL) {
     if (($record = $this->get_flagging_record($entity_id, $uid, $sid))) {
-      return flagging_load($record->fcid);
+      return flagging_load($record->flagging_id);
     }
   }
 
@@ -727,14 +727,14 @@ class flag_flag {
    * bypass it.
    *
    * @return
-   *   If the object is flagged, returns the value of the 'fcid' column.
+   *   If the object is flagged, returns the value of the 'flagging_id' column.
    *   Else, returns FALSE.
    *
    * @private
    */
   function _is_flagged($entity_id, $uid, $sid) {
     return db_select('flagging', 'fc')
-      ->fields('fc', array('fcid'))
+      ->fields('fc', array('flagging_id'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
@@ -750,12 +750,12 @@ class flag_flag {
    * function instead.
    *
    * @return
-   *   The 'fcid' column of the new {flagging} record.
+   *   The 'flagging_id' column of the new {flagging} record.
    *
    * @private
    */
   function _flag($entity_id, $uid, $sid) {
-    $fcid = db_insert('flagging')
+    $flagging_id = db_insert('flagging')
       ->fields(array(
         'fid' => $this->fid,
         'entity_type' => $this->entity_type,
@@ -766,7 +766,7 @@ class flag_flag {
       ))
       ->execute();
     $this->_increase_count($entity_id);
-    return $fcid;
+    return $flagging_id;
   }
 
   /**
@@ -776,25 +776,25 @@ class flag_flag {
    * function instead.
    *
    * @return
-   *   If the object was flagged, returns the value of the now deleted 'fcid'
+   *   If the object was flagged, returns the value of the now deleted 'flagging_id'
    *   column. Else, returns FALSE.
    *
    * @private
    */
   function _unflag($entity_id, $uid, $sid) {
-    $fcid = db_select('flagging', 'fc')
-      ->fields('fc', array('fcid'))
+    $flagging_id = db_select('flagging', 'fc')
+      ->fields('fc', array('flagging_id'))
       ->condition('fid', $this->fid)
       ->condition('uid', $uid)
       ->condition('sid', $sid)
       ->condition('entity_id', $entity_id)
       ->execute()
       ->fetchField();
-    if ($fcid) {
-      db_delete('flagging')->condition('fcid', $fcid)->execute();
+    if ($flagging_id) {
+      db_delete('flagging')->condition('flagging_id', $flagging_id)->execute();
       $this->_decrease_count($entity_id);
     }
-    return $fcid;
+    return $flagging_id;
   }
 
   /**
@@ -895,7 +895,7 @@ class flag_flag {
     if (!isset($sid)) {
       $sid = flag_get_sid($uid);
     }
-    return db_select('flagging', 'fc')->fields('fc', array('fcid'))
+    return db_select('flagging', 'fc')->fields('fc', array('flagging_id'))
       ->condition('fid', $this->fid)->condition('uid', $uid)->condition('sid', $sid)
       ->countQuery()->execute()->fetchField();
   }
