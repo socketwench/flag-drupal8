@@ -532,7 +532,7 @@ function flag_update_7303() {
       'not null' => TRUE,
       'default' => 0,
     ),
-    // Keys spec. Identical to current hook_schema() now we're finished.
+    // Keys spec. Identical to current hook_schema().
     array(
       'unique keys' => array(
         'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
@@ -541,6 +541,25 @@ function flag_update_7303() {
         'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
         'entity_id_fid' => array('entity_id', 'fid'),
       ),
+    )
+  );
+
+  // Drop the primary key.
+  db_drop_primary_key('flagging');
+
+  // Change field 'fcid' to 'flagging_id'.
+  db_change_field('flagging', 'fcid', 'flagging_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID for this particular tag.',
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ),
+    // Keys spec. Identical to current hook_schema().
+    array(
+      'primary key' => array('flagging_id'),
     )
   );
 
