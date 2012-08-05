@@ -36,7 +36,7 @@ class FlagTestCase extends DrupalWebTestCase {
   function testFlagAdmin() {
     // Add a new flag using the UI.
     $edit = array(
-      'name' => drupal_strtolower($this->randomName()),
+      'name' => strtolower($this->randomName()),
       'title' => $this->randomName(),
       'flag_short'          => 'flag short [node:nid]',
       'flag_long'           => 'flag long [node:nid]',
@@ -58,7 +58,7 @@ class FlagTestCase extends DrupalWebTestCase {
     $saved['types'] = array('page');
     unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]']);
 
-    $this->drupalPost(FLAG_ADMIN_PATH . '/add/node', $edit, t('Save flag'));
+    $this->drupalPost(FLAG_ADMIN_PATH . '/add/node/' . $edit['name'], $edit, t('Save flag'));
 
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $flag = flag_get_flag($edit['name']);
@@ -73,7 +73,7 @@ class FlagTestCase extends DrupalWebTestCase {
 
     // Edit the flag through the UI.
     $edit = array(
-      'name' => drupal_strtolower($this->randomName()),
+      'name' => strtolower($this->randomName()),
       'title' => $this->randomName(),
       'flag_short'          => 'flag 2 short [node:nid]',
       'flag_long'           => 'flag 2 long [node:nid]',
