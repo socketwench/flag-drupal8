@@ -88,7 +88,7 @@ function flag_views_data() {
     'title' => t('Content ID'),
     'help' => t('The unique ID of the object that has been flagged.'),
     'argument' => array(
-      'handler' => 'flag_handler_argument_content_id',
+      'handler' => 'flag_handler_argument_entity_id',
     ),
   );
 
