@@ -195,21 +195,30 @@ function theme_flag_admin_page($variables) {
 /**
  * Menu callback for adding a new flag.
  */
-function flag_add_page($entity_type = NULL) {
+function flag_add_page($type = NULL, $name = NULL) {
   drupal_set_title(t('Add new flag'));
-
-  if (isset($entity_type)) {
-    $flag = flag_flag::factory_by_content_type($entity_type);
+  if (isset($type) && isset($name)) {
+    $flag = flag_flag::factory_by_content_type($type);
+    $flag->name = $name;
     return drupal_get_form('flag_form', $flag);
   }
-
-  return drupal_get_form('flag_add_form');
+  else {
+    return drupal_get_form('flag_add_form');
+  }
 }
 
 /**
  * Present a form for creating a new flag, setting the type of flag.
  */
 function flag_add_form($form, &$form_state) {
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flag name'),
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#maxlength' => 32,
+    '#required' => TRUE,
+  );
+
   $types = array();
   foreach (flag_fetch_definition() as $type => $info) {
     $types[$type] = $info['title'] . '<div class="description">' . $info['description'] . '</div>';
@@ -230,7 +239,7 @@ function flag_add_form($form, &$form_state) {
 
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Add flag'), // @todo: maybe a new text here for the submit button?
+    '#value' => t('Add flag'),
   );
 
   return $form;
@@ -238,14 +247,17 @@ function flag_add_form($form, &$form_state) {
 
 function flag_add_form_validate($form, &$form_state) {
   $flag = flag_flag::factory_by_content_type($form_state['values']['type']);
-
-  if (get_class($flag) == 'flag_broken') {
-    form_set_error('type', t("This flag type, %type, isn't valid.", array('%type' => $form_state['values']['type'])));
+  $flag->name = $form_state['values']['name'];
+  $errors = $flag->validate_name();
+  foreach ($errors as $field => $field_errors) {
+    foreach ($field_errors as $error) {
+      form_set_error($field, $error['message']);
+    }
   }
 }
 
 function flag_add_form_submit($form, &$form_state) {
-  $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'];
+  $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'] . '/' . $form_state['values']['name'];
 }
 
 /**
@@ -253,6 +265,21 @@ function flag_add_form_submit($form, &$form_state) {
  */
 function flag_form($form, &$form_state, $flag) {
   $form['#flag'] = $flag;
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#default_value' => $flag->name,
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#maxlength' => 32,
+    '#required' => TRUE,
+    '#access' => empty($flag->locked['name']),
+    '#weight' => -3,
+  );
+
+  if (!empty($flag->fid)) {
+    $form['name']['#description'] .= ' <strong>' . t('Change this value only with great care.') . '</strong>';
+  }
 
   $form['title'] = array(
     '#type' => 'textfield',
@@ -262,21 +289,7 @@ function flag_form($form, &$form_state, $flag) {
     '#maxlength' => 255,
     '#required' => TRUE,
     '#access' => empty($flag->locked['title']),
-    '#weight' => -3,
-  );
-
-  $form['name'] = array(
-    '#type' => 'machine_name',
-    '#title' => t('Machine name'),
-    '#default_value' => $flag->name,
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
-    '#maxlength' => 32,
-    '#access' => empty($flag->locked['name']),
     '#weight' => -2,
-    '#machine_name' => array(
-      'exists' => 'flag_get_flag',
-      'source' => array('title'),
-    ),
   );
 
   $form['global'] = array(
