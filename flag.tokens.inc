@@ -53,21 +53,21 @@ function flag_token_info() {
     'name' => t('Flag action'),
     'description' => t('The flagging action taking place, either "flag" or "unflag".'),
   );
-  $tokens['flag-action']['content-url'] = array(
-    'name' => t('Flag content URL'),
-    'description' => t('The URL of the content being flagged.'),
+  $tokens['flag-action']['entity-url'] = array(
+    'name' => t('Flag entity URL'),
+    'description' => t('The URL of the entity being flagged.'),
   );
-  $tokens['flag-action']['content-title'] = array(
-    'name' => t('Flag content title'),
-    'description' => t('The title of the content being flagged.'),
+  $tokens['flag-action']['entity-title'] = array(
+    'name' => t('Flag entity title'),
+    'description' => t('The title of the entity being flagged.'),
   );
-  $tokens['flag-action']['content-type'] = array(
-    'name' => t('Flag content type'),
-    'description' => t('The type of content being flagged, such as <em>node</em> or <em>comment</em>.'),
+  $tokens['flag-action']['entity-type'] = array(
+    'name' => t('Flag entity type'),
+    'description' => t('The type of entity being flagged, such as <em>node</em> or <em>comment</em>.'),
   );
-  $tokens['flag-action']['content-id'] = array(
-    'name' => t('Flag content ID'),
-    'description' => t('The ID of content being flagged, may be a nid or cid.'),
+  $tokens['flag-action']['entity-id'] = array(
+    'name' => t('Flag entity ID'),
+    'description' => t('The ID of entity being flagged, such as a nid or cid.'),
   );
   $tokens['flag-action']['count'] = array(
     'name' => t('Flag count'),
@@ -136,17 +136,17 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
         case 'action':
           $replacements[$original] = $action->action;
           break;
-        case 'content-url':
-          $replacements[$original] = $sanitize ? check_url($action->content_url) : $action->content_url;
+        case 'entity-url':
+          $replacements[$original] = $sanitize ? check_url($action->entity_url) : $action->entity_url;
           break;
-        case 'content-title':
-          $replacements[$original] = $sanitize ? check_plain($action->content_title) : $action->content_title;
+        case 'entity-title':
+          $replacements[$original] = $sanitize ? check_plain($action->entity_title) : $action->entity_title;
           break;
-        case 'content-type':
-          $replacements[$original] = $action->content_type;
+        case 'entity-type':
+          $replacements[$original] = $action->entity_type;
           break;
-        case 'content-id':
-          $replacements[$original] = $action->content_id;
+        case 'entity-id':
+          $replacements[$original] = $action->entity_id;
           break;
         case 'count':
           $replacements[$original] = $action->count;
@@ -163,10 +163,10 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
         $flag_count_token = 'flag-' . str_replace('_', '-', $flag->name) . '-count';
         $flag_link_token = 'flag-' . str_replace('_', '-', $flag->name) . '-link';
         if ($name == $flag_count_token) {
-          $replacements[$original] = $flag->get_count($flag->get_content_id($object));
+          $replacements[$original] = $flag->get_count($flag->get_entity_id($object));
         }
         elseif ($name == $flag_link_token) {
-          $replacements[$original] = flag_create_link($flag->name, $flag->get_content_id($object));
+          $replacements[$original] = flag_create_link($flag->name, $flag->get_entity_id($object));
         }
       }
     }

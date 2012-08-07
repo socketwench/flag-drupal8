@@ -54,23 +54,23 @@ class flag_user extends flag_entity {
     $this->access_uid = empty($form_values['access_uid']) ? 'others' : '';
   }
 
-  function type_access($content_id, $action, $account) {
+  function type_access($entity_id, $action, $account) {
     // Prevent users from flagging themselves.
-    if ($this->access_uid == 'others' && $content_id == $account->uid) {
+    if ($this->access_uid == 'others' && $entity_id == $account->uid) {
       return FALSE;
     }
   }
 
-  function type_access_multiple($content_ids, $account) {
+  function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // Exclude anonymous.
-    if (array_key_exists(0, $content_ids)) {
+    if (array_key_exists(0, $entity_ids)) {
       $access[0] = FALSE;
     }
 
     // Prevent users from flagging themselves.
-    if ($this->access_uid == 'others' && array_key_exists($account->uid, $content_ids)) {
+    if ($this->access_uid == 'others' && array_key_exists($account->uid, $entity_ids)) {
       $access[$account->uid] = FALSE;
     }
 
@@ -84,17 +84,17 @@ class flag_user extends flag_entity {
     return FALSE;
   }
 
-  function get_flag_action($content_id) {
-    $flag_action = parent::get_flag_action($content_id);
-    $user = $this->fetch_content($content_id);
+  function get_flag_action($entity_id) {
+    $flag_action = parent::get_flag_action($entity_id);
+    $user = $this->fetch_entity($entity_id);
     $flag_action->content_title = $user->name;
     $flag_action->content_url = _flag_url('user/' . $user->uid);
     return $flag_action;
   }
 
-  function get_relevant_action_objects($content_id) {
+  function get_relevant_action_objects($entity_id) {
     return array(
-      'user' => $this->fetch_content($content_id),
+      'user' => $this->fetch_entity($entity_id),
     );
   }
 

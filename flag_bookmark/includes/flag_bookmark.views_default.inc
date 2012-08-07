@@ -157,7 +157,7 @@ function flag_bookmark_views_default_views() {
       'label' => 'bookmarks_user',
       'required' => 1,
       'id' => 'uid',
-      'table' => 'flag_content',
+      'table' => 'flagging',
       'field' => 'uid',
       'relationship' => 'flag_content_rel',
     ),
@@ -239,7 +239,7 @@ function flag_bookmark_views_default_views() {
     'ops' => array(
       'label' => 'Ops',
       'id' => 'ops',
-      'table' => 'flag_content',
+      'table' => 'flagging',
       'field' => 'ops',
       'relationship' => 'flag_content_rel',
     ),

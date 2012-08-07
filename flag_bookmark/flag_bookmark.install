@@ -26,7 +26,7 @@ function flag_bookmark_enable() {
     // Install a demonstration flag only if no flag exists. This is to prevent
     // a case where a disables and enables the module, and the demonstration
     // flag is overwritten or re-created.
-    $flag = flag_flag::factory_by_content_type('node');
+    $flag = flag_flag::factory_by_entity_type('node');
     $configuration = array(
         'name' => 'bookmarks',
         'global' => 0,

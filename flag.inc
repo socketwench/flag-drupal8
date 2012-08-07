@@ -6,7 +6,7 @@
  * Defines the flag types this module implements.
  *
  * @return
- *   An "array of arrays", keyed by content-types. The 'handler' slot
+ *   An "array of arrays", keyed by object type. The 'handler' slot
  *   should point to the PHP class implementing this flag.
  */
 function flag_flag_definitions() {
@@ -56,7 +56,7 @@ function flag_flag_definitions_alter(&$definitions) {
 /**
  * Returns a flag definition.
  */
-function flag_fetch_definition($content_type = NULL) {
+function flag_fetch_definition($entity_type = NULL) {
   static $defintions;
   if (!isset($defintions)) {
     $defintions = module_invoke_all('flag_definitions');
@@ -68,9 +68,9 @@ function flag_fetch_definition($content_type = NULL) {
     }
   }
 
-  if (isset($content_type)) {
-    if (isset($defintions[$content_type])) {
-      return $defintions[$content_type];
+  if (isset($entity_type)) {
+    if (isset($defintions[$entity_type])) {
+      return $defintions[$entity_type];
     }
   }
   else {
@@ -94,15 +94,15 @@ function flag_get_types() {
  * flag". A factory method usually populates this empty flag with settings
  * loaded from the database.
  */
-function flag_create_handler($content_type) {
-  $definition = flag_fetch_definition($content_type);
+function flag_create_handler($entity_type) {
+  $definition = flag_fetch_definition($entity_type);
   if (isset($definition) && class_exists($definition['handler'])) {
     $handler = new $definition['handler'];
   }
   else {
     $handler = new flag_broken;
   }
-  $handler->content_type = $content_type;
+  $handler->entity_type = $entity_type;
   $handler->construct();
   return $handler;
 }

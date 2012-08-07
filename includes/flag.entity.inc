@@ -17,8 +17,8 @@ class FlaggingController extends DrupalDefaultEntityController {
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
     // Add the flag name, which determines the bundle.
-    $query->innerJoin('flags', 'flags', 'base.fid = flags.fid');
-    $query->addField('flags', 'name', 'flag_name');
+    $query->innerJoin('flag', 'flag', 'base.fid = flag.fid');
+    $query->addField('flag', 'name', 'flag_name');
     return $query;
   }
 }

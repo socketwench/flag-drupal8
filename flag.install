@@ -92,7 +92,7 @@ function _flag_flag_content_message() {
 function flag_schema() {
   $schema = array();
 
-  $schema['flags'] = array(
+  $schema['flag'] = array(
     'description' => 'All available flags in the system.',
     'fields' => array(
       'fid' => array(
@@ -102,7 +102,7 @@ function flag_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'content_type' => array(
+      'entity_type' => array(
         'description' => 'The flag type, such as one of "node", "comment", or "user".',
         'type' => 'varchar',
         'length' => '128',
@@ -142,39 +142,39 @@ function flag_schema() {
     ),
   );
 
-  $schema['flag_content'] = array(
-    'description' => 'Content that has been flagged.',
+  $schema['flagging'] = array(
+    'description' => 'Objects that have been flagged.',
     'fields' => array(
-      'fcid' => array(
+      'flagging_id' => array(
         'description' => 'The unique ID for this particular tag.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
       'fid' => array(
-        'description' => 'The unqiue flag ID this content has been flagged with, from {flags}.',
+        'description' => 'The unique flag ID this object has been flagged with, from {flags}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
-      'content_type' => array(
-        'description' => 'The flag type, one of "node", "comment", "user".',
+      'entity_type' => array(
+        'description' => 'The flag type, eg "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
-      'content_id' => array(
-        'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
+      'entity_id' => array(
+        'description' => 'The unique ID of the object, such as either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'uid' => array(
-        'description' => 'The user ID by which this content was created.',
+        'description' => 'The user ID by whom this object was flagged.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -196,14 +196,14 @@ function flag_schema() {
         'disp-size' => 11,
       )
     ),
-    'primary key' => array('fcid'),
+    'primary key' => array('flagging_id'),
     'unique keys' => array(
-      'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
+      'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
     ),
     'indexes' => array(
-      'content_type_uid_sid' => array('content_type', 'uid', 'sid'),
-      'content_type_content_id_uid_sid' => array('content_type', 'content_id', 'uid', 'sid'),
-      'content_id_fid' => array('content_id', 'fid'),
+      'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
+      'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
+      'entity_id_fid' => array('entity_id', 'fid'),
     ),
   );
 
@@ -241,14 +241,14 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'content_type' => array(
+      'entity_type' => array(
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
         'not null' => TRUE,
         'default' => '',
       ),
-      'content_id' => array(
+      'entity_id' => array(
         'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
@@ -257,7 +257,7 @@ function flag_schema() {
         'disp-width' => '10',
       ),
       'count' => array(
-        'description' => 'The number of times this content has been flagged for this flag.',
+        'description' => 'The number of times this object has been flagged for this flag.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -273,10 +273,10 @@ function flag_schema() {
         'disp-size' => 11,
       )
     ),
-    'primary key' => array('fid', 'content_id'),
+    'primary key' => array('fid', 'entity_id'),
     'indexes' => array(
-      'fid_content_type' => array('fid', 'content_type'),
-      'content_type_content_id' => array('content_type', 'content_id'),
+      'fid_entity_type' => array('fid', 'entity_type'),
+      'entity_type_entity_id' => array('entity_type', 'entity_id'),
       'fid_count' => array('fid', 'count'),
       'fid_last_updated' => array('fid', 'last_updated'),
     ),
@@ -445,4 +445,184 @@ function flag_update_7203() {
  */
 function flag_update_7300() {
   registry_rebuild();
+}
+
+/**
+ * Rename {flag_content} table to {flagging} and {flags} table to {flag}.
+ */
+function flag_update_7301() {
+  db_rename_table('flag_content', 'flagging');
+  db_rename_table('flags', 'flag');
+  // A second cache clear appears to be required here...
+  cache_clear_all();
+  // ...which in fact isn't enough, as the schema cache appears to need explicit
+  // clearing to prevent the next updates failing to get the schema for the new
+  // table names.
+  drupal_get_schema(NULL, TRUE);
+}
+
+/**
+ * Rename database columns on the {flag} table.
+ */
+function flag_update_7302() {
+  // No keys or indexes are affected.
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flag', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, such as one of "node", "comment", or "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    )
+    // No keys to re-add.
+  );
+}
+
+/**
+ * Rename database columns on the {flagging} table.
+ */
+function flag_update_7303() {
+  // Drop affected keys and indexes.
+  db_drop_unique_key('flagging', 'fid_content_id_uid_sid');
+  db_drop_index('flagging', 'content_type_uid_sid');
+  db_drop_index('flagging', 'content_type_content_id_uid_sid');
+  db_drop_index('flagging', 'content_id_fid');
+
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flagging', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, eg "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    // Keys spec. Some are short-lived, as they are about to be dropped again
+    // and have hybrid names that refer to 'content_id' still.
+    array(
+      'unique keys' => array(
+        'fid_content_id_uid_sid' => array('fid', 'content_id', 'uid', 'sid'),
+      ),
+      'indexes' => array(
+        'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
+        'entity_type_content_id_uid_sid' => array('entity_type', 'content_id', 'uid', 'sid'),
+        'content_id_fid' => array('content_id', 'fid'),
+      ),
+    )
+  );
+
+  // Now we have to drop keys and indexes all over again!
+  db_drop_unique_key('flagging', 'fid_content_id_uid_sid');
+  db_drop_index('flagging', 'entity_type_content_id_uid_sid');
+  db_drop_index('flagging', 'content_id_fid');
+
+  // Change field 'content_id' to 'entity_id'.
+  db_change_field('flagging', 'content_id', 'entity_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID of the content, such as either the {cid}, {uid}, or {nid}.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    // Keys spec. Identical to current hook_schema().
+    array(
+      'unique keys' => array(
+        'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
+      ),
+      'indexes' => array(
+        'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
+        'entity_id_fid' => array('entity_id', 'fid'),
+      ),
+    )
+  );
+
+  // A serial field must be defined as a key, so make a temporary index on
+  // 'fcid' so we can safely drop the primary key.
+  // @see http://drupal.org/node/190027
+  db_add_index('flagging', 'temp', array('fcid'));
+  // Drop the primary key so we can rename the field.
+  db_drop_primary_key('flagging');
+
+  // Change field 'fcid' to 'flagging_id'.
+  db_change_field('flagging', 'fcid', 'flagging_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID for this particular tag.',
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ),
+    // Keys spec. Identical to current hook_schema().
+    array(
+      'primary key' => array('flagging_id'),
+    )
+  );
+  // Drop our temporary index.
+  db_drop_index('flagging', 'temp');
+
+  cache_clear_all();
+}
+
+/**
+ * Rename database columns on the {flag_counts} table.
+ */
+function flag_update_7304() {
+  // Drop keys and indexes using 'content_type'.
+  db_drop_index('flag_counts', 'fid_content_type');
+  db_drop_index('flag_counts', 'content_type_content_id');
+
+  // Change field 'content_type' to 'entity_type'.
+  db_change_field('flag_counts', 'content_type', 'entity_type',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The flag type, usually one of "node", "comment", "user".',
+      'type' => 'varchar',
+      'length' => '32',
+      'not null' => TRUE,
+      'default' => '',
+    ),
+    // Keys spec. Some are short-lived, as they are about to be dropped again.
+    // Note the hybrid names refer to 'content_id' still.
+    array(
+      'indexes' => array(
+        'fid_entity_type' => array('fid', 'entity_type'),
+        'entity_type_content_id' => array('entity_type', 'content_id'),
+      )
+    )
+  );
+
+  // Now drop keys and indexes using 'content_id'.
+  db_drop_primary_key('flag_counts');
+  db_drop_index('flag_counts', 'entity_type_content_id');
+
+  // Change field 'content_id' to 'entity_id'.
+  db_change_field('flag_counts', 'content_id', 'entity_id',
+    // Spec of the field. Identical to our current hook_schema(): we're not
+    // changing anything except the name.
+    array(
+      'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+      'disp-width' => '10',
+    ),
+    // Keys spec. Identical to current hook_schema() now we're finished.
+    array(
+      'primary key' => array('fid', 'entity_id'),
+      'indexes' => array(
+        'entity_type_entity_id' => array('entity_type', 'entity_id'),
+      ),
+    )
+  );
 }
