@@ -42,14 +42,14 @@ abstract class FlagCookieStorage {
    *
    * It just records this fact in a cookie.
    */
-  abstract function flag($content_id);
+  abstract function flag($entity_id);
 
   /**
    * "Unflags" an item.
    *
    * It just records this fact in a cookie.
    */
-  abstract function unflag($content_id);
+  abstract function unflag($entity_id);
 
   /**
    * Deletes all the cookies.
@@ -67,14 +67,14 @@ abstract class FlagCookieStorage {
  */
 class FlagGlobalCookieStorage extends FlagCookieStorage {
 
-  function flag($content_id) {
-    $cookie_key = $this->cookie_key($content_id);
+  function flag($entity_id) {
+    $cookie_key = $this->cookie_key($entity_id);
     setcookie($cookie_key, 1, REQUEST_TIME + $this->get_lifetime(), base_path());
     $_COOKIE[$cookie_key] = 1;
   }
 
-  function unflag($content_id) {
-    $cookie_key = $this->cookie_key($content_id);
+  function unflag($entity_id) {
+    $cookie_key = $this->cookie_key($entity_id);
     setcookie($cookie_key, 0, REQUEST_TIME + $this->get_lifetime(), base_path());
     $_COOKIE[$cookie_key] = 0;
   }
@@ -92,8 +92,8 @@ class FlagGlobalCookieStorage extends FlagCookieStorage {
     return $cookie_lifetime;
   }
 
-  protected function cookie_key($content_id) {
-    return 'flag_global_' . $this->flag->name . '_' . $content_id;
+  protected function cookie_key($entity_id) {
+    return 'flag_global_' . $this->flag->name . '_' . $entity_id;
   }
 
   /**
@@ -122,15 +122,15 @@ class FlagNonGlobalCookieStorage extends FlagCookieStorage {
     $this->flaggings = isset($_COOKIE['flags']) ? explode(' ', $_COOKIE['flags']) : array();
   }
 
-  function flag($content_id) {
-    if (!$this->is_flagged($content_id)) {
-      $this->flaggings[] = $this->cookie_key($content_id);
+  function flag($entity_id) {
+    if (!$this->is_flagged($entity_id)) {
+      $this->flaggings[] = $this->cookie_key($entity_id);
       $this->write();
     }
   }
 
-  function unflag($content_id) {
-    if (($index = $this->index_of($content_id)) !== FALSE) {
+  function unflag($entity_id) {
+    if (($index = $this->index_of($entity_id)) !== FALSE) {
       unset($this->flaggings[$index]);
       $this->write();
     }
@@ -140,8 +140,8 @@ class FlagNonGlobalCookieStorage extends FlagCookieStorage {
     return min((int) ini_get('session.cookie_lifetime'), (int) ini_get('session.gc_maxlifetime'));
   }
 
-  protected function cookie_key($content_id) {
-    return $this->flag->name . '_' . $content_id;
+  protected function cookie_key($entity_id) {
+    return $this->flag->name . '_' . $entity_id;
   }
 
   protected function write() {
@@ -150,12 +150,12 @@ class FlagNonGlobalCookieStorage extends FlagCookieStorage {
     $_COOKIE['flags'] = $serialized;
   }
 
-  protected function is_flagged($content_id) {
-    return $this->index_of($content_id) !== FALSE;
+  protected function is_flagged($entity_id) {
+    return $this->index_of($entity_id) !== FALSE;
   }
 
-  protected function index_of($content_id) {
-    return array_search($this->cookie_key($content_id), $this->flaggings);
+  protected function index_of($entity_id) {
+    return array_search($this->cookie_key($entity_id), $this->flaggings);
   }
 
   /**

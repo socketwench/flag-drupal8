@@ -73,9 +73,9 @@ class flag_handler_field_ops extends views_handler_field {
 
     // Find out if the content is flagged. We can't just peek at some field in
     // our loaded table because it doesn't always reflect the user browsing the
-    // page. So we explicitly add the flag_content table to find this out.
+    // page. So we explicitly add the flagging table to find this out.
     $join = new views_join();
-    $join->construct('flag_content', $info['views table'], $info['join field'], 'content_id');
+    $join->construct('flagging', $info['views table'], $info['join field'], 'entity_id');
     $join->extra[] = array(
       'field' => 'fid',
       'value' => $flag->fid,
@@ -93,15 +93,15 @@ class flag_handler_field_ops extends views_handler_field {
         'numeric' => TRUE,
       );
     }
-    $flag_table = $this->query->add_table('flag_content', $parent, $join);
-    $this->aliases['is_flagged'] = $this->query->add_field($flag_table, 'content_id');
+    $flag_table = $this->query->add_table('flagging', $parent, $join);
+    $this->aliases['is_flagged'] = $this->query->add_field($flag_table, 'entity_id');
 
     // Next, find out the content ID. We can't add_field() on this table
-    // (flag_content), because its content_id may be NULL (in case no user has
+    // (flagging), because its entity_id may be NULL (in case no user has
     // flagged this content, and it's a LEFT JOIN). So we reach to the parent
     // relationship and add_field() *its* content ID column.
     $left_table = $this->view->relationship[$this->options['relationship']]->table_alias;
-    $this->aliases['content_id'] = $this->query->add_field($left_table, $info['join field']);
+    $this->aliases['entity_id'] = $this->query->add_field($left_table, $info['join field']);
   }
 
   /**
@@ -116,10 +116,10 @@ class flag_handler_field_ops extends views_handler_field {
 
     $ids = array();
     foreach ($values as $row) {
-      $content_id = $row->{$this->aliases['content_id']};
+      $entity_id = $row->{$this->aliases['entity_id']};
       $is_flagged = $row->{$this->aliases['is_flagged']};
-      if (isset($content_id)) {
-        $ids[$content_id] = $is_flagged ? 'unflag' : 'flag';
+      if (isset($entity_id)) {
+        $ids[$entity_id] = $is_flagged ? 'unflag' : 'flag';
       }
     }
     $this->flag_applies = $ids ? $flag->access_multiple($ids) : array();
@@ -130,10 +130,10 @@ class flag_handler_field_ops extends views_handler_field {
       return t('Missing flag'); // get_flag() itself will print a more detailed message.
     }
 
-    $content_id = $values->{$this->aliases['content_id']};
+    $entity_id = $values->{$this->aliases['entity_id']};
     $is_flagged = $values->{$this->aliases['is_flagged']};
 
-    if (empty($this->flag_applies[$content_id])) {
+    if (empty($this->flag_applies[$entity_id])) {
       // Flag does not apply to this content.
       return;
     }
@@ -141,6 +141,6 @@ class flag_handler_field_ops extends views_handler_field {
     if (!empty($this->options['link_type'])) {
       $flag->link_type = $this->options['link_type'];
     }
-    return $flag->theme($is_flagged ? 'unflag' : 'flag', $content_id);
+    return $flag->theme($is_flagged ? 'unflag' : 'flag', $entity_id);
   }
 }

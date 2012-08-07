@@ -31,7 +31,7 @@ class flag_entity extends flag_flag {
    */
   function options_form(&$form) {
     $bundles = array();
-    $entity_info = entity_get_info($this->content_type);
+    $entity_info = entity_get_info($this->entity_type);
     foreach ($entity_info['bundles'] as $bundle_key => $bundle) {
       $bundles[$bundle_key] = check_plain($bundle['label']);
     }
@@ -62,9 +62,9 @@ class flag_entity extends flag_flag {
   /**
    * Loads the entity object.
    */
-  function _load_content($content_id) {
-    if (is_numeric($content_id)) {
-      $entity = entity_load($this->content_type, array($content_id));
+  function _load_entity($entity_id) {
+    if (is_numeric($entity_id)) {
+      $entity = entity_load($this->entity_type, array($entity_id));
       return reset($entity);
     }
     return NULL;
@@ -73,8 +73,8 @@ class flag_entity extends flag_flag {
   /**
    * Checks whether the flag applies for the current entity bundle.
    */
-  function applies_to_content_object($entity) {
-    $entity_info = entity_get_info($this->content_type);
+  function applies_to_entity($entity) {
+    $entity_info = entity_get_info($this->entity_type);
     if (empty($entity_info['entity keys']['bundle']) || in_array($entity->{$entity_info['entity keys']['bundle']}, $this->types)) {
       return TRUE;
     }
@@ -84,8 +84,8 @@ class flag_entity extends flag_flag {
   /**
    * Returns the entity id, if it already exists.
    */
-  function get_content_id($entity) {
-    $entity_info = entity_get_info($this->content_type);
+  function get_entity_id($entity) {
+    $entity_info = entity_get_info($this->entity_type);
     if ($entity && isset($entity->{$entity_info['entity keys']['id']})) {
       return $entity->{$entity_info['entity keys']['id']};
     }
@@ -107,36 +107,36 @@ class flag_entity extends flag_flag {
   function get_labels_token_types() {
     // The token type name might be different to the entity type name. If so,
     // an own flag entity handler can be used for overriding this.
-    return array_merge(array($this->content_type), parent::get_labels_token_types());
+    return array_merge(array($this->entity_type), parent::get_labels_token_types());
   }
 
   /**
    * Replaces tokens.
    */
-  function replace_tokens($label, $contexts, $options, $content_id) {
-    if ($content_id && ($entity = $this->fetch_content($content_id))) {
-      $contexts[$this->content_type] = $entity;
+  function replace_tokens($label, $contexts, $options, $entity_id) {
+    if ($entity_id && ($entity = $this->fetch_entity($entity_id))) {
+      $contexts[$this->entity_type] = $entity;
     }
-    return parent::replace_tokens($label, $contexts, $options, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $entity_id);
   }
 
   /**
    * Returns a 'flag action' object.
    */
-  function get_flag_action($content_id) {
-    $flag_action = parent::get_flag_action($content_id);
-    $entity = $this->fetch_content($content_id);
-    $flag_action->content_title = entity_label($this->content_type, $entity);
-    $flag_action->content_url = _flag_url($this->content_type . '/' . $this->get_content_id($entity));
+  function get_flag_action($entity_id) {
+    $flag_action = parent::get_flag_action($entity_id);
+    $entity = $this->fetch_entity($entity_id);
+    $flag_action->content_title = entity_label($this->entity_type, $entity);
+    $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_entity_id($entity));
     return $flag_action;
   }
 
   /**
    * Returns objects the action may possible need.
    */
-  function get_relevant_action_objects($content_id) {
+  function get_relevant_action_objects($entity_id) {
     return array(
-      $this->content_type => $this->fetch_content($content_id),
+      $this->entity_type => $this->fetch_entity($entity_id),
     );
   }
 
@@ -144,7 +144,7 @@ class flag_entity extends flag_flag {
    * Returns information for the Views integration.
    */
   function get_views_info() {
-    $entity_info = entity_get_info($this->content_type);
+    $entity_info = entity_get_info($this->entity_type);
     return array(
       'views table' => $entity_info['base table'],
       'join field' => $entity_info['entity keys']['id'],

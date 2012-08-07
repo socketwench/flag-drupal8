@@ -50,16 +50,16 @@ class flag_comment extends flag_entity {
     unset($form['display']['show_on_entity']);
   }
 
-  function type_access_multiple($content_ids, $account) {
+  function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // Ensure node types are granted access. This avoids a
-    // node_load() on every type, usually done by applies_to_content_id().
+    // node_load() on every type, usually done by applies_to_entity_id().
     $query = db_select('comment', 'c');
     $query->innerJoin('node', 'n', 'c.nid = n.nid');
     $result = $query
       ->fields('c', array('cid'))
-      ->condition('c.cid', $content_ids, 'IN')
+      ->condition('c.cid', $entity_ids, 'IN')
       ->condition('n.type', $this->types, 'NOT IN')
       ->execute();
     foreach ($result as $row) {
@@ -69,10 +69,10 @@ class flag_comment extends flag_entity {
     return $access;
   }
 
-  function get_content_id($comment) {
+  function get_entity_id($comment) {
     // Store the comment object in the static cache, to avoid getting it
     // again unneedlessly.
-    $this->remember_content($comment->cid, $comment);
+    $this->remember_entity($comment->cid, $comment);
     return $comment->cid;
   }
 
@@ -84,26 +84,26 @@ class flag_comment extends flag_entity {
     return array_merge(array('comment', 'node'), parent::get_labels_token_types());
   }
 
-  function replace_tokens($label, $contexts, $options, $content_id) {
-    if ($content_id) {
-      if (($comment = $this->fetch_content($content_id)) && ($node = node_load($comment->nid))) {
+  function replace_tokens($label, $contexts, $options, $entity_id) {
+    if ($entity_id) {
+      if (($comment = $this->fetch_entity($entity_id)) && ($node = node_load($comment->nid))) {
         $contexts['node'] = $node;
         $contexts['comment'] = $comment;
       }
     }
-    return parent::replace_tokens($label, $contexts, $options, $content_id);
+    return parent::replace_tokens($label, $contexts, $options, $entity_id);
   }
 
-  function get_flag_action($content_id) {
-    $flag_action = parent::get_flag_action($content_id);
-    $comment = $this->fetch_content($content_id);
+  function get_flag_action($entity_id) {
+    $flag_action = parent::get_flag_action($entity_id);
+    $comment = $this->fetch_entity($entity_id);
     $flag_action->content_title = $comment->subject;
     $flag_action->content_url = _flag_url("comment/$comment->cid", "comment-$comment->cid");
     return $flag_action;
   }
 
-  function get_relevant_action_objects($content_id) {
-    $comment = $this->fetch_content($content_id);
+  function get_relevant_action_objects($entity_id) {
+    $comment = $this->fetch_entity($entity_id);
     return array(
       'comment' => $comment,
       'node' => node_load($comment->nid),
