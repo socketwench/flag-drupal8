@@ -195,30 +195,22 @@ function theme_flag_admin_page($variables) {
 /**
  * Menu callback for adding a new flag.
  */
-function flag_add_page($type = NULL, $name = NULL) {
-  drupal_set_title(t('Add new flag'));
-  if (isset($type) && isset($name)) {
-    $flag = flag_flag::factory_by_entity_type($type);
-    $flag->name = $name;
+function flag_add_page($entity_type = NULL) {
+  if (isset($entity_type)) {
+    $flag = flag_flag::factory_by_entity_type($entity_type);
+    $type_info = flag_fetch_definition($entity_type);
+    drupal_set_title(t('Add new @type flag', array('@type' => $type_info['title'])));
     return drupal_get_form('flag_form', $flag);
   }
-  else {
-    return drupal_get_form('flag_add_form');
-  }
+
+  drupal_set_title(t('Select flag type'));
+  return drupal_get_form('flag_add_form');
 }
 
 /**
  * Present a form for creating a new flag, setting the type of flag.
  */
 function flag_add_form($form, &$form_state) {
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Flag name'),
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
-    '#maxlength' => 32,
-    '#required' => TRUE,
-  );
-
   $types = array();
   foreach (flag_fetch_definition() as $type => $info) {
     $types[$type] = $info['title'] . '<div class="description">' . $info['description'] . '</div>';
@@ -239,7 +231,7 @@ function flag_add_form($form, &$form_state) {
 
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Add flag'),
+    '#value' => t('Continue'),
   );
 
   return $form;
@@ -247,17 +239,13 @@ function flag_add_form($form, &$form_state) {
 
 function flag_add_form_validate($form, &$form_state) {
   $flag = flag_flag::factory_by_entity_type($form_state['values']['type']);
-  $flag->name = $form_state['values']['name'];
-  $errors = $flag->validate_name();
-  foreach ($errors as $field => $field_errors) {
-    foreach ($field_errors as $error) {
-      form_set_error($field, $error['message']);
-    }
+  if (get_class($flag) == 'flag_broken') {
+    form_set_error('type', t("This flag type, %type, isn't valid.", array('%type' => $form_state['values']['type'])));
   }
 }
 
 function flag_add_form_submit($form, &$form_state) {
-  $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'] . '/' . $form_state['values']['name'];
+  $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'];
 }
 
 /**
@@ -265,21 +253,6 @@ function flag_add_form_submit($form, &$form_state) {
  */
 function flag_form($form, &$form_state, $flag) {
   $form['#flag'] = $flag;
-
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#default_value' => $flag->name,
-    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
-    '#maxlength' => 32,
-    '#required' => TRUE,
-    '#access' => empty($flag->locked['name']),
-    '#weight' => -3,
-  );
-
-  if (!empty($flag->fid)) {
-    $form['name']['#description'] .= ' <strong>' . t('Change this value only with great care.') . '</strong>';
-  }
 
   $form['title'] = array(
     '#type' => 'textfield',
@@ -289,7 +262,21 @@ function flag_form($form, &$form_state, $flag) {
     '#maxlength' => 255,
     '#required' => TRUE,
     '#access' => empty($flag->locked['title']),
+    '#weight' => -3,
+  );
+
+  $form['name'] = array(
+    '#type' => 'machine_name',
+    '#title' => t('Machine name'),
+    '#default_value' => $flag->name,
+    '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+    '#maxlength' => 32,
+    '#access' => empty($flag->locked['name']),
     '#weight' => -2,
+    '#machine_name' => array(
+      'exists' => 'flag_get_flag',
+      'source' => array('title'),
+    ),
   );
 
   $form['global'] = array(
@@ -380,10 +367,10 @@ function flag_form($form, &$form_state, $flag) {
   );
 
   $options = array();
-  $node_types = node_type_get_types();
-  foreach ($node_types as $node_type) {
+  foreach (node_type_get_types() as $node_type) {
     $options[$node_type->type] = check_plain($node_type->name);
   }
+
   $form['access']['types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Flaggable content'),
@@ -550,7 +537,7 @@ function flag_form_submit($form, &$form_state) {
   $flag->form_input($form_state['values']);
   $flag->save();
   $flag->enable();
-  drupal_set_message(t('Flag @name has been saved.', array('@name' => $flag->get_title())));
+  drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
   _flag_clear_cache();
   $form_state['redirect'] = FLAG_ADMIN_PATH;
 }

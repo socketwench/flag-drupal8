@@ -109,7 +109,7 @@ function flag_menu() {
     'weight' => -10,
   );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
-    'title' => 'Add a new flag',
+    'title' => 'Add flag',
     'page callback' => 'flag_add_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),

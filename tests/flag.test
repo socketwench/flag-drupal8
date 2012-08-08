@@ -58,7 +58,7 @@ class FlagTestCase extends DrupalWebTestCase {
     $saved['types'] = array('page');
     unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]']);
 
-    $this->drupalPost(FLAG_ADMIN_PATH . '/add/node/' . $edit['name'], $edit, t('Save flag'));
+    $this->drupalPost(FLAG_ADMIN_PATH . '/add/node', $edit, t('Save flag'));
 
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $flag = flag_get_flag($edit['name']);
