@@ -296,7 +296,7 @@ function flag_form($form, &$form_state, $flag) {
   $form['messages']['flag_short'] = array(
     '#type' => 'textfield',
     '#title' => t('Flag link text'),
-    '#default_value' => $flag->flag_short,
+    '#default_value' => !empty($flag->flag_short) ? $flag->flag_short : t('Flag this item'),
     '#description' => t('The text for the "flag this" link for this flag.'),
     '#required' => TRUE,
     '#access' => empty($flag->locked['flag_short']),
@@ -321,7 +321,7 @@ function flag_form($form, &$form_state, $flag) {
   $form['messages']['unflag_short'] = array(
     '#type' => 'textfield',
     '#title' => t('Unflag link text'),
-    '#default_value' => $flag->unflag_short,
+    '#default_value' => !empty($flag->unflag_short) ? $flag->unflag_short : t('Unflag this item'),
     '#description' => t('The text for the "unflag this" link for this flag.'),
     '#required' => TRUE,
     '#access' => empty($flag->locked['unflag_short']),
