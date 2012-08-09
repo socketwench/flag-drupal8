@@ -111,7 +111,7 @@ class flag_flag {
       'unflag_long' => '',
       'unflag_message' => '',
       'unflag_denied_text' => '',
-      // The link type used by the flag, as defined in hook_flag_link_types().
+      // The link type used by the flag, as defined in hook_flag_link_type_info().
       'link_type' => 'toggle',
       'roles' => array(
         'flag' => array(DRUPAL_AUTHENTICATED_RID),

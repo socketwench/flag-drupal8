@@ -82,7 +82,7 @@ function flag_features_revert($module = NULL) {
  */
 function flag_features_providing_module() {
   $modules = array();
-  $hook = 'flag_definitions';
+  $hook = 'flag_type_info';
   foreach (module_implements($hook) as $module) {
     foreach (module_invoke($module, $hook) as $key => $value) {
       $modules[$key] = $module;

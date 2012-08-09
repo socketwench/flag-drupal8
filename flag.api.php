@@ -26,7 +26,7 @@
  *
  * @see flag_fetch_definition()
  */
-function hook_flag_definitions() {
+function hook_flag_type_info() {
   return array(
     'node' => array(
       'title' => t('Nodes'),
@@ -40,9 +40,9 @@ function hook_flag_definitions() {
  * Alter flag type definitions provided by other modules.
  *
  * @param $definitions
- *  An array of flag definitions returned by hook_flag_definitions().
+ *  An array of flag definitions returned by hook_flag_type_info().
  */
-function hook_flag_definitions_alter(&$definitions) {
+function hook_flag_type_info_alter(&$definitions) {
 
 }
 
@@ -160,9 +160,9 @@ function hook_flag_access_multiple($flag, $entity_ids, $account) {
  *    module's own CSS file for links.
  *
  * @see flag_get_link_types()
- * @see hook_flag_link_types_alter()
+ * @see hook_flag_link_type_info_alter()
  */
-function hook_flag_link_types() {
+function hook_flag_link_type_info() {
 
 }
 
@@ -173,9 +173,9 @@ function hook_flag_link_types() {
  *  An array of the link types defined by all modules.
  *
  * @see flag_get_link_types()
- * @see hook_flag_link_types()
+ * @see hook_flag_link_type_info()
  */
-function hook_flag_link_types_alter(&$link_types) {
+function hook_flag_link_type_info_alter(&$link_types) {
 
 }
 
@@ -200,7 +200,7 @@ function hook_flag_link_types_alter(&$link_types) {
  * @return
  *   An array defining properties of the link.
  *
- * @see hook_flag_link_types()
+ * @see hook_flag_link_type_info()
  * @see template_preprocess_flag()
  */
 function hook_flag_link() {
