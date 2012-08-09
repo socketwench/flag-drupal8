@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implements hook_flag_definitions().
+ * Implements hook_flag_type_info().
  *
  * Defines the flag types this module implements.
  *
@@ -9,7 +9,7 @@
  *   An "array of arrays", keyed by object type. The 'handler' slot
  *   should point to the PHP class implementing this flag.
  */
-function flag_flag_definitions() {
+function flag_flag_type_info() {
   // Entity types we specifically cater for.
   $flags = array(
     'node' => array(
@@ -33,13 +33,13 @@ function flag_flag_definitions() {
 }
 
 /**
- * Implements hook_flag_definitions_alter().
+ * Implements hook_flag_type_info_alter().
  *
  * Step in and add flag types for any entities not yet catered for, using the
  * basic flag_entity handler. This allows other modules to provide more
- * specialized handlers for entities in hook_flag_definitions() as normal.
+ * specialized handlers for entities in hook_flag_type_info() as normal.
  */
-function flag_flag_definitions_alter(&$definitions) {
+function flag_flag_type_info_alter(&$definitions) {
   foreach (entity_get_info() as $entity_type => $entity) {
     // Only add flag support for entities that don't yet have them, and which
     // are non-config entities.
@@ -59,12 +59,12 @@ function flag_flag_definitions_alter(&$definitions) {
 function flag_fetch_definition($entity_type = NULL) {
   static $defintions;
   if (!isset($defintions)) {
-    $defintions = module_invoke_all('flag_definitions');
-    drupal_alter('flag_definitions', $defintions);
+    $defintions = module_invoke_all('flag_type_info');
+    drupal_alter('flag_type_info', $defintions);
     if (!isset($defintions['node'])) {
       // We want our API to be available in hook_install, but our module is not
       // enabled by then, so let's load our implementation directly:
-      $defintions += flag_flag_definitions();
+      $defintions += flag_flag_type_info();
     }
   }
 
