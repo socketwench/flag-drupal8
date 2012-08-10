@@ -1049,20 +1049,6 @@ function flag_flag($action, $flag, $entity_id, $account) {
       }
     }
   }
-
-  if (module_exists('rules')) {
-    $event_name = ($action == 'flag' ? 'flag_flagged_' : 'flag_unflagged_') . $flag->name;
-    // We only support flags on entities.
-    if (entity_get_info($flag->entity_type)) {
-      $variables = array(
-        'flag' => $flag,
-        'flagged_' . $flag->entity_type => $entity_id,
-        'flagging_user' => $account,
-        'flagging' => $flag->get_flagging($entity_id,$account->uid),
-      );
-      rules_invoke_event_by_args($event_name, $variables);
-    }
-  }
 }
 
 /**

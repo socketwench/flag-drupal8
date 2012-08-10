@@ -582,6 +582,20 @@ class flag_flag {
         $this->_delete_flagging($existing_flagging_id);
         $this->_unflag($entity_id, $uid, $sid);
         module_invoke_all('flag', 'unflag', $this, $entity_id, $account, $existing_flagging_id);
+        // Invoke Rules event.
+        if (module_exists('rules')) {
+          $event_name = 'flag_unflagged_' . $this->name;
+          // We only support flags on entities.
+          if (entity_get_info($this->entity_type)) {
+            $variables = array(
+              'flag' => $this,
+              'flagged_' . $this->entity_type => $entity_id,
+              'flagging_user' => $account,
+              'flagging' => $this->get_flagging($entity_id, $account->uid),
+            );
+            rules_invoke_event_by_args($event_name, $variables);
+          }
+        }
       }
     }
     elseif ($action == 'flag') {
@@ -599,6 +613,20 @@ class flag_flag {
         // Field API will assign the fields their default values.
         $this->_insert_flagging($flagging, $entity_id, $flagging_id);
         module_invoke_all('flag', 'flag', $this, $entity_id, $account, $flagging_id);
+        // Invoke Rules event.
+        if (module_exists('rules')) {
+          $event_name = 'flag_flagged_' . $this->name;
+          // We only support flags on entities.
+          if (entity_get_info($this->entity_type)) {
+            $variables = array(
+              'flag' => $this,
+              'flagged_' . $this->entity_type => $entity_id,
+              'flagging_user' => $account,
+              'flagging' => $this->get_flagging($entity_id, $account->uid),
+            );
+            rules_invoke_event_by_args($event_name, $variables);
+          }
+        }
       }
       else {
         // Nothing to do. Item is already flagged.
