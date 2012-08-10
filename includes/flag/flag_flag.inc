@@ -591,7 +591,6 @@ class flag_flag {
               'flag' => $this,
               'flagged_' . $this->entity_type => $entity_id,
               'flagging_user' => $account,
-              'flagging' => $this->get_flagging($entity_id, $account->uid),
             );
             rules_invoke_event_by_args($event_name, $variables);
           }
