@@ -220,7 +220,7 @@ function flag_add_form($form, &$form_state) {
     '#type' => 'radios',
     '#title' => t('Flag type'),
     '#default_value' => 'node',
-    '#description' => t('The type of content this flag will affect. An individual flag can only affect one type of content. This cannot be changed once the flag is created.'),
+    '#description' => t('The type of object this flag will affect. This cannot be changed once the flag is created.'),
     '#required' => TRUE,
     '#options' => $types,
   );

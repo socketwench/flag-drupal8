@@ -249,6 +249,9 @@ function flag_help($path, $arg) {
     case FLAG_ADMIN_PATH:
       $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system.') . '</p>';
       return $output;
+    case FLAG_ADMIN_PATH . '/add':
+      $output = '<p>' . t('Select the type of flag to create. An individual flag can only affect one type of object. This cannot be changed once the flag is created.') . '</p>';
+      return $output;
     case FLAG_ADMIN_PATH . '/manage/%/fields':
       $output  = '<p>' . t('Flags can have fields added to them. For example, a "Spam" flag could have a <em>Reason</em> field where a user could type in why he believes the item flagged is spam. A "Bookmarks" flag could have a <em>Folder</em> field into which a user could arrange her bookmarks.') . '</p>';
       $output .= '<p>' . t('On this page you can add fields to flags, delete them, and otherwise manage them.') . '</p>';
