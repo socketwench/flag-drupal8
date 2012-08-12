@@ -57,7 +57,7 @@ function flag_flag_type_info_alter(&$definitions) {
  * Returns a flag definition.
  */
 function flag_fetch_definition($entity_type = NULL) {
-  static $defintions;
+  $cache = &drupal_static(__FUNCTION__);
   if (!isset($defintions)) {
     $defintions = module_invoke_all('flag_type_info');
     drupal_alter('flag_type_info', $defintions);
@@ -82,7 +82,7 @@ function flag_fetch_definition($entity_type = NULL) {
  * Returns all flag types defined on the system.
  */
 function flag_get_types() {
-  static $types;
+  $types = &drupal_static(__FUNCTION__);
   if (!isset($types)) {
     $types = array_keys(flag_fetch_definition());
   }

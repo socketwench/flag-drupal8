@@ -1361,7 +1361,7 @@ function flag_theme() {
  */
 function template_preprocess_flag(&$variables) {
   global $user;
-  static $initialized = array();
+  $initialized = &drupal_static(__FUNCTION__, array());
 
   // Some typing shotcuts:
   $flag =& $variables['flag'];
@@ -1498,7 +1498,7 @@ function _flag_link_type_fields() {
  *   An array of the structure [name] => [number of flags].
  */
 function flag_get_counts($entity_type, $entity_id, $reset = FALSE) {
-  static $counts;
+  $counts = &drupal_static(__FUNCTION__);
 
   if ($reset) {
     $counts = array();
@@ -1534,7 +1534,7 @@ function flag_get_counts($entity_type, $entity_id, $reset = FALSE) {
  *   Reset the internal cache and execute the SQL query another time.
  */
 function flag_get_flag_counts($flag_name, $reset = FALSE) {
-  static $counts;
+  $counts = &drupal_static(__FUNCTION__);
 
   if ($reset) {
     $counts = array();
@@ -1596,7 +1596,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL, $reset = FALSE) {
-  static $flags;
+  $flags = &drupal_static(__FUNCTION__);
 
   // Retrieve a list of all flags, regardless of the parameters.
   if (!isset($flags) || $reset) {
@@ -1809,7 +1809,7 @@ function flag_get_entity_id($flagging_id) {
  *
  */
 function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
-  static $flagged_content;
+  $flagged_content = &drupal_static(__FUNCTION__);
 
   if ($reset) {
     $flagged_content = array();
@@ -1947,7 +1947,7 @@ function flag_create_link($flag_name, $entity_id) {
  * @see hook_flag_link_type_info_alter()
  */
 function flag_get_link_types($reset = FALSE) {
-  static $link_types;
+  $link_types = &drupal_static(__FUNCTION__);
 
   if (!isset($link_types) || $reset) {
     $link_types = array();
@@ -1991,7 +1991,7 @@ function flag_check_token($token, $entity_id) {
  * Set the Session ID for a user. Utilizes the Session API module.
  */
 function flag_set_sid($uid = NULL, $create = TRUE) {
-  static $sids = array();
+  $sids = &drupal_static(__FUNCTION__, array());
 
   if (!isset($uid)) {
     $uid = $GLOBALS['user']->uid;
