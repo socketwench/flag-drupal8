@@ -29,6 +29,7 @@ class flag_flag {
   var $title = '';
   var $global = FALSE;
   // The sub-types, e.g. node types, this flag applies to.
+  // This may be an empty array to indicate all types apply.
   var $types = array();
 
   /**
