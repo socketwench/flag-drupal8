@@ -13,6 +13,8 @@
 /**
  * Define one or more flag types.
  *
+ * This hook may be placed in a $module.flag.inc file.
+ *
  * @return
  *  An array whose keys are flag type names and whose values are properties of
  *  the flag type.
@@ -38,6 +40,8 @@ function hook_flag_type_info() {
 
 /**
  * Alter flag type definitions provided by other modules.
+ *
+ * This hook may be placed in a $module.flag.inc file.
  *
  * @param $definitions
  *  An array of flag definitions returned by hook_flag_type_info().
@@ -164,6 +168,8 @@ function hook_flag_access_multiple($flag, $entity_ids, $account) {
  *
  * Link types defined here must be returned by this module's hook_flag_link().
  *
+ * This hook may be placed in a $module.flag.inc file.
+ *
  * @return
  *  An array of one or more types, keyed by the machine name of the type, and
  *  where each value is a link type definition as an array with the following
@@ -189,6 +195,8 @@ function hook_flag_link_type_info() {
 
 /**
  * Alter other modules' definitions of flag link types.
+ *
+ * This hook may be placed in a $module.flag.inc file.
  *
  * @param $link_types
  *  An array of the link types defined by all modules.
