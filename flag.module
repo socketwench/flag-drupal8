@@ -331,6 +331,25 @@ function flag_init() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function flag_hook_info() {
+  $hooks['flag_type_info'] = array(
+    'group' => 'flag',
+  );
+  $hooks['flag_type_info_alter'] = array(
+    'group' => 'flag',
+  );
+  $hooks['flag_link_type_info'] = array(
+    'group' => 'flag',
+  );
+  $hooks['flag_link_type_info_alter'] = array(
+    'group' => 'flag',
+  );
+  return $hooks;
+}
+
+/**
  * Implements hook_views_api().
  */
 function flag_views_api() {
@@ -446,37 +465,6 @@ function flag_flag_link($flag, $action, $entity_id) {
   return array(
     'href' => 'flag/' . ($flag->link_type == 'confirm' ? 'confirm/' : '') . "$action/$flag->name/$entity_id",
     'query' => drupal_get_destination() + ($flag->link_type == 'confirm' ? array() : array('token' => $token)),
-  );
-}
-
-/**
- * Implements hook_flag_link_type_info().
- */
-function flag_flag_link_type_info() {
-  return array(
-    'toggle' => array(
-      'title' => t('JavaScript toggle'),
-      'description' => t('An AJAX request will be made and degrades to type "Normal link" if JavaScript is not available.'),
-      'uses standard js' => TRUE,
-      'uses standard css' => TRUE,
-    ),
-    'normal' => array(
-      'title' => t('Normal link'),
-      'description' => t('A normal non-JavaScript request will be made and the current page will be reloaded.'),
-      'uses standard js' => FALSE,
-      'uses standard css' => FALSE,
-    ),
-    'confirm' => array(
-      'title' => t('Confirmation form'),
-      'description' => t('The user will be taken to a confirmation form on a separate page to confirm the flag.'),
-      'options' => array(
-        'flag_confirmation' => '',
-        'unflag_confirmation' => '',
-      ),
-      'uses standard js' => FALSE,
-      'uses standard css' => FALSE,
-      'provides form' => TRUE,
-    ),
   );
 }
 
