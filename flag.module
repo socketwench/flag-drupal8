@@ -2062,23 +2062,30 @@ function flag_get_link_types() {
   $link_types = &drupal_static(__FUNCTION__);
 
   if (!isset($link_types)) {
-    $link_types = array();
-    foreach (module_implements('flag_link_type_info') as $module) {
-      $module_types = module_invoke($module, 'flag_link_type_info');
-      foreach ($module_types as $type_name => $info) {
-        $link_types[$type_name] = $info + array(
-          'module' => $module,
-          'name' => $type_name,
-          'title' => '',
-          'description' => '',
-          'options' => array(),
-          'uses standard js' => TRUE,
-          'uses standard css' => TRUE,
-          'provides form' => FALSE,
-        );
-      }
+    if ($cache = cache_get('flag_link_type_info')) {
+      $link_types = $cache->data;
     }
-    drupal_alter('flag_link_type_info', $link_types);
+    else {
+      $link_types = array();
+      foreach (module_implements('flag_link_type_info') as $module) {
+        $module_types = module_invoke($module, 'flag_link_type_info');
+        foreach ($module_types as $type_name => $info) {
+          $link_types[$type_name] = $info + array(
+            'module' => $module,
+            'name' => $type_name,
+            'title' => '',
+            'description' => '',
+            'options' => array(),
+            'uses standard js' => TRUE,
+            'uses standard css' => TRUE,
+            'provides form' => FALSE,
+          );
+        }
+      }
+      drupal_alter('flag_link_type_info', $link_types);
+
+      cache_set('flag_link_type_info', $link_types);
+    }
   }
 
   return $link_types;
