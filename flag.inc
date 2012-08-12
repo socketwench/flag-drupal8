@@ -58,23 +58,23 @@ function flag_flag_type_info_alter(&$definitions) {
  */
 function flag_fetch_definition($entity_type = NULL) {
   $cache = &drupal_static(__FUNCTION__);
-  if (!isset($defintions)) {
-    $defintions = module_invoke_all('flag_type_info');
-    drupal_alter('flag_type_info', $defintions);
-    if (!isset($defintions['node'])) {
+  if (!isset($definitions)) {
+    $definitions = module_invoke_all('flag_type_info');
+    drupal_alter('flag_type_info', $definitions);
+    if (!isset($definitions['node'])) {
       // We want our API to be available in hook_install, but our module is not
       // enabled by then, so let's load our implementation directly:
-      $defintions += flag_flag_type_info();
+      $definitions += flag_flag_type_info();
     }
   }
 
   if (isset($entity_type)) {
-    if (isset($defintions[$entity_type])) {
-      return $defintions[$entity_type];
+    if (isset($definitions[$entity_type])) {
+      return $definitions[$entity_type];
     }
   }
   else {
-    return $defintions;
+    return $definitions;
   }
 }
 
