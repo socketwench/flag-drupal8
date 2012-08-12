@@ -35,12 +35,16 @@ function flag_entity_info() {
     ),
   );
 
-  foreach (flag_get_flags(NULL, NULL, NULL, TRUE) as $flag) {
-    $return['flagging']['bundles'][$flag->name] = array(
-      'label' => $flag->title,
+  // Add bundle info but bypass flag_get_flags() as we cannot use it here, as
+  // it calls entity_get_info().
+  $result = db_query("SELECT name, title FROM {flag}");
+  $flag_names = $result->fetchAllKeyed();
+  foreach ($flag_names as $flag_name => $flag_title) {
+    $return['flagging']['bundles'][$flag_name] = array(
+      'label' => $flag_title,
       'admin' => array(
         'path' => FLAG_ADMIN_PATH . '/manage/%flag',
-        'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag->name,
+        'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag_name,
         'bundle argument' => FLAG_ADMIN_PATH_START + 1,
         'access arguments' => array('administer flags'),
       ),
