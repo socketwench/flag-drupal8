@@ -232,7 +232,6 @@ function flag_rules_action_info() {
     ),
   );
   foreach (flag_get_types() as $type) {
-    $flag = flag_create_handler($type);
     $entity_info = entity_get_info($type);
     $items += array(
       'flag_flag' . $type => array(
@@ -357,7 +356,6 @@ function flag_rules_action_fetch_entity_by_user($flag, $user) {
 function flag_rules_condition_info() {
   $items = array();
   foreach (flag_get_types() as $type) {
-    $flag = flag_create_handler($type);
     $entity_info = entity_get_info($type);
     $label = isset($entity_info[$type]['label']) ? $entity_info[$type]['label'] : $type;
     $items += array(
