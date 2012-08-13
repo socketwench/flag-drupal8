@@ -35,10 +35,17 @@ function flag_admin_listing($form, &$form_state, $flags) {
     '#type' => 'actions',
   );
 
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save flag order'),
-  );
+  if (count($flags) == 1) {
+    // Don't show weights with only one flag.
+    unset($form['flags'][$flag->name]['weight']);
+  }
+  elseif (count($flags) > 1) {
+    // Only show the form button if there are several flags.
+    $form['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save flag order'),
+    );
+  }
 
   return $form;
 }
@@ -75,15 +82,17 @@ function theme_flag_admin_listing($variables) {
       unset($ops['flags_fields']);
     }
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
-    $row = array(
-      $flag->name,
-      drupal_render($form['flags'][$flag->name]['weight']),
-      $flag->entity_type,
-      empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles),
-      $flag->types ? implode(', ', $flag->types) : '-',
-      $flag->global ? t('Yes') : t('No'),
-      theme('links', array('links' => $ops)),
-    );
+    $row = array();
+    $row[] = $flag->name;
+    if (count($flags) > 1) {
+      $row[] = drupal_render($form['flags'][$flag->name]['weight']);
+    }
+    $row[] = $flag->entity_type;
+    $row[] = empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles);
+    $row[] = $flag->types ? implode(', ', $flag->types) : '-';
+    $row[] = $flag->global ? t('Yes') : t('No');
+    $row[] = theme('links', array('links' => $ops));
+
     $rows[] = array(
       'data' => $row,
       'class' => array('draggable'),
@@ -94,11 +103,15 @@ function theme_flag_admin_listing($variables) {
       array('data' => t('No flags are currently defined.'), 'colspan' => 7),
     );
   }
-  else {
+  elseif (count($flags) > 1) {
     drupal_add_tabledrag('flag-admin-listing-table', 'order', 'sibling', 'flag-weight');
   }
 
-  $header = array(t('Flag'), t('Weight'), t('Flag type'), t('Roles'), t('Entity bundles'), t('Global?'), t('Operations'));
+  $header = array(t('Flag'));
+  if (count($flags) > 1) {
+    $header[] = t('Weight');
+  }
+  $header = array_merge($header, array(t('Flag type'), t('Roles'), t('Entity bundles'), t('Global?'), t('Operations')));
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'flag-admin-listing-table')));
   $output .= drupal_render_children($form);
 
