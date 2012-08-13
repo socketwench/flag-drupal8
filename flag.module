@@ -1937,9 +1937,6 @@ function flag_create_link($flag_name, $entity_id) {
 /**
  * Return an array of link types provided by modules.
  *
- * @param $reset
- *  (Optional) Whether to reset the static cache.
- *
  * @return
  *  An array of link types as defined by hook_flag_link_type_info(). These are keyed
  *  by the type name, and each value is an array of properties. In addition to
@@ -1950,10 +1947,10 @@ function flag_create_link($flag_name, $entity_id) {
  * @see hook_flag_link_type_info()
  * @see hook_flag_link_type_info_alter()
  */
-function flag_get_link_types($reset = FALSE) {
+function flag_get_link_types() {
   $link_types = &drupal_static(__FUNCTION__);
 
-  if (!isset($link_types) || $reset) {
+  if (!isset($link_types)) {
     $link_types = array();
     foreach (module_implements('flag_link_type_info') as $module) {
       $module_types = module_invoke($module, 'flag_link_type_info');
