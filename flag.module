@@ -403,6 +403,7 @@ function flag_flag_link_type_info() {
       ),
       'uses standard js' => FALSE,
       'uses standard css' => FALSE,
+      'provides form' => TRUE,
     ),
   );
 }
@@ -1963,6 +1964,7 @@ function flag_get_link_types() {
           'options' => array(),
           'uses standard js' => TRUE,
           'uses standard css' => TRUE,
+          'provides form' => FALSE,
         );
       }
     }

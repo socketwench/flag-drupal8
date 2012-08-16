@@ -158,6 +158,10 @@ function hook_flag_access_multiple($flag, $entity_ids, $account) {
  *    module's own JS file for links.
  *  - 'uses standard css': Boolean, indicates whether the link requires Flag
  *    module's own CSS file for links.
+ *  - 'provides form': (optional) Boolean indicating that this link type shows
+ *    the user a flagging entity form. This property is used in the UI, eg to
+ *    warn the admin user of link types that are not compatible with other
+ *    flag options. Defaults to FALSE.
  *
  * @see flag_get_link_types()
  * @see hook_flag_link_type_info_alter()
