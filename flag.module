@@ -1030,31 +1030,58 @@ function flag($action, $flag_name, $entity_id, $account = NULL) {
 }
 
 /**
- * Implements hook_flag(). Trigger actions if any are available.
+ * Implements hook_flag_flag().
  */
-function flag_flag($action, $flag, $entity_id, $account) {
+function flag_flag_flag($flag, $entity_id, $account, $flagging_id) {
   if (module_exists('trigger')) {
-    $context['hook'] = 'flag';
-    $context['account'] = $account;
-    $context['flag'] = $flag;
-    $context['op'] = $action;
-    // We add to the $context all the objects we know about:
-    $context = array_merge($flag->get_relevant_action_objects($entity_id), $context);
-    // The primary object the actions work on.
-    $object = $flag->fetch_entity($entity_id);
+    flag_flag_trigger('flag', $flag, $entity_id, $account, $flagging_id);
+  }
+}
 
-    // Generic "all flags" actions.
-    foreach (trigger_get_assigned_actions('flag_' . $action)  as $aid => $action_info) {
-      // The 'if ($aid)' is a safeguard against http://drupal.org/node/271460#comment-886564
-      if ($aid) {
-        actions_do($aid, $object, $context);
-      }
+/**
+ * Implements hook_flag_unflag().
+ */
+function flag_flag_unflag($flag, $entity_id, $account, $flagging_id) {
+  if (module_exists('trigger')) {
+    flag_flag_trigger('unflag', $flag, $entity_id, $account, $flagging_id);
+  }
+}
+
+/**
+ * Trigger actions if any are available. Helper for hook_flag_(un)flag().
+ *
+ * @param $op
+ *  The operation being performed: one of 'flag' or 'unflag'.
+ * @param $flag
+ *  The flag object.
+ * @param $entity_id
+ *  The id of the entity the flag is on.
+ * @param $account
+ *  The user account performing the action.
+ * @param $flagging_id
+ *  The id of the flagging in the {flagging} table.
+ */
+function flag_flag_trigger($action, $flag, $entity_id, $account, $flagging_id) {
+  $context['hook'] = 'flag';
+  $context['account'] = $account;
+  $context['flag'] = $flag;
+  $context['op'] = $action;
+  // We add to the $context all the objects we know about:
+  $context = array_merge($flag->get_relevant_action_objects($entity_id), $context);
+  // The primary object the actions work on.
+  $object = $flag->fetch_entity($entity_id);
+
+  // Generic "all flags" actions.
+  foreach (trigger_get_assigned_actions('flag_' . $action)  as $aid => $action_info) {
+    // The 'if ($aid)' is a safeguard against http://drupal.org/node/271460#comment-886564
+    if ($aid) {
+      actions_do($aid, $object, $context);
     }
-    // Actions specifically for this flag.
-    foreach (trigger_get_assigned_actions('flag_' . $action . '_' . $flag->name) as $aid => $action_info) {
-      if ($aid) {
-        actions_do($aid, $object, $context);
-      }
+  }
+  // Actions specifically for this flag.
+  foreach (trigger_get_assigned_actions('flag_' . $action . '_' . $flag->name) as $aid => $action_info) {
+    if ($aid) {
+      actions_do($aid, $object, $context);
     }
   }
 }

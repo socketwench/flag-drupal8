@@ -611,7 +611,7 @@ class flag_flag {
         // delete the {flagging} record.
         $this->_delete_flagging($existing_flagging_id);
         $this->_unflag($entity_id, $uid, $sid);
-        module_invoke_all('flag', 'unflag', $this, $entity_id, $account, $existing_flagging_id);
+        module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
         // Invoke Rules event.
         if (module_exists('rules')) {
           $event_name = 'flag_unflagged_' . $this->name;
@@ -641,7 +641,7 @@ class flag_flag {
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
         $this->_insert_flagging($flagging, $entity_id, $flagging_id);
-        module_invoke_all('flag', 'flag', $this, $entity_id, $account, $flagging_id);
+        module_invoke_all('flag_flag', $this, $entity_id, $account, $flagging_id);
         // Invoke Rules event.
         if (module_exists('rules')) {
           $event_name = 'flag_flagged_' . $this->name;
