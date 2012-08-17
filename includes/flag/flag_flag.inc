@@ -615,7 +615,7 @@ class flag_flag {
           // Note the order: We decrease the count first so hooks have accurate
           // data, then invoke hooks, then delete the flagging entity.
           $this->_decrease_count($entity_id);
-          module_invoke_all('flag_unflag', $this, $entity_id, $account, $flagging->flagging_id);
+          module_invoke_all('flag_unflag', $this, $entity_id, $account, $flagging);
           // Invoke Rules event.
           if (module_exists('rules')) {
             $event_name = 'flag_unflagged_' . $this->name;
@@ -655,7 +655,7 @@ class flag_flag {
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
         $this->_insert_flagging($flagging, $entity_id, $flagging_id);
-        module_invoke_all('flag_flag', $this, $entity_id, $account, $flagging_id);
+        module_invoke_all('flag_flag', $this, $entity_id, $account, $flagging);
         // Invoke Rules event.
         if (module_exists('rules')) {
           $event_name = 'flag_flagged_' . $this->name;
