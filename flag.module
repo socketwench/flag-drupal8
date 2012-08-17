@@ -1032,18 +1032,18 @@ function flag($action, $flag_name, $entity_id, $account = NULL) {
 /**
  * Implements hook_flag_flag().
  */
-function flag_flag_flag($flag, $entity_id, $account, $flagging_id) {
+function flag_flag_flag($flag, $entity_id, $account, $flagging) {
   if (module_exists('trigger')) {
-    flag_flag_trigger('flag', $flag, $entity_id, $account, $flagging_id);
+    flag_flag_trigger('flag', $flag, $entity_id, $account, $flagging);
   }
 }
 
 /**
  * Implements hook_flag_unflag().
  */
-function flag_flag_unflag($flag, $entity_id, $account, $flagging_id) {
+function flag_flag_unflag($flag, $entity_id, $account, $flagging) {
   if (module_exists('trigger')) {
-    flag_flag_trigger('unflag', $flag, $entity_id, $account, $flagging_id);
+    flag_flag_trigger('unflag', $flag, $entity_id, $account, $flagging);
   }
 }
 
@@ -1059,9 +1059,9 @@ function flag_flag_unflag($flag, $entity_id, $account, $flagging_id) {
  * @param $account
  *  The user account performing the action.
  * @param $flagging_id
- *  The id of the flagging in the {flagging} table.
+ *  The flagging entity.
  */
-function flag_flag_trigger($action, $flag, $entity_id, $account, $flagging_id) {
+function flag_flag_trigger($action, $flag, $entity_id, $account, $flagging) {
   $context['hook'] = 'flag';
   $context['account'] = $account;
   $context['flag'] = $flag;
