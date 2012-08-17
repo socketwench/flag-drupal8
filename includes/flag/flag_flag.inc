@@ -607,12 +607,15 @@ class flag_flag {
         $this->_unflag_anonymous($entity_id);
       }
       if ($flagged) {
+        if (!isset($flagging)) {
+          $flagging = flagging_load($existing_flagging_id);
+        }
         $transaction = db_transaction();
         try {
           // Note the order: We decrease the count first so hooks have accurate
           // data, then invoke hooks, then delete the flagging entity.
           $this->_decrease_count($entity_id);
-          module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
+          module_invoke_all('flag_unflag', $this, $entity_id, $account, $flagging->flagging_id);
           // Invoke Rules event.
           if (module_exists('rules')) {
             $event_name = 'flag_unflagged_' . $this->name;
@@ -622,13 +625,13 @@ class flag_flag {
                 'flag' => $this,
                 'flagged_' . $this->entity_type => $entity_id,
                 'flagging_user' => $account,
-                'flagging' => $this->get_flagging($entity_id, $account->uid),
+                'flagging' => $flagging,
               );
               rules_invoke_event_by_args($event_name, $variables);
             }
           }
-          $this->_delete_flagging($existing_flagging_id);
-          $this->_unflag($entity_id, $existing_flagging_id);
+          $this->_delete_flagging($flagging);
+          $this->_unflag($entity_id, $flagging->flagging_id);
         }
         catch (Exception $e) {
           $transaction->rollback();
@@ -702,12 +705,10 @@ class flag_flag {
     // Update the cache.
     flagging_load($flagging->flagging_id, TRUE);
   }
-  private function _delete_flagging($flagging_id) {
-    if (($flagging = flagging_load($flagging_id))) {
-      field_attach_delete('flagging', $flagging);
-      // Remove from the cache.
-      flagging_load($flagging_id, TRUE);
-    }
+  private function _delete_flagging($flagging) {
+    field_attach_delete('flagging', $flagging);
+    // Remove from the cache.
+    flagging_load($flagging_id, TRUE);
   }
 
   /**
