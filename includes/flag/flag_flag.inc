@@ -611,6 +611,7 @@ class flag_flag {
         // delete the {flagging} record.
         $this->_delete_flagging($existing_flagging_id);
         $this->_unflag($entity_id, $existing_flagging_id);
+        $this->_decrease_count($entity_id);
         module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
         // Invoke Rules event.
         if (module_exists('rules')) {
@@ -637,6 +638,7 @@ class flag_flag {
           $flagging = $this->new_flagging($entity_id, $uid, $sid);
         }
         $flagging_id = $this->_flag($entity_id, $uid, $sid);
+        $this->_increase_count($entity_id);
         // We're writing out a flagging entity even when we aren't passed one
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
@@ -822,7 +824,6 @@ class flag_flag {
         'timestamp' => REQUEST_TIME,
       ))
       ->execute();
-    $this->_increase_count($entity_id);
     return $flagging_id;
   }
 
@@ -836,7 +837,6 @@ class flag_flag {
    */
   function _unflag($entity_id, $flagging_id) {
     db_delete('flagging')->condition('flagging_id', $flagging_id)->execute();
-    $this->_decrease_count($entity_id);
   }
 
   /**
