@@ -152,10 +152,6 @@ function flag_rules_event_info() {
         'variables' => $variables,
         'access callback' => 'flag_rules_integration_access',
       );
-
-      // Remove the flagging variable: the flagging is already deleted when
-      // the rules event is invoked.
-      unset($variables['flagging']);
       $items['flag_unflagged_' . $flag->name] = array(
         'group' => t('Flag'),
         'label' => t('A @flag-type has been unflagged, under "@flag-title"', array('@flag-title' => $flag->get_title(), '@flag-type' => t($flag->entity_type))),

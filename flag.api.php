@@ -100,6 +100,9 @@ function hook_flag_flag($flag, $entity_id, $account, $flagging_id) {
 /**
  * Act on an object being unflagged.
  *
+ * This is invoked after the flag count has been decreased, but before the
+ * flagging entity has been deleted.
+ *
  * @param $flag
  *  The flag object.
  * @param $entity_id
