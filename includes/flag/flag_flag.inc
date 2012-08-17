@@ -610,7 +610,7 @@ class flag_flag {
         // Note the order: We delete the entity before calling _unflag() to
         // delete the {flagging} record.
         $this->_delete_flagging($existing_flagging_id);
-        $this->_unflag($entity_id, $uid, $sid);
+        $this->_unflag($entity_id, $existing_flagging_id);
         module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
         // Invoke Rules event.
         if (module_exists('rules')) {
@@ -832,26 +832,11 @@ class flag_flag {
    * You probably shouldn't call this raw private method: call the flag()
    * function instead.
    *
-   * @return
-   *   If the object was flagged, returns the value of the now deleted 'flagging_id'
-   *   column. Else, returns FALSE.
-   *
    * @private
    */
-  function _unflag($entity_id, $uid, $sid) {
-    $flagging_id = db_select('flagging', 'fc')
-      ->fields('fc', array('flagging_id'))
-      ->condition('fid', $this->fid)
-      ->condition('uid', $uid)
-      ->condition('sid', $sid)
-      ->condition('entity_id', $entity_id)
-      ->execute()
-      ->fetchField();
-    if ($flagging_id) {
-      db_delete('flagging')->condition('flagging_id', $flagging_id)->execute();
-      $this->_decrease_count($entity_id);
-    }
-    return $flagging_id;
+  function _unflag($entity_id, $flagging_id) {
+    db_delete('flagging')->condition('flagging_id', $flagging_id)->execute();
+    $this->_decrease_count($entity_id);
   }
 
   /**
