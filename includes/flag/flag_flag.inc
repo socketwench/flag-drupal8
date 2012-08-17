@@ -607,24 +607,33 @@ class flag_flag {
         $this->_unflag_anonymous($entity_id);
       }
       if ($flagged) {
-        // Note the order: We delete the entity before calling _unflag() to
-        // delete the {flagging} record.
-        $this->_delete_flagging($existing_flagging_id);
-        $this->_unflag($entity_id, $existing_flagging_id);
-        $this->_decrease_count($entity_id);
-        module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
-        // Invoke Rules event.
-        if (module_exists('rules')) {
-          $event_name = 'flag_unflagged_' . $this->name;
-          // We only support flags on entities.
-          if (entity_get_info($this->entity_type)) {
-            $variables = array(
-              'flag' => $this,
-              'flagged_' . $this->entity_type => $entity_id,
-              'flagging_user' => $account,
-            );
-            rules_invoke_event_by_args($event_name, $variables);
+        $transaction = db_transaction();
+        try {
+          // Note the order: We decrease the count first so hooks have accurate
+          // data, then invoke hooks, then delete the flagging entity.
+          $this->_decrease_count($entity_id);
+          module_invoke_all('flag_unflag', $this, $entity_id, $account, $existing_flagging_id);
+          // Invoke Rules event.
+          if (module_exists('rules')) {
+            $event_name = 'flag_unflagged_' . $this->name;
+            // We only support flags on entities.
+            if (entity_get_info($this->entity_type)) {
+              $variables = array(
+                'flag' => $this,
+                'flagged_' . $this->entity_type => $entity_id,
+                'flagging_user' => $account,
+                'flagging' => $this->get_flagging($entity_id, $account->uid),
+              );
+              rules_invoke_event_by_args($event_name, $variables);
+            }
           }
+          $this->_delete_flagging($existing_flagging_id);
+          $this->_unflag($entity_id, $existing_flagging_id);
+        }
+        catch (Exception $e) {
+          $transaction->rollback();
+          watchdog_exception('flag', $e);
+          throw $e;
         }
       }
     }
