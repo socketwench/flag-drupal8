@@ -703,12 +703,12 @@ class flag_flag {
     field_attach_presave('flagging', $flagging);
     field_attach_update('flagging', $flagging);
     // Update the cache.
-    flagging_load($flagging->flagging_id, TRUE);
+    entity_get_controller('flagging')->resetCache();
   }
   private function _delete_flagging($flagging) {
     field_attach_delete('flagging', $flagging);
     // Remove from the cache.
-    flagging_load($flagging_id, TRUE);
+    entity_get_controller('flagging')->resetCache();
   }
 
   /**
