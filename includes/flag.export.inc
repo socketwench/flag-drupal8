@@ -96,7 +96,7 @@ function flag_import_form_validate($form, &$form_state) {
   ob_end_clean();
 
   if (!isset($flags) || !is_array($flags)) {
-    form_set_error('import', t('A valid list of flags could be found in the import code.'));
+    form_set_error('import', t('A valid list of flags could not be found in the import code.'));
     return;
   }
 
