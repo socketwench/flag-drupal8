@@ -53,6 +53,11 @@ class flag_comment extends flag_entity {
   function type_access_multiple($entity_ids, $account) {
     $access = array();
 
+    // If all subtypes are allowed, we have nothing to say here.
+    if (empty($this->types)) {
+      return $access;
+    }
+
     // Ensure node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_entity_id().
     $query = db_select('comment', 'c');
