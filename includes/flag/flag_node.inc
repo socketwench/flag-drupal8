@@ -86,6 +86,11 @@ class flag_node extends flag_entity {
   function type_access_multiple($entity_ids, $account = NULL) {
     $access = array();
 
+    // If all subtypes are allowed, we have nothing to say here.
+    if (empty($this->types)) {
+      return $access;
+    }
+
     // Ensure that only flaggable node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_entity_id().
     $result = db_select('node', 'n')->fields('n', array('nid'))
