@@ -229,16 +229,32 @@ function hook_flag_link() {
 }
 
 /**
- * TODO
+ * Act on flag deletion.
+ *
+ * This is invoked after all the flag database tables have had their relevant
+ * entries deleted.
+ *
+ * @param $flag
+ *  The flag object that has been deleted.
  */
-function flag_delete () {
+function hook_flag_delete($flag) {
 
 }
 
 /**
- * TODO
+ * Act when a flag is reset.
+ *
+ * @param $flag
+ *  The flag object.
+ * @param $entity_id
+ *  The entity ID on which all flaggings are to be removed. May be NULL, in
+ *  which case all of this flag's entities are to be unflagged.
+ * @param $rows
+ *  Database rows from the {flagging} table.
+ *
+ * @see flag_reset_flag()
  */
-function hook_flag_reset() {
+function hook_flag_reset($flag, $entity_id, $rows) {
 
 }
 
