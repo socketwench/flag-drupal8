@@ -96,6 +96,11 @@ function flag_views_data() {
   $data['flagging']['flagged'] = array(
     'title' => t('Flagged'),
     'real field' => 'uid',
+    'field' => array(
+      'handler' => 'flag_handler_field_flagged',
+      'label' => t('Flagged'),
+      'help' => t('A boolean field to show whether the flag is set or not.'),
+    ),
     'filter' => array(
       'handler' => 'flag_handler_filter_flagged',
       'label' => t('Flagged'),
