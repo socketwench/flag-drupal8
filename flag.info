@@ -19,6 +19,7 @@ files[] = flag.rules.inc
 ; Views
 files[] = includes/views/flag_handler_argument_entity_id.inc
 files[] = includes/views/flag_handler_field_ops.inc
+files[] = includes/views/flag_handler_field_flagged.inc
 files[] = includes/views/flag_handler_filter_flagged.inc
 files[] = includes/views/flag_handler_sort_flagged.inc
 files[] = includes/views/flag_handler_relationships.inc
