@@ -83,7 +83,7 @@ function theme_flag_admin_listing($variables) {
     }
     $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
     $row = array();
-    $row[] = $flag->name;
+    $row[] = $flag->title . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
     if (count($flags) > 1) {
       $row[] = drupal_render($form['flags'][$flag->name]['weight']);
     }
