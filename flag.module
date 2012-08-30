@@ -1790,17 +1790,14 @@ function flag_get_default_flags($include_disabled = FALSE) {
  * @param
  *   The flag name for which to retrieve flagged entites.
  */
-function flag_get_flagged_entities($flag_name) {
+function flag_get_flag_flagging_data($flag_name) {
   $return = array();
   $flag = flag_get_flag($flag_name);
   $result = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->execute();
-  foreach ($result as $row) {
-    $return[] = $row;
-  }
-  return $return;
+  return $result->fetchAllAssoc('flagging_id');
 }
 
 /**
