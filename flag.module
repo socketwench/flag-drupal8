@@ -1573,8 +1573,12 @@ function flag_get_flag_counts($flag_name, $reset = FALSE) {
   }
   if (!isset($counts[$flag_name])) {
     $flag = flag_get_flag($flag_name);
-    $counts[$flag_name] = db_select('flag_counts', 'fc')->fields('fc', array('flagging_id'))
-      ->condition('fid', $flag->fid)->countQuery()->execute()->fetchField();
+    $counts[$flag_name] = db_select('flag_counts', 'fc')
+      ->fields('fc', array('flagging_id'))
+      ->condition('fid', $flag->fid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   return $counts[$flag_name];
