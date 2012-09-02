@@ -17,7 +17,6 @@ class flag_node extends flag_entity {
       'show_on_page' => TRUE,
       'show_on_teaser' => TRUE,
       'show_on_form' => FALSE,
-      'show_contextual_link' => FALSE,
       'i18n' => 0,
     );
     return $options;
@@ -73,12 +72,6 @@ class flag_node extends flag_entity {
       '#title' => t('Display checkbox on node edit form'),
       '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/structure/types'))),
     ) + $form['display']['show_on_form'];
-    $form['display']['show_contextual_link'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display in contextual links'),
-      '#default_value' => $this->show_contextual_link,
-      '#access' => empty($this->locked['show_contextual_link']) && module_exists('contextual'),
-    );
 
     unset($form['display']['show_on_entity']);
   }

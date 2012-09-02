@@ -22,6 +22,7 @@ class flag_entity extends flag_flag {
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
       'access_author' => '',
+      'show_contextual_link' => FALSE,
     );
     return $options;
   }
@@ -55,6 +56,13 @@ class flag_entity extends flag_flag {
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->show_on_form,
       '#access' => empty($this->locked['show_on_form']),
+    );
+    $form['display']['show_contextual_link'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display in contextual links'),
+      '#default_value' => $this->show_contextual_link,
+      '#description' => t('Note that not all entity types support contextual links.'),
+      '#access' => empty($this->locked['show_contextual_link']) && module_exists('contextual'),
     );
   }
 
