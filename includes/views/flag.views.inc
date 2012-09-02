@@ -206,8 +206,8 @@ function flag_views_data_alter(&$data) {
   // Add a relationship for the user that flagged any type of content.
   $data['users']['flag_user_content_rel'] = array(
     'group' => t('Flags'),
-    'title' => t("User's flagged content"),
-    'help' => t('Limit results to users that have flagged certain content.'),
+    'title' => t("User's flaggings"),
+    'help' => t('Relate users to the flaggings they have made on objects, using a particular flag.'),
     'relationship' => array(
       'base' => 'flagging',
       'base field' => 'uid',
