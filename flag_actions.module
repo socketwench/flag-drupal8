@@ -24,6 +24,7 @@ function flag_actions_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('administer actions'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
   );
   $items[FLAG_ADMIN_PATH . '/actions/add'] = array(
     'title' => 'Add action',
