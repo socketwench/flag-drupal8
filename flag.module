@@ -719,20 +719,32 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_contextual_links_view_alter().
  */
 function flag_contextual_links_view_alter(&$element, $items) {
+  if (isset($element['#element']['#entity_type'])) {
+    $entity_type = $element['#element']['#entity_type'];
 
-  // Check if we have a node link to process
-  if (isset($element['#element']['#node']->nid)) {
-    $node = $element['#element']['#node'];
+    // Get the entity out of the element. This requires a bit of legwork.
+    if (isset($element['#element']['#entity'])) {
+      // EntityAPI entities will all have the entity in the same place.
+      $entity = $element['#element']['#entity'];
+    }
+    elseif (isset($element['#element']['#' . $entity_type])) {
+      // Node module at least puts it here.
+      $entity = $element['#element']['#' . $entity_type];
+    }
+    else {
+      // Give up.
+      return;
+    }
 
     // Get all possible flags for this entity type.
-    $flags = flag_get_flags('node');
+    $flags = flag_get_flags($entity_type);
 
     foreach ($flags as $name => $flag) {
       if (!$flag->show_contextual_link) {
         continue;
       }
 
-      $entity_id = $flag->get_entity_id($node);
+      list($entity_id) = entity_extract_ids($entity_type, $entity);
       if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
         // User has no permission to use this flag or flag does not apply to this
         // object. The link is not skipped if the user has "flag" access but
