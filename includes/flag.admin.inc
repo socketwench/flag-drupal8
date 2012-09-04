@@ -379,17 +379,13 @@ function flag_form($form, &$form_state, $flag) {
     '#weight' => 10,
   );
 
-  $options = array();
-  foreach (node_type_get_types() as $node_type) {
-    $options[$node_type->type] = check_plain($node_type->name);
-  }
-
+  // Flag classes will want to override this form element.
   $form['access']['types'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Flaggable content'),
-    '#options' => $options,
+    '#title' => t('Flaggable types'),
+    '#options' => array(),
     '#default_value' => $flag->types,
-    '#description' => t('Check any node types that this flag may be used on. You must check at least one node type.'),
+    '#description' => t('Check any sub-types that this flag may be used on.'),
     '#required' => TRUE,
     '#weight' => 10,
     '#access' => empty($flag->locked['types']),
