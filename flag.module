@@ -5,7 +5,7 @@
  * The Flag module.
  */
 
-define('FLAG_API_VERSION', 2);
+define('FLAG_API_VERSION', 3);
 
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);

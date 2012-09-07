@@ -143,7 +143,7 @@ function theme_flag_admin_listing_disabled($variables) {
       $rows[] = array(
         $flag->name,
         $flag->module,
-        $flag->entity_type,
+        $flag->entity_type ? $flag->entity_type : t('Unknown'),
         theme('links', array('links' => $ops)),
       );
     }

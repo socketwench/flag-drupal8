@@ -237,14 +237,54 @@ function flag_update_page($flag) {
  *   The flag object passed by reference.
  */
 function flag_update_export(&$flag) {
-  // Update differences.
-  if (empty($flag->api_version) || $flag->api_version == 1) {
+  // Set the API version to 1 by default.
+  if (empty($flag->api_version)) {
+    $flag->api_version = 1;
+  }
+
+  // Loop through the classes until the API version is up to date.
+  while ($flag->api_version != FLAG_API_VERSION) {
+    // Get the class for the update.
+    $update_class = 'FlagUpdate_' . $flag->api_version;
+
+    // Run the update and change the API version on the flag.
+    $update_class::update($flag);
+    $flag->api_version = $update_class::$new_api_version;
+  }
+}
+
+/**
+ * Flag update class for API 1 flags.
+ */
+class FlagUpdate_1 {
+  /**
+   * The API version this class updates a flag to.
+   */
+  public static $new_api_version = 2;
+
+  /**
+   * The update function for the flag.
+   */
+  static function update(&$flag) {
     if (isset($flag->roles) && !isset($flag->roles['flag'])) {
       $flag->roles = array(
         'flag' => $flag->roles,
         'unflag' => $flag->roles,
       );
     }
-    $flag->api_version = FLAG_API_VERSION;
+  }
+}
+
+/**
+ * Flag update class for API 2 flags.
+ */
+class FlagUpdate_2 {
+  public static $new_api_version = 3;
+
+  static function update(&$flag) {
+    if (isset($flag->content_type)) {
+      $flag->entity_type = $flag->content_type;
+      unset($flag->content_type);
+    }
   }
 }
