@@ -90,9 +90,18 @@ function flag_get_types() {
 }
 
 /**
- * Instantiates a new flag handler. A flag handler is more commonly know as "a
- * flag". A factory method usually populates this empty flag with settings
- * loaded from the database.
+ * Instantiates a new flag handler.
+ *
+ * A flag handler is more commonly know as "a flag". A factory method usually
+ * populates this empty flag with settings loaded from the database.
+ *
+ * @param $entity_type
+ *  The entity type to create a flag handler for. This may be FALSE if the
+ *  entity type property could not be found in the flag configuration data.
+ *
+ * @return
+ *  A flag handler object. This may be the special class flag_broken is there is
+ *  a problem with the flag.
  */
 function flag_create_handler($entity_type) {
   $definition = flag_fetch_definition($entity_type);
