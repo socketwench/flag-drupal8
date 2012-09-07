@@ -102,6 +102,10 @@ class flag_flag {
    * Create a complete flag (except an FID) from an array definition.
    */
   static function factory_by_array($config) {
+    // Allow for flags with a missing entity type.
+    $config += array(
+      'entity_type' => FALSE,
+    );
     $flag = flag_create_handler($config['entity_type']);
 
     foreach ($config as $option => $value) {
