@@ -588,7 +588,7 @@ function flag_delete_confirm($form, &$form_state, $flag) {
   return confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $flag->get_title())),
     !empty($_GET['destination']) ? $_GET['destination'] : FLAG_ADMIN_PATH,
-    isset($flag->module) ? t('This flag is provided by the %module module. It will loose any customizations and be disabled.', array('%module' => $flag->module)) : t('This action cannot be undone.'),
+    isset($flag->module) ? t('This flag is provided by the %module module. It will lose any customizations and be disabled.', array('%module' => $flag->module)) : t('This action cannot be undone.'),
     t('Delete'), t('Cancel')
   );
 }
