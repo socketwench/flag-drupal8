@@ -12,6 +12,30 @@
  *
  * This is the base class for all flag implementations. Notable derived
  * classes are flag_node and flag_comment.
+ *
+ * There are several ways to obtain a flag handler, operating at different
+ * levels.
+ *
+ * To load an existing flag that's defined in database or code, use one of:
+ * - flag_get_flag(), the main flag API function.
+ * - flag_load(), the loader for hook_menu().
+ * - flag_get_flags(), the main API function for loading all flags. This calls
+ *   flag_get_default_flags() to get flags in code.
+ *
+ * The above all use factory methods to instantiate the object for the flag and
+ * load in its settings from configuration. The factory methods are:
+ * - flag_flag::factory_by_row(), creates a flag handler from a database row.
+ *   This is used by all the API functions above.
+ * - flag_flag::factory_by_array(), creates a flag handler from a configuration
+ *   array. This is used by flag_get_default_flags() and the flag import form.
+ * - flag_flag::factory_by_entity_type(), creates an empty flag handler for the
+ *   given entity type. This is used when a new or dummy flag handler is required
+ *   and there is no configuration yet.
+ *
+ * The factory methods in turn all call the low-level function
+ * flag_create_handler(), which obtains the correct handler for the flag, or if
+ * that can't be found, the special handler flag_broken. Finally, this calls
+ * $flag->construct() on the new handler object.
  */
 class flag_flag {
 
