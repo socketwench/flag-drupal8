@@ -60,7 +60,7 @@ function flag_export_flags($flags = array(), $module = '', $indent = '') {
     $output .= $indent . '// Exported flag: "' . check_plain($flag->get_title()) . '"' . ".\n";
     $output .= $indent . '$flags[\'' . $flag->name . '\'] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
   }
-  $output .= $indent . 'return $flags;';
+  $output .= $indent . 'return $flags;' . "\n";
   return $output;
 }
 
