@@ -248,8 +248,11 @@ function flag_update_export(&$flag) {
     $update_class = 'FlagUpdate_' . $flag->api_version;
 
     // Run the update and change the API version on the flag.
-    $update_class::update($flag);
-    $flag->api_version = $update_class::$new_api_version;
+    // @todo: change this to work with the static class when we drop support for
+    // PHP 5.2: see commit d5b517.
+    $update_handler = new $update_class;
+    $update_handler->update($flag);
+    $flag->api_version = $update_handler->new_api_version;
   }
 }
 
@@ -259,8 +262,10 @@ function flag_update_export(&$flag) {
 class FlagUpdate_1 {
   /**
    * The API version this class updates a flag to.
+   *
+   * @todo: Change this to a class constant when we drop support for PHP 5.2.
    */
-  public static $new_api_version = 2;
+  public $new_api_version = 2;
 
   /**
    * The update function for the flag.
@@ -279,7 +284,7 @@ class FlagUpdate_1 {
  * Flag update class for API 2 flags.
  */
 class FlagUpdate_2 {
-  public static $new_api_version = 3;
+  public $new_api_version = 3;
 
   static function update(&$flag) {
     if (isset($flag->content_type)) {
