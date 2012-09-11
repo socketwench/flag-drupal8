@@ -47,6 +47,13 @@ function flag_bookmark_enable() {
     );
     $flag->form_input($configuration);
     $flag->save();
+
+    // Clear the flag cache so the new permission is seen by core.
+    drupal_static_reset('flag_get_flags');
+
+    // Grant permissions.
+    $permissions = array('flag bookmarks', 'unflag bookmarks');
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, $permissions);
   }
 }
 

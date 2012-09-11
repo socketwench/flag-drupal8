@@ -109,9 +109,8 @@ function flag_bookmark_views_default_views() {
   );
 
   $access = array(
-    'type' => 'role',
-    'role' => drupal_map_assoc($flag->roles['flag']),
-    'perm' => '',
+    'type' => 'perm',
+    'perm' => 'flag bookmarks',
   );
 
   // Additional fields and style options if comment exists.

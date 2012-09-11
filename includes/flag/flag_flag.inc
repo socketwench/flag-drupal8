@@ -86,6 +86,14 @@ class flag_flag {
   var $types = array();
 
   /**
+   * The roles array. This can be populated by fetch_roles() when needed.
+   */
+  var $roles = array(
+    'flag' => array(),
+    'unflag' => array(),
+  );
+
+  /**
    * Creates a flag from a database row. Returns it.
    *
    * This is static method.
@@ -171,10 +179,6 @@ class flag_flag {
       'unflag_denied_text' => '',
       // The link type used by the flag, as defined in hook_flag_link_type_info().
       'link_type' => 'toggle',
-      'roles' => array(
-        'flag' => array(DRUPAL_AUTHENTICATED_RID),
-        'unflag' => array(DRUPAL_AUTHENTICATED_RID),
-      ),
       'weight' => 0,
     );
 
@@ -205,6 +209,26 @@ class flag_flag {
   }
 
   /**
+   * Load this flag's role data from permissions.
+   *
+   * Loads an array of roles into the flag, where each key is an action ('flag'
+   * and 'unflag'), and each value is a flat array of role ids which may perform
+   * that action.
+   *
+   * This should only be used when a complete overview of a flag's permissions
+   * is needed. Use $flag->access or $flag->user_access() instead.
+   */
+  function fetch_roles() {
+    $actions = array('flag', 'unflag');
+    foreach ($actions as $action) {
+      // Build the permission string.
+      $permission = "$action $this->name";
+      // We want a flat array of rids rather than $rid => $role_name.
+      $this->roles[$action] = array_keys(user_roles(FALSE, $permission));
+    }
+  }
+
+  /**
    * Update the flag with settings entered in a form.
    */
   function form_input($form_values) {
@@ -213,9 +237,6 @@ class flag_flag {
     foreach ($form_values as $field => $value) {
       $this->$field = $value;
     }
-    // But checkboxes need some massaging:
-    $this->roles['flag'] = array_values(array_filter($this->roles['flag']));
-    $this->roles['unflag'] = array_values(array_filter($this->roles['unflag']));
     $this->types = array_values(array_filter($this->types));
     // Clear internal titles cache:
     $this->get_title(NULL, TRUE);
@@ -364,7 +385,28 @@ class flag_flag {
   }
 
   /**
-   * Determines whether the user has access to use this flag.
+   * Provides permissions for this flag.
+   *
+   * @return
+   *  An array of permissions for hook_permission().
+   */
+  function get_permissions() {
+    return array(
+      "flag $this->name" => array(
+        'title' => t('Flag %flag_title', array(
+          '%flag_title' => $this->title,
+        )),
+      ),
+      "unflag $this->name" => array(
+        'title' => t('Unflag %flag_title', array(
+          '%flag_title' => $this->title,
+        )),
+      ),
+    );
+  }
+
+  /**
+   * Determines whether the user has the permission to use this flag.
    *
    * @param $action
    *   Optional. The action to test, either "flag" or "unflag". If none given,
@@ -374,6 +416,8 @@ class flag_flag {
    *
    * @return
    *   Boolean TRUE if the user is allowed to flag/unflag. FALSE otherwise.
+   *
+   * @see flag_permission()
    */
   function user_access($action = 'flag', $account = NULL) {
     if (!isset($account)) {
@@ -385,8 +429,8 @@ class flag_flag {
       return FALSE;
     }
 
-    $matched_roles = array_intersect($this->roles[$action], array_keys($account->roles));
-    return !empty($matched_roles) || $account->uid == 1;
+    $permission_string = "$action $this->name";
+    return user_access($permission_string, $account);
   }
 
   /**

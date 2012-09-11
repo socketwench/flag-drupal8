@@ -57,6 +57,9 @@ function flag_export_flags($flags = array(), $module = '', $indent = '') {
       unset($new_flag['entity_info']);
     }
 
+    // Remove roles.
+    unset($new_flag['roles']);
+
     $output .= $indent . '// Exported flag: "' . check_plain($flag->get_title()) . '"' . ".\n";
     $output .= $indent . '$flags[\'' . $flag->name . '\'] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
   }
@@ -287,9 +290,20 @@ class FlagUpdate_2 {
   public $new_api_version = 3;
 
   static function update(&$flag) {
+    // Change the content_type property to entity_type.
     if (isset($flag->content_type)) {
       $flag->entity_type = $flag->content_type;
       unset($flag->content_type);
+    }
+
+    // We can't convert the flag roles data to user permissions at this point
+    // because the flag is disabled and hence hook_permission() doesn't see it
+    // to define its permissions.
+    // Instead, we copy it to import_roles, which the flag add form will handle
+    // on new flags (which this flag will behave as when it is re-enabled).
+    // @see flag_form()
+    if (isset($flag->roles)) {
+      $flag->import_roles = $flag->roles;
     }
   }
 }

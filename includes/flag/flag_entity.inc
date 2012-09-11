@@ -94,6 +94,32 @@ class flag_entity extends flag_flag {
   }
 
   /**
+   * Provides permissions for this flag.
+   *
+   * @return
+   *  An array of permissions for hook_permission().
+   */
+  function get_permissions() {
+    // For entity flags, use the human label of the entity.
+    $entity_info = entity_get_info($this->entity_type);
+    $entity_label = $entity_info['label'];
+    return array(
+      "flag $this->name" => array(
+        'title' => t('Flag %entity entities as %flag_title', array(
+          '%flag_title' => $this->title,
+          '%entity' => $entity_label,
+        )),
+      ),
+      "unflag $this->name" => array(
+        'title' => t('Unflag %entity entities as %flag_title', array(
+          '%flag_title' => $this->title,
+          '%entity' => $entity_label,
+        )),
+      ),
+    );
+  }
+
+  /**
    * Returns the entity id, if it already exists.
    */
   function get_entity_id($entity) {
