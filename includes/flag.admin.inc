@@ -81,14 +81,15 @@ function theme_flag_admin_listing($variables) {
     if (!module_exists('field_ui')) {
       unset($ops['flags_fields']);
     }
-    $roles = array_flip(array_intersect(array_flip(user_roles()), $flag->roles['flag']));
+    $permission = "flag $flag->name";
+    $roles = user_roles(FALSE, $permission);
     $row = array();
     $row[] = $flag->title . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
     if (count($flags) > 1) {
       $row[] = drupal_render($form['flags'][$flag->name]['weight']);
     }
     $row[] = $flag->entity_type;
-    $row[] = empty($flag->roles['flag']) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles);
+    $row[] = empty($roles) ? '<em>' . t('No roles') . '</em>' : implode(', ', $roles);
     $row[] = $flag->types ? implode(', ', $flag->types) : '-';
     $row[] = $flag->global ? t('Yes') : t('No');
     $row[] = theme('links', array('links' => $ops));
@@ -266,6 +267,7 @@ function flag_add_form_submit($form, &$form_state) {
  */
 function flag_form($form, &$form_state, $flag) {
   $form['#flag'] = $flag;
+  $form['#flag_name'] = $flag->name;
 
   $form['title'] = array(
     '#type' => 'textfield',
@@ -396,9 +398,26 @@ function flag_form($form, &$form_state, $flag) {
     $form['access']['types']['#value'] = $flag->types;
   }
 
+  // Load the user permissions into the flag.
+  if (isset($flag->fid)) {
+    $flag->fetch_roles();
+  }
+  elseif (isset($flag->import_roles)) {
+    // Convert the roles data from old API 2 flags that have been run through
+    // the update system.
+    // @see FlagUpdate_2::update()
+    $flag->roles = $flag->import_roles;
+  }
+  else {
+    // For new flags, provide a reasonable default value.
+    $flag->roles = array(
+      'flag' => array(DRUPAL_AUTHENTICATED_RID),
+      'unflag' => array(DRUPAL_AUTHENTICATED_RID),
+    );
+  }
+
   $form['access']['roles'] = array(
     '#title' => t('Roles that may use this flag'),
-    '#access' => empty($flag->locked['roles']),
     '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
     '#theme' => 'flag_form_roles',
     '#theme_wrappers' => array('form_element'),
@@ -427,12 +446,6 @@ function flag_form($form, &$form_state, $flag) {
     '#default_value' => $flag->roles['unflag'],
     '#parents' => array('roles', 'unflag'),
   );
-
-  // Disabled access breaks checkboxes unless #value is hard coded.
-  if (!empty($flag->locked['roles'])) {
-    $form['access']['roles']['#type'] = 'value';
-    $form['access']['roles']['#value'] = $flag->roles;
-  }
 
   $form['access']['unflag_denied_text'] = array(
     '#type' => 'textfield',
@@ -544,10 +557,38 @@ function flag_form_validate($form, &$form_state) {
 function flag_form_submit($form, &$form_state) {
   $flag = $form['#flag'];
   $flag->form_input($form_state['values']);
+
   $flag->save();
   $flag->enable();
   drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
   _flag_clear_cache();
+
+  // Save permissions.
+  // This needs to be done after the flag cache has been cleared, so that
+  // the new permissions are picked up by hook_permission().
+  // This may need to move to the flag class when we implement extra permissions
+  // for different flag types: http://drupal.org/node/879988
+
+  // If the flag machine name as changed, clean up all the obsolete permissions.
+  if ($flag->name != $form['#flag_name']) {
+    $old_name = $form['#flag_name'];
+    $permissions = array("flag $old_name", "unflag $old_name");
+    foreach (array_keys(user_roles()) as $rid) {
+      user_role_revoke_permissions($rid, $permissions);
+    }
+  }
+
+  foreach (array_keys(user_roles(!module_exists('session_api'))) as $rid) {
+    // Create an array of permissions, based on the checkboxes element name.
+    $permissions = array(
+      "flag $flag->name" => $flag->roles['flag'][$rid],
+      "unflag $flag->name" => $flag->roles['unflag'][$rid],
+    );
+    user_role_change_permissions($rid, $permissions);
+  }
+  // @todo: when we add database caching for flags we'll have to clear the
+  // cache again here.
+
   $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
 

@@ -626,3 +626,57 @@ function flag_update_7304() {
     )
   );
 }
+
+/**
+ * Convert flag roles to permissions.
+ */
+function flag_update_7305() {
+  // We can't use flag_get_flags() to get all flags to act on, because that
+  // now looks for user permissions and we want the old roles array to convert.
+  // Hence we need to get flags directly from the database.
+  // Flags defined in code are saved in the database by flag_get_flags(), so
+  // this will get them too, unless the module providing them was *only just*
+  // installed before update.php was run. This edge case is not covered.
+
+  $result = db_query("SELECT name, options FROM {flag}");
+  $flag_data = $result->fetchAllKeyed();
+
+  // Note we don't call hook_flag_alter() because we don't have a complete flag.
+  // If your custom module does something to flag roles, it is your
+  // responsibility to handle upgrading your extra role data.
+
+  foreach ($flag_data as $flag_name => $flag_options) {
+    $flag_options = unserialize($flag_options);
+    $flag_roles = $flag_options['roles'];
+
+    foreach ($flag_roles['flag'] as $rid) {
+      $permission = "flag $flag_name";
+      user_role_grant_permissions($rid, array($permission));
+    }
+    foreach ($flag_roles['unflag'] as $rid) {
+      $permission = "unflag $flag_name";
+      user_role_grant_permissions($rid, array($permission));
+    }
+
+    // Save the flag options with the roles array removed.
+    unset($flag_options['roles']);
+    db_update('flag')
+      ->fields(array(
+        'options' => serialize($flag_options),
+      ))
+      ->condition('name', $flag_name)
+      ->execute();
+  }
+
+  // Flags in code will now report as overridden because the roles option is no
+  // longer output. Notify the user that they should update them.
+  if (count(module_implements('flag_default_flags'))) {
+    drupal_set_message(t('Flags which are defined in code with hook_flag_default_flags() or Features need to be re-exported.'));
+  }
+
+  // Direct the user to read the change notice, which has more details of how
+  // access to flag objects has been affected.
+  return t('Flag roles have been converted to user permissions. Permissions have been granted to each flag based on flag roles. You should review the consequences of this in the <a href="!url">change record</a>.', array(
+    '!url' => 'http://drupal.org/node/1724256',
+  ));
+}

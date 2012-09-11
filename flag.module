@@ -358,7 +358,7 @@ function flag_features_api() {
  * Implements hook_permission().
  */
 function flag_permission() {
-  return array(
+  $permissions = array(
     'administer flags' => array(
       'title' => t('Administer flags'),
       'description' => t('Create and edit site-wide flags.'),
@@ -369,6 +369,32 @@ function flag_permission() {
       'restrict access' => TRUE,
     ),
   );
+
+  $flags = flag_get_flags();
+  $entity_info = entity_get_info();
+  // Provide flag and unflag permissions for each flag.
+  foreach ($flags as $flag_name => $flag) {
+    $permissions += $flag->get_permissions();
+  }
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter(): user_admin_permissions.
+ *
+ * Disable permission on the permissions form that don't make sense for
+ * anonymous users when Session API module is not enabled.
+ */
+function flag_form_user_admin_permissions_alter(&$form, &$form_state, $form_id) {
+  if (!module_exists('session_api')) {
+    $flags = flag_get_flags();
+    // Disable flag and unflag permission checkboxes for anonymous users.
+    foreach ($flags as $flag_name => $flag) {
+      $form['checkboxes'][DRUPAL_ANONYMOUS_RID]["flag $flag_name"]['#disabled'] = TRUE;
+      $form['checkboxes'][DRUPAL_ANONYMOUS_RID]["unflag $flag_name"]['#disabled'] = TRUE;
+    }
+  }
 }
 
 /**
@@ -1738,8 +1764,8 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
     // Sort the list of flags by weight.
     uasort($flags, '_flag_compare_weight');
 
-    // Allow modules implementing hook_flag_alter(&$flag) to modify each flag.
     foreach ($flags as $flag) {
+      // Allow modules implementing hook_flag_alter(&$flag) to modify each flag.
       drupal_alter('flag', $flag);
     }
   }

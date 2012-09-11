@@ -154,7 +154,8 @@ class flag_handler_relationship_content extends flag_handler_relationship {
         'value' => '***CURRENT_USER***',
         'numeric' => TRUE,
       );
-      if (array_search(DRUPAL_ANONYMOUS_RID, $flag->roles['flag']) !== FALSE) {
+      $flag_roles = user_roles(FALSE, "flag $flag->name");
+      if (isset($flag_roles[DRUPAL_ANONYMOUS_RID])) {
         // Disable page caching for anonymous users.
         drupal_page_is_cacheable(FALSE);
 

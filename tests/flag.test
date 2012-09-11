@@ -62,6 +62,8 @@ class FlagTestCase extends DrupalWebTestCase {
 
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $flag = flag_get_flag($edit['name']);
+    // Load the roles array for checking it matches.
+    $flag->fetch_roles();
 
     // Check that the flag object is in the database.
     $this->assertTrue($flag != FALSE, t('Flag object found in database'));
@@ -69,6 +71,17 @@ class FlagTestCase extends DrupalWebTestCase {
     // Check each individual property of the flag and make sure it was set.
     foreach ($saved as $property => $value) {
       $this->assertEqual($flag->$property, $value, t('Flag property %property properly saved.', array('%property' => $property)));
+    }
+
+    // Check permissions.
+    $permissions = user_role_permissions(user_roles());
+    foreach ($saved['roles'] as $action => $rids) {
+      foreach ($rids as $rid) {
+        $permission_string = "$action ". $saved['name'];
+        $this->assertTrue(isset($permissions[$rid][$permission_string]), t('Permission %perm set for flag.', array(
+          '%perm' => $permission_string,
+        )));
+      }
     }
 
     // Edit the flag through the UI.
@@ -99,6 +112,8 @@ class FlagTestCase extends DrupalWebTestCase {
 
     flag_get_flags(NULL, NULL, NULL, TRUE);
     $flag = flag_get_flag($edit['name']);
+    // Load the roles array for checking it matches.
+    $flag->fetch_roles();
 
     // Check that the flag object is in the database.
     $this->assertTrue($flag != FALSE, t('Flag object found in database'));
@@ -106,6 +121,22 @@ class FlagTestCase extends DrupalWebTestCase {
     // Check each individual property of the flag and make sure it was set.
     foreach ($saved as $property => $value) {
       $this->assertEqual($flag->$property, $value, t('Flag property %property properly saved.', array('%property' => $property)));
+    }
+
+    // Clear the user access cache so our changes to permissions are noticed.
+    drupal_static_reset('user_access');
+    drupal_static_reset('user_role_permissions');
+
+    // Check permissions.
+    $permissions = user_role_permissions(user_roles());
+
+    foreach ($saved['roles'] as $action => $rids) {
+      foreach ($rids as $rid) {
+        $permission_string = "$action ". $saved['name'];
+        $this->assertTrue(isset($permissions[$rid][$permission_string]), t('Permission %perm set for flag.', array(
+          '%perm' => $permission_string,
+        )));
+      }
     }
 
     // Delete the flag through the UI.
