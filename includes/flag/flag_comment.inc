@@ -44,7 +44,6 @@ class flag_comment extends flag_entity {
       '#type' => 'checkbox',
       '#title' => t('Display link under comment'),
       '#default_value' => $this->show_on_comment,
-      '#access' => empty($this->locked['show_on_comment']),
     );
 
     unset($form['display']['show_on_entity']);

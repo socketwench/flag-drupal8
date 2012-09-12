@@ -276,7 +276,6 @@ function flag_form($form, &$form_state, $flag) {
     '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
     '#maxlength' => 255,
     '#required' => TRUE,
-    '#access' => empty($flag->locked['title']),
     '#weight' => -3,
   );
 
@@ -286,7 +285,6 @@ function flag_form($form, &$form_state, $flag) {
     '#default_value' => $flag->name,
     '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
     '#maxlength' => 32,
-    '#access' => empty($flag->locked['name']),
     '#weight' => -2,
     '#machine_name' => array(
       'exists' => 'flag_get_flag',
@@ -299,7 +297,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Global flag'),
     '#default_value' => $flag->global,
     '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
-    '#access' => empty($flag->locked['global']),
     '#weight' => -1,
   );
 
@@ -314,7 +311,6 @@ function flag_form($form, &$form_state, $flag) {
     '#default_value' => !empty($flag->flag_short) ? $flag->flag_short : t('Flag this item'),
     '#description' => t('The text for the "flag this" link for this flag.'),
     '#required' => TRUE,
-    '#access' => empty($flag->locked['flag_short']),
   );
 
   $form['messages']['flag_long'] = array(
@@ -322,7 +318,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Flag link description'),
     '#default_value' => $flag->flag_long,
     '#description' => t('The description of the "flag this" link. Usually displayed on mouseover.'),
-    '#access' => empty($flag->locked['flag_long']),
   );
 
   $form['messages']['flag_message'] = array(
@@ -330,7 +325,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Flagged message'),
     '#default_value' => $flag->flag_message,
     '#description' => t('Message displayed after flagging content. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
-    '#access' => empty($flag->locked['flag_message']),
   );
 
   $form['messages']['unflag_short'] = array(
@@ -339,7 +333,6 @@ function flag_form($form, &$form_state, $flag) {
     '#default_value' => !empty($flag->unflag_short) ? $flag->unflag_short : t('Unflag this item'),
     '#description' => t('The text for the "unflag this" link for this flag.'),
     '#required' => TRUE,
-    '#access' => empty($flag->locked['unflag_short']),
   );
 
   $form['messages']['unflag_long'] = array(
@@ -347,7 +340,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Unflag link description'),
     '#default_value' => $flag->unflag_long,
     '#description' => t('The description of the "unflag this" link. Usually displayed on mouseover.'),
-    '#access' => empty($flag->locked['unflag_long']),
   );
 
   $form['messages']['unflag_message'] = array(
@@ -355,7 +347,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Unflagged message'),
     '#default_value' => $flag->unflag_message,
     '#description' => t('Message displayed after content has been unflagged. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
-    '#access' => empty($flag->locked['unflag_message']),
   );
 
   $form['messages']['tokens_help'] = array(
@@ -390,7 +381,6 @@ function flag_form($form, &$form_state, $flag) {
     '#description' => t('Check any sub-types that this flag may be used on.'),
     '#required' => TRUE,
     '#weight' => 10,
-    '#access' => empty($flag->locked['types']),
   );
 
   // Disabled access breaks checkboxes unless #value is hard coded.
@@ -452,7 +442,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Unflag not allowed text'),
     '#default_value' => $flag->unflag_denied_text,
     '#description' => t('If a user is allowed to flag but not unflag, this text will be displayed after flagging. Often this is the past-tense of the link text, such as "flagged".'),
-    '#access' => empty($flag->locked['unflag_denied_text']),
     '#weight' => -1,
   );
 
@@ -473,7 +462,6 @@ function flag_form($form, &$form_state, $flag) {
     '#after_build' => array('flag_expand_link_option', 'flag_check_link_types'),
     '#default_value' => $flag->link_type,
     '#weight' => 2,
-    '#access' => empty($flag->locked['link_type']),
   );
 
   $form['display']['link_options_intro'] = array(
@@ -497,7 +485,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Flag confirmation message'),
     '#default_value' => isset($flag->flag_confirmation) ? $flag->flag_confirmation : '',
     '#description' => t('Message displayed if the user has clicked the "flag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to flag this content?"'),
-    '#access' => empty($flag->locked['flag_confirmation']),
   );
 
   $form['display']['link_options_confirm']['unflag_confirmation'] = array(
@@ -505,7 +492,6 @@ function flag_form($form, &$form_state, $flag) {
     '#title' => t('Unflag confirmation message'),
     '#default_value' => isset($flag->unflag_confirmation) ? $flag->unflag_confirmation : '',
     '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
-    '#access' => empty($flag->locked['unflag_confirmation']),
   );
 
   $form['actions'] = array(
@@ -522,7 +508,42 @@ function flag_form($form, &$form_state, $flag) {
 
   $flag->options_form($form);
 
+  // Add our process handler to disable access to locked properties.
+  $form['#process'][] = 'flag_form_locked_process';
+
   return $form;
+}
+
+/**
+ * Form process handler for locking flag properties.
+ *
+ * Flags defined in code may define an array of properties in $flag->locked that
+ * are to be locked and may not be edited by the user.
+ */
+function flag_form_locked_process($element, &$form_state, $form) {
+  $flag = $form['#flag'];
+
+  // Disable access to a form element whose name matches a locked flag property.
+  if (isset($element['#name']) && !empty($flag->locked[$element['#name']])) {
+    $element['#access'] = FALSE;
+  }
+
+  // Recurse into the form array.
+  foreach (element_children($element) as $key) {
+    // Workaround for Core inconvenience: setting #process here prevents an
+    // element's essential #process handlers from its hook_element_info()
+    // definition from being set in form_builder().
+    // @see http://drupal.org/node/1779496
+    if (isset($element[$key]['#type']) && ($info = element_info($element[$key]['#type']))) {
+      if (isset($info['#process'])) {
+        $element[$key]['#process'] = $info['#process'];
+      }
+    }
+
+    $element[$key]['#process'][] = 'flag_form_locked_process';
+  }
+
+  return $element;
 }
 
 /**

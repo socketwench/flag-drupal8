@@ -41,7 +41,6 @@ class flag_user extends flag_entity {
       '#type' => 'checkbox',
       '#title' => t('Display link on user profile page'),
       '#default_value' => $this->show_on_profile,
-      '#access' => empty($this->locked['show_on_profile']),
     );
 
     unset($form['display']['show_on_entity']);
