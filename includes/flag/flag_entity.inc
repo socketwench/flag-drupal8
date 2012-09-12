@@ -49,20 +49,18 @@ class flag_entity extends flag_flag {
       '#type' => 'checkbox',
       '#title' => t('Display link on entity'),
       '#default_value' => isset($this->show_on_entity) ? $this->show_on_entity : TRUE,
-      '#access' => empty($this->locked['show_on_entity']),
     );
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->show_on_form,
-      '#access' => empty($this->locked['show_on_form']),
     );
     $form['display']['show_contextual_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display in contextual links'),
       '#default_value' => $this->show_contextual_link,
       '#description' => t('Note that not all entity types support contextual links.'),
-      '#access' => empty($this->locked['show_contextual_link']) && module_exists('contextual'),
+      '#access' => module_exists('contextual'),
     );
   }
 

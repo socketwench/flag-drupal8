@@ -58,14 +58,12 @@ class flag_node extends flag_entity {
       '#type' => 'checkbox',
       '#title' => t('Display link on node teaser'),
       '#default_value' => $this->show_on_teaser,
-      '#access' => empty($this->locked['show_on_teaser']),
     );
 
     $form['display']['show_on_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display link on node page'),
       '#default_value' => $this->show_on_page,
-      '#access' => empty($this->locked['show_on_page']),
     );
     // Override the UI texts for nodes.
     $form['display']['show_on_form'] = array(
