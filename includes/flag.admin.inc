@@ -705,7 +705,7 @@ function _flag_clear_cache() {
   }
   // Reset our flags cache, thereby making the following code aware of the
   // modifications.
-  flag_get_flags(NULL, NULL, NULL, TRUE);
+  drupal_static_reset('flag_get_flags');
   // The title of a flag may appear in the menu (indirectly, via our "default
   // views"), so we need to clear the menu cache. This call also clears the
   // page cache, which is desirable too because the flag labels may have

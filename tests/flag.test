@@ -60,7 +60,7 @@ class FlagTestCase extends DrupalWebTestCase {
 
     $this->drupalPost(FLAG_ADMIN_PATH . '/add/node', $edit, t('Save flag'));
 
-    flag_get_flags(NULL, NULL, NULL, TRUE);
+    drupal_static_reset('flag_get_flags');
     $flag = flag_get_flag($edit['name']);
     // Load the roles array for checking it matches.
     $flag->fetch_roles();
@@ -110,7 +110,7 @@ class FlagTestCase extends DrupalWebTestCase {
 
     $this->drupalPost(FLAG_ADMIN_PATH . '/manage/' . $flag->name, $edit, t('Save flag'));
 
-    flag_get_flags(NULL, NULL, NULL, TRUE);
+    drupal_static_reset('flag_get_flags');
     $flag = flag_get_flag($edit['name']);
     // Load the roles array for checking it matches.
     $flag->fetch_roles();
@@ -141,7 +141,7 @@ class FlagTestCase extends DrupalWebTestCase {
 
     // Delete the flag through the UI.
     $this->drupalPost(FLAG_ADMIN_PATH . '/manage/' . $flag->name . '/delete', array(), t('Delete'));
-    flag_get_flags(NULL, NULL, NULL, TRUE);
+    drupal_static_reset('flag_get_flags');
     $this->assertFalse(flag_get_flag($flag->name), t('Flag successfully deleted.'));
   }
 

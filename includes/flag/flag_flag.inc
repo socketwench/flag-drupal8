@@ -1314,7 +1314,7 @@ class flag_flag {
         $default_flag = clone $default_flag;
         $default_flag->fid = $this->fid;
         $default_flag->save();
-        flag_get_flags(NULL, NULL, NULL, TRUE);
+        drupal_static_reset('flag_get_flags');
         return TRUE;
       }
       else {
