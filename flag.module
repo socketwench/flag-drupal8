@@ -1709,17 +1709,15 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * @param $account
  *   Optional. The user accont to filter available flags. If not set, all
  *   flags for will this node will be returned.
- * @param $reset
- *   Optional. Reset the internal query cache.
  *
  * @return $flags
  *   An array of the structure [fid] = flag_object.
  */
-function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL, $reset = FALSE) {
+function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
   $flags = &drupal_static(__FUNCTION__);
 
   // Retrieve a list of all flags, regardless of the parameters.
-  if (!isset($flags) || $reset) {
+  if (!isset($flags)) {
     $flags = array();
 
     // Database flags.
