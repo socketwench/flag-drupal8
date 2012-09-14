@@ -1880,7 +1880,8 @@ function _flag_compare_weight($flag1, $flag2) {
  *   TRUE if the flag is enabled for this type and subtype.
  */
 function _flag_entity_enabled($flag, $entity_type, $content_subtype = NULL) {
-  $return = $flag->entity_type == $entity_type && (!isset($content_subtype) || in_array($content_subtype, $flag->types));
+  $return = ($flag->entity_type == $entity_type) &&
+    (!isset($content_subtype) || !count($flag->types) || in_array($content_subtype, $flag->types));
   return $return;
 }
 
