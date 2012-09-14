@@ -307,7 +307,7 @@ function flag_help($path, $arg) {
       $output .=   t('You will also want to pick either the "Confirmation form" or the "Form" <a href="@form-link-type-url">link type</a> for your flag, or else users won\'t have a means to enter values for the fields. (In case a form isn\'t used, the fields are assigned their default values.)', array(
         '@form-link-type-url' => url('admin/structure/flags/manage/' . $arg[4], array('fragment' => 'edit-link-type')),
       ));
-      if (!module_exists('flag_form')) {
+      if (!module_exists('flagging_form')) {
         $output .= ' <strong>'
           . t("Note: You don't have the <em><a href='@flagging-form-url'>Flagging Form</a></em> module enabled. You'll have to <a href='@enable-url'>enable it</a> to have the \"Form\" link-type.", array(
             '@enable-url' => url('admin/modules'),
