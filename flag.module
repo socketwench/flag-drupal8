@@ -687,10 +687,17 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
  * @see flag_field_attach_form().
  */
 function flag_field_attach_submit($entity_type, $entity, $form, &$form_state) {
-  // Put the form values in the entity so flag_field_attach_save() can find
-  // them. We can't call flag() here as new entities have no id yet.
-  if (isset($form_state['values']['flag'])) {
-    $entity->flag = $form_state['values']['flag'];
+  // This is invoked for each flag_field_attach_form(), but possibly more than
+  // once for a particular form in the case that a form is showing multiple
+  // entities (field collection, inline entity form). Hence we can't simply
+  // assume our submitted form values are in $form_state['values']['flag'].
+  if (isset($form['flag'])) {
+    $parents = $form['flag']['#parents'];
+    $flag_values = drupal_array_get_nested_value($form_state['values'], $parents);
+
+    // Put the form values in the entity so flag_field_attach_save() can find
+    // them. We can't call flag() here as new entities have no id yet.
+    $entity->flag = $flag_values;
   }
 }
 
