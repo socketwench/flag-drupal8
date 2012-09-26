@@ -152,7 +152,7 @@ function flag_schema() {
         'not null' => TRUE,
       ),
       'fid' => array(
-        'description' => 'The unique flag ID this object has been flagged with, from {flags}.',
+        'description' => 'The unique flag ID this object has been flagged with, from {flag}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
@@ -211,7 +211,7 @@ function flag_schema() {
     'description' => 'The types (usually as defined in {node_type}) that are affected by a flag.',
     'fields' => array(
       'fid' => array(
-        'description' => 'The unqiue flag ID as defined for the flag in {flags}.',
+        'description' => 'The unqiue flag ID as defined for the flag in {flag}.',
         'type' => 'int',
         'size' => 'small',
         'unsigned' => TRUE,
