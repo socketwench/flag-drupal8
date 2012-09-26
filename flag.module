@@ -465,7 +465,6 @@ function flag_permission() {
   );
 
   $flags = flag_get_flags();
-  $entity_info = entity_get_info();
   // Provide flag and unflag permissions for each flag.
   foreach ($flags as $flag_name => $flag) {
     $permissions += $flag->get_permissions();
