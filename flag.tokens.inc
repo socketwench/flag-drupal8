@@ -43,7 +43,7 @@ function flag_token_info() {
     'type' => 'date',
   );
 
-  // Flage action tokens.
+  // Flag action tokens.
   $types['flag-action'] = array(
     'name' => t('Flag actions'),
     'description' => t('Tokens available in response to a flag action being executed by a user.'),
