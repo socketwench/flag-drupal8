@@ -2061,7 +2061,7 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
  *   Optional. The name of a flag if wanting a list specific to a single flag.
  *
  * @return
- *   If no flag name is given, an array of flaging data, keyed by the user
+ *   If no flag name is given, an array of flagging data, keyed by the user
  *   ID that flagged the entity. Each flagging array is structured as
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
