@@ -45,13 +45,13 @@ function flag_flag_type_info() {
  * specialized handlers for entities in hook_flag_type_info() as normal.
  */
 function flag_flag_type_info_alter(&$definitions) {
-  foreach (entity_get_info() as $entity_type => $entity) {
+  foreach (entity_get_info() as $entity_type => $entity_info) {
     // Only add flag support for entities that don't yet have them, and which
     // are non-config entities.
-    if (!isset($definitions[$entity_type]) && empty($entity['configuration'])) {
+    if (!isset($definitions[$entity_type]) && empty($entity_info['configuration'])) {
       $definitions[$entity_type] = array(
-        'title' => $entity['label'],
-        'description' => t('@entity-type entity', array('@entity-type' => $entity['label'])),
+        'title' => $entity_info['label'],
+        'description' => t('@entity-type entity', array('@entity-type' => $entity_info['label'])),
         'handler' => 'flag_entity',
       );
     }
