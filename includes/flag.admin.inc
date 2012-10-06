@@ -299,6 +299,14 @@ function flag_form($form, &$form_state, $flag) {
     '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
     '#weight' => -1,
   );
+  // Don't allow the 'global' checkbox to be changed when flaggings exist:
+  // there are too many unpleasant consequences in either direction.
+  // @todo: Allow this, but with a confirmation form, assuming anyone actually
+  // needs this feature.
+  if (!empty($flag->fid) && flag_get_flag_counts($flag->name)) {
+    $form['global']['#disabled'] = TRUE;
+    $form['global']['#description'] .= '<br />' . t('This setting cannot be changed when flaggings exist for this flag.');
+  }
 
   $form['messages'] = array(
     '#type' => 'fieldset',
