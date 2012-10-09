@@ -74,7 +74,7 @@ class flag_node extends flag_entity {
     unset($form['display']['show_on_entity']);
   }
 
-  function type_access_multiple($entity_ids, $account = NULL) {
+  function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // If all subtypes are allowed, we have nothing to say here.
