@@ -74,27 +74,44 @@ class flag_handler_field_ops extends views_handler_field {
     // Find out if the content is flagged. We can't just peek at some field in
     // our loaded table because it doesn't always reflect the user browsing the
     // page. So we explicitly add the flagging table to find this out.
-    $join = new views_join();
-    $join->construct('flagging', $info['views table'], $info['join field'], 'entity_id');
-    $join->extra[] = array(
-      'field' => 'fid',
-      'value' => $flag->fid,
-      'numeric' => TRUE,
-    );
-    if (!$flag->global) {
-      $join->extra[] = array(
-        'field' => 'uid',
-        'value' => '***CURRENT_USER***',
-        'numeric' => TRUE,
-      );
-      $join->extra[] = array(
-        'field' => 'sid',
-        'value' => '***FLAG_CURRENT_USER_SID***',
-        'numeric' => TRUE,
-      );
+    // If the relationship is created with 'Current User' checked, we probably
+    // already have the appropriate join. We just need the appropriate table
+    // alias for that join. We look in the relationship settings to see if
+    // user_scope is set to 'current' to determine this.
+    $relationship = $this->view->relationship[$this->options['relationship']];
+    if (isset($relationship->options['user_scope']) && $relationship->options['user_scope'] == 'current') {
+      $table_alias = $relationship->alias;
     }
-    $flag_table = $this->query->add_table('flagging', $parent, $join);
-    $this->aliases['is_flagged'] = $this->query->add_field($flag_table, 'entity_id');
+    // Otherwise, let's set up the alias, keeping it unique for this flag in
+    // case there are multiple flag relationships in a single view.
+    else {
+      $table_alias = 'flagging_current_user_' . $flag->fid;
+    }
+    // Now that we have the table alias, let's see if it's already been joined
+    // to. If it hasn't, we'll set up a join.
+    if (!isset($this->query->table_queue[$table_alias])) {
+      $join = new views_join();
+      $join->construct('flagging', $info['views table'], $info['join field'], 'entity_id');
+      $join->extra[] = array(
+        'field' => 'fid',
+        'value' => $flag->fid,
+        'numeric' => TRUE,
+      );
+      if (!$flag->global) {
+        $join->extra[] = array(
+          'field' => 'uid',
+          'value' => '***CURRENT_USER***',
+          'numeric' => TRUE,
+        );
+        $join->extra[] = array(
+          'field' => 'sid',
+          'value' => '***FLAG_CURRENT_USER_SID***',
+          'numeric' => TRUE,
+        );
+      }
+      $table_alias = $this->query->add_table($table_alias, $parent, $join);
+    }
+    $this->aliases['is_flagged'] = $this->query->add_field($table_alias, 'entity_id');
 
     // Next, find out the content ID. We can't add_field() on this table
     // (flagging), because its entity_id may be NULL (in case no user has
