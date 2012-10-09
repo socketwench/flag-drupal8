@@ -2112,6 +2112,7 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
       ->condition('entity_id', $entity_id)
       ->orderBy('timestamp', 'DESC')
       ->execute();
+    $entity_flags[$entity_type][$entity_id] = array();
     foreach ($result as $flag_content) {
       // Build a list of flaggings for all flags by user.
       $entity_flags[$entity_type][$entity_id]['users'][$flag_content->uid][$flag_names[$flag_content->fid]] = $flag_content;
@@ -2119,8 +2120,13 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
       $entity_flags[$entity_type][$entity_id]['flags'][$flag_names[$flag_content->fid]][$flag_content->uid] = $flag_content;
     }
   }
-
-  return isset($flag_name) ? $entity_flags[$entity_type][$entity_id]['flags'][$flag_name] : $entity_flags[$entity_type][$entity_id]['users'];
+  if (empty($entity_flags[$entity_type][$entity_id])) {
+    return array();
+  }
+  if (isset($flag_name)) {
+    return $entity_flags[$entity_type][$entity_id]['flags'][$flag_name];
+  }
+  return $entity_flags[$entity_type][$entity_id]['users'];
 }
 
 /**
