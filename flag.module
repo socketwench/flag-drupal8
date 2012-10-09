@@ -301,21 +301,61 @@ function flag_help($path, $arg) {
       $output = '<p>' . t('Select the type of flag to create. An individual flag can only affect one type of object. This cannot be changed once the flag is created.') . '</p>';
       return $output;
     case FLAG_ADMIN_PATH . '/manage/%/fields':
+      // Get the existing link types that provide a flagging form.
+      $link_types = flag_get_link_types();
+      $form_link_types = array();
+      foreach (flag_get_link_types() as $link_type) {
+        if ($link_type['provides form']) {
+          $form_link_types[] = '<em>' . $link_type['title'] . '</em>';
+        }
+      }
+
+      // Get the flag for which we're managing fields.
+      $flag = menu_get_object('flag', FLAG_ADMIN_PATH_START + 1);
+
+      // Common text.
       $output  = '<p>' . t('Flags can have fields added to them. For example, a "Spam" flag could have a <em>Reason</em> field where a user could type in why he believes the item flagged is spam. A "Bookmarks" flag could have a <em>Folder</em> field into which a user could arrange her bookmarks.') . '</p>';
       $output .= '<p>' . t('On this page you can add fields to flags, delete them, and otherwise manage them.') . '</p>';
-      $output .= '<p>';
-      $output .=   t('You will also want to pick either the "Confirmation form" or the "Form" <a href="@form-link-type-url">link type</a> for your flag, or else users won\'t have a means to enter values for the fields. (In case a form isn\'t used, the fields are assigned their default values.)', array(
-        '@form-link-type-url' => url('admin/structure/flags/manage/' . $arg[4], array('fragment' => 'edit-link-type')),
-      ));
-      if (!module_exists('flagging_form')) {
-        $output .= ' <strong>'
-          . t("Note: You don't have the <em><a href='@flagging-form-url'>Flagging Form</a></em> module enabled. You'll have to <a href='@enable-url'>enable it</a> to have the \"Form\" link-type.", array(
-            '@enable-url' => url('admin/modules'),
-            '@flagging-form-url' => 'http://drupal.org/project/flagging_form',
-          ))
-          . '</strong>';
+
+      // Three cases:
+      if ($flag->link_type == 'form') {
+        // Case 1: the current link type is the flagging form. Don't tell the
+        // user anything extra, all is fine.
       }
-      $output .= '</p>';
+      elseif ($link_types[$flag->link_type]['provides form']) {
+        // Case 2: the current link type shows the form for creation of the
+        // flagging, but it not the flagging form. Tell the user they can't edit
+        // existing flagging fields.
+        $output .= t("Field values may be edited when flaggings are created because this flag's link type shows a form for the flagging. However, to edit field values on existing flaggings, you will need to set your flag to use the <em>Flagging form</em> link type. This is provided by the <em><a href='!flagging-form-url'>Flagging Form</a></em> module.", array(
+          '!flagging-form-url' => 'http://drupal.org/project/flagging_form',
+        ));
+        if (!module_exists('flagging_form')) {
+          $output .= ' <span class="warning">'
+            . t("You do not currently have this module enabled.")
+            . '</span>';
+        }
+        $output .= '</p>';
+      }
+      else {
+        // Case 3: the current link type does not allow access to the flagging
+        // form. Tell the user they should change it.
+        $output .= '<p class="warning">' . t("To allow users to enter values for fields you will need to <a href='!form-link-type-url'>set your flag</a> to use one of the following link types which allow users to access the flagging form: !link-types-list. (In case a form isn't used, the fields are assigned their default values.)", array(
+          '!form-link-type-url' => url('admin/structure/flags/manage/' . $flag->name, array('fragment' => 'edit-link-type')),
+          // The list of labels from link types. These are all defined in code
+          // in hook_flag_link_type_info() and therefore safe to output raw.
+          '!link-types-list' => implode(', ', $form_link_types),
+        )) . '</p>';
+        $output .= '<p>' . t("Additionally, to edit field values on existing flaggings, you will need to set your flag to use the Flagging form link type. This is provided by the <em><a href='!flagging-form-url'>Flagging Form</a></em> module.", array(
+          '!flagging-form-url' => 'http://drupal.org/project/flagging_form',
+        ));
+        if (!module_exists('flagging_form')) {
+          $output .= ' <span class="warning">'
+            . t("You do not currently have this module enabled.")
+            . '</span>';
+        }
+        $output .= '</p>';
+      }
+
       return $output;
   }
 }
