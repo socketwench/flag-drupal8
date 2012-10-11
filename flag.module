@@ -2100,6 +2100,7 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
  *   ID that flagged the entity. Each flagging array is structured as
  *   an array of flag information for each flag, keyed by the flag name. If
  *   a flag name is specified, only the information for that flag is returned.
+ *   If no flags were found an empty array is returned.
  */
 function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
   $entity_flags = &drupal_static(__FUNCTION__, array());
