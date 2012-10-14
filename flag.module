@@ -64,6 +64,7 @@ function flag_entity_info() {
  *   The entity object, or FALSE if it can't be found.
  */
 function flagging_load($flagging_id, $reset = FALSE) {
+  // The flag machine name is loaded in by FlaggingController::buildQuery().
   $result = entity_load('flagging', array($flagging_id), array(), $reset);
   return reset($result);
 }
@@ -91,6 +92,37 @@ function flagging_load($flagging_id, $reset = FALSE) {
 //  - The entity type is "flagging", not "flag_flagging".
 // On the one hand this succinct version is readable and nice. On the other hand, it isn't
 // very "correct".
+
+/**
+ * Implements hook_entity_query_alter().
+ *
+ * Converts EntityFieldQuery instances on flaggings that have an entity
+ * condition on bundles (flag machine names).
+ *
+ * Based on taxonomy_entity_query_alter().
+ */
+function flag_entity_query_alter($query) {
+  $conditions = &$query->entityConditions;
+
+  // Alter only flagging queries with bundle conditions.
+  if (isset($conditions['entity_type']) && $conditions['entity_type']['value'] == 'flagging' && isset($conditions['bundle'])) {
+    // Convert flag machine names to flag IDs.
+    $flags = flag_get_flags();
+    $fids = array();
+    if (is_array($conditions['bundle']['value'])) {
+      foreach ($conditions['bundle']['value'] as $flag_name) {
+        $fids[] = $flags[$flag_name]->fid;
+      }
+    }
+    else {
+      $flag_name = $conditions['bundle']['value'];
+      $fids = $flags[$flag_name]->fid;
+    }
+
+    $query->propertyCondition('fid', $fids, $conditions['bundle']['operator']);
+    unset($conditions['bundle']);
+  }
+}
 
 /**
  * Implements hook_menu().
