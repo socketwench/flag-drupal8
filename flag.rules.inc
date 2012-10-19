@@ -81,7 +81,7 @@ class FlagRulesUIClass extends RulesDataUI implements RulesDataDirectInputFormIn
       '#required' => empty($info['optional']),
       '#multiple' => FALSE,
       '#default_value' => $settings[$name],
-      '#emtpy' => t('There is no suiting flag available.')
+      '#empty' => t('There is no suiting flag available.')
     );
     return $form;
   }
