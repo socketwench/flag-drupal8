@@ -16,7 +16,7 @@
  */
 function flag_flag_type_info() {
   // Entity types we specifically cater for.
-  $flags = array(
+  $definitions = array(
     'node' => array(
       'title' => t('Nodes'),
       'description' => t("Nodes are a Drupal site's primary content."),
@@ -34,7 +34,7 @@ function flag_flag_type_info() {
     ),
   );
 
-  return $flags;
+  return $definitions;
 }
 
 /**
