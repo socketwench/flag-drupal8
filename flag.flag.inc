@@ -22,17 +22,20 @@ function flag_flag_type_info() {
       'description' => t("Nodes are a Drupal site's primary content."),
       'handler' => 'flag_node',
     ),
-    'comment' => array(
-      'title' => t('Comments'),
-      'description' => t('Comments are responses to node content.'),
-      'handler' => 'flag_comment',
-    ),
     'user' => array(
       'title' => t('Users'),
       'description' => t('Users who have created accounts on your site.'),
       'handler' => 'flag_user',
     ),
   );
+
+  if (module_exists('comment')) {
+    $definitions['comment'] = array(
+      'title' => t('Comments'),
+      'description' => t('Comments are responses to node content.'),
+      'handler' => 'flag_comment',
+    );
+  }
 
   return $definitions;
 }
