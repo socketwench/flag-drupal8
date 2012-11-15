@@ -2162,7 +2162,10 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
     return array();
   }
   if (isset($flag_name)) {
-    return $entity_flags[$entity_type][$entity_id]['flags'][$flag_name];
+    if (isset($entity_flags[$entity_type][$entity_id]['flags'][$flag_name])) {
+      return $entity_flags[$entity_type][$entity_id]['flags'][$flag_name];
+    }
+    return array();
   }
   return $entity_flags[$entity_type][$entity_id]['users'];
 }
