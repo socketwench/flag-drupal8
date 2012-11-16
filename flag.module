@@ -2294,3 +2294,12 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
 function flag_get_sid($uid = NULL, $create = FALSE) {
   return flag_set_sid($uid, $create);
 }
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function flag_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && !empty($plugin)) {
+    return "plugins/$plugin";
+  }
+}
