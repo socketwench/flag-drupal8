@@ -580,6 +580,24 @@ class flag_flag {
   }
 
   /**
+   * Utility function: Checks whether a flag applies to a certain type, and
+   * possibly subtype, of entity.
+   *
+   * @param $entity_type
+   *   The type of entity being checked, usually "node".
+   * @param $content_subtype
+   *   The subtype (node type) being checked.
+   *
+   * @return
+   *   TRUE if the flag is enabled for this type and subtype.
+   */
+  function access_entity_enabled($entity_type, $content_subtype = NULL) {
+   $return = ($this->entity_type == $entity_type) &&
+     (!isset($content_subtype) || !count($this->types) || in_array($content_subtype, $this->types));
+   return $return;
+ }
+
+  /**
    * Returns TRUE if the flag is configured to show the flag-link using hook_link.
    * Derived classes are likely to implement this.
    */

@@ -1915,7 +1915,7 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
   // Filter out flags based on type and subtype.
   if (isset($entity_type) || isset($content_subtype)) {
     foreach ($filtered_flags as $name => $flag) {
-      if (!_flag_entity_enabled($flag, $entity_type, $content_subtype)) {
+      if (!$flag->access_entity_enabled($entity_type, $content_subtype)) {
         unset($filtered_flags[$name]);
       }
     }
@@ -1943,24 +1943,6 @@ function _flag_compare_weight($flag1, $flag2) {
     return 0;
   }
   return $flag1->weight < $flag2->weight ? -1 : 1;
-}
-
-/**
- * Utility function: Checks whether a flag applies to a certain type, and
- * possibly subtype, of entity.
- *
- * @param $entity_type
- *   The type of entity being checked, usually "node".
- * @param $content_subtype
- *   The subtype (node type) being checked.
- *
- * @return
- *   TRUE if the flag is enabled for this type and subtype.
- */
-function _flag_entity_enabled($flag, $entity_type, $content_subtype = NULL) {
-  $return = ($flag->entity_type == $entity_type) &&
-    (!isset($content_subtype) || !count($flag->types) || in_array($content_subtype, $flag->types));
-  return $return;
 }
 
 /**
