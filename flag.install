@@ -56,6 +56,9 @@ function flag_requirements($phase) {
     if (module_exists('session_api')) {
       if (file_exists('./robots.txt')) {
         $flag_path = url('flag') . '/';
+        // We don't use url() because this may return an absolute URL when
+        // language negotiation is set to 'domain'.
+        $flag_path = parse_url($flag_path, PHP_URL_PATH);
         $robots_string = 'Disallow: ' . $flag_path;
         $contents = file_get_contents('./robots.txt');
         if (strpos($contents, $robots_string) === FALSE) {
