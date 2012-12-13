@@ -635,7 +635,7 @@ class flag_flag {
   function flag($action, $entity_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
      // Get the user.
     if (!isset($account)) {
-      $account = $GLOBALS['user'];
+      $account = user_load($GLOBALS['user']->uid);
     }
     if (!$account) {
       return FALSE;
