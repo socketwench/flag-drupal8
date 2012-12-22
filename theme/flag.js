@@ -50,7 +50,10 @@ Drupal.flagLink = function(context) {
   /**
    * A click handler that is attached to all <A class="flag"> elements.
    */
-  function flagClick() {
+  function flagClick(event) {
+    // Prevent the default browser click handler
+    event.preventDefault();
+
     // 'this' won't point to the element when it's inside the ajax closures,
     // so we reference it using a variable.
     var element = this;
@@ -95,7 +98,6 @@ Drupal.flagLink = function(context) {
         $wrapper.removeClass('flag-waiting');
       }
     });
-    return false;
   }
 
   $('a.flag-link-toggle:not(.flag-processed)', context).addClass('flag-processed').click(flagClick);
