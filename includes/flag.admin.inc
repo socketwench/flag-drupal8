@@ -208,6 +208,14 @@ function theme_flag_admin_page($variables) {
 
 /**
  * Menu callback for adding a new flag.
+ *
+ * @param $entity_type
+ *  The entity type for the new flag, taken from the path argument. If not
+ *  present (i.e., '/add'), a form showing all possible flag types is shown.
+ *  Otherwise, this shows a form for adding af flag the given type.
+ *
+ * @see flag_add_form()
+ * @see flag_form()
  */
 function flag_add_page($entity_type = NULL) {
   if (isset($entity_type)) {
