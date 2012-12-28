@@ -475,12 +475,22 @@ function flag_form($form, &$form_state, $flag) {
     '#type' => 'radios',
     '#title' => t('Link type'),
     '#options' => _flag_link_type_options(),
-    '#option_descriptions' => _flag_link_type_descriptions(),
     '#flag_link_fields' => _flag_link_type_fields(),
-    '#after_build' => array('flag_expand_link_option', 'flag_check_link_types'),
+    '#after_build' => array('flag_check_link_types'),
     '#default_value' => $flag->link_type,
     '#weight' => 2,
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
+    ),
+    '#attributes' => array(
+      'class' => array('flag-link-options'),
+    ),
   );
+  // Add the descriptions to each ratio button element. These attach to the
+  // elements when FormAPI expands them.
+  foreach (_flag_link_type_descriptions() as $key => $description) {
+    $form['display']['link_type'][$key]['#description'] = $description;
+  }
 
   $form['display']['link_options_intro'] = array(
     '#markup' => '<p id="link-options-intro">' . t('The selected link type may require these additional settings:') . '</p>',
@@ -685,25 +695,6 @@ function flag_delete_confirm_submit($form, &$form_state) {
   }
   drupal_set_message(t('Flag @name has been deleted.', array('@name' => $flag->get_title())));
   $form_state['redirect'] = FLAG_ADMIN_PATH;
-}
-
-/**
- * FormAPI after_build function to add descriptions to radio buttons.
- */
-function flag_expand_link_option($element) {
-  $element['#attached'] = array(
-    'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
-  );
-
-  foreach (element_children($element) as $key) {
-    // Add a description to the link option.
-    if (isset($element['#option_descriptions'][$key])) {
-      $element[$key]['#description'] = $element['#option_descriptions'][$key];
-    }
-  }
-  $element['#attributes']['class'] = array('flag-link-options');
-
-  return $element;
 }
 
 /**
