@@ -1046,8 +1046,12 @@ class flag_flag {
       $sid = flag_get_sid($uid);
     }
     return db_select('flagging', 'fc')->fields('fc', array('flagging_id'))
-      ->condition('fid', $this->fid)->condition('uid', $uid)->condition('sid', $sid)
-      ->countQuery()->execute()->fetchField();
+      ->condition('fid', $this->fid)
+      ->condition('uid', $uid)
+      ->condition('sid', $sid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
