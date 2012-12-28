@@ -220,6 +220,8 @@ function theme_flag_admin_page($variables) {
 function flag_add_page($entity_type = NULL) {
   if (isset($entity_type)) {
     $flag = flag_flag::factory_by_entity_type($entity_type);
+    // Mark the flag as new.
+    $flag->is_new = TRUE;
     $type_info = flag_fetch_definition($entity_type);
     drupal_set_title(t('Add new @type flag', array('@type' => $type_info['title'])));
     return drupal_get_form('flag_form', $flag);
@@ -600,7 +602,8 @@ function flag_form_submit($form, &$form_state) {
   $flag->save();
   $flag->enable();
   drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
-  _flag_clear_cache();
+  // We clear caches more vigorously if the flag was new.
+  _flag_clear_cache(!empty($flag->is_new));
 
   // Save permissions.
   // This needs to be done after the flag cache has been cleared, so that
@@ -678,7 +681,7 @@ function flag_delete_confirm_submit($form, &$form_state) {
   if ($form_state['values']['confirm']) {
     $flag->delete();
     $flag->disable();
-    _flag_clear_cache();
+    _flag_clear_cache(TRUE);
   }
   drupal_set_message(t('Flag @name has been deleted.', array('@name' => $flag->get_title())));
   $form_state['redirect'] = FLAG_ADMIN_PATH;
@@ -716,14 +719,25 @@ function flag_check_link_types($element) {
 
 /**
  * Clears various caches when a flag is modified.
+ *
+ * @param $clear_entity_info
+ *  Whether to also clear the entity info cache. This is needed when adding or
+ *  deleting a flag, as this changes the bundles on the flagging entity. In
+ *  particular, when no flags exist yet, no Field admin UI paths exist and these
+ *  need to be created.
  */
-function _flag_clear_cache() {
-  if (module_exists('views')) {
-    views_invalidate_cache();
-  }
+function _flag_clear_cache($clear_entity_info = FALSE) {
   // Reset our flags cache, thereby making the following code aware of the
   // modifications.
   drupal_static_reset('flag_get_flags');
+
+  if ($clear_entity_info) {
+    entity_info_cache_clear();
+  }
+
+  if (module_exists('views')) {
+    views_invalidate_cache();
+  }
   // The title of a flag may appear in the menu (indirectly, via our "default
   // views"), so we need to clear the menu cache. This call also clears the
   // page cache, which is desirable too because the flag labels may have
