@@ -580,6 +580,7 @@ function flag_form_locked_process($element, &$form_state, $form) {
  * Add/Edit flag form validate.
  */
 function flag_form_validate($form, &$form_state) {
+  $form_state['values']['title'] = trim($form_state['values']['title']);
   $form_values = $form_state['values'];
 
   if ($form_values['link_type'] == 'confirm') {
@@ -607,6 +608,8 @@ function flag_form_validate($form, &$form_state) {
  */
 function flag_form_submit($form, &$form_state) {
   $flag = $form['#flag'];
+
+  $form_state['values']['title'] = trim($form_state['values']['title']);
   $flag->form_input($form_state['values']);
 
   $flag->save();
