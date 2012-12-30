@@ -55,6 +55,14 @@ class flag_entity extends flag_flag {
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->show_on_form,
     );
+    // We use FieldAPI to put the flag checkbox on the entity form, so therefore
+    // require the entity to be fielable. Since this is a potential DX
+    // headscratcher for a developer wondering where this option has gone,
+    // we disable it and explain why.
+    if (empty($entity_info['fieldable'])) {
+      $form['display']['show_on_form']['#disabled'] = TRUE;
+      $form['display']['show_on_form']['#description'] = t('This is only possible on entities which are fieldable.');
+    }
     $form['display']['show_contextual_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display in contextual links'),
