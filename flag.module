@@ -927,7 +927,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
  *
  * Handles the 'show_on_entity' flag option.
  *
- * Note this is broken for taxonomy terms. @see http://drupal.org/node/1067120
+ * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
   $links = flag_link($type, $entity, $view_mode == 'teaser');
