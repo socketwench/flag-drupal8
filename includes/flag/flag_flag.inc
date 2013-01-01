@@ -1392,7 +1392,7 @@ class flag_flag {
    * Renders a flag/unflag link. This is a wrapper around theme('flag') that,
    * in Drupal 6, easily channels the call to the right template file.
    *
-   * For parameters docmentation, see theme_flag().
+   * For parameters documentation, see flag.tpl.php.
    */
   function theme($action, $entity_id, $after_flagging = FALSE) {
     static $js_added = array();
