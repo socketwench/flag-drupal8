@@ -396,8 +396,7 @@ function flag_help($path, $arg) {
  * Implements hook_init().
  */
 function flag_init() {
-  $path = drupal_get_path('module', 'flag');
-  include_once $path . '/includes/flag.actions.inc';
+  module_load_include('inc', 'flag', 'includes/flag.actions');
 }
 
 /**
