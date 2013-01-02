@@ -80,13 +80,10 @@ function flag_page($action, $flag, $entity_id) {
  * @see flag_confirm_submit()
  */
 function flag_confirm($form, &$form_state, $action, $flag, $entity_id) {
+  $form['#flag'] = $flag;
   $form['action'] = array(
     '#type' => 'value',
     '#value' => $action,
-  );
-  $form['flag_name'] = array(
-    '#type' => 'value',
-    '#value' => $flag->name,
   );
   $form['entity_id'] = array(
     '#type' => 'value',
@@ -117,11 +114,9 @@ function flag_confirm($form, &$form_state, $action, $flag, $entity_id) {
  * @see flag_confirm()
  */
 function flag_confirm_submit(&$form, &$form_state) {
+  $flag = $form['#flag'];
   $action = $form_state['values']['action'];
-  $flag_name = $form_state['values']['flag_name'];
   $entity_id = $form_state['values']['entity_id'];
-
-  $flag = flag_get_flag($flag_name);
 
   if ($action == 'flag') {
     // If the action 'flag', further build up the new entity from form values.

@@ -679,7 +679,7 @@ function theme_flag_form_roles($variables) {
  * Delete flag page.
  */
 function flag_delete_confirm($form, &$form_state, $flag) {
-  $form['fid'] = array('#type' => 'value', '#value' => $flag->fid);
+  $form['#flag'] = $flag;
 
   return confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $flag->get_title())),
@@ -690,7 +690,7 @@ function flag_delete_confirm($form, &$form_state, $flag) {
 }
 
 function flag_delete_confirm_submit($form, &$form_state) {
-  $flag = flag_get_flag(NULL, $form_state['values']['fid']);
+  $flag = $form['#flag'];
   if ($form_state['values']['confirm']) {
     $flag->delete();
     $flag->disable();
