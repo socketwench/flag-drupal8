@@ -285,3 +285,122 @@ class FlagAccessTestCase extends DrupalWebTestCase {
   }
 
 }
+
+class FlagLinkTypeConfirmTestCase extends DrupalWebTestCase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Flag confirm link tests'),
+      'description' => t('Flag confirm form link type.'),
+      'group' => t('Flag'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp('flag');
+
+    // Create a test flag on article nodes.
+    // Keep the original data so we can compare strings.
+    $this->flag_data = array(
+      'entity_type' => 'node',
+      'name' => 'test_flag',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(
+        0 => 'article',
+      ),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => 'You have flagged this item.',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => 'You have unflagged this item',
+      'unflag_denied_text' => 'You may not unflag this item',
+      'link_type' => 'confirm',
+      'flag_confirmation' => 'Are you sure you want to flag this item?',
+      'unflag_confirmation' => 'Are you sure you want to unflag this item?',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_on_page' => 1,
+      'show_on_teaser' => 1,
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+    $flag = flag_flag::factory_by_array($this->flag_data);
+    $flag->save();
+    // Reset our cache so our permissions show up.
+    drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    // Create test user who can flag and unflag.
+    $flag_unflag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($flag_unflag_user);
+
+    // Create an article node to flag and unflag.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+    $this->nid = $node->nid;
+  }
+
+  /**
+   * Test that a user sees the flag confirm form.
+   */
+  function testFlag() {
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink($this->flag_data['flag_short'], 0, 'The flag link appears on the page');
+
+    // Click the link to flag the node.
+    $this->clickLink($this->flag_data['flag_short']);
+
+    $this->assertUrl('flag/confirm/flag/test_flag/' . $this->nid, array(
+      'query' => array(
+        'destination' => 'node/' . $this->nid,
+      ),
+    ), 'On confirm flagging form page.');
+
+    $this->assertText($this->flag_data['flag_confirmation'], 'The flag confirmation text appears as the confirmation page title.');
+
+    // Click the button to confirm the flagging.
+    $this->drupalPost(NULL, array(), $this->flag_data['flag_short']);
+
+    $this->assertText($this->flag_data['flag_message'], 'The flag message appears once the item has been flagged.');
+    $this->assertLink($this->flag_data['unflag_short'], 0, 'The unflag link appears once the item has been flagged.');
+
+    // Click the link to unflag the node.
+    $this->clickLink($this->flag_data['unflag_short']);
+
+    $this->assertUrl('flag/confirm/unflag/test_flag/' . $this->nid, array(
+      'query' => array(
+        'destination' => 'node/' . $this->nid,
+      ),
+    ), t('On confirm unflagging form page.'));
+
+    $this->assertText($this->flag_data['unflag_confirmation'], 'The unflag confirmation text appears as the confirmation page title.');
+
+    // Click the button to confirm the flagging.
+    $this->drupalPost(NULL, array(), $this->flag_data['unflag_short']);
+
+    $this->assertText($this->flag_data['unflag_message'], 'The unflag message appears once the item has been flagged.');
+  }
+
+}
