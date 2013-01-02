@@ -5,7 +5,7 @@
  * Tests for the Flag module.
  */
 
-class FlagTestCase extends DrupalWebTestCase {
+class FlagAdminTestCase extends DrupalWebTestCase {
   var $_flag = FALSE;
 
   /**
@@ -13,7 +13,7 @@ class FlagTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => t('Flag tests'),
+      'name' => t('Flag admin tests'),
       'description' => t('Add, edit and delete flags.'),
       'group' => t('Flag'),
     );
@@ -145,12 +145,143 @@ class FlagTestCase extends DrupalWebTestCase {
     $this->assertFalse(flag_get_flag($flag->name), t('Flag successfully deleted.'));
   }
 
-  /**
-   * Test that only allowed users have access to flags.
-   */
-  function testFlagAccess() {
+}
 
+class FlagAccessTestCase extends DrupalWebTestCase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Flag access tests'),
+      'description' => t('Access to flag and unflag entities.'),
+      'group' => t('Flag'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp('flag');
+
+    // Create a test flag on article nodes.
+    $flag_data = array(
+      'entity_type' => 'node',
+      'name' => 'test_flag',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(
+        0 => 'article',
+      ),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => '',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => '',
+      'unflag_denied_text' => 'You may not unflag this item',
+      // Use the normal link type as it involves no intermediary page loads.
+      'link_type' => 'normal',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_on_page' => 1,
+      'show_on_teaser' => 1,
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+    $flag = flag_flag::factory_by_array($flag_data);
+    $flag->save();
+    // Reset our cache so our permissions show up.
+    drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    // Create an article node that various users will try to flag.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+    $this->nid = $node->nid;
+  }
+
+  /**
+   * Test that a user without flag access can't see the flag.
+   */
+  function testFlagAccessNone() {
+    // Create test user who can't flag at all.
+    $no_flag_user = $this->drupalCreateUser(array());
+    $this->drupalLogin($no_flag_user);
+
+    // Clear the user access cache so our changes to permissions are noticed.
+    drupal_static_reset('user_access');
+    drupal_static_reset('user_role_permissions');
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertNoLink('Flag this item', 0, 'The flag link does not appear on the page');
+  }
+
+  /**
+   * Test that a user with only flag access can flag but not unflag.
+   */
+  function testFlagAccessFlagOnly() {
+    // Create test user who can flag but not unflag.
+    $flag_user = $this->drupalCreateUser(array('flag test_flag',));
+    $this->drupalLogin($flag_user);
+
+    // Clear the user access cache so our changes to permissions are noticed.
+    drupal_static_reset('user_access');
+    drupal_static_reset('user_role_permissions');
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page.');
+
+    // Click the link to flag the node.
+    $this->clickLink(t('Flag this item'));
+
+    $this->assertText('You may not unflag this item', 0, 'The unflag denied text appears on the page after flagging.');
+  }
+
+  /**
+   * Test that a user with flag access can flag and unflag.
+   */
+  function testFlagAccessFlagUnflag() {
+    // Create test user who can flag and unflag.
+    $flag_unflag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($flag_unflag_user);
+
+    // Clear the user access cache so our changes to permissions are noticed.
+    drupal_static_reset('user_access');
+    drupal_static_reset('user_role_permissions');
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page.');
+
+    // Click the link to flag the node.
+    $this->clickLink(t('Flag this item'));
+
+    $this->assertLink('Unflag this item', 0, 'The unflag link appears on the page after flagging.');
+
+    // Click the link to unflag the node.
+    $this->clickLink(t('Unflag this item'));
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page after unflagging.');
   }
 
 }
-
