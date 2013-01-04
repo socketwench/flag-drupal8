@@ -1733,18 +1733,6 @@ function _flag_link_type_descriptions() {
   return $options;
 }
 
-/**
- * Return an array of flag link fields that are dependent on a link type.
- */
-function _flag_link_type_fields() {
-  $options = array();
-  $types = flag_get_link_types();
-  foreach ($types as $type_name => $type) {
-    $options[$type_name] = array_keys($type['options']);
-  }
-  return $options;
-}
-
 // ---------------------------------------------------------------------------
 // Non-Views public API
 
