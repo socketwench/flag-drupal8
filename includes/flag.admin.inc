@@ -475,7 +475,6 @@ function flag_form($form, &$form_state, $flag) {
     '#type' => 'radios',
     '#title' => t('Link type'),
     '#options' => _flag_link_type_options(),
-    '#flag_link_fields' => _flag_link_type_fields(),
     '#after_build' => array('flag_check_link_types'),
     '#default_value' => $flag->link_type,
     '#weight' => 2,
