@@ -764,7 +764,7 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] . '_node_form')) {
     global $user;
     $nid = !empty($form['nid']['#value']) ? $form['nid']['#value'] : NULL;
-    $flags = flag_get_flags('node', $form['type']['#value'], $user);
+    $flags = flag_get_flags('node', $form['type']['#value']);
 
     // Filter out flags which need to be included on the node form.
     $flags_in_form = 0;
@@ -786,6 +786,8 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
       // Global flags have their value set even if the user doesn't have access
       // to it, similar to the way "published" and "promote" keep the default
       // values even if the user doesn't have "administer nodes" permission.
+      // Furthermore, a global flag is set to its default value on new nodes
+      // even if the user creating the node doesn't have access to the flag.
       $access = $flag->access($nid, $flag_status ? 'unflag' : 'flag', $user);
       if (!$access && !$flag->global) {
         continue;
@@ -965,8 +967,6 @@ function flag_node_update($node) {
  * Shared saving routine between flag_node_insert() and flag_node_update().
  */
 function flag_node_save($node) {
-  global $user;
-
   // Response to the flag checkboxes added to the form in flag_form_alter().
   $remembered = FALSE;
   if (isset($node->flag)) {
@@ -980,7 +980,11 @@ function flag_node_save($node) {
         // modification:
         $remembered = TRUE;
       }
-      flag($state ? 'flag' : 'unflag', $name, $node->nid, $user);
+
+      $action = $state ? 'flag' : 'unflag';
+      // Pass TRUE for $skip_permission_check so that flags that have been
+      // passed through as hidden form values are saved.
+      $flag->flag($action, $node->nid, NULL, TRUE);
     }
   }
 }
