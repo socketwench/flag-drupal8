@@ -49,11 +49,13 @@ class flag_entity extends flag_flag {
       '#type' => 'checkbox',
       '#title' => t('Display link on entity'),
       '#default_value' => isset($this->show_on_entity) ? $this->show_on_entity : TRUE,
+      '#weight' => 0,
     );
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->show_on_form,
+      '#weight' => 5,
     );
     // We use FieldAPI to put the flag checkbox on the entity form, so therefore
     // require the entity to be fielable. Since this is a potential DX
@@ -69,6 +71,7 @@ class flag_entity extends flag_flag {
       '#default_value' => $this->show_contextual_link,
       '#description' => t('Note that not all entity types support contextual links.'),
       '#access' => module_exists('contextual'),
+      '#weight' => 10,
     );
   }
 

@@ -1176,7 +1176,7 @@ function flag_user_view($account, $view_mode) {
       // User has no permission to use this flag.
       continue;
     }
-    if (!$flag->uses_hook_link(array())) {
+    if (!$flag->show_on_profile) {
       // Flag not set to appear on profile.
       continue;
     }
