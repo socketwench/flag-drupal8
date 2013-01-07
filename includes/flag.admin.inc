@@ -477,7 +477,9 @@ function flag_form($form, &$form_state, $flag) {
     '#options' => _flag_link_type_options(),
     '#after_build' => array('flag_check_link_types'),
     '#default_value' => $flag->link_type,
-    '#weight' => 2,
+    // Give this a high weight so additions by the flag classes for entity-
+    // specific options go above.
+    '#weight' => 18,
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
     ),
