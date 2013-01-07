@@ -5,7 +5,35 @@
  * Tests for the Flag module.
  */
 
-class FlagAdminTestCase extends DrupalWebTestCase {
+/**
+ * Base class for our tests with common methods.
+ */
+abstract class FlagTestCaseBase extends DrupalWebTestCase {
+
+  /**
+   * Helper to create a flag from an array of data and clear caches etc.
+   *
+   * @param $flag_data
+   *  An array of flag data.
+   *
+   * @return
+   *  The flag object.
+   */
+  function createFlag($flag_data) {
+    $flag = flag_flag::factory_by_array($flag_data);
+    $flag->save();
+    // Reset our cache so our permissions show up.
+    drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    return $flag;
+  }
+
+}
+
+class FlagAdminTestCase extends FlagTestCaseBase {
   var $_flag = FALSE;
 
   /**
@@ -148,39 +176,11 @@ class FlagAdminTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Base class for our tests with common methods.
- */
-abstract class FlagAccessTestCaseBase extends DrupalWebTestCase {
-
-  /**
-   * Helper to create a flag from an array of data and clear caches etc.
-   *
-   * @param $flag_data
-   *  An array of flag data.
-   *
-   * @return
-   *  The flag object.
-   */
-  function createFlag($flag_data) {
-    $flag = flag_flag::factory_by_array($flag_data);
-    $flag->save();
-    // Reset our cache so our permissions show up.
-    drupal_static_reset('flag_get_flags');
-
-    // Reset permissions so that permissions for this flag are available.
-    $this->checkPermissions(array(), TRUE);
-
-    return $flag;
-  }
-
-}
-
-/**
  * Access to flags using the entity forms.
  *
  * @todo: complete this test class.
  */
-class FlagAccessFormTestCase extends FlagAccessTestCaseBase {
+class FlagAccessFormTestCase extends FlagTestCaseBase {
 
   /**
    * Implements getInfo().
@@ -278,7 +278,7 @@ class FlagAccessFormTestCase extends FlagAccessTestCaseBase {
 /**
  * Access to flags using the basic flag link.
  */
-class FlagAccessLinkTestCase extends FlagAccessTestCaseBase {
+class FlagAccessLinkTestCase extends FlagTestCaseBase {
 
   /**
    * Implements getInfo().
