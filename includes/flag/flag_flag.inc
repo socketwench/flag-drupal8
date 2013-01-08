@@ -551,6 +551,10 @@ class flag_flag {
    * Implements access() implemented by each child class.
    *
    * @abstract
+   *
+   * @return
+   *  FALSE if access should be denied, or NULL if there is no restriction to
+   *  be made. This should NOT return TRUE.
    */
   function type_access($entity_id, $action, $account) {
     return NULL;
@@ -560,6 +564,12 @@ class flag_flag {
    * Implements access_multiple() implemented by each child class.
    *
    * @abstract
+   *
+   * @return
+   *  An array keyed by entity ids, whose values represent the access to the
+   *  corresponding entity. The access value may be FALSE if access should be
+   *  denied, or NULL (or not set) if there is no restriction to  be made. It
+   *  should NOT be TRUE.
    */
   function type_access_multiple($entity_ids, $account) {
     return array();
