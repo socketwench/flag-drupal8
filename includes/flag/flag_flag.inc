@@ -1399,8 +1399,8 @@ class flag_flag {
   }
 
   /**
-   * Renders a flag/unflag link. This is a wrapper around theme('flag') that,
-   * in Drupal 6, easily channels the call to the right template file.
+   * Renders a flag/unflag link. This is a wrapper around theme('flag') that
+   * channels the call to the right template file.
    *
    * For parameters documentation, see flag.tpl.php.
    */
