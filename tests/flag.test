@@ -237,10 +237,6 @@ class FlagAccessFormTestCase extends FlagTestCaseBase {
     $no_flag_user = $this->drupalCreateUser(array('create article content'));
     $this->drupalLogin($no_flag_user);
 
-    // Clear the user access cache so our changes to permissions are noticed.
-    drupal_static_reset('user_access');
-    drupal_static_reset('user_role_permissions');
-
     $this->drupalGet('node/add/article');
 
     // Check that the flag form element cannot be seen
@@ -348,10 +344,6 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
     $no_flag_user = $this->drupalCreateUser(array());
     $this->drupalLogin($no_flag_user);
 
-    // Clear the user access cache so our changes to permissions are noticed.
-    drupal_static_reset('user_access');
-    drupal_static_reset('user_role_permissions');
-
     // Look at our node.
     $this->drupalGet('node/' . $this->nid);
 
@@ -365,10 +357,6 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
     // Create test user who can flag but not unflag.
     $flag_user = $this->drupalCreateUser(array('flag test_flag',));
     $this->drupalLogin($flag_user);
-
-    // Clear the user access cache so our changes to permissions are noticed.
-    drupal_static_reset('user_access');
-    drupal_static_reset('user_role_permissions');
 
     // Look at our node.
     $this->drupalGet('node/' . $this->nid);
@@ -388,10 +376,6 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
     // Create test user who can flag and unflag.
     $flag_unflag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
     $this->drupalLogin($flag_unflag_user);
-
-    // Clear the user access cache so our changes to permissions are noticed.
-    drupal_static_reset('user_access');
-    drupal_static_reset('user_role_permissions');
 
     // Look at our node.
     $this->drupalGet('node/' . $this->nid);
