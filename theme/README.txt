@@ -19,9 +19,11 @@ In order to customize flag theming:
 
 Template variants
 -----------------
-In addition, the theme layer will first look for the template
-'flag--<FLAG_NAME>.tpl.php' before it turns to 'flag.tpl.php'. This too
-you should place in your theme's folder.[2][1]
+The theme layer will first look for the following templates in this order:
+  - flag--<FLAG_NAME>.tpl.php
+  - flag--<FLAG_LINK_TYPE>.tpl.php
+  - flag.tpl.php
+These should also be placed in your theme's folder.[2][1]
 
 
 Footnotes
