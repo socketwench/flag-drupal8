@@ -83,18 +83,6 @@ class flag_plugin_argument_validate_flaggability extends views_plugin_argument_v
     }
   }
 
-  // This function seems useless, but in the Drupal 6 branch it allows for
-  // compatibility between Views 3 and Views 2.
-  function _get_option($option, $default) {
-    return $this->options[$option];
-  }
-
-  // This function seems useless, but in the Drupal 6 branch it allows for
-  // compatibility between Views 3 and Views 2.
-  function _option_name($option) {
-    return $option;
-  }
-
   /**
    * Migrate existing Views 2 options to Views 3.
    */
