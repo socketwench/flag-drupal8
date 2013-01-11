@@ -1582,13 +1582,21 @@ function flag_theme() {
 
   return array(
     'flag' => array(
-      'variables' => array('flag' => NULL, 'action' => NULL, 'entity_id' => NULL, 'after_flagging' => FALSE),
+      'variables' => array(
+        'flag' => NULL,
+        'action' => NULL,
+        'entity_id' => NULL,
+        'after_flagging' => FALSE,
+      ),
       'template' => 'flag',
       'pattern' => 'flag__',
       'path' => $path,
     ),
     'flag_tokens_browser' => array(
-      'variables' => array('types' => array('all'), 'global_types' => TRUE),
+      'variables' => array(
+        'types' => array('all'),
+        'global_types' => TRUE,
+      ),
       'file' => 'flag.tokens.inc',
     ),
     'flag_admin_listing' => array(
@@ -1596,11 +1604,18 @@ function flag_theme() {
       'file' => 'includes/flag.admin.inc',
     ),
     'flag_admin_listing_disabled' => array(
-      'variables' => array('flags' => NULL, 'default_flags' => NULL),
+      'variables' => array(
+        'flags' => NULL,
+        'default_flags' => NULL,
+      ),
       'file' => 'includes/flag.admin.inc',
     ),
     'flag_admin_page' => array(
-      'variables' => array('flags' => NULL, 'default_flags' => NULL, 'flag_admin_listing' => NULL),
+      'variables' => array(
+        'flags' => NULL,
+        'default_flags' => NULL,
+        'flag_admin_listing' => NULL,
+      ),
       'file' => 'includes/flag.admin.inc',
     ),
     'flag_form_roles' => array(

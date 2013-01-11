@@ -1431,12 +1431,22 @@ class flag_flag {
       }
       if (!isset($js_added[$this->name . '_' . $entity_id])) {
         $js_added[$this->name . '_' . $entity_id] = TRUE;
-        $js_template = theme($this->theme_suggestions(), array('flag' => $this, 'action' => $js_action, 'entity_id' => $entity_id, 'after_flagging' => $after_flagging));
+        $js_template = theme($this->theme_suggestions(), array(
+          'flag' => $this,
+          'action' => $js_action,
+          'entity_id' => $entity_id,
+          'after_flagging' => $after_flagging,
+        ));
         drupal_add_js(array('flag' => array('templates' => array($this->name . '_' . $entity_id => $js_template))), 'setting');
       }
     }
 
-    return theme($this->theme_suggestions(), array('flag' => $this, 'action' => $action, 'entity_id' => $entity_id, 'after_flagging' => $after_flagging));
+    return theme($this->theme_suggestions(), array(
+      'flag' => $this,
+      'action' => $action,
+      'entity_id' => $entity_id,
+      'after_flagging' => $after_flagging,
+    ));
   }
 
   /**
