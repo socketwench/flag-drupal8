@@ -753,16 +753,22 @@ class flag_flag {
         $this->_flag_anonymous($entity_id);
       }
       if (!$flagged) {
+        // The entity is unflagged. By definition there is no flagging entity,
+        // but we may have been passed one in to save.
         if (!isset($flagging)) {
           // Construct a new flagging object if we don't have one.
           $flagging = $this->new_flagging($entity_id, $uid, $sid);
         }
+        // Save the flagging entity (just our table).
         $flagging_id = $this->_flag($entity_id, $uid, $sid);
+        // The _flag() method is a plain DB record writer, so it's a bit
+        // antiquated. We have to explicitly get our new ID out.
+        $flagging->flagging_id = $flagging_id;
         $this->_increase_count($entity_id);
         // We're writing out a flagging entity even when we aren't passed one
         // (e.g., when flagging via JavaScript toggle links); in this case
         // Field API will assign the fields their default values.
-        $this->_insert_flagging($flagging, $entity_id, $flagging_id);
+        $this->_insert_flagging($flagging);
         module_invoke_all('flag_flag', $this, $entity_id, $account, $flagging);
         // Invoke Rules event.
         if (module_exists('rules')) {
@@ -802,8 +808,7 @@ class flag_flag {
    * operation is also accompanied by some bookkeeping (calling hooks, updating
    * counters) or access control. These tasks are handled by the flag() method.
    */
-  private function _insert_flagging($flagging, $entity_id, $flagging_id) {
-    $flagging->flagging_id = $flagging_id;
+  private function _insert_flagging($flagging) {
     field_attach_presave('flagging', $flagging);
     field_attach_insert('flagging', $flagging);
   }
