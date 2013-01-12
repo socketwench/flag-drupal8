@@ -30,6 +30,9 @@ function flag_entity_info() {
         'bundle' => 'name',
       ),
       'bundles' => array(),
+      // The following tells EntityAPI how to save flaggings, thus allowing use
+      // of Entity metadata wrappers (if present).
+      'save callback' => 'flagging_save',
     ),
   );
 
@@ -69,7 +72,48 @@ function flagging_load($flagging_id, $reset = FALSE) {
   return reset($result);
 }
 
-// @todo: Implement flagging_save(). It's not required but other modules may expect it.
+/**
+ * Saves a flagging entity.
+ *
+ * For a new flagging, throws an exception is the flag action is not allowed for
+ * the given combination of flag, entity, and user.
+ *
+ * @param $flagging
+ *   The flagging entity. This may have either flag_name or the flag fid set,
+ *   and may also omit the uid property to use the current user.
+ *
+ * @throws Exception
+ */
+function flagging_save($flagging) {
+  // Get the flag, either way.
+  if (isset($flagging->flag_name)) {
+    $flag = flag_get_flag($flagging->flag_name);
+  }
+  else {
+    $flag = flag_get_flag(NULL, $flagging->fid);
+  }
+
+  if (!$flag) {
+    throw new Exception('Flag not found for flagging entity.');
+  }
+
+  // Fill in properties that may be omitted.
+  $flagging->fid = $flag->fid;
+  $flagging->flag_name = $flag->name;
+
+  if (!empty($flagging->uid)) {
+    $account = user_load($flagging->uid);
+  }
+  else {
+    $account = NULL;
+  }
+
+  $result = $flag->flag('flag', $flagging->entity_id, $account, FALSE, $flagging);
+
+  if (!$result) {
+    throw new Exception('Flag action not allowed for given flagging entity properties.');
+  }
+}
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
