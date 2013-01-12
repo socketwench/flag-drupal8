@@ -33,6 +33,180 @@ abstract class FlagTestCaseBase extends DrupalWebTestCase {
 
 }
 
+class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Flagging CRUD'),
+      'description' => t('Basic CRUD operations on flagging entities.'),
+      'group' => t('Flag'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp('flag');
+
+    $flag_data = array(
+      'entity_type' => 'node',
+      'name' => 'test_flag',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(
+        0 => 'article',
+      ),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => '',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => '',
+      'unflag_denied_text' => 'You may not unflag this item',
+      'link_type' => 'normal',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_on_page' => 1,
+      'show_on_teaser' => 1,
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+    $this->flag = $this->createFlag($flag_data);
+
+    // Create test user who can flag and unflag.
+    $this->flag_unflag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($this->flag_unflag_user);
+  }
+
+  /**
+   * Test creation of a flagging entity with flagging_save().
+   */
+  function testFlaggingCreate() {
+    // Create an article node that we try to create a flagging entity for.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+
+    // Create a flagging entity and save it.
+    $flagging = array(
+      'fid' => $this->flag->fid,
+      'entity_type' => 'node',
+      'entity_id' => $node->nid,
+      'uid' => $this->flag_unflag_user->uid,
+    );
+
+    $flagging = (object) $flagging;
+    flagging_save($flagging);
+
+    // Test flagging has a flagging_id
+    $this->assertTrue(!empty($flagging->flagging_id), 'The flagging entity has an entity id.');
+
+    // Test the database record exists.
+    $result = db_query("SELECT * FROM {flagging} WHERE fid = :fid AND entity_id = :nid AND uid = :uid", array(
+      ':fid' => $this->flag->fid,
+      ':nid' => $node->nid,
+      ':uid' => $this->flag_unflag_user->uid,
+    ));
+    $records = $result->fetchAll();
+    $this->assertTrue(count($records), 'The flagging record exists in the database.');
+
+    // Test node is flagged.
+    // The current user is not the same as the user logged into the internal
+    // browser, so we have to pass the UID param explicitly.
+    $this->assertTrue($this->flag->is_flagged($node->nid, $this->flag_unflag_user->uid), 'The node has been flagged by creating the flagging.');
+  }
+
+  /**
+   * Test throwing of exceptions with flagging_save().
+   */
+  function testFlaggingCreateException() {
+    // Create an article node that we try to create a flagging entity for.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+
+    // Create test user who can't use this flag.
+    $no_flag_user = $this->drupalCreateUser(array());
+
+    // Create a flagging entity with that tries to perform an flagging action
+    // that is not permitted.
+    $flagging = array(
+      'fid' => $this->flag->fid,
+      'entity_type' => 'node',
+      'entity_id' => $node->nid,
+      'uid' => $no_flag_user->uid,
+    );
+
+    $flagging = (object) $flagging;
+    try {
+      flagging_save($flagging);
+      $this->fail(t('Expected exception has not been thrown.'));
+    }
+    catch (Exception $e) {
+      $this->pass(t('Expected exception has been thrown.'));
+    }
+  }
+
+  /**
+   * Test creation of a flagging entity with flagging_save().
+   */
+  function testFlaggingUpdate() {
+    // Create an article node that we try to create a flagging entity for.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+
+    // Flag the node as the user.
+    $flag = flag_get_flag('test_flag');
+    $flag->flag('flag', $node->nid, $this->flag_unflag_user);
+
+    // Get the flagging record back from the database.
+    $result = db_query("SELECT * FROM {flagging} WHERE fid = :fid AND entity_id = :nid AND uid = :uid", array(
+      ':fid' => $this->flag->fid,
+      ':nid' => $node->nid,
+      ':uid' => $this->flag_unflag_user->uid,
+    ));
+    $record = $result->fetchObject();
+
+    // Load the flagging entity we just created.
+    $flagging = flagging_load($record->flagging_id);
+
+    // Save it, as if we were updating field values.
+    flagging_save($flagging);
+
+    // This should have no effect: the node should still be flagged.
+    $this->assertTrue($this->flag->is_flagged($node->nid, $this->flag_unflag_user->uid), 'The node is still flagged after updating the flagging.');
+  }
+
+}
+
 class FlagAdminTestCase extends FlagTestCaseBase {
   var $_flag = FALSE;
 
