@@ -1449,79 +1449,6 @@ function flag_flag_access_multiple($flag, $entity_ids, $account) {
 }
 
 /**
- * Implements hook_node_operations().
- *
- * Add additional options on the admin/build/node page.
- */
-function flag_node_operations() {
-  global $user;
-
-  $flags = flag_get_flags('node', NULL, $user);
-  $operations = array();
-
-  foreach ($flags as $flag) {
-    $operations['flag_' . $flag->name] = array(
-      'label' => $flag->get_label('flag_short'),
-      'callback' => 'flag_nodes',
-      'callback arguments' => array('flag', $flag->name),
-      'behavior' => array(),
-    );
-    $operations['unflag_' . $flag->name] = array(
-      'label' => $flag->get_label('unflag_short'),
-      'callback' => 'flag_nodes',
-      'callback arguments' => array('unflag', $flag->name),
-      'behavior' => array(),
-    );
-  }
-  return $operations;
-}
-
-/**
- * Callback function for hook_node_operations().
- */
-function flag_nodes($nodes, $action, $flag_name) {
-  $performed = FALSE;
-  foreach ($nodes as $nid) {
-    $performed |= flag($action, $flag_name, $nid);
-  }
-  if ($performed) {
-    drupal_set_message(t('The update has been performed.'));
-  }
-}
-
-/**
- * Implements hook_user_operations().
- */
-function flag_user_operations() {
-  global $user;
-
-  $flags = flag_get_flags('user', NULL, $user);
-  $operations = array();
-
-  foreach ($flags as $flag) {
-    $operations['flag_' . $flag->name] = array(
-      'label' => $flag->get_label('flag_short'),
-      'callback' => 'flag_users',
-      'callback arguments' => array('flag', $flag->name),
-    );
-    $operations['unflag_' . $flag->name] = array(
-      'label' => $flag->get_label('unflag_short'),
-      'callback' => 'flag_users',
-      'callback arguments' => array('unflag', $flag->name),
-    );
-  }
-  return $operations;
-}
-/**
- * Callback function for hook_user_operations().
- */
-function flag_users($users, $action, $flag_name) {
-  foreach ($users as $uid) {
-    flag($action, $flag_name, $uid);
-  }
-}
-
-/**
  * Implements hook_mail().
  */
 function flag_mail($key, &$message, $params) {
@@ -2309,6 +2236,82 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
  */
 function flag_get_sid($uid = NULL, $create = FALSE) {
   return flag_set_sid($uid, $create);
+}
+
+// ---------------------------------------------------------------------------
+// Drupal Core operations
+
+/**
+ * Implements hook_node_operations().
+ *
+ * Add additional options on the admin/build/node page.
+ */
+function flag_node_operations() {
+  global $user;
+
+  $flags = flag_get_flags('node', NULL, $user);
+  $operations = array();
+
+  foreach ($flags as $flag) {
+    $operations['flag_' . $flag->name] = array(
+      'label' => $flag->get_label('flag_short'),
+      'callback' => 'flag_nodes',
+      'callback arguments' => array('flag', $flag->name),
+      'behavior' => array(),
+    );
+    $operations['unflag_' . $flag->name] = array(
+      'label' => $flag->get_label('unflag_short'),
+      'callback' => 'flag_nodes',
+      'callback arguments' => array('unflag', $flag->name),
+      'behavior' => array(),
+    );
+  }
+  return $operations;
+}
+
+/**
+ * Callback function for hook_node_operations().
+ */
+function flag_nodes($nodes, $action, $flag_name) {
+  $performed = FALSE;
+  foreach ($nodes as $nid) {
+    $performed |= flag($action, $flag_name, $nid);
+  }
+  if ($performed) {
+    drupal_set_message(t('The update has been performed.'));
+  }
+}
+
+/**
+ * Implements hook_user_operations().
+ */
+function flag_user_operations() {
+  global $user;
+
+  $flags = flag_get_flags('user', NULL, $user);
+  $operations = array();
+
+  foreach ($flags as $flag) {
+    $operations['flag_' . $flag->name] = array(
+      'label' => $flag->get_label('flag_short'),
+      'callback' => 'flag_users',
+      'callback arguments' => array('flag', $flag->name),
+    );
+    $operations['unflag_' . $flag->name] = array(
+      'label' => $flag->get_label('unflag_short'),
+      'callback' => 'flag_users',
+      'callback arguments' => array('unflag', $flag->name),
+    );
+  }
+  return $operations;
+}
+/**
+ * Callback function for hook_user_operations().
+ */
+function flag_users($users, $action, $flag_name) {
+  foreach ($users as $uid) {
+    flag($action, $flag_name, $uid);
+  }
 }
 
 // ---------------------------------------------------------------------------
