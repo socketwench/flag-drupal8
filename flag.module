@@ -794,13 +794,8 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
         continue;
       }
 
-      if (isset($form['#node']->flag[$flag->name])) {
-        $flag_status = $form['#node']->flag[$flag->name];
-      }
-      else {
-        $flag_status_default = variable_get('flag_' . $flag->name . '_default_' . $form['type']['#value'], 0);
-        $flag_status = $nid ? $flag->is_flagged($nid) : $flag_status_default;
-      }
+      $flag_status_default = variable_get('flag_' . $flag->name . '_default_' . $form['type']['#value'], 0);
+      $flag_status = $nid ? $flag->is_flagged($nid) : $flag_status_default;
 
       // If the flag is not global and the user doesn't have access, skip it.
       // Global flags have their value set even if the user doesn't have access
