@@ -6,90 +6,6 @@
  */
 
 /**
- * Implements hook_install().
- */
-function flag_install() {
-}
-
-/**
- * Implements hook_uninstall().
- */
-function flag_uninstall() {
-  $result = db_select('variable', 'v')
-    ->fields('v', array('name'))
-    ->condition('name', 'flag_%', 'LIKE')
-    ->execute();
-  foreach ($result as $row) {
-    variable_del($row->name);
-  }
-
-  drupal_set_message(t('Flag has been uninstalled.'));
-}
-
-/**
- * Implements hook_requirements().
- *
- * Prevent installing this module if the "Flag content" module is installed as well.
- */
-function flag_requirements($phase) {
-  $requirements = array();
-  $t = get_t();
-  if ($phase == 'install') {
-    if (!defined('MAINTENANCE_MODE') && _flag_flag_content_installed()) {
-      $requirements['flag_content_clash'] = array(
-        'title' => $t('Flag'),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => _flag_flag_content_message(),
-      );
-    }
-  }
-
-  if ($phase == 'runtime') {
-    if (module_exists('translation') && !module_exists('translation_helpers')) {
-      $requirements['flag_translation'] = array(
-        'title' => $t('Flag'),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('To have the flag module work with translations, you need to install and enable the <a href="http://drupal.org/project/translation_helpers">Translation helpers</a> module.'),
-        'value' => $t('Translation helpers module not found.'),
-      );
-    }
-    if (module_exists('session_api')) {
-      if (file_exists('./robots.txt')) {
-        $flag_path = url('flag') . '/';
-        // We don't use url() because this may return an absolute URL when
-        // language negotiation is set to 'domain'.
-        $flag_path = parse_url($flag_path, PHP_URL_PATH);
-        $robots_string = 'Disallow: ' . $flag_path;
-        $contents = file_get_contents('./robots.txt');
-        if (strpos($contents, $robots_string) === FALSE) {
-          $requirements['flag_robots'] = array(
-            'title' => $t('Flag robots.txt problem'),
-            'severity' => REQUIREMENT_WARNING,
-            'description' => $t('Flag module may currently be used with anonymous users, however the robots.txt file does not exclude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
-            'value' => $t('Search engines flagging content'),
-          );
-        }
-      }
-    }
-  }
-  return $requirements;
-}
-
-/**
- * Returns TRUE if the "Flag content" module, which we aren't compatible with,
- * is installed.
- */
-function _flag_flag_content_installed() {
-  $version = @drupal_get_installed_schema_version('flag_content', TRUE);
-  return (isset($version) && $version != SCHEMA_UNINSTALLED);
-}
-
-function _flag_flag_content_message() {
-  $t = get_t();
-  return $t("You are trying to install the <em>Flag</em> module. However, you have the <em>\"Flag content\"</em> module installed, and these two modules aren't compatible (because they happen to use a database table by the same name). To install the <em>Flag</em> module, you'll first have to disable and then <a href='@uninstall-url'>uninstall</a> the <em>\"Flag content\"</em> module.", array('@uninstall-url' => url('admin/modules/uninstall')));
-}
-
-/**
  * Implements hook_schema().
  */
 function flag_schema() {
@@ -286,6 +202,90 @@ function flag_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function flag_install() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function flag_uninstall() {
+  $result = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', 'flag_%', 'LIKE')
+    ->execute();
+  foreach ($result as $row) {
+    variable_del($row->name);
+  }
+
+  drupal_set_message(t('Flag has been uninstalled.'));
+}
+
+/**
+ * Implements hook_requirements().
+ *
+ * Prevent installing this module if the "Flag content" module is installed as well.
+ */
+function flag_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  if ($phase == 'install') {
+    if (!defined('MAINTENANCE_MODE') && _flag_flag_content_installed()) {
+      $requirements['flag_content_clash'] = array(
+        'title' => $t('Flag'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => _flag_flag_content_message(),
+      );
+    }
+  }
+
+  if ($phase == 'runtime') {
+    if (module_exists('translation') && !module_exists('translation_helpers')) {
+      $requirements['flag_translation'] = array(
+        'title' => $t('Flag'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('To have the flag module work with translations, you need to install and enable the <a href="http://drupal.org/project/translation_helpers">Translation helpers</a> module.'),
+        'value' => $t('Translation helpers module not found.'),
+      );
+    }
+    if (module_exists('session_api')) {
+      if (file_exists('./robots.txt')) {
+        $flag_path = url('flag') . '/';
+        // We don't use url() because this may return an absolute URL when
+        // language negotiation is set to 'domain'.
+        $flag_path = parse_url($flag_path, PHP_URL_PATH);
+        $robots_string = 'Disallow: ' . $flag_path;
+        $contents = file_get_contents('./robots.txt');
+        if (strpos($contents, $robots_string) === FALSE) {
+          $requirements['flag_robots'] = array(
+            'title' => $t('Flag robots.txt problem'),
+            'severity' => REQUIREMENT_WARNING,
+            'description' => $t('Flag module may currently be used with anonymous users, however the robots.txt file does not exclude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
+            'value' => $t('Search engines flagging content'),
+          );
+        }
+      }
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Returns TRUE if the "Flag content" module, which we aren't compatible with,
+ * is installed.
+ */
+function _flag_flag_content_installed() {
+  $version = @drupal_get_installed_schema_version('flag_content', TRUE);
+  return (isset($version) && $version != SCHEMA_UNINSTALLED);
+}
+
+function _flag_flag_content_message() {
+  $t = get_t();
+  return $t("You are trying to install the <em>Flag</em> module. However, you have the <em>\"Flag content\"</em> module installed, and these two modules aren't compatible (because they happen to use a database table by the same name). To install the <em>Flag</em> module, you'll first have to disable and then <a href='@uninstall-url'>uninstall</a> the <em>\"Flag content\"</em> module.", array('@uninstall-url' => url('admin/modules/uninstall')));
 }
 
 function flag_update_last_removed() {
