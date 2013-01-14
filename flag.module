@@ -2343,3 +2343,43 @@ function flag_ctools_plugin_directory($module, $plugin) {
     return "plugins/$plugin";
   }
 }
+
+// ---------------------------------------------------------------------------
+// Entity Metadata callbacks
+
+/**
+ * Getter callback that returns whether the given entity is flagged.
+ */
+function flag_properties_get_flagging_boolean($entity, array $options, $name, $entity_type, $property_info) {
+  list($entity_id,) = entity_extract_ids($entity_type, $entity);
+
+  $flagging_data = flag_get_user_flags($entity_type, $entity_id);
+  return isset($flagging_data[$property_info['flag_name']]);
+}
+
+/**
+ * Getter callback that returns entities the given user flagged.
+ */
+function flag_properties_get_flagged_entities($entity, array $options, $name, $entity_type, $property_info) {
+  // Need the entity type the flag applies to.
+  $flag_entity_type = $property_info['flag_entity_type'];
+
+  $flagging_data = flag_get_user_flags($flag_entity_type, NULL, $entity->uid);
+
+  $flag_name = $property_info['flag_name'];
+  if (isset($flagging_data[$flag_name])) {
+    return array_keys($flagging_data[$flag_name]);
+  }
+  return array();
+}
+
+/**
+ * Getter callback that returns users who flagged the given entity.
+ */
+function flag_properties_get_flagging_users($entity, array $options, $name, $entity_type, $property_info) {
+  list($entity_id,) = entity_extract_ids($entity_type, $entity);
+
+  $flagging_data = flag_get_entity_flags($entity_type, $entity_id, $property_info['flag_name']);
+
+  return array_keys($flagging_data);
+}
