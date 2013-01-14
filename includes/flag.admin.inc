@@ -480,6 +480,7 @@ function flag_form($form, &$form_state, $flag) {
     '#description' => t('Flags are usually controlled through links that allow users to toggle their behavior. You can choose how users interact with flags by changing options here. It is legitimate to have none of the following checkboxes ticked, if, for some reason, you wish <a href="@placement-url">to place the the links on the page yourself</a>.', array('@placement-url' => 'http://drupal.org/node/295383')),
     '#tree' => FALSE,
     '#weight' => 20,
+    '#after_build' => array('flag_link_type_options_states'),
   );
 
   $form['display']['link_type'] = array(
@@ -505,7 +506,10 @@ function flag_form($form, &$form_state, $flag) {
   }
 
   $form['display']['link_options_intro'] = array(
-    '#markup' => '<p id="link-options-intro">' . t('The selected link type may require these additional settings:') . '</p>',
+    // This is a hack to allow a markup element to use FormAPI states.
+    // @see http://www.bywombats.com/blog/06-25-2011/using-containers-states-enabled-markup-form-elements
+    '#type' => 'container',
+    '#children' => '<p id="link-options-intro">' . t('The selected link type may require these additional settings:') . '</p>',
     '#weight' => 20,
   );
 
@@ -554,6 +558,42 @@ function flag_form($form, &$form_state, $flag) {
   $flag->options_form($form);
 
   return $form;
+}
+
+/**
+ * FormAPI after_build function set states on link type options fieldsets.
+ *
+ * We do this in an after build so we handle further link types fieldsets from
+ * other modules that provide link types.
+ *
+ * This expects a link type's fieldset to be $form['display'][link_options_TYPE]
+ * so that can be matched up with the radio button value.
+ */
+function flag_link_type_options_states($element) {
+  $intro_element_values_array = array();
+  foreach (element_children($element) as $key) {
+    if (isset($element[$key]['#type']) && $element[$key]['#type'] == 'fieldset' && substr($key, 0, 12) == 'link_options') {
+      // Trim the radio value from the fieldset key. This assumed the fieldset
+      // key is 'link_options_TYPE'.
+      $radio_value = substr($key, 13);
+      $element[$key]['#states'] = array(
+        'visible' => array(
+          ':input[name="link_type"]' => array('value' => $radio_value),
+        ),
+      );
+      // Gather up the radio values for the format we need for a multiple
+      // value state.
+      $intro_element_values_array[] = array('value' => $radio_value);
+    }
+  }
+
+  $element['link_options_intro']['#states'] = array(
+    'visible' => array(
+      ':input[name="link_type"]' => $intro_element_values_array,
+    ),
+  );
+
+  return $element;
 }
 
 /**
