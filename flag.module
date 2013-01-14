@@ -1473,67 +1473,6 @@ function flag_flag_access_multiple($flag, $entity_ids, $account) {
 }
 
 /**
- * Trim a flag to a certain size.
- *
- * @param $fid
- *   The flag object.
- * @param $account
- *   The user object on behalf the trimming will occur.
- * @param $cutoff_size
- *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
- */
-function flag_trim_flag($flag, $account, $cutoff_size) {
-  $result = db_select('flagging', 'fc')
-    ->fields('fc')
-    ->condition('fid', $flag->fid)
-    ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
-    ->orderBy('timestamp', 'DESC')
-    ->execute();
-  $i = 1;
-  foreach ($result as $row) {
-    if ($i++ > $cutoff_size) {
-      flag('unflag', $flag->name, $row->entity_id, $account);
-    }
-  }
-}
-
-/**
- * Remove all flagged entities from a flag.
- *
- * @param $flag
- *   The flag object.
- * @param $entity_id
- *   Optional. The entity ID on which all flaggings will be removed. If left
- *   empty, this will remove all of this flag's entities.
- */
-function flag_reset_flag($flag, $entity_id = NULL) {
-  $query = db_select('flagging', 'fc')
-    ->fields('fc')
-    ->condition('fid', $flag->fid);
-
-  if ($entity_id) {
-    $query->condition('entity_id', $entity_id);
-  }
-
-  $result = $query->execute()->fetchAllAssoc('flagging_id', PDO::FETCH_ASSOC);
-  $rows = array();
-  foreach ($result as $row) {
-    $rows[] = $row;
-  }
-  module_invoke_all('flag_reset', $flag, $entity_id, $rows);
-
-  $query = db_delete('flagging')->condition('fid' , $flag->fid);
-  // Update the flag_counts table.
-  $count_query = db_delete('flag_counts')->condition('fid', $flag->fid);
-  if ($entity_id) {
-    $query->condition('entity_id', $entity_id);
-    $count_query->condition('entity_id', $entity_id);
-  }
-  $count_query->execute();
-  return $query->execute();
-}
-
-/**
  * Implements hook_node_operations().
  *
  * Add additional options on the admin/build/node page.
@@ -2235,6 +2174,67 @@ function flag_create_link($flag_name, $entity_id) {
     return;
   }
   return $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id);
+}
+
+/**
+ * Trim a flag to a certain size.
+ *
+ * @param $fid
+ *   The flag object.
+ * @param $account
+ *   The user object on behalf the trimming will occur.
+ * @param $cutoff_size
+ *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
+ */
+function flag_trim_flag($flag, $account, $cutoff_size) {
+  $result = db_select('flagging', 'fc')
+    ->fields('fc')
+    ->condition('fid', $flag->fid)
+    ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
+    ->orderBy('timestamp', 'DESC')
+    ->execute();
+  $i = 1;
+  foreach ($result as $row) {
+    if ($i++ > $cutoff_size) {
+      flag('unflag', $flag->name, $row->entity_id, $account);
+    }
+  }
+}
+
+/**
+ * Remove all flagged entities from a flag.
+ *
+ * @param $flag
+ *   The flag object.
+ * @param $entity_id
+ *   Optional. The entity ID on which all flaggings will be removed. If left
+ *   empty, this will remove all of this flag's entities.
+ */
+function flag_reset_flag($flag, $entity_id = NULL) {
+  $query = db_select('flagging', 'fc')
+    ->fields('fc')
+    ->condition('fid', $flag->fid);
+
+  if ($entity_id) {
+    $query->condition('entity_id', $entity_id);
+  }
+
+  $result = $query->execute()->fetchAllAssoc('flagging_id', PDO::FETCH_ASSOC);
+  $rows = array();
+  foreach ($result as $row) {
+    $rows[] = $row;
+  }
+  module_invoke_all('flag_reset', $flag, $entity_id, $rows);
+
+  $query = db_delete('flagging')->condition('fid' , $flag->fid);
+  // Update the flag_counts table.
+  $count_query = db_delete('flag_counts')->condition('fid', $flag->fid);
+  if ($entity_id) {
+    $query->condition('entity_id', $entity_id);
+    $count_query->condition('entity_id', $entity_id);
+  }
+  $count_query->execute();
+  return $query->execute();
 }
 
 /**
