@@ -535,30 +535,6 @@ function _flag_url($path, $fragment = NULL, $absolute = TRUE) {
 }
 
 /**
- * Implements hook_views_api().
- */
-function flag_views_api() {
-  return array(
-    'api' => 3.0,
-    'path' => drupal_get_path('module', 'flag') . '/includes/views',
-  );
-}
-
-/**
- * Implements hook_features_api().
- */
-function flag_features_api() {
-  return array(
-    'flag' => array(
-      'name' => t('Flag'),
-      'feature_source' => TRUE,
-      'default_hook' => 'flag_default_flags',
-      'file' => drupal_get_path('module', 'flag') . '/includes/flag.features.inc',
-    ),
-  );
-}
-
-/**
  * Implements hook_permission().
  */
 function flag_permission() {
@@ -2333,6 +2309,33 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
  */
 function flag_get_sid($uid = NULL, $create = FALSE) {
   return flag_set_sid($uid, $create);
+}
+
+// ---------------------------------------------------------------------------
+// Contrib integration hooks
+
+/**
+ * Implements hook_views_api().
+ */
+function flag_views_api() {
+  return array(
+    'api' => 3.0,
+    'path' => drupal_get_path('module', 'flag') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_features_api().
+ */
+function flag_features_api() {
+  return array(
+    'flag' => array(
+      'name' => t('Flag'),
+      'feature_source' => TRUE,
+      'default_hook' => 'flag_default_flags',
+      'file' => drupal_get_path('module', 'flag') . '/includes/flag.features.inc',
+    ),
+  );
 }
 
 /**
