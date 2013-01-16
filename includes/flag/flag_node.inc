@@ -132,20 +132,13 @@ class flag_node extends flag_entity {
     return parent::get_flagging_record($entity_id, $uid, $sid);
   }
 
+  /**
+   * This is overridden for no other purpose than to document that $entity_id
+   * can be one of the following fake IDs in certain contexts:
+   *  - 'new': On a new node form.
+   *  - 'fake': On the node type admin form.
+   */
   function replace_tokens($label, $contexts, $options, $entity_id) {
-    if (is_numeric($entity_id) && ($node = $this->fetch_entity($entity_id))) {
-      $contexts['node'] = $node;
-    }
-    // Nodes accept the node-type as a $entity_id in the case that a new node
-    // is being created and a full node object does not yet exist.
-    elseif (!empty($entity_id) && ($type = node_type_get_type($entity_id))) {
-      $entity_id = NULL;
-      $contexts['node'] = (object) array(
-        'nid' => NULL,
-        'type' => $type->type,
-        'title' => '',
-      );
-    }
     return parent::replace_tokens($label, $contexts, $options, $entity_id);
   }
 }

@@ -622,10 +622,18 @@ function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
   $flags = flag_get_flags('node', $form['#node_type']->type, $user);
   foreach ($flags as $flag) {
     if ($flag->show_on_form) {
+      // To be able to process node tokens in flag labels, we create a fake
+      // node and store it in the flag's cache for replace_tokens() to find,
+      // with a fake ID.
+      $flag->remember_entity('fake', (object) array(
+        'nid' => NULL,
+        'type' => $form['#node_type']->type,
+        'title' => '',
+      ));
       $var = 'flag_' . $flag->name . '_default';
       $form['workflow']['flag'][$var] = array(
         '#type' => 'checkbox',
-        '#title' => $flag->get_label('flag_short', $form['#node_type']->type),
+        '#title' => $flag->get_label('flag_short', 'fake'),
         '#default_value' => variable_get($var . '_' . $form['#node_type']->type, 0),
         '#return_value' => 1,
       );
@@ -808,11 +816,18 @@ function flag_form_alter(&$form, &$form_state, $form_id) {
         continue;
       }
 
+      if (!$nid) {
+        // To be able to process node tokens for a node which hasn't yet been
+        // saved (e.g., on node/add/article), we "save" it to the flag's cache
+        // under a pseudo ID.
+        $flag->remember_entity('new', $form['#node']);
+      }
+
       // Add the flag checkbox if displaying on the form.
       $form['flag'][$flag->name] = array(
         '#type' => 'checkbox',
-        '#title' => $flag->get_label('flag_short', $nid ? $nid : $form['type']['#value']),
-        '#description' => $flag->get_label('flag_long', $nid ? $nid : $form['type']['#value']),
+        '#title' => $flag->get_label('flag_short', $nid ? $nid : 'new'),
+        '#description' => $flag->get_label('flag_long', $nid ? $nid : 'new'),
         '#default_value' => $flag_status,
         '#return_value' => 1,
         '#attributes' => array('title' => $flag->get_title()), // Used by our drupalSetSummary().
