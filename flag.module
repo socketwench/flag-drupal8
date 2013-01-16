@@ -947,7 +947,6 @@ function flag_link($type, $entity = NULL, $teaser = FALSE) {
   if (!isset($entity) || !flag_fetch_definition($type)) {
     return;
   }
-  global $user;
 
   // Get all possible flags for this entity type.
   $flags = flag_get_flags($type);
