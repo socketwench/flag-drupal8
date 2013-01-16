@@ -221,21 +221,10 @@ function flag_uninstall() {
 
 /**
  * Implements hook_requirements().
- *
- * Prevent installing this module if the "Flag content" module is installed as well.
  */
 function flag_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  if ($phase == 'install') {
-    if (!defined('MAINTENANCE_MODE') && _flag_flag_content_installed()) {
-      $requirements['flag_content_clash'] = array(
-        'title' => $t('Flag'),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => _flag_flag_content_message(),
-      );
-    }
-  }
 
   if ($phase == 'runtime') {
     if (module_exists('translation') && !module_exists('translation_helpers')) {
@@ -266,20 +255,6 @@ function flag_requirements($phase) {
     }
   }
   return $requirements;
-}
-
-/**
- * Returns TRUE if the "Flag content" module, which we aren't compatible with,
- * is installed.
- */
-function _flag_flag_content_installed() {
-  $version = @drupal_get_installed_schema_version('flag_content', TRUE);
-  return (isset($version) && $version != SCHEMA_UNINSTALLED);
-}
-
-function _flag_flag_content_message() {
-  $t = get_t();
-  return $t("You are trying to install the <em>Flag</em> module. However, you have the <em>\"Flag content\"</em> module installed, and these two modules aren't compatible (because they happen to use a database table by the same name). To install the <em>Flag</em> module, you'll first have to disable and then <a href='@uninstall-url'>uninstall</a> the <em>\"Flag content\"</em> module.", array('@uninstall-url' => url('admin/modules/uninstall')));
 }
 
 function flag_update_last_removed() {
