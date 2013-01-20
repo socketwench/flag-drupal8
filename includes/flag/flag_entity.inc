@@ -174,7 +174,7 @@ class flag_entity extends flag_flag {
     $flag_action = parent::get_flag_action($entity_id);
     $entity = $this->fetch_entity($entity_id);
     $flag_action->content_title = entity_label($this->entity_type, $entity);
-    $flag_action->content_url = _flag_url($this->entity_type . '/' . $this->get_entity_id($entity));
+    $flag_action->content_url = $this->_flag_url($this->entity_type . '/' . $this->get_entity_id($entity));
     return $flag_action;
   }
 

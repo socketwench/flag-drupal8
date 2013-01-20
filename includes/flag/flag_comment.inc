@@ -102,7 +102,7 @@ class flag_comment extends flag_entity {
     $flag_action = parent::get_flag_action($entity_id);
     $comment = $this->fetch_entity($entity_id);
     $flag_action->content_title = $comment->subject;
-    $flag_action->content_url = _flag_url("comment/$comment->cid", "comment-$comment->cid");
+    $flag_action->content_url = $this->_flag_url("comment/$comment->cid", "comment-$comment->cid");
     return $flag_action;
   }
 
