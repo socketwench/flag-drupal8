@@ -1909,20 +1909,6 @@ function flag_get_flag_flagging_data($flag_name) {
 }
 
 /**
- * Get entity ID from a flag content ID.
- *
- * @param $flagging_id
- *   The flag content ID for which to look up the entity ID.
- */
-function flag_get_entity_id($flagging_id) {
-  return db_select('flagging', 'fc')
-    ->fields('fc', array('entity_id'))
-    ->condition('flagging_id', $flagging_id)
-    ->execute()
-    ->fetchField();
-}
-
-/**
  * Find what a user has flagged, either a single node or on the entire site.
  *
  * @param $entity_type
