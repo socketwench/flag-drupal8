@@ -1464,6 +1464,13 @@ class flag_flag {
     $suggestions[] = 'flag';
     return $suggestions;
   }
+
+  /**
+   * A shortcut function to output the link URL.
+   */
+  function _flag_url($path, $fragment = NULL, $absolute = TRUE) {
+    return url($path, array('fragment' => $fragment, 'absolute' => $absolute));
+  }
 }
 
 /**

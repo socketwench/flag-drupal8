@@ -84,7 +84,7 @@ class flag_user extends flag_entity {
     $flag_action = parent::get_flag_action($entity_id);
     $user = $this->fetch_entity($entity_id);
     $flag_action->content_title = $user->name;
-    $flag_action->content_url = _flag_url('user/' . $user->uid);
+    $flag_action->content_url = $this->_flag_url('user/' . $user->uid);
     return $flag_action;
   }
 

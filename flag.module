@@ -528,13 +528,6 @@ function flag_create_handler($entity_type) {
 }
 
 /**
- * A shortcut function to output the link URL.
- */
-function _flag_url($path, $fragment = NULL, $absolute = TRUE) {
-  return url($path, array('fragment' => $fragment, 'absolute' => $absolute));
-}
-
-/**
  * Implements hook_permission().
  */
 function flag_permission() {
