@@ -192,6 +192,11 @@ class flag_entity extends flag_flag {
    */
   function get_views_info() {
     $entity_info = entity_get_info($this->entity_type);
+
+    if (!isset($entity_info['base table'])) {
+      return NULL;
+    }
+
     return array(
       'views table' => $entity_info['base table'],
       'join field' => $entity_info['entity keys']['id'],
