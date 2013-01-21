@@ -1923,8 +1923,6 @@ function flag_get_flag_flagging_data($flag_name) {
  *   Optional. The user SID (provided by Session API) whose flags we're
  *   checking. If none given, the current user will be used. The SID is 0 for
  *   logged in users.
- * @param $reset
- *   Reset the internal cache and execute the SQL query another time.
  *
  * @return $flags
  *   If returning a single item's flags (that is, when $entity_id isn't NULL),
@@ -1935,15 +1933,8 @@ function flag_get_flag_flagging_data($flag_name) {
  *   [flag_name] => [entity_id] => Object from above.
  *
  */
-function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid = NULL, $reset = FALSE) {
+function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid = NULL) {
   $flagged_content = &drupal_static(__FUNCTION__);
-
-  if ($reset) {
-    $flagged_content = array();
-    if (!isset($entity_type)) {
-      return;
-    }
-  }
 
   $uid = !isset($uid) ? $GLOBALS['user']->uid : $uid;
   $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
