@@ -676,7 +676,7 @@ class flag_flag {
 
     // Clear various caches; We don't want code running after us to report
     // wrong counts or false flaggings.
-    flag_get_counts(NULL, NULL, TRUE);
+    drupal_static_reset('flag_get_counts');
     drupal_static_reset('flag_get_user_flags');
     drupal_static_reset('flag_get_entity_flags');
 

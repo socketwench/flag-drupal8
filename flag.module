@@ -1650,21 +1650,12 @@ function _flag_link_type_descriptions() {
  *   The entity type (usually 'node').
  * @param $entity_id
  *   The entity ID (usually the node ID).
- * @param $reset
- *   Reset the internal cache and execute the SQL query another time.
  *
  * @return $flags
  *   An array of the structure [name] => [number of flags].
  */
-function flag_get_counts($entity_type, $entity_id, $reset = FALSE) {
+function flag_get_counts($entity_type, $entity_id) {
   $counts = &drupal_static(__FUNCTION__);
-
-  if ($reset) {
-    $counts = array();
-    if (!isset($entity_type)) {
-      return;
-    }
-  }
 
   if (!isset($counts[$entity_type][$entity_id])) {
     $counts[$entity_type][$entity_id] = array();
