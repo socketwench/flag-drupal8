@@ -1451,18 +1451,6 @@ function flag_flag_access_multiple($flag, $entity_ids, $account) {
 }
 
 /**
- * Implements hook_mail().
- */
-function flag_mail($key, &$message, $params) {
-  switch ($key) {
-    case 'over_threshold':
-      $message['subject'] = $params['subject'];
-      $message['body'] = $params['body'];
-      break;
-  }
-}
-
-/**
  * Implements hook_theme().
  */
 function flag_theme() {
