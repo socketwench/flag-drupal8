@@ -33,11 +33,6 @@ Drupal.flagLink = function(context) {
 
     // Find the wrapper of the old link.
     var $wrapper = $(element).parents('.flag-wrapper:first');
-    if ($wrapper.length == 0) {
-      // If no ancestor wrapper was found, or if the 'flag-wrapper' class is
-      // attached to the <a> element itself, then take the element itself.
-      $wrapper = $(element);
-    }
     // Replace the old link with the new one.
     $wrapper.after($newLink).remove();
     Drupal.attachBehaviors($newLink.get(0));
