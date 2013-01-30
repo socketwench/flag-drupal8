@@ -94,6 +94,18 @@ class flag_flag {
   );
 
   /**
+   * An associative array containing textual errors that may be created during validation.
+   *
+   * The array keys should reflect the type of error being set. At this time,
+   * the only "special" behavior related to the array keys is that
+   * drupal_access_denied() is called when the key is 'access-denied' and
+   * javascript is disabled.
+   *
+   * @var array
+   */
+  var $errors = array();
+
+  /**
    * Creates a flag from a database row. Returns it.
    *
    * This is static method.
@@ -651,7 +663,7 @@ class flag_flag {
    *   applicable to the item, etc.), TRUE otherwise.
    */
   function flag($action, $entity_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {
-     // Get the user.
+    // Get the user.
     if (!isset($account)) {
       $account = $GLOBALS['user'];
     }
@@ -662,6 +674,7 @@ class flag_flag {
     // Check access and applicability.
     if (!$skip_permission_check) {
       if (!$this->access($entity_id, $action, $account)) {
+        $this->errors['access-denied'] = t('You are not allowed to flag, or unflag, this content.');
         // User has no permission to flag/unflag this object.
         return FALSE;
       }
@@ -670,8 +683,13 @@ class flag_flag {
       // We are skipping permission checks. However, at a minimum we must make
       // sure the flag applies to this entity type:
       if (!$this->applies_to_entity_id($entity_id)) {
+        $this->errors['entity-type'] = t('This flag does not apply to this entity type.');
         return FALSE;
       }
+    }
+
+    if (($this->errors = module_invoke_all('flag_validate', $action, $this, $entity_id, $account, $skip_permission_check, $flagging))) {
+      return FALSE;
     }
 
     // Clear various caches; We don't want code running after us to report
@@ -691,6 +709,7 @@ class flag_flag {
       $sid = flag_get_sid($uid, TRUE);
       // Anonymous users must always have a session id.
       if ($sid == 0 && $account->uid == 0) {
+        $this->errors['session'] = t('Internal error: You are anonymous but you have no session ID.');
         return FALSE;
       }
     }
@@ -1162,6 +1181,13 @@ class flag_flag {
   }
 
   /**
+   * Returns an array of errors set during validation.
+   */
+  function get_errors() {
+    return $this->errors;
+  }
+
+  /**
    * @addtogroup actions
    * @{
    * Methods that can be overridden to support Actions.
@@ -1409,7 +1435,7 @@ class flag_flag {
    *
    * For parameters documentation, see flag.tpl.php.
    */
-  function theme($action, $entity_id, $after_flagging = FALSE) {
+  function theme($action, $entity_id, $after_flagging = FALSE, $errors = array()) {
     static $js_added = array();
     global $user;
 
@@ -1451,6 +1477,7 @@ class flag_flag {
       'action' => $action,
       'entity_id' => $entity_id,
       'after_flagging' => $after_flagging,
+      'errors' => $errors,
     ));
   }
 

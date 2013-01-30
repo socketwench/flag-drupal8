@@ -121,6 +121,42 @@ function hook_flag_unflag($flag, $entity_id, $account, $flagging) {
 }
 
 /**
+ * Perform custom validation on a flag before flagging/unflagging.
+ *
+ * @param $action
+ *  The action about to be carried out. Either 'flag' or 'unflag'.
+ * @param $flag
+ *  The flag object.
+ * @param $entity_id
+ *  The id of the entity the user is trying to flag or unflag.
+ * @param $account
+ *  The user account performing the action.
+ * @param $flagging
+ *  The flagging entity.
+ *
+ * @return
+ *   Optional array: textual error with the error-name as the key.
+ *   If the error name is 'access-denied' and javascript is disabled,
+ *   drupal_access_denied will be called and a 403 will be returned.
+ *   If validation is successful, do not return a value.
+ */
+function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permission_check, $flagging) {
+  // We're only operating on the "test" flag, and users may always unflag.
+  if ($flag->name == 'test' && $action == 'flag') {
+    // Get all flags set by the current user.
+    $flags = flag_get_user_flags('node', NULL, $account->uid, $sid = NULL, $reset = FALSE);
+    // Check if this user has any flags of this type set.
+    if (isset($flags['test'])) {
+      $count = count($flags[$flag->name]);
+      if ($count >= 2) {
+        // Users may flag only 2 nodes with this flag.
+        return(array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
+      }
+    }
+  }
+}
+
+/**
  * Allow modules to allow or deny access to flagging.
  *
  * @param $flag

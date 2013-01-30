@@ -38,7 +38,7 @@ Drupal.flagLink = function(context) {
     Drupal.attachBehaviors($newLink.get(0));
 
     $('.flag-message', $newLink).fadeIn();
-    setTimeout(function(){ $('.flag-message', $newLink).fadeOut() }, 3000);
+    setTimeout(function(){ $('.flag-message.flag-auto-remove', $newLink).fadeOut() }, 3000);
     return $newLink.get(0);
   }
 
@@ -73,20 +73,12 @@ Drupal.flagLink = function(context) {
       data: { js: true },
       dataType: 'json',
       success: function (data) {
-        if (data.status) {
-          // Success.
-          data.link = $wrapper.get(0);
-          $.event.trigger('flagGlobalBeforeLinkUpdate', [data]);
-          if (!data.preventDefault) { // A handler may cancel updating the link.
-            data.link = updateLink(element, data.newLink);
-          }
-          $.event.trigger('flagGlobalAfterLinkUpdate', [data]);
+        data.link = $wrapper.get(0);
+        $.event.trigger('flagGlobalBeforeLinkUpdate', [data]);
+        if (!data.preventDefault) { // A handler may cancel updating the link.
+          data.link = updateLink(element, data.newLink);
         }
-        else {
-          // Failure.
-          alert(data.errorMessage);
-          $wrapper.removeClass('flag-waiting');
-        }
+        $.event.trigger('flagGlobalAfterLinkUpdate', [data]);
       },
       error: function (xmlhttp) {
         alert('An HTTP error '+ xmlhttp.status +' occurred.\n'+ element.href);

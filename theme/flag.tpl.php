@@ -21,6 +21,8 @@
  * - $link_title: The title attribute for the link.
  *
  * - $message_text: The long message to show after a flag action has been carried out.
+ * - $message_classes: A space-separated list of CSS classes that should be applied to
+ *   the message.
  * - $after_flagging: This template is called for the link both before and after being
  *   flagged. If displaying to the user immediately after flagging, this value
  *   will be boolean TRUE. This is usually used in conjunction with immedate
@@ -42,7 +44,7 @@
     <span class="<?php print $flag_classes ?>"><?php print $link_text; ?></span>
   <?php endif; ?>
   <?php if ($after_flagging): ?>
-    <span class="flag-message flag-<?php print $status; ?>-message">
+    <span class="<?php print $message_classes; ?>">
       <?php print $message_text; ?>
     </span>
   <?php endif; ?>

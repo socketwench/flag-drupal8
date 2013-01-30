@@ -1463,6 +1463,7 @@ function flag_theme() {
         'action' => NULL,
         'entity_id' => NULL,
         'after_flagging' => FALSE,
+        'errors' => array(),
       ),
       'template' => 'flag',
       'pattern' => 'flag__',
@@ -1510,6 +1511,7 @@ function flag_theme() {
  * - $action
  * - $entity_id
  * - $after_flagging
+ * - $errors
  *
  * See 'flag.tpl.php' for their documentation.
  */
@@ -1521,6 +1523,7 @@ function template_preprocess_flag(&$variables) {
   $flag =& $variables['flag'];
   $action = $variables['action'];
   $entity_id = $variables['entity_id'];
+  $errors = join('<br />', $variables['errors']);
   $flag_css_name = str_replace('_', '-', $flag->name);
 
   // Generate the link URL.
@@ -1563,7 +1566,6 @@ function template_preprocess_flag(&$variables) {
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
   $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name;
   $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name . '-' . $entity_id;
-  $variables['flag_wrapper_classes'] = implode(' ', $variables['flag_wrapper_classes_array']);
 
   $variables['flag_classes_array'] = array();
   $variables['flag_classes_array'][] = 'flag';
@@ -1578,12 +1580,30 @@ function template_preprocess_flag(&$variables) {
     $link['attributes']['class'] = is_string($link['attributes']['class']) ? array_filter(explode(' ', $link['attributes']['class'])) : $link['attributes']['class'];
     $variables['flag_classes_array'] = array_merge($variables['flag_classes_array'], $link['attributes']['class']);
   }
+  $variables['message_classes_array'] = array();
   if ($variables['after_flagging']) {
-    $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
-    $variables['message_text'] = $flag->get_label($inverse_action . '_message', $entity_id);
-    $variables['flag_classes_array'][] = $variables['status'];
+    $variables['message_classes_array'][] = 'flag-message';
+    if ($errors) {
+      $variables['message_classes_array'][] = 'flag-failure-message';
+      $variables['message_text'] = $errors;
+    }
+    else {
+      $inverse_action = ($action == 'flag' ? 'unflag' : 'flag');
+      $variables['message_classes_array'][] = 'flag-success-message';
+      $variables['message_classes_array'][] = 'flag-' . $variables['status'] . '-message';
+      $variables['message_text'] = $flag->get_label($inverse_action . '_message', $entity_id);
+      $variables['flag_classes_array'][] = $variables['status'];
+      // By default we make our JS code remove, after a few seconds, only success messages.
+      $variables['message_classes_array'][] = 'flag-auto-remove';
+    }
   }
+  else {
+    $variables['message_text'] = '';
+  }
+
+  $variables['flag_wrapper_classes'] = implode(' ', $variables['flag_wrapper_classes_array']);
   $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
+  $variables['message_classes'] = join(' ', $variables['message_classes_array']);
 
   // Backward compatibility: The following section preserves some deprecated
   // variables either to make old flag.tpl.php files continue to work, or to
