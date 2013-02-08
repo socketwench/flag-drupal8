@@ -8,17 +8,14 @@
 /**
  * Implements hook_flag_type_info().
  *
- * We define flag types for those Core entities we specifically cater for whose
- * modules are required by Drupal core. Other core entities we cater for have
- * their flag type defined in implementations of this hook on behalf of their
- * providing modules, so that the entity's module is correctly picked up as a
- * dependency.
+ * Defines the flag types this module implements.
  *
  * @return
  *   An "array of arrays", keyed by object type. The 'handler' slot
  *   should point to the PHP class implementing this flag.
  */
 function flag_flag_type_info() {
+  // Entity types we specifically cater for.
   $definitions = array(
     'node' => array(
       'title' => t('Nodes'),
@@ -32,31 +29,13 @@ function flag_flag_type_info() {
     ),
   );
 
-  return $definitions;
-}
-
-/**
- * Implement hook_flag_type_info() on behalf of the core Comment module.
- */
-function comment_flag_type_info() {
-  $definitions['comment'] = array(
-    'title' => t('Comments'),
-    'description' => t('Comments are responses to node content.'),
-    'handler' => 'flag_comment',
-  );
-
-  return $definitions;
-}
-
-/**
- * Implement hook_flag_type_info() on behalf of the core Taxonomy module.
- */
-function taxonomy_flag_type_info() {
-  $definitions['taxonomy_term'] = array(
-    'title' => t('Taxonomy Terms'),
-    'description' => t('Taxonomy terms are used to categorize content.'),
-    'handler' => 'flag_entity',
-  );
+  if (module_exists('comment')) {
+    $definitions['comment'] = array(
+      'title' => t('Comments'),
+      'description' => t('Comments are responses to node content.'),
+      'handler' => 'flag_comment',
+    );
+  }
 
   return $definitions;
 }
