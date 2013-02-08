@@ -34,6 +34,16 @@ function flag_flag_type_info() {
       'title' => t('Comments'),
       'description' => t('Comments are responses to node content.'),
       'handler' => 'flag_comment',
+      'module' => 'comment',
+    );
+  }
+
+  if (module_exists('taxonomy')) {
+    $definitions['taxonomy_term'] = array(
+      'title' => t('Taxonomy Terms'),
+      'description' => t('Taxonomy terms are used to categorize content.'),
+      'handler' => 'flag_entity',
+      'module' => 'taxonomy',
     );
   }
 

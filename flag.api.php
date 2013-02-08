@@ -25,6 +25,8 @@
  *  - 'description': A longer description shown in the UI when creating a new
  *    flag.
  *  - 'handler': The name of the class implementing this flag type.
+ *  - 'module': (optional) The name of the module that should be registered as a
+ *    dependency for this flag type.
  *
  * @see flag_fetch_definition()
  */
@@ -34,6 +36,7 @@ function hook_flag_type_info() {
       'title' => t('Nodes'),
       'description' => t("Nodes are a Drupal site's primary content."),
       'handler' => 'flag_node',
+      'module' => 'node',
     ),
   );
 }
