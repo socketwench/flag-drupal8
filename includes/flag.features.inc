@@ -85,7 +85,7 @@ function flag_features_providing_module() {
   $hook = 'flag_type_info';
   foreach (module_implements($hook) as $module) {
     foreach (module_invoke($module, $hook) as $key => $value) {
-      $modules[$key] = $module;
+      $modules[$key] = isset($value['module']) ? $value['module'] : $module;
     }
   }
   return $modules;
