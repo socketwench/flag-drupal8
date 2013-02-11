@@ -160,7 +160,10 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
 }
 
 /**
- * Allow modules to allow or deny access to flagging.
+ * Allow modules to allow or deny access to flagging for a single entity.
+ *
+ * Called when displaying a single entity view or edit page.  For flag access
+ * checks from within Views, implement hook_flag_access_multiple().
  *
  * @param $flag
  *  The flag object.
@@ -175,6 +178,7 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
  *   Boolean TRUE if the user is allowed to flag/unflag the given entity.
  *   FALSE otherwise.
  *
+ * @see hook_flag_access_multiple()
  * @see flag_flag:access()
  */
 function hook_flag_access($flag, $entity_id, $action, $account) {
@@ -182,7 +186,10 @@ function hook_flag_access($flag, $entity_id, $action, $account) {
 }
 
 /**
- * Allow modules to allow or deny access to flagging.
+ * Allow modules to allow or deny access to flagging for multiple entities.
+ *
+ * Called when preparing a View or list of multiple flaggable entities.
+ * For flag access checks for individual entities, see hook_flag_access().
  *
  * @param $flag
  *  The flag object.
