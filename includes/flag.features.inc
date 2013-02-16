@@ -17,10 +17,28 @@ function flag_features_export($data, &$export, $module_name = '') {
   // Ensure the modules that provide the flag are included as dependencies.
   $modules = flag_features_providing_module();
   foreach ($data as $key => $flag) {
-    // Get the module that provided the flag definition.
+    $module = '';
     if ($flag = flag_load($flag, TRUE)) {
-      $module = $modules[$flag->entity_type];
-      $export['dependencies'][$module] = $module;
+      // Try to get the module that provides the entity this flag is on.
+      // First pass: check whether there's a module that implements
+      // hook_flag_type_info() for this entity.
+      if (array_key_exists($flag->entity_type, $modules)) {
+        $module = $modules[$flag->entity_type];
+      }
+      else {
+        // Second pass: check whether this entity is defined using Entity API
+        // and therefore has an extra 'module' property in its information.
+        if ($entity_info = entity_get_info($flag->entity_type)) {
+          if (isset($entity_info['module'])) {
+            $module = $entity_info['module'];
+          }
+        }
+      }
+
+      if (!empty($module)) {
+        $export['dependencies'][$module] = $module;
+      }
+
       $export['features']['flag'][$flag->name] = $flag->name;
     }
   }
