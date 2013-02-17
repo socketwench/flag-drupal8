@@ -1353,7 +1353,7 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
   if ($flag->entity_type == 'node') {
     // For non-existent nodes (such as on the node add form), assume that the
     // current user is creating the content.
-    if (empty($entity_id) || !($node = node_load($entity_id))) {
+    if (empty($entity_id) || !($node = $flag->fetch_entity($entity_id))) {
       return $flag->access_author == 'others' ? FALSE : NULL;
     }
 
