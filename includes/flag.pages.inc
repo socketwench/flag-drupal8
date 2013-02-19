@@ -55,7 +55,7 @@ function flag_page($action, $flag, $entity_id) {
         drupal_set_message($error, 'error');
       }
       if (isset($errors['access-denied'])) {
-        drupal_access_denied();
+        return MENU_ACCESS_DENIED;
       }
       else {
         drupal_goto();
