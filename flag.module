@@ -908,12 +908,12 @@ function flag_contextual_links_view_alter(&$element, $items) {
 /**
  * Implements hook_entity_view().
  *
- * Handles the 'show_on_entity' flag option.
+ * Handles the 'show_in_links' flag option.
  *
  * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
-  $links = flag_link($type, $entity, $view_mode == 'teaser');
+  $links = flag_link($type, $entity, $view_mode);
   if (isset($links)) {
     $entity->content['links']['flag'] = array(
       '#theme' => 'links',
@@ -930,13 +930,13 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
  *  The entity type.
  * @param $entity
  *  The entity
- * @param $teaser
- *  Boolean indicating whether the current view mode is 'teaser'.
+ * @param $view_mode
+ *  String indicating the current view mode.
  *
  * @return
  *  An array of link data, suitable for passing to theme_links().
  */
-function flag_link($type, $entity = NULL, $teaser = FALSE) {
+function flag_link($type, $entity = NULL, $view_mode) {
   if (!isset($entity) || !flag_fetch_definition($type)) {
     return;
   }
@@ -947,7 +947,7 @@ function flag_link($type, $entity = NULL, $teaser = FALSE) {
   foreach ($flags as $flag) {
     $entity_id = $flag->get_entity_id($entity);
 
-    if (!$flag->uses_hook_link($teaser)) {
+    if (!$flag->uses_hook_link($view_mode)) {
       // Flag is not configured to show its link here.
       continue;
     }

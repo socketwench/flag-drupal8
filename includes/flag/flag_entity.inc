@@ -16,8 +16,10 @@ class flag_entity extends flag_flag {
     $options = parent::options();
     $options += array(
       // Output the flag in the entity links.
+      // This is empty for now and will get overriden for different
+      // entities.
       // @see hook_entity_view().
-      'show_on_entity' => TRUE,
+      'show_in_links' => array(),
       // Add a checkbox for the flag in the entity form.
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
@@ -43,20 +45,30 @@ class flag_entity extends flag_flag {
       '#description' => t('Select the bundles that this flag may be used on. Leave blank to allow on all bundles for the entity type.'),
       '#default_value' => $this->types,
     );
-    // Handlers may want to unset this option if they provide their own more
-    // specific ways to show links.
-    $form['display']['show_on_entity'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display link on entity'),
-      '#default_value' => isset($this->show_on_entity) ? $this->show_on_entity : TRUE,
-      '#weight' => 0,
+
+    // Add checkboxes to show flag link on each entity view mode.
+    $options = array();
+    $defaults = array();
+    foreach ($entity_info['view modes'] as $name => $view_mode) {
+      $options[$name] = t('Display on @name view mode', array('@name' => $view_mode['label']));
+      $defaults[$name] = !empty($this->show_in_links[$name]) ? $name : 0;
+    }
+
+    $form['display']['show_in_links'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Display in entity links'),
+      '#description' => t('Show the flag link with the other links on the entity.'),
+      '#options' => $options,
+      '#default_value' => $defaults,
     );
+
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->show_on_form,
       '#weight' => 5,
     );
+
     // We use FieldAPI to put the flag checkbox on the entity form, so therefore
     // require the entity to be fielable. Since this is a potential DX
     // headscratcher for a developer wondering where this option has gone,
@@ -141,9 +153,10 @@ class flag_entity extends flag_flag {
   /**
    * Returns TRUE if the link should be displayed.
    */
-  function uses_hook_link($teaser) {
-    if ($this->show_on_entity) {
-      return TRUE;
+  function uses_hook_link($view_mode) {
+    // Check for settings for the given view mode.
+    if (isset($this->show_in_links[$view_mode])) {
+      return (bool) $this->show_in_links[$view_mode];
     }
     return FALSE;
   }

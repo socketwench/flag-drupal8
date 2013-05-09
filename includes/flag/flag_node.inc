@@ -12,11 +12,7 @@ class flag_node extends flag_entity {
   function options() {
     $options = parent::options();
     // Use own display settings in the meanwhile.
-    unset($options['show_on_entity']);
     $options += array(
-      'show_on_page' => TRUE,
-      'show_on_teaser' => TRUE,
-      'show_on_form' => FALSE,
       'i18n' => 0,
     );
     return $options;
@@ -54,24 +50,11 @@ class flag_node extends flag_entity {
       '#weight' => 5,
     );
 
-    $form['display']['show_on_teaser'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display link on node teaser'),
-      '#default_value' => $this->show_on_teaser,
-    );
-
-    $form['display']['show_on_page'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display link on node page'),
-      '#default_value' => $this->show_on_page,
-    );
     // Override the UI texts for nodes.
     $form['display']['show_on_form'] = array(
       '#title' => t('Display checkbox on node edit form'),
       '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/structure/types'))),
     ) + $form['display']['show_on_form'];
-
-    unset($form['display']['show_on_entity']);
   }
 
   function type_access_multiple($entity_ids, $account) {
@@ -111,13 +94,6 @@ class flag_node extends flag_entity {
       }
     }
     return $entity_id;
-  }
-
-  function uses_hook_link($teaser) {
-    if ($teaser && $this->show_on_teaser || !$teaser && $this->show_on_page) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
   function flag($action, $entity_id, $account = NULL, $skip_permission_check = FALSE, $flagging = NULL) {

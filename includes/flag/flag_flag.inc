@@ -631,7 +631,7 @@ class flag_flag {
    * Returns TRUE if the flag is configured to show the flag-link using hook_link.
    * Derived classes are likely to implement this.
    */
-  function uses_hook_link($teaser) {
+  function uses_hook_link($view_mode) {
     return FALSE;
   }
 
