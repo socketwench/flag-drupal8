@@ -2072,6 +2072,8 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
+    // Account for session ID (in the case of anonymous users).
+    ->condition('sid', flag_get_sid($account->uid))
     ->orderBy('timestamp', 'DESC')
     ->execute();
   $i = 1;
