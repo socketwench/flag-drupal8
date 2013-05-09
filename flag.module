@@ -1601,15 +1601,25 @@ function template_preprocess_flag(&$variables) {
     $variables['message_text'] = '';
   }
 
-  $variables['flag_wrapper_classes'] = implode(' ', $variables['flag_wrapper_classes_array']);
-  $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
-  $variables['message_classes'] = join(' ', $variables['message_classes_array']);
-
   // Backward compatibility: The following section preserves some deprecated
   // variables either to make old flag.tpl.php files continue to work, or to
   // prevent PHP from generating E_NOTICEs there. @todo: Remove these sometime.
   $variables['setup'] = FALSE;
   $variables['last_action'] = $variables['status'];
+}
+
+/**
+ * Theme processor for flag.tpl.php.
+ *
+ * @param array &$variables
+ *  An array of variables for the template. See 'flag.tpl.php' for their
+ *  documentation.
+ */
+function template_process_flag(&$variables) {
+  // Convert class arrays to strings.
+  $variables['flag_wrapper_classes'] = implode(' ', $variables['flag_wrapper_classes_array']);
+  $variables['flag_classes'] = implode(' ', $variables['flag_classes_array']);
+  $variables['message_classes'] = implode(' ', $variables['message_classes_array']);
 }
 
 /**
