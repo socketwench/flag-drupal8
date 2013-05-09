@@ -313,6 +313,12 @@ function flag_rules_action_unflag($flag, $entity, $flagging_user, $permissions_c
  * Base action implementation: Trim flag.
  */
 function flag_rules_action_trim($flag, $flagging_user, $cutoff_size) {
+  // For some reason, when this action fires in response to a flagging event,
+  // as an anonymous user, then the $flagging_user is sent through as FALSE.
+  // Not sure why. This workaround fixes the problem in this specific case.
+  if ($flagging_user === FALSE) {
+    $flagging_user = $GLOBALS['user'];
+  }
   flag_trim_flag($flag, $flagging_user, $cutoff_size);
 }
 
