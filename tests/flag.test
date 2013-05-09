@@ -72,8 +72,10 @@ class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
       'show_on_form' => 0,
       'access_author' => '',
       'show_contextual_link' => 0,
-      'show_on_page' => 1,
-      'show_on_teaser' => 1,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
       'i18n' => 0,
       'api_version' => 3,
     );
@@ -250,15 +252,19 @@ class FlagAdminTestCase extends FlagTestCaseBase {
       'roles[unflag][2]' => TRUE,
       'types[article]' => FALSE,
       'types[page]' => TRUE,
-      'show_on_teaser' => FALSE,
-      'show_on_page' => FALSE,
+      'show_in_links[full]' => FALSE,
+      'show_in_links[teaser]' => FALSE,
+      'show_in_links[rss]' => FALSE,
+      'show_in_links[search_index]' => FALSE,
+      'show_in_links[search_result]' => FALSE,
       'show_on_form' => FALSE,
       'link_type' => 'toggle',
     );
     $saved = $edit;
     $saved['roles'] = array('flag' => array(2), 'unflag' => array(2));
     $saved['types'] = array('page');
-    unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]']);
+    $saved['show_in_links'] = array('full' => 0, 'teaser' => 0, 'rss' => 0, 'search_index' => 0, 'search_result' => 0);
+    unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]'], $saved['show_in_links[full]'], $saved['show_in_links[teaser]'], $saved['show_in_links[rss]'], $saved['show_in_links[search_index]'], $saved['show_in_links[search_result]']);
 
     $this->drupalPost(FLAG_ADMIN_PATH . '/add/node', $edit, t('Save flag'));
 
@@ -300,15 +306,19 @@ class FlagAdminTestCase extends FlagTestCaseBase {
       'roles[unflag][2]' => TRUE,
       'types[article]' => TRUE,
       'types[page]' => FALSE,
-      'show_on_teaser' => TRUE,
-      'show_on_page' => TRUE,
+      'show_in_links[full]' => TRUE,
+      'show_in_links[teaser]' => TRUE,
+      'show_in_links[rss]' => FALSE,
+      'show_in_links[search_index]' => FALSE,
+      'show_in_links[search_result]' => FALSE,
       'show_on_form' => TRUE,
       'link_type' => 'normal',
     );
     $saved = $edit;
     $saved['roles'] = array('flag' => array(2), 'unflag' => array(2));
     $saved['types'] = array('article');
-    unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]']);
+    $saved['show_in_links'] = array('full' => TRUE, 'teaser' => TRUE, 'rss' => 0, 'search_index' => 0, 'search_result' => 0);
+    unset($saved['roles[flag][2]'], $saved['roles[unflag][2]'], $saved['types[article]'], $saved['types[page]'], $saved['show_in_links[full]'], $saved['show_in_links[teaser]'], $saved['show_in_links[rss]'], $saved['show_in_links[search_index]'], $saved['show_in_links[search_result]']);
 
     $this->drupalPost(FLAG_ADMIN_PATH . '/manage/' . $flag->name, $edit, t('Save flag'));
 
@@ -400,8 +410,10 @@ class FlagAccessFormTestCase extends FlagTestCaseBase {
       'show_on_form' => 1,
       'access_author' => '',
       'show_contextual_link' => 0,
-      'show_on_page' => 1,
-      'show_on_teaser' => 1,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
       'i18n' => 0,
       'api_version' => 3,
     );
@@ -489,8 +501,10 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
       'show_on_form' => 0,
       'access_author' => '',
       'show_contextual_link' => 0,
-      'show_on_page' => 1,
-      'show_on_teaser' => 1,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
       'i18n' => 0,
       'api_version' => 3,
     );
@@ -612,8 +626,10 @@ class FlagLinkTypeConfirmTestCase extends DrupalWebTestCase {
       'show_on_form' => 0,
       'access_author' => '',
       'show_contextual_link' => 0,
-      'show_on_page' => 1,
-      'show_on_teaser' => 1,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
       'i18n' => 0,
       'api_version' => 3,
     );

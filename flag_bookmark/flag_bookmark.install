@@ -23,8 +23,10 @@ function flag_bookmark_enable() {
     $configuration = array(
         'name' => 'bookmarks',
         'global' => 0,
-        'show_on_page' => 1,
-        'show_on_teaser' => 1,
+        'show_in_links' => array(
+          'full' => 1,
+          'teaser' => 1,
+        ),
         'show_on_form' => 1,
         // The following UI labels aren't wrapped in t() because they are written
         // to the DB in English. They are passed to t() later, thus allowing for

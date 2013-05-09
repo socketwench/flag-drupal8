@@ -340,5 +340,29 @@ class FlagUpdate_3 {
     if (isset($flag->roles)) {
       $flag->import_roles = $flag->roles;
     }
+
+    // Update show_on_teaser property to use new view mode settings.
+    if (!empty($flag->show_on_teaser)) {
+      $flag->show_in_links['teaser'] = TRUE;
+      unset($flag->show_on_teaser);
+    }
+
+    // Update show_on_page property to use new view mode settings.
+    if (!empty($flag->show_on_page)) {
+      $flag->show_in_links['full'] = TRUE;
+      unset($flag->show_on_page);
+    }
+
+    // Update show_on_comment and show_on_entity properties to use new view
+    // mode settings. Since the old logic was to show on all view modes, do that.
+    if (!empty($flag->show_on_entity) || !empty($flag->show_on_comment)) {
+      if ($entity_info = entity_get_info($flag->entity_type)) {
+        foreach ($entity_info['view modes'] as $view_mode => $value) {
+          $flag->show_in_links[$view_mode] = TRUE;
+        }
+      }
+
+      unset($flag->show_on_entity, $flag->show_on_comment);
+    }
   }
 }

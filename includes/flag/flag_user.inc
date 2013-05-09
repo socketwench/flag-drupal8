@@ -11,9 +11,6 @@
 class flag_user extends flag_entity {
   function options() {
     $options = parent::options();
-    // We supersede, but do not supplant, the regular entity display with an
-    // option that's formatted in the style of user profiles.
-    $options['show_on_entity'] = FALSE;
     $options += array(
       'show_on_profile' => TRUE,
       'access_uid' => '',
@@ -46,8 +43,6 @@ class flag_user extends flag_entity {
       // Put this above 'show on entity'.
       '#weight' => -1,
     );
-    // Explain how 'show on entity' is different.
-    $form['display']['show_on_entity']['#description'] = t('Show the link in the same format as on other entities.');
   }
 
   function form_input($form_values) {
