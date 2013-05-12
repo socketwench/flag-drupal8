@@ -866,82 +866,30 @@ function flag_contextual_links_view_alter(&$element, $items) {
 /**
  * Implements hook_entity_view().
  *
- * Handles the 'show_in_links' flag option.
+ * Handles the 'show_in_links' and 'show_as_field' flag options.
  *
  * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
-  $links = flag_link($type, $entity, $view_mode);
-  if (isset($links)) {
-    $entity->content['links']['flag'] = array(
-      '#theme' => 'links',
-      '#links' => $links,
-      '#attributes' => array('class' => array('links', 'inline')),
-    );
-  }
-
   // Get all possible flags for this entity type.
   $flags = flag_get_flags($type);
   foreach ($flags as $flag) {
-    $entity_id = $flag->get_entity_id($entity);
-    // For a new, unsaved entity, make a dummy entity ID so that the flag
-    // handler can remember the entity. This allows access to the flag to be
-    // correctly handled in node and comment preview.
-    if (is_null($entity_id)) {
-      $entity_id = 'new';
-    }
-    $flag->remember_entity($entity_id, $entity);
-
-    if ($flag->show_as_field) {
-      if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
-        // User has no permission to use this flag or flag does not apply to this
-        // entity. The link is not skipped if the user has "flag" access but
-        // not "unflag" access (this way the unflag denied message is shown).
-        continue;
-      }
-      $entity->content['flag-' . $flag->name] = array(
-       '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array('needs_wrapping_element' => TRUE)),
-      );
-    }
-  }
-
-}
-
-/**
- * Creates an array of links for all the flags of given entity.
- *
- * @param $type
- *  The entity type.
- * @param $entity
- *  The entity
- * @param $view_mode
- *  String indicating the current view mode.
- *
- * @return
- *  An array of link data, suitable for passing to theme_links().
- */
-function flag_link($type, $entity = NULL, $view_mode) {
-  if (!isset($entity) || !flag_fetch_definition($type)) {
-    return;
-  }
-
-  // Get all possible flags for this entity type.
-  $flags = flag_get_flags($type);
-
-  foreach ($flags as $flag) {
-    $entity_id = $flag->get_entity_id($entity);
-    // For a new, unsaved entity, make a dummy entity ID so that the flag
-    // handler can remember the entity. This allows access to the flag to be
-    // correctly handled in node and comment preview.
-    if (is_null($entity_id)) {
-      $entity_id = 'new';
-    }
-    $flag->remember_entity($entity_id, $entity);
-
-    if (!$flag->uses_hook_link($view_mode)) {
-      // Flag is not configured to show its link here.
+    // Check if the flag outputs on entity view.
+    if (!($flag->show_as_field || $flag->uses_hook_link($view_mode))) {
+      // Flag is not configured to output on entity view, so skip it to save on
+      // calls to access checks.
       continue;
     }
+
+    $entity_id = $flag->get_entity_id($entity);
+    // For a new, unsaved entity, make a dummy entity ID so that the flag
+    // handler can remember the entity. This allows access to the flag to be
+    // correctly handled in node and comment preview.
+    if (is_null($entity_id)) {
+      $entity_id = 'new';
+    }
+    $flag->remember_entity($entity_id, $entity);
+
     if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
       // User has no permission to use this flag or flag does not apply to this
       // entity. The link is not skipped if the user has "flag" access but
@@ -949,16 +897,33 @@ function flag_link($type, $entity = NULL, $view_mode) {
       continue;
     }
 
-    // The flag links are actually fully rendered theme functions.
-    // The HTML attribute is set to TRUE to allow whatever the themer desires.
-    $links['flag-' . $flag->name] = array(
-      'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
-      'html' => TRUE,
-    );
+    // We're good to go. Output the flag in the appropriate manner(s).
+
+    // The old-style entity links output.
+    if ($flag->uses_hook_link($view_mode)) {
+      // The flag links are actually fully rendered theme functions.
+      // The HTML attribute is set to TRUE to allow whatever the themer desires.
+      $links['flag-' . $flag->name] = array(
+        'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
+        'html' => TRUE,
+      );
+    }
+
+    // The pseudofield output.
+    if ($flag->show_as_field) {
+      $entity->content['flag-' . $flag->name] = array(
+       '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array('needs_wrapping_element' => TRUE)),
+      );
+    }
   }
 
+  // If any links were made, add them to the entity's links array.
   if (isset($links)) {
-    return $links;
+    $entity->content['links']['flag'] = array(
+      '#theme' => 'links',
+      '#links' => $links,
+      '#attributes' => array('class' => array('links', 'inline')),
+    );
   }
 }
 
