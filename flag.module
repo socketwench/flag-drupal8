@@ -875,7 +875,7 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
   $flags = flag_get_flags($type);
   foreach ($flags as $flag) {
     // Check if the flag outputs on entity view.
-    if (!($flag->show_as_field || $flag->uses_hook_link($view_mode))) {
+    if (!($flag->show_as_field || $flag->shows_in_entity_links($view_mode))) {
       // Flag is not configured to output on entity view, so skip it to save on
       // calls to access checks.
       continue;
@@ -900,7 +900,7 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
     // We're good to go. Output the flag in the appropriate manner(s).
 
     // The old-style entity links output.
-    if ($flag->uses_hook_link($view_mode)) {
+    if ($flag->shows_in_entity_links($view_mode)) {
       // The flag links are actually fully rendered theme functions.
       // The HTML attribute is set to TRUE to allow whatever the themer desires.
       $links['flag-' . $flag->name] = array(

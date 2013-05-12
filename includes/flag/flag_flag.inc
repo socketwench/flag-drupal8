@@ -628,10 +628,18 @@ class flag_flag {
  }
 
   /**
-   * Returns TRUE if the flag is configured to show the flag-link using hook_link.
+   * Determine whether the flag should show a flag link in entity links.
+   *
    * Derived classes are likely to implement this.
+   *
+   * @param $view_mode
+   *   The view mode of the entity being displayed.
+   *
+   * @return
+   *   A boolean indicating whether the flag link is to be shown in entity
+   *   links.
    */
-  function uses_hook_link($view_mode) {
+  function shows_in_entity_links($view_mode) {
     return FALSE;
   }
 
