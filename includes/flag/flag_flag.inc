@@ -1439,21 +1439,21 @@ class flag_flag {
    *  The action the link is about to carry out, either "flag" or "unflag".
    * @param $entity_id
    *  The ID of the object to flag.
-   * @param $after_flagging = FALSE
-   *  (Optional) Set to TRUE if this flag link is being displayed as the result
-   *  of a flagging action.
-   * @param $errors = array()
-   *  An array of error messages.
    * @param $variables = array()
-   *  An array of further variables to pass to theme('flag'). For parameters
-   *  documentation, see flag.tpl.php
+   *  An array of further variables to pass to theme('flag'). For the full list
+   *  of parameters, see flag.tpl.php. Of particular interest:
+   *  - after_flagging: Set to TRUE if this flag link is being displayed as the result
+   *    of a flagging action.
+   *  - errors: An array of error messages.
    *
    * @return
    *  The HTML for the flag link.
    */
-  function theme($action, $entity_id, $after_flagging = FALSE, $errors = array(), $variables = array()) {
+  function theme($action, $entity_id, $variables = array()) {
     static $js_added = array();
     global $user;
+
+    $after_flagging = !empty($variables['after_flagging']);
 
     // If the flagging user is anonymous, set a boolean for the benefit of
     // JavaScript code. Currently, only our "anti-crawlers" mechanism uses it.
@@ -1492,8 +1492,6 @@ class flag_flag {
       'flag' => $this,
       'action' => $action,
       'entity_id' => $entity_id,
-      'after_flagging' => $after_flagging,
-      'errors' => $errors,
     ) + $variables);
   }
 

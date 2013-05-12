@@ -941,7 +941,7 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
     $entity_id = $flag->get_entity_id($entity);
     if ($flag->show_as_field) {
       $entity->content['flag-' . $flag->name] = array(
-       '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, FALSE, array(), array('needs_wrapping_element' => TRUE)),
+       '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array('needs_wrapping_element' => TRUE)),
       );
     }
   }
