@@ -78,6 +78,19 @@ Drupal.flagLink = function(context) {
         if (!data.preventDefault) { // A handler may cancel updating the link.
           data.link = updateLink(element, data.newLink);
         }
+
+        // Find all the link wrappers on the page for this flag, but exclude
+        // the triggering element because Flag's own javascript updates it.
+        var $wrappers = $('.flag-wrapper.flag-' + data.flagName.flagNameToCSS() + '-' + data.contentId).not(data.link);
+        var $newLink = $(data.newLink);
+
+        // Hide message, because we want the message to be shown on the triggering element alone.
+        $('.flag-message', $newLink).hide();
+
+        // Finally, update the page.
+        $wrappers = $newLink.replaceAll($wrappers);
+        Drupal.attachBehaviors($wrappers.parent());
+
         $.event.trigger('flagGlobalAfterLinkUpdate', [data]);
       },
       error: function (xmlhttp) {
