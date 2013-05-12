@@ -149,7 +149,10 @@ function flag_build_javascript_info($flag, $entity_id) {
   $errors = $flag->get_errors();
   $info = array(
     'status' => TRUE,
-    'newLink' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, TRUE, $errors),
+    'newLink' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array(
+      'after_flagging' => TRUE,
+      'errors' => $errors,
+    )),
     // Further information for the benefit of custom JavaScript event handlers:
     'flagSuccess' => !$errors,
     'contentId' => $entity_id,
