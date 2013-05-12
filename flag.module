@@ -698,6 +698,12 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
       if ($entity_type == 'node') {
         $flag_status = variable_get('flag_' . $flag->name . '_default_' . $form['type']['#value'], 0);
       }
+
+      // For a new, unsaved entity, make a dummy entity ID so that the flag
+      // handler can remember the entity. This allows access to the flag to be
+      // correctly handled in node and comment preview.
+      $id = 'new';
+      $flag->remember_entity($id, $entity);
     }
 
     // If the flag is not global and the user doesn't have access, skip it.
@@ -878,6 +884,14 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
   $flags = flag_get_flags($type);
   foreach ($flags as $flag) {
     $entity_id = $flag->get_entity_id($entity);
+    // For a new, unsaved entity, make a dummy entity ID so that the flag
+    // handler can remember the entity. This allows access to the flag to be
+    // correctly handled in node and comment preview.
+    if (is_null($entity_id)) {
+      $entity_id = 'new';
+    }
+    $flag->remember_entity($entity_id, $entity);
+
     if ($flag->show_as_field) {
       if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
         // User has no permission to use this flag or flag does not apply to this
@@ -916,6 +930,13 @@ function flag_link($type, $entity = NULL, $view_mode) {
 
   foreach ($flags as $flag) {
     $entity_id = $flag->get_entity_id($entity);
+    // For a new, unsaved entity, make a dummy entity ID so that the flag
+    // handler can remember the entity. This allows access to the flag to be
+    // correctly handled in node and comment preview.
+    if (is_null($entity_id)) {
+      $entity_id = 'new';
+    }
+    $flag->remember_entity($entity_id, $entity);
 
     if (!$flag->uses_hook_link($view_mode)) {
       // Flag is not configured to show its link here.
