@@ -669,11 +669,6 @@ function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
  * @see flag_field_attach_submit().
  */
 function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
-  // Nodes have their own special form handling: see flag_form_alter().
-  if ($entity_type == 'node') {
-    return;
-  }
-
   list($id) = entity_extract_ids($entity_type, $entity);
   // Some modules are being stupid here. Commerce!
   if (empty($id)) {
@@ -692,13 +687,25 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
     }
 
     // Get the flag status.
-    // We don't have per-bundle defaults on general entities yet.
-    $flag_status = $id ? $flag->is_flagged($id) : FALSE;
+    if (isset($id)) {
+      $flag_status = $flag->is_flagged($id);
+    }
+    else {
+      // We don't have per-bundle defaults on general entities yet: default
+      // status is just unflagged.
+      $flag_status = FALSE;
+      // Apply the per-bundle defaults for nodes.
+      if ($entity_type == 'node') {
+        $flag_status = variable_get('flag_' . $flag->name . '_default_' . $form['type']['#value'], 0);
+      }
+    }
 
     // If the flag is not global and the user doesn't have access, skip it.
     // Global flags have their value set even if the user doesn't have access
     // to it, similar to the way "published" and "promote" keep the default
     // values even if the user doesn't have "administer nodes" permission.
+    // Furthermore, a global flag is set to its default value on new nodes
+    // even if the user creating the node doesn't have access to the flag.
     global $user;
     $access = $flag->access($id, $flag_status ? 'unflag' : 'flag');
     if (!$access && !$flag->global) {
@@ -711,6 +718,8 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
       '#description' => $flag->get_label('flag_long', $id),
       '#default_value' => $flag_status,
       '#return_value' => 1,
+      // Used by our drupalSetSummary() on vertical tabs.
+      '#attributes' => array('title' => $flag->get_title()),
     );
 
     // If the user does not have access to the flag, set as a value.
@@ -736,6 +745,19 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
       '#title' => t('Flags'),
       '#collapsible' => TRUE,
     );
+
+    if ($entity_type == 'node') {
+      // Turn the fieldset into a vertical tab.
+      $form['flag'] += array(
+        '#group' => 'additional_settings',
+        '#attributes' => array('class' => array('flag-fieldset')),
+        '#attached' => array(
+          'js' => array(
+            'vertical-tabs' => drupal_get_path('module', 'flag') . '/theme/flag-admin.js',
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -787,89 +809,6 @@ function flag_field_attach_save($entity_type, $entity) {
   // Get the flag values we stashed in the entity in flag_field_attach_submit().
   foreach ($entity->flag as $flag_name => $state) {
     flag($state ? 'flag' : 'unflag', $flag_name, $id);
-  }
-}
-
-/**
- * Implements hook_form_alter().
- */
-function flag_form_alter(&$form, &$form_state, $form_id) {
-  // Alter node forms.
-  if (isset($form['type']) && isset($form['#node']) && ($form_id == $form['type']['#value'] . '_node_form')) {
-    global $user;
-    $nid = !empty($form['nid']['#value']) ? $form['nid']['#value'] : NULL;
-    $flags = flag_get_flags('node', $form['type']['#value']);
-
-    // Filter out flags which need to be included on the node form.
-    $flags_in_form = 0;
-    $flags_visible = 0;
-    foreach ($flags as $name => $flag) {
-      if (!$flag->show_on_form) {
-        continue;
-      }
-
-      $flag_status_default = variable_get('flag_' . $flag->name . '_default_' . $form['type']['#value'], 0);
-      $flag_status = $nid ? $flag->is_flagged($nid) : $flag_status_default;
-
-      // If the flag is not global and the user doesn't have access, skip it.
-      // Global flags have their value set even if the user doesn't have access
-      // to it, similar to the way "published" and "promote" keep the default
-      // values even if the user doesn't have "administer nodes" permission.
-      // Furthermore, a global flag is set to its default value on new nodes
-      // even if the user creating the node doesn't have access to the flag.
-      $access = $flag->access($nid, $flag_status ? 'unflag' : 'flag', $user);
-      if (!$access && !$flag->global) {
-        continue;
-      }
-
-      if (!$nid) {
-        // To be able to process node tokens for a node which hasn't yet been
-        // saved (e.g., on node/add/article), we "save" it to the flag's cache
-        // under a pseudo ID.
-        $flag->remember_entity('new', $form['#node']);
-      }
-
-      // Add the flag checkbox if displaying on the form.
-      $form['flag'][$flag->name] = array(
-        '#type' => 'checkbox',
-        '#title' => $flag->get_label('flag_short', $nid ? $nid : 'new'),
-        '#description' => $flag->get_label('flag_long', $nid ? $nid : 'new'),
-        '#default_value' => $flag_status,
-        '#return_value' => 1,
-        '#attributes' => array('title' => $flag->get_title()), // Used by our drupalSetSummary().
-      );
-      // If the user does not have access to the flag, set as a value.
-      if (!$access) {
-        $form['flag'][$flag->name]['#type'] = 'value';
-        $form['flag'][$flag->name]['#value'] = $flag_status;
-      }
-      else {
-        $flags_visible++;
-      }
-      $flags_in_form++;
-    }
-    if ($flags_in_form) {
-      $form['flag'] += array(
-        '#weight' => 1,
-        '#tree' => TRUE,
-      );
-    }
-    if ($flags_visible) {
-      $form['flag'] += array(
-        '#type' => 'fieldset',
-        '#title' => t('Flags'),
-        '#collapsible' => TRUE,
-        // Vertical tabs support:
-        '#group' => 'additional_settings',
-        '#attributes' => array('class' => array('flag-fieldset')),
-        '#attached' => array(
-          'js' => array(
-            'vertical-tabs' => drupal_get_path('module', 'flag') . '/theme/flag-admin.js',
-          ),
-        ),
-      );
-    }
-
   }
 }
 
