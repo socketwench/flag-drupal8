@@ -2072,14 +2072,18 @@ function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
  *
  * You should call this function from your template when you want to put the
  * link on the page yourself. For example, you could call this function from
- * your 'node.tpl.php':
- *
- *   <?php print flag_create_link('bookmarks', $node->nid); ?>
+ * your theme preprocessor for node.tpl.php:
+ * @code
+ * $variables['my_flag_link'] = flag_create_link('bookmarks', $node->nid);
+ * @endcode
  *
  * @param $flag_name
  *   The "machine readable" name of the flag; e.g. 'bookmarks'.
  * @param $entity_id
  *   The entity ID to check for flagging, for example a node ID.
+ *
+ * @return
+ *   The HTML for the themed flag link.
  */
 function flag_create_link($flag_name, $entity_id) {
   $flag = flag_get_flag($flag_name);
