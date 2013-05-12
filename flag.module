@@ -1627,12 +1627,6 @@ function template_preprocess_flag(&$variables) {
   else {
     $variables['message_text'] = '';
   }
-
-  // Backward compatibility: The following section preserves some deprecated
-  // variables either to make old flag.tpl.php files continue to work, or to
-  // prevent PHP from generating E_NOTICEs there. @todo: Remove these sometime.
-  $variables['setup'] = FALSE;
-  $variables['last_action'] = $variables['status'];
 }
 
 /**
