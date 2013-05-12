@@ -164,9 +164,9 @@ class flag_entity extends flag_flag {
   }
 
   /**
-   * Returns TRUE if the link should be displayed.
+   * Determine whether the flag should show a flag link in entity links.
    */
-  function uses_hook_link($view_mode) {
+  function shows_in_entity_links($view_mode) {
     // Check for settings for the given view mode.
     if (isset($this->show_in_links[$view_mode])) {
       return (bool) $this->show_in_links[$view_mode];
