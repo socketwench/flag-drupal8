@@ -879,6 +879,12 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
   foreach ($flags as $flag) {
     $entity_id = $flag->get_entity_id($entity);
     if ($flag->show_as_field) {
+      if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
+        // User has no permission to use this flag or flag does not apply to this
+        // entity. The link is not skipped if the user has "flag" access but
+        // not "unflag" access (this way the unflag denied message is shown).
+        continue;
+      }
       $entity->content['flag-' . $flag->name] = array(
        '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array('needs_wrapping_element' => TRUE)),
       );
