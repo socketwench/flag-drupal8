@@ -20,6 +20,8 @@ class flag_entity extends flag_flag {
       // entities.
       // @see hook_entity_view().
       'show_in_links' => array(),
+      // Output the flag as individual pseudofields.
+      'show_as_field' => FALSE,
       // Add a checkbox for the flag in the entity form.
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
@@ -61,6 +63,17 @@ class flag_entity extends flag_flag {
       '#options' => $options,
       '#default_value' => $defaults,
     );
+
+    $form['display']['show_as_field'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display link as field'),
+      '#description' => t('Show the flag link as a pseudofield, which can be ordered among other entity elements in the "Manage display" settings for the entity type.'),
+      '#default_value' => isset($this->show_as_field) ? $this->show_as_field : TRUE,
+    );
+    if (empty($entity_info['fieldable'])) {
+      $form['display']['show_as_field']['#disabled'] = TRUE;
+      $form['display']['show_as_field']['#description'] = t("This entity type is not fieldable.");
+    }
 
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
