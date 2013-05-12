@@ -1430,12 +1430,28 @@ class flag_flag {
   }
 
   /**
-   * Renders a flag/unflag link. This is a wrapper around theme('flag') that
-   * channels the call to the right template file.
+   * Renders a flag/unflag link.
    *
-   * For parameters documentation, see flag.tpl.php.
+   * This is a wrapper around theme('flag') that channels the call to the right
+   * template file.
+   *
+   * @param $action
+   *  The action the link is about to carry out, either "flag" or "unflag".
+   * @param $entity_id
+   *  The ID of the object to flag.
+   * @param $after_flagging = FALSE
+   *  (Optional) Set to TRUE if this flag link is being displayed as the result
+   *  of a flagging action.
+   * @param $errors = array()
+   *  An array of error messages.
+   * @param $variables = array()
+   *  An array of further variables to pass to theme('flag'). For parameters
+   *  documentation, see flag.tpl.php
+   *
+   * @return
+   *  The HTML for the flag link.
    */
-  function theme($action, $entity_id, $after_flagging = FALSE, $errors = array()) {
+  function theme($action, $entity_id, $after_flagging = FALSE, $errors = array(), $variables = array()) {
     static $js_added = array();
     global $user;
 
@@ -1478,7 +1494,7 @@ class flag_flag {
       'entity_id' => $entity_id,
       'after_flagging' => $after_flagging,
       'errors' => $errors,
-    ));
+    ) + $variables);
   }
 
   /**

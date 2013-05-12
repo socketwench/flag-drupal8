@@ -601,6 +601,19 @@ function flag_field_extra_fields() {
           'weight' => 10
         );
       }
+
+      if ($flag->show_as_field) {
+        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $name] = array(
+          // It would be nicer to use % as the placeholder, but the label is
+          // run through check_plain() by field_ui_display_overview_form()
+          // (arguably incorrectly; see http://drupal.org/node/1991292).
+          'label' => t('Flag: @title', array(
+            '@title' => $flag->title,
+          )),
+          'description' => t('Individual flag link'),
+          'weight' => 10,
+        );
+      }
     }
   }
 
@@ -921,6 +934,18 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
       '#attributes' => array('class' => array('links', 'inline')),
     );
   }
+
+  // Get all possible flags for this entity type.
+  $flags = flag_get_flags($type);
+  foreach ($flags as $flag) {
+    $entity_id = $flag->get_entity_id($entity);
+    if ($flag->show_as_field) {
+      $entity->content['flag-' . $flag->name] = array(
+       '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, FALSE, array(), array('needs_wrapping_element' => TRUE)),
+      );
+    }
+  }
+
 }
 
 /**
@@ -1463,6 +1488,7 @@ function flag_theme() {
         'action' => NULL,
         'entity_id' => NULL,
         'after_flagging' => FALSE,
+        'needs_wrapping_element' => FALSE,
         'errors' => array(),
       ),
       'template' => 'flag',
@@ -1512,6 +1538,7 @@ function flag_theme() {
  * - $entity_id
  * - $after_flagging
  * - $errors
+ * - $needs_wrapping_element
  *
  * See 'flag.tpl.php' for their documentation.
  */
