@@ -490,12 +490,18 @@ class flag_flag {
     }
 
     // Allow modules to disallow (or allow) access to flagging.
-    $access_array = module_invoke_all('flag_access', $this, $entity_id, $action, $account);
-
-    foreach ($access_array as $set_access) {
-      if (isset($set_access)) {
-        $access = $set_access;
-      }
+    // We grant access to the flag if both of the following conditions are met:
+    // - No modules say to deny access.
+    // - At least one module says to grant access.
+    // If no module specified either allow or deny, we fall back to the
+    // default access check above.
+    $module_access = module_invoke_all('flag_access', $this, $entity_id, $action, $account);
+    if (in_array(FALSE, $module_access, TRUE)) {
+      $access = FALSE;
+    }
+    elseif (in_array(TRUE, $module_access, TRUE)) {
+      // WARNING: This allows modules to bypass the default access check!
+      $access = TRUE;
     }
 
     return $access;

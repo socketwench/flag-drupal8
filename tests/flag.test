@@ -703,3 +703,160 @@ class FlagLinkTypeConfirmTestCase extends DrupalWebTestCase {
   }
 
 }
+
+/**
+ * Verifies the implementation of hook_flag_access().
+ */
+class FlagHookFlagAccessTestCase extends FlagTestCaseBase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Flag hook_flag_access() tests'),
+      'description' => t('Checks the ability of modules to use hook_flag_access().'),
+      'group' => t('Flag'),
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp('flag');
+
+    $success = module_enable(array('flagaccesstest'), FALSE);
+
+    // Create a test flag on article nodes.
+    $flag_data = array(
+      'entity_type' => 'node',
+      'name' => 'test_flag',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(
+        0 => 'article',
+      ),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => '',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => '',
+      'unflag_denied_text' => 'You may not unflag this item',
+      // Use the normal link type as it involves no intermediary page loads.
+      'link_type' => 'normal',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+    $flag = $this->createFlag($flag_data);
+
+    // Create an article node that various users will try to flag.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => 1,
+      'type' => 'article',
+      'is_new' => TRUE,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+    $this->nid = $node->nid;
+  }
+
+  /**
+   * Verifies that the user sees the flag if a module returns NULL (Ignore).
+   */
+  function testFlagAccessIgnore() {
+    variable_set('FlagHookFlagAccessTestCaseMode', 'ignore');
+    $flag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($flag_user);
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page.');
+
+    // Click the link to flag the node.
+    $this->clickLink(t('Flag this item'));
+
+    $this->assertLink('Unflag this item', 0, 'The unflag link appears on the page after flagging.');
+
+    // Click the link to unflag the node.
+    $this->clickLink(t('Unflag this item'));
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page after unflagging.');
+  }
+
+  /**
+   * Verifies that the user sees the flag if a module returns TRUE (Allow).
+   */
+  function testFlagAccessAllow() {
+    variable_set('FlagHookFlagAccessTestCaseMode', 'allow');
+    $flag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($flag_user);
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page.');
+
+    // Click the link to flag the node.
+    $this->clickLink(t('Flag this item'));
+
+    $this->assertLink('Unflag this item', 0, 'The unflag link appears on the page after flagging.');
+
+    // Click the link to unflag the node.
+    $this->clickLink(t('Unflag this item'));
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page after unflagging.');
+  }
+
+  /**
+   * Verifies that the user sees the flag if a module returns TRUE (Allow) to override default access check.
+   */
+  function testFlagAccessAllowOverride() {
+    variable_set('FlagHookFlagAccessTestCaseMode', 'allow');
+    $flag_user = $this->drupalCreateUser(array());
+    $this->drupalLogin($flag_user);
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page.');
+
+    // Click the link to flag the node.
+    $this->clickLink(t('Flag this item'));
+
+    $this->assertLink('Unflag this item', 0, 'The unflag link appears on the page after flagging.');
+
+    // Click the link to unflag the node.
+    $this->clickLink(t('Unflag this item'));
+
+    $this->assertLink('Flag this item', 0, 'The flag link appears on the page after unflagging.');
+  }
+
+  /**
+   * Verifies that the user does not see the flag if a module returns FALSE (Deny).
+   */
+  function testFlagAccessDeny() {
+    variable_set('FlagHookFlagAccessTestCaseMode', 'deny');
+    $flag_user = $this->drupalCreateUser(array('flag test_flag', 'unflag test_flag'));
+    $this->drupalLogin($flag_user);
+
+    // Look at our node.
+    $this->drupalGet('node/' . $this->nid);
+
+    $this->assertNoLink('Flag this item', 0, 'The flag link does not appear on the page.');
+  }
+
+}

@@ -175,8 +175,13 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
  *  The user on whose behalf to test the flagging action.
  *
  * @return
- *   Boolean TRUE if the user is allowed to flag/unflag the given entity.
- *   FALSE otherwise.
+ *   One of the following values:
+ *     - TRUE: User has access to the flag.
+ *     - FALSE: User does not have access to the flag.
+ *     - NULL: This module does not perform checks on this flag/action.
+ *
+ *   NOTE: Any module that returns FALSE will prevent the user from
+ *   being able to use the flag.
  *
  * @see hook_flag_access_multiple()
  * @see flag_flag:access()
