@@ -911,7 +911,7 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
 
     // The pseudofield output.
     if ($flag->show_as_field) {
-      $entity->content['flag-' . $flag->name] = array(
+      $entity->content['flag_' . $flag->name] = array(
        '#markup' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id, array('needs_wrapping_element' => TRUE)),
       );
     }
