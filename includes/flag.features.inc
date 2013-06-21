@@ -12,7 +12,7 @@ function flag_features_export($data, &$export, $module_name = '') {
   $pipe = array();
 
   // Add flag module as a dependency.
-  $export['dependencies']['features'] = 'flag';
+  $export['dependencies']['flag'] = 'flag';
 
   // Ensure the modules that provide the flag are included as dependencies.
   $modules = flag_features_providing_module();
