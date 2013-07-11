@@ -358,12 +358,17 @@ class flag_flag {
   }
 
   /**
-   * Stores some object in fetch_entity()'s cache, so subsequenet calls to
-   * fetch_entity() return it.
+   * Store an object in the flag handler's cache.
    *
    * This is needed because otherwise fetch_object() loads the object from the
    * database (by calling _load_entity()), whereas sometimes we want to fetch
-   * an object that hasn't yet been saved to the database. See flag_nodeapi().
+   * an object that hasn't yet been saved to the database. Subsequent calls to
+   * fetch_entity() return the remembered object.
+   *
+   * @param $entity_id
+   *  The ID of the object to cache.
+   * @param $object
+   *  The object to cache.
    */
   function remember_entity($entity_id, $object) {
     $this->fetch_entity($entity_id, $object);
@@ -612,9 +617,10 @@ class flag_flag {
    * possibly subtype, of entity.
    *
    * @param $entity_type
-   *   The type of entity being checked, usually "node".
+   *   The type of entity being checked, such as "node".
    * @param $content_subtype
-   *   The subtype (node type) being checked.
+   *   The subtype being checked. For entities this will be the bundle name (the
+   *   node type in the case of nodes).
    *
    * @return
    *   TRUE if the flag is enabled for this type and subtype.

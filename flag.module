@@ -1870,7 +1870,7 @@ function flag_get_flag_flagging_data($flag_name) {
 }
 
 /**
- * Find what a user has flagged, either a single node or on the entire site.
+ * Find what a user has flagged, either a single entity or on the entire site.
  *
  * @param $entity_type
  *   The type of entity that will be retrieved. Usually 'node'.
