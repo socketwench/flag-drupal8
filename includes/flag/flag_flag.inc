@@ -426,10 +426,10 @@ class flag_flag {
    * Determines whether the user has the permission to use this flag.
    *
    * @param $action
-   *   Optional. The action to test, either "flag" or "unflag". If none given,
+   *   (optional) The action to test, either "flag" or "unflag". If none given,
    *   "flag" will be tested, which is the minimum permission to use a flag.
    * @param $account
-   *   Optional. The user object. If none given, the current user will be used.
+   *   (optional) The user object. If none given, the current user will be used.
    *
    * @return
    *   Boolean TRUE if the user is allowed to flag/unflag. FALSE otherwise.
@@ -529,7 +529,7 @@ class flag_flag {
    *   The array of entity IDs to check. The keys are the entity IDs, the
    *   values are the actions to test: either 'flag' or 'unflag'.
    * @param $account
-   *   Optional. The account for which the actions will be compared against.
+   *   (optional) The account for which the actions will be compared against.
    *   If left empty, the current user will be used.
    *
    * @return
@@ -675,7 +675,7 @@ class flag_flag {
    * @param $skip_permission_check
    *   Flag the item even if the $account user don't have permission to do so.
    * @param $flagging
-   *   Optional. This method works in tandem with Drupal's Field subsystem.
+   *   (optional) This method works in tandem with Drupal's Field subsystem.
    *   Pass in a flagging entity if you want operate on it as well.
    *
    * @return
@@ -869,9 +869,9 @@ class flag_flag {
    * @param mixed $entity_id
    *   The unique identifier of the object being flagged.
    * @param int $uid
-   *   Optional. The user id of the user doing the flagging.
+   *   (optional) The user id of the user doing the flagging.
    * @param mixed $sid
-   *   Optional. The user SID (provided by Session API) who is doing the
+   *   (optional) The user SID (provided by Session API) who is doing the
    *   flagging. The SID is 0 for logged in users.
    *
    * @return stdClass
@@ -896,7 +896,7 @@ class flag_flag {
    * item results in only one SQL query.
    *
    * @param $uid
-   *   Optional. The user ID whose flags we're checking. If none given, the
+   *   (optional) The user ID whose flags we're checking. If none given, the
    *   current user will be used.
    *
    * @return
