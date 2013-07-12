@@ -331,11 +331,16 @@ function flag_admin_menu_map() {
 /**
  * Menu loader for '%flag' arguments.
  *
+ * @param $flag_name
+ *   The machine name of the flag.
  * @param $include_disabled
- *   Whether to return a disabled flag too. Normally only enabled flags are
- *   returned. Some menu items operate on disabled flags and in this case
- *   you need to turn on this switch by doing
- *   <code>'load arguments' => array(TRUE)</code> in your menu router.
+ *   (optional) Whether to return a disabled flag too. Normally only enabled
+ *   flags are returned. Some menu items operate on disabled flags and in this
+ *   case you need to turn on this switch by doing:
+ *   @code
+ *   'load arguments' => array(TRUE)
+ *   @endcode
+ *   in your hook_menu().
  *
  * @return
  *   Either the flag object, or FALSE if none was found.
@@ -463,7 +468,16 @@ function flag_hook_info() {
 }
 
 /**
- * Returns a flag definition.
+ * Get a flag type definition.
+ *
+ * @param $entity_type
+ *   (optional) The entity type to get the definition for, or NULL to return
+ *   all flag types.
+ *
+ * @return
+ *   The flag type definition array.
+ *
+ * @see hook_flag_type_info()
  */
 function flag_fetch_definition($entity_type = NULL) {
   $definitions = &drupal_static(__FUNCTION__);
@@ -491,6 +505,9 @@ function flag_fetch_definition($entity_type = NULL) {
 
 /**
  * Returns all flag types defined on the system.
+ *
+ * @return
+ *   An array of flag type names.
  */
 function flag_get_types() {
   $types = &drupal_static(__FUNCTION__);
@@ -1108,7 +1125,7 @@ function flag_user_delete($account) {
 }
 
 /**
- * Callback function for user account cancellation or deletion.
+ * Shared helper for user account cancellation or deletion.
  */
 function flag_user_account_removal($account) {
   // Remove flags by this user.
@@ -1224,8 +1241,15 @@ function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
 /**
  * Flags or unflags an item.
  *
+ * @param $action
+ *   Either 'flag' or 'unflag'.
+ * @param $flag_name
+ *   The name of the flag to use.
+ * @param $entity_id
+ *   The ID of the item to flag or unflag.
  * @param $account
- *   The user on whose behalf to flag. Leave empty for the current user.
+ *   (optional) The user on whose behalf to flag. Omit for the current user.
+ *
  * @return
  *   FALSE if some error occured (e.g., user has no permission, flag isn't
  *   applicable to the item, etc.), TRUE otherwise.
@@ -1651,7 +1675,7 @@ function flag_get_counts($entity_type, $entity_id) {
  * @param $flag_name
  *   The flag name for which to retrieve a flag count.
  * @param $reset
- *   Reset the internal cache and execute the SQL query another time.
+ *   (optional) Reset the internal cache and execute the SQL query another time.
  */
 function flag_get_flag_counts($flag_name, $reset = FALSE) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1707,14 +1731,14 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  * returned.
  *
  * @param $entity_type
- *   Optional. The type of entity for which to load the flags. Usually 'node'.
+ *   (optional) The type of entity for which to load the flags. Usually 'node'.
  * @param $content_subtype
- *   Optional. The node type for which to load the flags.
+ *   (optional) The node type for which to load the flags.
  * @param $account
- *   Optional. The user accont to filter available flags. If not set, all
+ *   (optional) The user accont to filter available flags. If not set, all
  *   flags for will this node will be returned.
  *
- * @return $flags
+ * @return
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
@@ -1812,7 +1836,8 @@ function _flag_compare_weight($flag1, $flag2) {
  * Retrieve a list of flags defined by modules.
  *
  * @param $include_disabled
- *   Unless specified, only enabled flags will be returned.
+ *   (optional) Unless specified, only enabled flags will be returned.
+ *
  * @return
  *   An array of flag prototypes, not usable for flagging. Use flag_get_flags()
  *   if needing to perform a flagging with any enabled flag.
@@ -1856,8 +1881,11 @@ function flag_get_default_flags($include_disabled = FALSE) {
 /**
  * Get all flagged entities in a flag.
  *
- * @param
+ * @param $flag_name
  *   The flag name for which to retrieve flagged entites.
+ *
+ * @return
+ *   An array of flagging data, keyed by the flagging ID.
  */
 function flag_get_flag_flagging_data($flag_name) {
   $return = array();
@@ -1875,17 +1903,17 @@ function flag_get_flag_flagging_data($flag_name) {
  * @param $entity_type
  *   The type of entity that will be retrieved. Usually 'node'.
  * @param $entity_id
- *   Optional. The entity ID to check for flagging. If none given, all
+ *   (optional) The entity ID to check for flagging. If none given, all
  *   entities flagged by this user will be returned.
  * @param $uid
- *   Optional. The user ID whose flags we're checking. If none given, the
+ *   (optional) The user ID whose flags we're checking. If none given, the
  *   current user will be used.
  * @param $sid
- *   Optional. The user SID (provided by Session API) whose flags we're
+ *   (optional) The user SID (provided by Session API) whose flags we're
  *   checking. If none given, the current user will be used. The SID is 0 for
  *   logged in users.
  *
- * @return $flags
+ * @return
  *   If returning a single item's flags (that is, when $entity_id isn't NULL),
  *   an array of the structure
  *   [flag_name] => (flagging_id => [flagging_id], uid => [uid], entity_id => [entity_id], timestamp => [timestamp], ...)
@@ -1952,7 +1980,7 @@ function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid 
  * @param $entity_id
  *   The entity ID to check for flagging.
  * @param $flag_name
- *   Optional. The name of a flag if wanting a list specific to a single flag.
+ *   (optional) The name of a flag if wanting a list specific to a single flag.
  *
  * @return
  *   If no flag name is given, an array of flagging data, keyed by the user
@@ -2056,7 +2084,7 @@ function flag_trim_flag($flag, $account, $cutoff_size) {
  * @param $flag
  *   The flag object.
  * @param $entity_id
- *   Optional. The entity ID on which all flaggings will be removed. If left
+ *   (optional) The entity ID on which all flaggings will be removed. If left
  *   empty, this will remove all of this flag's entities.
  */
 function flag_reset_flag($flag, $entity_id = NULL) {
@@ -2090,9 +2118,10 @@ function flag_reset_flag($flag, $entity_id = NULL) {
  * Return an array of link types provided by modules.
  *
  * @return
- *  An array of link types as defined by hook_flag_link_type_info(). These are keyed
- *  by the type name, and each value is an array of properties. In addition to
- *  those defined in hook_flag_link_type_info(), the following properties are set:
+ *  An array of link types as defined by hook_flag_link_type_info(). These are
+ *  keyed by the type name, and each value is an array of properties. In
+ *  addition to those defined in hook_flag_link_type_info(), the following
+ *  properties are set:
  *  - 'module': The providing module.
  *  - 'name': The machine name of the type.
  *
