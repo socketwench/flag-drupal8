@@ -140,32 +140,38 @@ function flagging_save($flagging) {
 /**
  * Implements hook_entity_query_alter().
  *
- * Converts EntityFieldQuery instances on flaggings that have an entity
- * condition on bundles (flag machine names).
+ * Replaces bundle condition in EntityFieldQuery on flagging entities
+ * with query condition on [name] field in [flag] table.
  *
- * Based on taxonomy_entity_query_alter().
+ * @see flag_query_flagging_flag_names_alter()
  */
-function flag_entity_query_alter($query) {
+function flag_entity_query_alter(EntityFieldQuery $query) {
   $conditions = &$query->entityConditions;
 
   // Alter only flagging queries with bundle conditions.
   if (isset($conditions['entity_type']) && $conditions['entity_type']['value'] == 'flagging' && isset($conditions['bundle'])) {
-    // Convert flag machine names to flag IDs.
-    $flags = flag_get_flags();
-    $fids = array();
-    if (is_array($conditions['bundle']['value'])) {
-      foreach ($conditions['bundle']['value'] as $flag_name) {
-        $fids[] = $flags[$flag_name]->fid;
-      }
-    }
-    else {
-      $flag_name = $conditions['bundle']['value'];
-      $fids = $flags[$flag_name]->fid;
-    }
-
-    $query->propertyCondition('fid', $fids, $conditions['bundle']['operator']);
+    $query->addTag('flagging_flag_names'); // Add tag to alter query.
+    // Make value and operator of the bundle condition accessible
+    // in hook_query_TAG_alter.
+    $query->addMetaData('flag_name_value', $conditions['bundle']['value']);
+    $query->addMetaData('flag_name_operator', $conditions['bundle']['operator']);
     unset($conditions['bundle']);
   }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for flagging_flag_names tag.
+ *
+ * @see flag_entity_query_alter()
+ */
+function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
+  // Get value and operator for bundle condition from meta data.
+  $value = $query->getMetaData('flag_name_value');
+  $operator = $query->getMetaData('flag_name_operator');
+  // Join [flag] and [flagging] tables by [fid] and
+  // apply bundle condition on [flag].[name] field.
+  $query->join('flag', 'f', 'flagging.fid = f.fid');
+  $query->condition('f.name', $value, $operator);
 }
 
 /**
