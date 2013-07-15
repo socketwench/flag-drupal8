@@ -2141,7 +2141,9 @@ function flag_get_link_types() {
     if ($cache = cache_get('flag_link_type_info')) {
       $link_types = $cache->data;
     }
-    else {
+    // In some rare edge cases cache_get() can return an empty result. If it
+    // does, we make sure to fetch the link types again.
+    if (empty($link_types)) {
       $link_types = array();
       foreach (module_implements('flag_link_type_info') as $module) {
         $module_types = module_invoke($module, 'flag_link_type_info');
