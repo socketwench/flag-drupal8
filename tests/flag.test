@@ -33,6 +33,9 @@ abstract class FlagTestCaseBase extends DrupalWebTestCase {
 
 }
 
+/**
+ * Test CRUD operations on Flagging entities.
+ */
 class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
 
   /**
@@ -209,6 +212,9 @@ class FlagFlaggingCRUDTestCase extends FlagTestCaseBase {
 
 }
 
+/**
+ * Test Flag admin UI.
+ */
 class FlagAdminTestCase extends FlagTestCaseBase {
   var $_flag = FALSE;
 
@@ -583,6 +589,9 @@ class FlagAccessLinkTestCase extends FlagTestCaseBase {
 
 }
 
+/**
+ * Test the 'confirm form' link type.
+ */
 class FlagLinkTypeConfirmTestCase extends DrupalWebTestCase {
 
   /**
