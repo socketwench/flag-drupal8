@@ -1272,6 +1272,12 @@ class flag_flag {
    * Saves a flag to the database. It is a wrapper around update() and insert().
    */
   function save() {
+    // Allow the 'global' property to be a boolean, particularly when defined in
+    // hook_flag_default_flags(). Without this, a value of FALSE gets casted to
+    // an empty string which violates our schema. Other boolean properties are
+    // fine, as they are serialized.
+    $this->global = (int) $this->global;
+
     if (isset($this->fid)) {
       $this->update();
       $this->is_new = FALSE;
