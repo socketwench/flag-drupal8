@@ -190,29 +190,6 @@ function flag_rules_action_info() {
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
     ),
-    'flag_fetch_entity_by_user' => array(
-      'label' => t('Fetch content flagged by user'),
-      'base' => 'flag_rules_action_fetch_entity_by_user',
-      'parameter' => array(
-        'flag' => array(
-          'type' => 'flag',
-          'label' => t('Flag'),
-        ),
-        'flagging_user' => array(
-          'type' => 'user',
-          'label' => t('User who flagged the content'),
-          'description' => t('For non-global flags, this is the user who flagged the content. (For global flags, this argument is ignored.)'),
-        ),
-      ),
-      'provides' => array(
-        'content_flagged_by_user' => array(
-          'label' => t('Content flagged by user'),
-          'type' => 'list<node>',
-        ),
-      ),
-      'group' => t('Flag'),
-      'access callback' => 'flag_rules_integration_access',
-    ),
   );
   $param_defaults = array(
     'flagging_user' => array(
@@ -229,38 +206,64 @@ function flag_rules_action_info() {
   );
   foreach (flag_get_types() as $type) {
     $entity_info = entity_get_info($type);
+    $label = $entity_info['label'];
     $items += array(
+      'flag_fetch_' . $type . '_by_user' => array(
+        'label' => t('Fetch @label flagged by user', array('@label' => $label)),
+        'base' => 'flag_rules_action_fetch_entity_by_user',
+        'parameter' => array(
+          'flag' => array(
+            'type' => 'flag',
+            'label' => t('Flag'),
+            'flag_type' => $type,
+            'description' => t('The flag to check for.'),
+          ),
+          'flagging_user' => array(
+            'type' => 'user',
+            'label' => t('User who flagged the @label', array('@label' => $label)),
+            'description' => t('For non-global flags, this is the user who flagged the @label. (For global flags, this argument is ignored.)', array('@label' => $label)),
+          ),
+        ),
+        'provides' => array(
+          'content_flagged_by_user' => array(
+            'label' => t('Content flagged by user'),
+            'type' => 'list<' . $type . '>',
+          ),
+        ),
+        'group' => t('Flag'),
+        'access callback' => 'flag_rules_integration_access',
+      ),
       'flag_flag' . $type => array(
-        'label' => t('Flag a @type', array('@type' => $type)),
+        'label' => t('Flag a @label', array('@label' => $label)),
         'base' => 'flag_rules_action_flag',
         'parameter' => array(
           'flag' => array(
             'type' => 'flag',
             'label' => t('Flag'),
             'flag_type' => $type,
-            'description' => t('The flag to check for.')
+            'description' => t('The flag to check for.'),
           ),
           $type => array(
             'type' => $type,
-            'label' => isset($entity_info[$type]['label']) ? $entity_info[$type]['label'] : $type,
+            'label' => $label,
           ),
         ) + $param_defaults,
         'group' => t('Flag'),
         'access callback' => 'flag_rules_integration_access',
       ),
       'flag_unflag' . $type => array(
-        'label' => t('Unflag a @type', array('@type' => $type)),
+        'label' => t('Unflag a @label', array('@label' => $label)),
         'base' => 'flag_rules_action_unflag',
         'parameter' => array(
           'flag' => array(
             'type' => 'flag',
             'label' => t('Flag'),
             'flag_type' => $type,
-            'description' => t('The flag to check for.')
+            'description' => t('The flag to check for.'),
           ),
           $type => array(
             'type' => $type,
-            'label' => isset($entity_info[$type]['label']) ? $entity_info[$type]['label'] : $type,
+            'label' => $label,
           ),
         ) + $param_defaults,
         'group' => t('Flag'),
@@ -268,7 +271,7 @@ function flag_rules_action_info() {
       ),
     );
     $items['flag_fetch_users_' . $type] = array(
-      'label' => t('Fetch users who have flagged a @type', array('@type' => $type)),
+      'label' => t('Fetch users who have flagged a @label', array('@label' => $label)),
       'base' => 'flag_rules_action_fetch_users',
       'parameter' => array(
         'flag' => array(
@@ -279,7 +282,7 @@ function flag_rules_action_info() {
         ),
         $type => array(
           'type' => $type,
-          'label' => isset($entity_info[$type]['label']) ? $entity_info[$type]['label'] : $type,
+          'label' => $label,
         ),
       ),
       'provides' => array(
@@ -292,6 +295,9 @@ function flag_rules_action_info() {
       'access callback' => 'flag_rules_integration_access',
     );
   }
+  // For backward compatibility sake. This was the original name of the 'fetch node by user'.
+  $items['flag_fetch_entity_by_user'] = $items['flag_fetch_node_by_user'];
+  $items['flag_fetch_entity_by_user']['label'] .= ' '. t('(Legacy)');
   return $items;
 }
 
