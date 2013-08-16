@@ -186,6 +186,11 @@ function flag_rules_action_info() {
           'label' => t('Flag queue size'),
           'description' => t('The maximum number of objects to keep in the queue. Newly flagged objects will be kept; older ones will be removed. Tip: by typing "1" here you implement a singleton.'),
         ),
+        'trim_newest' => array(
+          'type' => 'boolean',
+          'label' => t('Trim newest flags'),
+          'description' => t('Checking this will trim the newest flags.  This will prevent new flags once a limit is reached.'),
+        ),
       ),
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
@@ -318,14 +323,14 @@ function flag_rules_action_unflag($flag, $entity, $flagging_user, $permissions_c
 /**
  * Base action implementation: Trim flag.
  */
-function flag_rules_action_trim($flag, $flagging_user, $cutoff_size) {
+function flag_rules_action_trim($flag, $flagging_user, $cutoff_size, $trim_newest) {
   // For some reason, when this action fires in response to a flagging event,
   // as an anonymous user, then the $flagging_user is sent through as FALSE.
   // Not sure why. This workaround fixes the problem in this specific case.
   if ($flagging_user === FALSE) {
     $flagging_user = $GLOBALS['user'];
   }
-  flag_trim_flag($flag, $flagging_user, $cutoff_size);
+  flag_trim_flag($flag, $flagging_user, $cutoff_size, $trim_newest);
 }
 
 /**

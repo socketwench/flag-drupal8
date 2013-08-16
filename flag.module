@@ -2066,16 +2066,28 @@ function flag_create_link($flag_name, $entity_id) {
  *   The user object on behalf the trimming will occur.
  * @param $cutoff_size
  *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
+ * @param $trim_newest
+ *   An optional boolean indicating whether to trim the newest flags.
  */
-function flag_trim_flag($flag, $account, $cutoff_size) {
-  $result = db_select('flagging', 'fc')
+function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest) {
+  $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
     ->condition(db_or()->condition('uid', $account->uid)->condition('uid', 0))
     // Account for session ID (in the case of anonymous users).
-    ->condition('sid', flag_get_sid($account->uid))
-    ->orderBy('timestamp', 'DESC')
-    ->execute();
+    ->condition('sid', flag_get_sid($account->uid));
+  // If $trim_newest is TRUE, then, we should order by 'ASC' as we should trim
+  // the newest flags.
+  if ($trim_newest) {
+    $query->orderBy('timestamp', 'ASC');
+  }
+  else {
+    $query->orderBy('timestamp', 'DESC') ;
+  }
+
+  // Execute the query
+  $result = $query->execute();
+
   $i = 1;
   foreach ($result as $row) {
     if ($i++ > $cutoff_size) {
