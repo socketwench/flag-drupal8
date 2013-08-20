@@ -195,6 +195,70 @@ function flag_rules_action_info() {
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
     ),
+    'fetch_overall_flag_count' => array(
+      'label' => t('Fetch overall flag count'),
+      'base' => 'flag_rules_action_fetch_overall_flag_count',
+      'parameter' => array(
+        'flag' => array(
+          'type' => 'flag',
+          'label' => t('Flag'),
+        ),
+      ),
+      'provides' => array(
+        'overall_flag_count' => array(
+          'label' => t('Overall flag count'),
+          'type' => 'integer',
+        ),
+      ),
+      'group' => t('Flag'),
+      'access callback' => 'flag_rules_integration_access',
+    ),
+    'fetch_entity_flag_count' => array(
+      'label' => t('Fetch entity flag count'),
+      'base' => 'flag_rules_action_fetch_entity_flag_count',
+      'parameter' => array(
+        'flag' => array(
+          'type' => 'flag',
+          'label' => t('Flag'),
+        ),
+        'entity_type' => array(
+          'type' => 'text',
+          'label' => t('Entity type'),
+          'options list' => 'flag_rules_get_flag_types',
+          'restriction' => 'input',
+        ),
+      ),
+      'provides' => array(
+        'entity_flag_count' => array(
+          'label' => t('Entity flag count'),
+          'type' => 'integer',
+        ),
+      ),
+      'group' => t('Flag'),
+      'access callback' => 'flag_rules_integration_access',
+    ),
+    'fetch_user_flag_count' => array(
+      'label' => t('Fetch user flag count'),
+      'base' => 'flag_rules_action_fetch_user_flag_count',
+      'parameter' => array(
+        'flag' => array(
+          'type' => 'flag',
+          'label' => t('Flag'),
+        ),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User'),
+        ),
+      ),
+      'provides' => array(
+        'user_flag_count' => array(
+          'label' => t('User flag count'),
+          'type' => 'integer',
+        ),
+      ),
+      'group' => t('Flag'),
+      'access callback' => 'flag_rules_integration_access',
+    ),
   );
   $param_defaults = array(
     'flagging_user' => array(
@@ -361,6 +425,44 @@ function flag_rules_action_fetch_entity_by_user($flag, $user) {
 
   $flagged = $result->fetchCol();
   return array('content_flagged_by_user' => $flagged);
+}
+
+/**
+ * Base action implementation: Fetch overall count for a particular flag.
+ */
+function flag_rules_action_fetch_overall_flag_count($flag) {
+  $count = flag_get_flag_counts($flag->name);
+  return array('overall_flag_count' => $count);
+}
+
+/**
+ * Helper function which will return all the available flag types.
+ *
+ *  @return
+ *  An array of flag type names keyed by the type name.
+ */
+function flag_rules_get_flag_types() {
+  $types = array();
+  foreach (flag_get_types() as $type) {
+    $types[$type] = $type;
+  }
+  return $types;
+}
+
+/**
+ * Base action implementation: Fetch count of flags for a particular entity.
+ */
+function flag_rules_action_fetch_entity_flag_count($flag, $entity_type) {
+  $count = flag_get_entity_flag_counts($flag, $entity_type);
+  return array('entity_flag_count' => $count);
+}
+
+/**
+ * Base action implementation: Fetch user's flag count.
+ */
+function flag_rules_action_fetch_user_flag_count($flag, $user) {
+  $count = flag_get_user_flag_counts($flag, $user);
+  return array('user_flag_count' => $count);
 }
 
 /**

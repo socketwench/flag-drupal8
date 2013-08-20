@@ -1644,6 +1644,68 @@ function _flag_link_type_descriptions() {
 // Non-Views public API
 
 /**
+ * Get the count of flags for a certain entity.
+ *
+ * @param $flag
+ *   The flag.
+ * @param $entity_type
+ *   The entity type (usually 'node').
+ *
+ * @return
+ *   The flag count with the flag name and entity type as the array key.
+ */
+function flag_get_entity_flag_counts($flag, $entity_type) {
+  $counts = &drupal_static(__FUNCTION__);
+
+  // We check to see if the flag count is already in the cache,
+  // if it's not, run the query.
+  if (!isset($counts[$flag->name][$entity_type])) {
+    $counts[$flag->name][$entity_type] = array();
+    $result = db_select('flagging', 'f')
+      ->fields('f', array('fid'))
+      ->condition('fid', $flag->fid)
+      ->condition('entity_type', $entity_type)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $counts[$flag->name][$entity_type] =  $result;
+  }
+
+  return $counts[$flag->name][$entity_type];
+}
+
+/**
+ * Get the user's flag count.
+ *
+ * @param $flag
+ *   The flag.
+ * @param $user
+ *   The user object.
+ *
+ * @return
+ *   The flag count with the flag name and the uid as the array key.
+ */
+function flag_get_user_flag_counts($flag, $user) {
+  $counts = &drupal_static(__FUNCTION__);
+
+  // We check to see if the flag count is already in the cache,
+  // if it's not, run the query.
+  if (!isset($counts[$flag->name][$user->uid])) {
+    $counts[$flag->name][$user->uid] = array();
+    $result = db_select('flagging', 'f')
+      ->fields('f', array('fid'))
+      ->condition('fid', $flag->fid)
+      ->condition('uid', $user->uid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $counts[$flag->name][$user->uid] = $result;
+  }
+
+  return $counts[$flag->name][$user->uid];
+}
+
+/**
  * Get flag counts for all flags on a node.
  *
  * @param $entity_type
@@ -1651,8 +1713,8 @@ function _flag_link_type_descriptions() {
  * @param $entity_id
  *   The entity ID (usually the node ID).
  *
- * @return $flags
- *   An array of the structure [name] => [number of flags].
+ * @return
+ *   The flag count with the entity type and id as array keys.
  */
 function flag_get_counts($entity_type, $entity_id) {
   $counts = &drupal_static(__FUNCTION__);
