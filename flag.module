@@ -2452,3 +2452,32 @@ function flag_properties_get_flagging_users($entity, array $options, $name, $ent
 
   return array_keys($flagging_data);
 }
+
+/**
+ * Getter callback that returns the SID of the user that is being retrieved.
+ *
+ * Callback for hook_entity_property_info_alter().
+ *
+ * @param stdobj $entity
+ *  The entity object representing a user for which we are getting inforamtion for.
+ *
+ * @param array $options
+ *  Options reguarding the nature of the entity. Language, etc.
+ *
+ * @param string $name
+ *  The name of the property we are running this callback for.
+ *
+ * @param string $entity_type
+ *  The type that the stdobj $entity is supposed to be.
+ *
+ * @param $property_info
+ *  The ifnromatin that represents the property we are providing a result for.
+ *
+ * @return an integer representing the user's sid field from the session_api table
+ *
+ * @ingroup callbacks
+ */
+function flag_properties_get_user_sid($entity, array $options, $name, $entity_type, $property_info) {
+  $sid =  flag_get_sid($entity->uid, FALSE);
+  return $sid;
+}
