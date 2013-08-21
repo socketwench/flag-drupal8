@@ -415,14 +415,19 @@ function flag_rules_action_fetch_users($flag, $entity) {
 /**
  * Base action implementation: Fetch entities who were flagged a user.
  */
-function flag_rules_action_fetch_entity_by_user($flag, $user) {
-  $result = db_select('flagging', 'fc')
+function flag_rules_action_fetch_entity_by_user($flag, $entity) {
+  $user = entity_metadata_wrapper('user', $entity);
+  $sid = $user->flag_sid->value();
+  $query = db_select('flagging', 'fc')
     ->fields('fc', array('entity_id'))
     ->condition('entity_type', $flag->entity_type)
-    ->condition('uid', $user->uid)
-    ->condition('fid', $flag->fid)
-    ->execute();
-
+    ->condition('uid', $user->uid->value())
+    ->condition('fid', $flag->fid);
+  // Filter out any bad session ids and any users that aren't anonymous.
+  if (!empty($sid) && $sid != -1) {
+    $query->condition('sid', $sid);
+  }
+  $result = $query->execute();
   $flagged = $result->fetchCol();
   return array('content_flagged_by_user' => $flagged);
 }
