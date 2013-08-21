@@ -2137,7 +2137,7 @@ function flag_create_link($flag_name, $entity_id) {
  *   This will trim the flag if $permissions_check is TRUE even if the user
  *   doesn't have the permission to flag/unflag.
  */
-+ function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest, $permissions_check = FALSE) {
+function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest, $permissions_check = FALSE) {
   $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
