@@ -1255,7 +1255,7 @@ function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
  *   The ID of the item to flag or unflag.
  * @param $account
  *   (optional) The user on whose behalf to flag. Omit for the current user.
- * @permissions_check
+ * @param permissions_check
  *   (optional) A boolean indicating whether to skip permissions.
  *
  * @return
