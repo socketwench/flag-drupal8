@@ -1255,17 +1255,19 @@ function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
  *   The ID of the item to flag or unflag.
  * @param $account
  *   (optional) The user on whose behalf to flag. Omit for the current user.
+ * @permissions_check
+ *   (optional) A boolean indicating whether to skip permissions.
  *
  * @return
  *   FALSE if some error occured (e.g., user has no permission, flag isn't
  *   applicable to the item, etc.), TRUE otherwise.
  */
-function flag($action, $flag_name, $entity_id, $account = NULL) {
+function flag($action, $flag_name, $entity_id, $account = NULL, $permissions_check = FALSE) {
   if (!($flag = flag_get_flag($flag_name))) {
     // Flag does not exist.
     return FALSE;
   }
-  return $flag->flag($action, $entity_id, $account);
+  return $flag->flag($action, $entity_id, $account, $permissions_check);
 }
 
 /**
@@ -2130,8 +2132,12 @@ function flag_create_link($flag_name, $entity_id) {
  *   The number of flaggings allowed. Any flaggings beyond that will be trimmed.
  * @param $trim_newest
  *   An optional boolean indicating whether to trim the newest flags.
+ * @param $permissions_check
+ *   (optional) A boolean indicating whether to skip permissions.
+ *   This will trim the flag if $permissions_check is TRUE even if the user
+ *   doesn't have the permission to flag/unflag.
  */
-function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest) {
++ function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest, $permissions_check = FALSE) {
   $query = db_select('flagging', 'fc')
     ->fields('fc')
     ->condition('fid', $flag->fid)
@@ -2153,7 +2159,7 @@ function flag_trim_flag($flag, $account, $cutoff_size, $trim_newest) {
   $i = 1;
   foreach ($result as $row) {
     if ($i++ > $cutoff_size) {
-      flag('unflag', $flag->name, $row->entity_id, $account);
+      flag('unflag', $flag->name, $row->entity_id, $account, $permissions_check);
     }
   }
 }

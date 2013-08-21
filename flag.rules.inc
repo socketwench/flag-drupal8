@@ -167,6 +167,14 @@ function flag_rules_event_info() {
  * Implements hook_rules_action_info().
  */
 function flag_rules_action_info() {
+  $param_defaults = array(
+    'permission_check' => array(
+      'type' => 'boolean',
+      'label' => t('Skip permission check'),
+      'description' => t('Whether to ignore permissions of the user on whose behalf to flag.'),
+      'restriction' => 'input',
+    ),
+  );
   $items = array(
     'flag_trim' => array(
       'label' => t('Trim a flag'),
@@ -191,7 +199,7 @@ function flag_rules_action_info() {
           'label' => t('Trim newest flags'),
           'description' => t('Checking this will trim the newest flags.  This will prevent new flags once a limit is reached.'),
         ),
-      ),
+      ) + $param_defaults,
       'group' => t('Flag'),
       'access callback' => 'flag_rules_integration_access',
     ),
@@ -260,18 +268,10 @@ function flag_rules_action_info() {
       'access callback' => 'flag_rules_integration_access',
     ),
   );
-  $param_defaults = array(
-    'flagging_user' => array(
-      'type' => 'user',
-      'label' => t('User on whose behalf to flag'),
-      'description' => t('For non-global flags, this is the user on whose behalf to flag the object. In addition, if checked below, the access permissions to the flag are checked against this user.'),
-    ),
-    'permission_check' => array(
-      'type' => 'boolean',
-      'label' => t('Skip permission check'),
-      'description' => t('Whether to ignore permissions of the user on whose behalf to flag.'),
-      'restriction' => 'input',
-    ),
+  $param_defaults['flagging_user'] = array(
+    'type' => 'user',
+    'label' => t('User on whose behalf to flag'),
+    'description' => t('For non-global flags, this is the user on whose behalf to flag the object. In addition, if checked below, the access permissions to the flag are checked against this user.'),
   );
   foreach (flag_get_types() as $type) {
     $entity_info = entity_get_info($type);
@@ -387,14 +387,14 @@ function flag_rules_action_unflag($flag, $entity, $flagging_user, $permissions_c
 /**
  * Base action implementation: Trim flag.
  */
-function flag_rules_action_trim($flag, $flagging_user, $cutoff_size, $trim_newest) {
+function flag_rules_action_trim($flag, $flagging_user, $cutoff_size, $trim_newest, $permissions_check) {
   // For some reason, when this action fires in response to a flagging event,
   // as an anonymous user, then the $flagging_user is sent through as FALSE.
   // Not sure why. This workaround fixes the problem in this specific case.
   if ($flagging_user === FALSE) {
     $flagging_user = $GLOBALS['user'];
   }
-  flag_trim_flag($flag, $flagging_user, $cutoff_size, $trim_newest);
+  flag_trim_flag($flag, $flagging_user, $cutoff_size, $trim_newest, $permissions_check);
 }
 
 /**
