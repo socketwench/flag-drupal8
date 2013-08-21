@@ -47,18 +47,22 @@ function flag_export_flags($flags = array(), $module = '', $indent = '') {
     // Allow other modules to change the exported flag.
     drupal_alter('flag_export', $new_flag);
 
-    // Remove the flag ID.
-    unset($new_flag['fid']);
-    // The name is emitted as the key for the array.
-    unset($new_flag['name']);
-
-// Do not export the whole entity info, as it is just used as helper data.
-    if (isset($new_flag['entity_info'])) {
-      unset($new_flag['entity_info']);
+    // Remove properties we don't export.
+    $unset_properties = array(
+      // Remove the flag ID.
+      'fid',
+      // The name is emitted as the key for the array.
+      'name',
+      // The entity info is just used as helper data.
+      'entity_info',
+      // Remove roles.
+      'roles',
+      // Remove errors.
+      'errors',
+    );
+    foreach ($unset_properties as $property) {
+      unset($new_flag[$property]);
     }
-
-    // Remove roles.
-    unset($new_flag['roles']);
 
     $output .= $indent . '// Exported flag: "' . check_plain($flag->get_title()) . '"' . ".\n";
     $output .= $indent . '$flags[\'' . $flag->name . '\'] = ' . (function_exists('features_var_export') ? features_var_export($new_flag, $indent) : var_export($new_flag, TRUE)) . ";\n";
