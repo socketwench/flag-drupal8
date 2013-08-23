@@ -2320,7 +2320,7 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
  *   current user.
  * @param bool $create
  *   (optional) Determines whether a session should be created if it doesn't
- *   exist yet. Defaults to TRUE.
+ *   exist yet. Defaults to FALSE.
  *
  * @return
  *   The session ID, if the session exists. If not, the return value is 0.
