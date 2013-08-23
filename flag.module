@@ -2267,6 +2267,21 @@ function flag_check_token($token, $entity_id) {
 
 /**
  * Set the Session ID for a user. Utilizes the Session API module.
+ *
+ * Creates a Session ID for an anonymous user and returns it. It will always
+ * return 0 for registered users.
+ *
+ * @param int $uid
+ *   (optional) The user ID to create a session ID for. Defaults to the
+ *   current user.
+ * @param bool $create
+ *   (optional) Determines whether a session should be created if it doesn't
+ *   exist yet. Defaults to TRUE.
+ *
+ * @return
+ *   The session ID, if a session was created. If not, the return value is 0.
+ *
+ * @see flag_get_sid()
  */
 function flag_set_sid($uid = NULL, $create = TRUE) {
   $sids = &drupal_static(__FUNCTION__, array());
@@ -2275,8 +2290,13 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
     $uid = $GLOBALS['user']->uid;
   }
 
-  if (!isset($sids[$uid])) {
+  // Set the sid if none has been set yet. If the caller specified to create an
+  // sid and we have an invalid one (-1), create it.
+  if (!isset($sids[$uid]) || ($sids[$uid] == -1 && $create)) {
     if (module_exists('session_api') && session_api_available() && $uid == 0) {
+      // This returns one of the following:
+      // - -1. This indicates that no session exists and none was created.
+      // - A positive integer with the Session ID when it does exist.
       $sids[$uid] = session_api_get_sid($create);
     }
     else {
@@ -2284,18 +2304,28 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
     }
   }
 
-  return $sids[$uid];
+  // Keep the -1 case internal and let the outside world only distinguish two
+  // cases: (1) there is an SID; (2) there is no SID (-> 0).
+  return $sids[$uid] == -1 ? 0 : $sids[$uid];
 }
 
 /**
  * Get the Session ID for a user. Utilizes the Session API module.
  *
- * @param $uid
- *   The user ID. If the UID is 0 (anonymous users), then a SID will be
- *   returned. SID will always be 0 for any authenticated user.
- * @param $create
- *   If the user doesn't yet have a session, should one be created? Defaults
- *   to FALSE.
+ * Gets the Session ID for an anonymous user. It will always return 0 for
+ * registered users.
+ *
+ * @param int $uid
+ *   (optional) The user ID to return the session ID for. Defaults to the
+ *   current user.
+ * @param bool $create
+ *   (optional) Determines whether a session should be created if it doesn't
+ *   exist yet. Defaults to TRUE.
+ *
+ * @return
+ *   The session ID, if the session exists. If not, the return value is 0.
+ *
+ * @see flag_set_sid()
  */
 function flag_get_sid($uid = NULL, $create = FALSE) {
   return flag_set_sid($uid, $create);
