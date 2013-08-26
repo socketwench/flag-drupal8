@@ -145,6 +145,10 @@ function flag_import_form_validate($form, &$form_state) {
 function flag_import_form_submit($form, &$form_state) {
   module_load_include('inc', 'flag', 'includes/flag.admin');
 
+  // Build up values for the cache clear.
+  $entity_types = array();
+  $new = FALSE;
+
   foreach ($form_state['flags'] as $flag) {
     $flag->save();
     if (!empty($flag->status)) {
@@ -152,12 +156,14 @@ function flag_import_form_submit($form, &$form_state) {
     }
     if ($flag->is_new) {
       drupal_set_message(t('Flag @name has been imported.', array('@name' => $flag->name)));
+      $new = TRUE;
     }
     else {
       drupal_set_message(t('Flag @name has been updated.', array('@name' => $flag->name)));
     }
+    $entity_types[] = $flag->entity_type;
   }
-  _flag_clear_cache();
+  _flag_clear_cache($entity_types, $new);
 
   $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
