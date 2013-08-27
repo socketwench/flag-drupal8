@@ -88,7 +88,7 @@ function theme_flag_admin_listing($variables) {
     $permission = "flag $flag->name";
     $roles = user_roles(FALSE, $permission);
     $row = array();
-    $row[] = $flag->title . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
+    $row[] = check_plain($flag->title) . ' <small>(' . t('Machine name: @name', array('@name' => $flag->name)) . ')</small>';
     if (count($flags) > 1) {
       $row[] = drupal_render($form['flags'][$flag->name]['weight']);
     }
