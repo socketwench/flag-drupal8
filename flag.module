@@ -612,7 +612,7 @@ function flag_field_extra_fields() {
   $flags = flag_get_flags();
   foreach ($flags as $name => $flag) {
     // Skip flags that aren't on entities.
-    if (!is_subclass_of($flag, 'flag_entity')) {
+    if (!($flag instanceof flag_entity)) {
       continue;
     }
 
