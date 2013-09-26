@@ -224,15 +224,14 @@ function flag_uninstall() {
  */
 function flag_requirements($phase) {
   $requirements = array();
-  $t = get_t();
 
   if ($phase == 'runtime') {
     if (module_exists('translation') && !module_exists('translation_helpers')) {
       $requirements['flag_translation'] = array(
-        'title' => $t('Flag'),
+        'title' => t('Flag'),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('To have the flag module work with translations, you need to install and enable the <a href="http://drupal.org/project/translation_helpers">Translation helpers</a> module.'),
-        'value' => $t('Translation helpers module not found.'),
+        'description' => t('To have the flag module work with translations, you need to install and enable the <a href="http://drupal.org/project/translation_helpers">Translation helpers</a> module.'),
+        'value' => t('Translation helpers module not found.'),
       );
     }
     if (module_exists('session_api')) {
@@ -245,10 +244,10 @@ function flag_requirements($phase) {
         $contents = file_get_contents('./robots.txt');
         if (strpos($contents, $robots_string) === FALSE) {
           $requirements['flag_robots'] = array(
-            'title' => $t('Flag robots.txt problem'),
+            'title' => t('Flag robots.txt problem'),
             'severity' => REQUIREMENT_WARNING,
-            'description' => $t('Flag module may currently be used with anonymous users, however the robots.txt file does not exclude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
-            'value' => $t('Search engines flagging content'),
+            'description' => t('Flag module may currently be used with anonymous users, however the robots.txt file does not exclude the "@flag-path" path, which may cause search engines to randomly flag and unflag content when they index the site. It is highly recommended to add "@robots-string" to your robots.txt file (located in the root of your Drupal installation).', array('@flag-path' => $flag_path, '@robots-string' => $robots_string)),
+            'value' => t('Search engines flagging content'),
           );
         }
       }
