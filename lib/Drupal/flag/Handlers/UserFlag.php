@@ -5,10 +5,12 @@
  *   Contains the flag_user class.
  */
 
+namespace Drupal\flag\Handlers;
+
 /**
  * Implements a user flag.
  */
-class flag_user extends flag_entity {
+class UserFlag extends Flag {
   function options() {
     $options = parent::options();
     $options += array(

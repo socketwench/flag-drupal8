@@ -5,10 +5,12 @@
  *   Contains the flag_node class.
  */
 
+namespace Drupal\flag\Handlers;
+
 /**
  * Implements a node flag.
  */
-class flag_node extends flag_entity {
+class NodeFlag extends Flag {
   function options() {
     $options = parent::options();
     // Use own display settings in the meanwhile.

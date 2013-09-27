@@ -20,12 +20,12 @@ function flag_flag_type_info() {
     'node' => array(
       'title' => t('Nodes'),
       'description' => t("Nodes are a Drupal site's primary content."),
-      'handler' => 'flag_node',
+      'handler' => '\Drupal\flag\Handlers\NodeFlag',
     ),
     'user' => array(
       'title' => t('Users'),
       'description' => t('Users who have created accounts on your site.'),
-      'handler' => 'flag_user',
+      'handler' => '\Drupal\flag\Handlers\UserFlag',
     ),
   );
 
@@ -33,7 +33,7 @@ function flag_flag_type_info() {
     $definitions['comment'] = array(
       'title' => t('Comments'),
       'description' => t('Comments are responses to node content.'),
-      'handler' => 'flag_comment',
+      'handler' => '\Drupal\flag\Handlers\CommentFlag',
       'module' => 'comment',
     );
   }
@@ -42,7 +42,7 @@ function flag_flag_type_info() {
     $definitions['taxonomy_term'] = array(
       'title' => t('Taxonomy Terms'),
       'description' => t('Taxonomy terms are used to categorize content.'),
-      'handler' => 'flag_entity',
+      'handler' => '\Drupal\flag\Handlers\Flag',
       'module' => 'taxonomy',
     );
   }
