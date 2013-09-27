@@ -2,13 +2,15 @@
 
 /**
  * @file
- *   Contains the flag_entity class.
+ *   Contains the Flag class.
  */
+
+namespace Drupal\flag\Handlers;
 
 /**
  * Base entity flag handler.
  */
-class flag_entity extends flag_flag {
+class Flag extends AbstractFlag {
   /**
    * Adds additional options that are common for all entity types.
    */
@@ -36,9 +38,9 @@ class flag_entity extends flag_flag {
    */
   function options_form(&$form) {
     $bundles = array();
-    $entity_info = entity_get_info($this->entity_type);
-    foreach ($entity_info['bundles'] as $bundle_key => $bundle) {
-      $bundles[$bundle_key] = check_plain($bundle['label']);
+    $bundle_info =  entity_get_bundles($this->entity_type);
+    foreach ($bundle_info as $bundle_key => $info) {
+      $bundles[$bundle_key] = $info['label'];
     }
     $form['access']['types'] = array(
       '#type' => 'checkboxes',
@@ -51,7 +53,8 @@ class flag_entity extends flag_flag {
     // Add checkboxes to show flag link on each entity view mode.
     $options = array();
     $defaults = array();
-    foreach ($entity_info['view modes'] as $name => $view_mode) {
+    $view_modes = entity_get_view_modes($this->entity_type);
+    foreach ($view_modes as $name => $view_mode) {
       $options[$name] = t('Display on @name view mode', array('@name' => $view_mode['label']));
       $defaults[$name] = !empty($this->show_in_links[$name]) ? $name : 0;
     }

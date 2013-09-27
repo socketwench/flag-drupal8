@@ -488,14 +488,14 @@ function flag_hook_info() {
 function flag_fetch_definition($entity_type = NULL) {
   $definitions = &drupal_static(__FUNCTION__);
   if (!isset($definitions)) {
-    if ($cache = cache_get('flag_type_info')) {
+    if ($cache = cache()->get('flag_type_info')) {
       $definitions = $cache->data;
     }
     else {
       $definitions = module_invoke_all('flag_type_info');
       drupal_alter('flag_type_info', $definitions);
 
-      cache_set('flag_type_info', $definitions);
+      cache()->set('flag_type_info', $definitions);
     }
   }
 
@@ -534,7 +534,7 @@ function flag_get_types() {
  *  entity type property could not be found in the flag configuration data.
  *
  * @return
- *  A flag handler object. This may be the special class flag_broken is there is
+ *  A flag handler object. This may be the special class BrokenFlag is there is
  *  a problem with the flag.
  */
 function flag_create_handler($entity_type) {
@@ -543,7 +543,7 @@ function flag_create_handler($entity_type) {
     $handler = new $definition['handler'];
   }
   else {
-    $handler = new flag_broken;
+    $handler = new \Drupal\flag\Handlers\BrokenFlag();
   }
   $handler->entity_type = $entity_type;
   $handler->construct();
@@ -2218,10 +2218,10 @@ function flag_get_link_types() {
   $link_types = &drupal_static(__FUNCTION__);
 
   if (!isset($link_types)) {
-    if ($cache = cache_get('flag_link_type_info')) {
+    if ($cache = cache()->get('flag_link_type_info')) {
       $link_types = $cache->data;
     }
-    // In some rare edge cases cache_get() can return an empty result. If it
+    // In some rare edge cases cache()->get() can return an empty result. If it
     // does, we make sure to fetch the link types again.
     if (empty($link_types)) {
       $link_types = array();
@@ -2242,7 +2242,7 @@ function flag_get_link_types() {
       }
       drupal_alter('flag_link_type_info', $link_types);
 
-      cache_set('flag_link_type_info', $link_types);
+      cache()->set('flag_link_type_info', $link_types);
     }
   }
 

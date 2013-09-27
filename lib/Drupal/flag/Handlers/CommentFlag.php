@@ -5,10 +5,12 @@
  *   Contains the flag_comment class.
  */
 
+namespace Drupal\flag\Handlers;
+
 /**
  * Implements a comment flag.
  */
-class flag_comment extends flag_entity {
+class CommentFlag extends Flag {
   function options() {
     $options = parent::options();
     $options += array(

@@ -5,6 +5,9 @@
  * Contains administrative pages for creating, editing, and deleting flags.
  */
 
+use Drupal\flag\Handlers\AbstractFlag;
+use Drupal\flag\Handlers\BrokenFlag;
+
 /**
  * Flag administration page. Display a list of existing flags.
  */
@@ -227,7 +230,7 @@ function theme_flag_admin_page($variables) {
  */
 function flag_add_page($entity_type = NULL) {
   if (isset($entity_type)) {
-    $flag = flag_flag::factory_by_entity_type($entity_type);
+    $flag = \Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
     // Mark the flag as new.
     $flag->is_new = TRUE;
     $type_info = flag_fetch_definition($entity_type);
@@ -270,8 +273,8 @@ function flag_add_form($form, &$form_state) {
 }
 
 function flag_add_form_validate($form, &$form_state) {
-  $flag = flag_flag::factory_by_entity_type($form_state['values']['type']);
-  if (get_class($flag) == 'flag_broken') {
+  $flag = AbstractFlag::factory_by_entity_type($form_state['values']['type']);
+  if (get_class($flag) == 'BrokenFlag') {
     form_set_error('type', t("This flag type, %type, isn't valid.", array('%type' => $form_state['values']['type'])));
   }
 }

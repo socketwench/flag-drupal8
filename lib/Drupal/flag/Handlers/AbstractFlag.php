@@ -2,10 +2,10 @@
 
 /**
  * @file
- *  Contains the flag_flag class.
- *  Flag type classes use an object oriented style inspired by that
- *  of Views 2.
+ * Contains \Drupal\flag\Handlers\flag_flag
  */
+
+namespace Drupal\flag\Handlers;
 
 /**
  * This abstract class represents a flag, or, in Views 2 terminology, "a handler".
@@ -37,7 +37,7 @@
  * that can't be found, the special handler flag_broken. Finally, this calls
  * $flag->construct() on the new handler object.
  */
-class flag_flag {
+class AbstractFlag {
 
   /**
    * The database ID.
@@ -1537,15 +1537,5 @@ class flag_flag {
    */
   function _flag_url($path, $fragment = NULL, $absolute = TRUE) {
     return url($path, array('fragment' => $fragment, 'absolute' => $absolute));
-  }
-}
-
-/**
- * A dummy flag to be used where the real implementation can't be found.
- */
-class flag_broken extends flag_flag {
-  function options_form(&$form) {
-    drupal_set_message(t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->entity_type)), 'error');
-    $form = array();
   }
 }
