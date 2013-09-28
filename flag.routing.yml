@@ -1,0 +1,6 @@
+flag.settings:
+  path: 'admin/structure/flags'
+  defaults:
+    _content: '\Drupal\flag\Controller\FlagAdminController::content'
+  requirements:
+    _permission: 'administer flags'

@@ -1287,7 +1287,7 @@ class AbstractFlag {
       $this->is_new = TRUE;
     }
     // Clear the page cache for anonymous users.
-    cache_clear_all('*', 'cache_page', TRUE);
+    cache()->deleteTags(array('content' => TRUE));
   }
 
   /**
