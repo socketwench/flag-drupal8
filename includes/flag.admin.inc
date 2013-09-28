@@ -11,6 +11,7 @@ use Drupal\flag\Handlers\BrokenFlag;
 /**
  * Flag administration page. Display a list of existing flags.
  */
+/*
 function flag_admin_page() {
   $flags = flag_get_flags();
   $default_flags = flag_get_default_flags(TRUE);
@@ -21,6 +22,7 @@ function flag_admin_page() {
     'flag_admin_listing' => $flag_admin_listing,
   ));
 }
+*/
 
 /**
  * A form for ordering the weights of all the active flags in the system.

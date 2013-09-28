@@ -10,6 +10,8 @@ define('FLAG_API_VERSION', 3);
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
+use Drupal\flag\Handlers\AbstractFlag;
+
 /**
  * Implements hook_entity_info().
  */
@@ -178,6 +180,7 @@ function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
  * Implements hook_menu().
  */
 function flag_menu() {
+  /*
   $items[FLAG_ADMIN_PATH] = array(
     'title' => 'Flags',
     'page callback' => 'flag_admin_page',
@@ -187,6 +190,7 @@ function flag_menu() {
     'file' => 'includes/flag.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
+  */
   $items[FLAG_ADMIN_PATH . '/list'] = array(
     'title' => 'List',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -1827,7 +1831,7 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
       ->execute();
     foreach ($result as $row) {
       if (!isset($flags[$row->name])) {
-        $flags[$row->name] = flag_flag::factory_by_row($row);
+        $flags[$row->name] = AbstractFlag::factory_by_row($row);
       }
       else {
         $flags[$row->name]->types[] = $row->type;
