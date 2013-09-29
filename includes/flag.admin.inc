@@ -229,7 +229,7 @@ function theme_flag_admin_page($variables) {
  *
  * @see flag_add_form()
  * @see flag_form()
- */
+ *//*
 function flag_add_page($entity_type = NULL) {
   if (isset($entity_type)) {
     $flag = \Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
@@ -243,10 +243,10 @@ function flag_add_page($entity_type = NULL) {
   drupal_set_title(t('Select flag type'));
   return drupal_get_form('flag_add_form');
 }
-
+*/
 /**
  * Present a form for creating a new flag, setting the type of flag.
- */
+ *//*
 function flag_add_form($form, &$form_state) {
   $types = array();
   foreach (flag_fetch_definition() as $type => $info) {
@@ -284,10 +284,10 @@ function flag_add_form_validate($form, &$form_state) {
 function flag_add_form_submit($form, &$form_state) {
   $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'];
 }
-
+*/
 /**
  * Add/Edit flag page.
- */
+ *//*
 function flag_form($form, &$form_state, $flag) {
   $form['#flag'] = $flag;
   $form['#flag_name'] = $flag->name;
@@ -564,7 +564,7 @@ function flag_form($form, &$form_state, $flag) {
 
   return $form;
 }
-
+*/
 /**
  * FormAPI after_build function set states on link type options fieldsets.
  *
@@ -635,7 +635,7 @@ function flag_form_locked_process($element, &$form_state, $form) {
 
 /**
  * Add/Edit flag form validate.
- */
+ *//*
 function flag_form_validate($form, &$form_state) {
   $form_state['values']['title'] = trim($form_state['values']['title']);
   $form_values = $form_state['values'];
@@ -659,10 +659,10 @@ function flag_form_validate($form, &$form_state) {
     }
   }
 }
-
+*/
 /**
  * Add/Edit flag form submit.
- */
+ *//*
 function flag_form_submit($form, &$form_state) {
   $flag = $form['#flag'];
 
@@ -703,7 +703,7 @@ function flag_form_submit($form, &$form_state) {
 
   $form_state['redirect'] = FLAG_ADMIN_PATH;
 }
-
+*/
 /**
  * Output the access options for roles in a table.
  */

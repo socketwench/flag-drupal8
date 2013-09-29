@@ -180,17 +180,12 @@ function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
  * Implements hook_menu().
  */
 function flag_menu() {
-  /*
+
   $items[FLAG_ADMIN_PATH] = array(
     'title' => 'Flags',
-    'page callback' => 'flag_admin_page',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer flags'),
+    'route_name' => 'flag_settings',
     'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
-    'file' => 'includes/flag.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
   );
-  */
   $items[FLAG_ADMIN_PATH . '/list'] = array(
     'title' => 'List',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -198,12 +193,19 @@ function flag_menu() {
   );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
     'title' => 'Add flag',
-    'page callback' => 'flag_add_page',
+/*    'page callback' => 'flag_add_page',
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.admin.inc',
-    'type' => MENU_LOCAL_ACTION,
+*/
+    'route_name' => 'flag_add_page',
+    'type' => MENU_SIBLING_LOCAL_TASK,
     'weight' => 1,
+  );
+  $items[FLAG_ADMIN_PATH . '/add/%node_type'] = array(
+    'title' => 'Flag Add',
+    'route_name' => 'flag_add',
+    'type' => MENU_CALLBACK,
   );
   $items[FLAG_ADMIN_PATH . '/import'] = array(
     'title' => 'Import',
@@ -452,7 +454,9 @@ function flag_help($path, $arg) {
 }
 
 /**
- * Implements hook_init().
+ * Implements hook_init()
+ *
+ * @todo Figure out where Rules module, see https://drupal.org/node/1211396
  */
 function flag_init() {
   module_load_include('inc', 'flag', 'includes/flag.actions');
@@ -1004,8 +1008,7 @@ function flag_entity_delete($entity, $type) {
     return;
   }
 
-  list($id) = entity_extract_ids($type, $entity);
-  _flag_entity_delete($type, $id);
+  _flag_entity_delete($entity->entityType(), $entity->id());
 }
 
 /**
