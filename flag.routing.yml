@@ -18,3 +18,10 @@ flag_add:
     _form: '\Drupal\flag\Form\FlagAddForm'
   requirements:
     _permission: 'administer flags'
+
+flag_import:
+  path: '/admin/structure/flags/import'
+  defaults:
+    _form: '\Drupal\flag\Form\FlagImportForm'
+  requirements:
+    _permission: 'use flag import'
