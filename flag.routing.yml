@@ -25,3 +25,10 @@ flag_import:
     _form: '\Drupal\flag\Form\FlagImportForm'
   requirements:
     _permission: 'use flag import'
+
+flag_export:
+  path: '/admin/structure/flags/export'
+  defaults:
+    _form: '\Drupal\flag\Form\FlagExportForm'
+  requirements:
+    _permission: 'use flag import'
