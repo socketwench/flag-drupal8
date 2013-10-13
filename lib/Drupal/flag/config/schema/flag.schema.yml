@@ -1,0 +1,13 @@
+flag.flag.*:
+  type: mapping
+  label: 'Flag'
+  mapping:
+    id:
+      type: string
+      label: 'Flag identifier'
+    uuid:
+      type: string
+      label: 'UUID'
+    label:
+      type: label
+      label: 'Label'
