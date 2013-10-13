@@ -12,6 +12,13 @@ flag_add_page:
   requirements:
     _permission: 'administer flags'
 
+flag.flag_list:
+  path: '/admin/structure/flagz/add'
+  defaults:
+    _entity_list: 'flag_flag'
+  requirements:
+    _permission: 'administer flags'
+
 flag_add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
