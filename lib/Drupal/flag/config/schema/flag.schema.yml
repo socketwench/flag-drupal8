@@ -11,3 +11,36 @@ flag.flag.*:
     label:
       type: label
       label: 'Label'
+    is_global:
+      type: boolean
+      label: 'Is flag global'
+    flag_short:
+      type: string
+      label: 'Flag Link Text'
+    flag_long:
+      type: string
+      label: 'Flag Description'
+    flag_message:
+      type: string
+      label: 'Flag Message'
+    unflag_short:
+      type: string
+      label: 'Unflag Link Text'
+    unflag_long:
+      type: string
+      label: 'Unflag Description'
+    unflag_message:
+      type: string
+      label: 'Unflag Message'
+    unflag_denied_text:
+      type: string
+      label: 'Unflag Denied Text'
+    weight:
+      type: integer
+      label: 'Weight'
+#    link_type:
+#      type: sequence
+#      label: 'Link Type'
+#      sequence:
+#        - type: flag.link.[plugin]
+#          label: 'Flag Link Type's
