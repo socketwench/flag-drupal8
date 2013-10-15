@@ -8,21 +8,20 @@
 
 namespace Drupal\flag\Form;
 
-use Drupal\Core\Form\FormBase;
+use Drupal\Core\Entity\EntityFormController;
 use Drupal\flag\Handlers\AbstractFlag;
 
-class FlagAddForm extends FormBase{
+class FlagAddForm extends EntityFormController {
 
-  public function getFormID() {
-    return 'flag_add';
-  }
+  public function form(array $form, array &$form_state, $entity_type = NULL) {
+    $form = parent::form($form, $form_state);
 
-  public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
-    $flag = \Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
+    $flag = $this->entity; //\Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
+
     // Mark the flag as new.
     $flag->is_new = TRUE;
     $type_info = flag_fetch_definition($entity_type);
-    drupal_set_title(t('Add new @type flag', array('@type' => $type_info['title'])));
+ //   drupal_set_title(t('Add new @type flag', array('@type' => $type_info['title'])));
 
 
     $form['#flag'] = $flag;
@@ -54,7 +53,7 @@ class FlagAddForm extends FormBase{
     $form['global'] = array(
       '#type' => 'checkbox',
       '#title' => t('Global flag'),
-      '#default_value' => $flag->global,
+      '#default_value' => $flag->is_global,
       '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
       '#weight' => -1,
     );
@@ -62,7 +61,7 @@ class FlagAddForm extends FormBase{
     // there are too many unpleasant consequences in either direction.
     // @todo: Allow this, but with a confirmation form, assuming anyone actually
     // needs this feature.
-    if (!empty($flag->fid) && flag_get_flag_counts($flag->name)) {
+    if (!empty($flag->id) && flag_get_flag_counts($flag->name)) {
       $form['global']['#disabled'] = TRUE;
       $form['global']['#description'] .= '<br />' . t('This setting cannot be changed when flaggings exist for this flag.');
     }
@@ -115,7 +114,7 @@ class FlagAddForm extends FormBase{
       '#default_value' => $flag->unflag_message,
       '#description' => t('Message displayed after content has been unflagged. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
     );
-
+/*
     $form['messages']['tokens_help'] = array(
       '#title' => t('Token replacement'),
       '#type' => 'fieldset',
@@ -134,7 +133,7 @@ class FlagAddForm extends FormBase{
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
-
+*/
     $form['access'] = array(
       '#type' => 'fieldset',
       '#title' => t('Flag access'),
@@ -152,14 +151,14 @@ class FlagAddForm extends FormBase{
       '#required' => TRUE,
       '#weight' => 10,
     );
-
+/*
     // Disabled access breaks checkboxes unless #value is hard coded.
     if (!empty($flag->locked['types'])) {
       $form['access']['types']['#value'] = $flag->types;
     }
 
     // Load the user permissions into the flag.
-    if (isset($flag->fid)) {
+    if (isset($flag->id)) {
       $flag->fetch_roles();
     }
     elseif (isset($flag->import_roles)) {
@@ -175,7 +174,7 @@ class FlagAddForm extends FormBase{
         'unflag' => array(DRUPAL_AUTHENTICATED_RID),
       );
     }
-
+*/
     $form['access']['roles'] = array(
       '#title' => t('Roles that may use this flag'),
       '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
@@ -197,13 +196,13 @@ class FlagAddForm extends FormBase{
     $form['access']['roles']['flag'] = array(
       '#type' => 'checkboxes',
       '#options' => user_roles(!module_exists('session_api')),
-      '#default_value' => $flag->roles['flag'],
+//      '#default_value' => $flag->roles['flag'],
       '#parents' => array('roles', 'flag'),
     );
     $form['access']['roles']['unflag'] = array(
       '#type' => 'checkboxes',
       '#options' => user_roles(!module_exists('session_api')),
-      '#default_value' => $flag->roles['unflag'],
+//      '#default_value' => $flag->roles['unflag'],
       '#parents' => array('roles', 'unflag'),
     );
 
@@ -266,7 +265,7 @@ class FlagAddForm extends FormBase{
       '#id' => 'link-options-confirm',
       '#weight' => 21,
     );
-
+/*
     $form['display']['link_options_confirm']['flag_confirmation'] = array(
       '#type' => 'textfield',
       '#title' => t('Flag confirmation message'),
@@ -280,7 +279,7 @@ class FlagAddForm extends FormBase{
       '#default_value' => isset($flag->unflag_confirmation) ? $flag->unflag_confirmation : '',
       '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
     );
-
+*/
     $form['actions'] = array(
       '#type' => 'actions',
     );
@@ -299,12 +298,17 @@ class FlagAddForm extends FormBase{
 
     // Allow the flag handler to make additions and changes to the form.
     // Note that the flag_broken handler will completely empty the form array!
-    $flag->options_form($form);
+//    $flag->options_form($form);
 
     return $form;
   }
 
-  public function validateForm(array &$form, array &$form_state) {
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::validate().
+   */
+  public function validate(array $form, array &$form_state) {
+    parent::validate($form, $form_state);
+
     $form_state['values']['title'] = trim($form_state['values']['title']);
     $form_values = $form_state['values'];
 
@@ -319,8 +323,8 @@ class FlagAddForm extends FormBase{
 
 
     $flag = $form['#flag'];
-    $flag->form_input($form_values);
-    $errors = $flag->validate();
+// @todo: Move this into the flag controller here.
+//    $errors = $flag->validate();
     foreach ($errors as $field => $field_errors) {
       foreach ($field_errors as $error) {
         form_set_error($field, $error['message']);
@@ -328,17 +332,17 @@ class FlagAddForm extends FormBase{
     }
   }
 
-  public function submitForm(array &$form, array &$form_state) {
-    $flag = $form['#flag'];
+  public function save(array $form, array &$form_state) {
+    $flag = $this->entity;
 
     $form_state['values']['title'] = trim($form_state['values']['title']);
-    $flag->form_input($form_state['values']);
 
-    $flag->save();
-    $flag->enable();
+    $status = $flag->save();
+//    $flag->enable();
     drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
+
     // We clear caches more vigorously if the flag was new.
-    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
+//    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 
     // Save permissions.
     // This needs to be done after the flag cache has been cleared, so that
@@ -354,7 +358,7 @@ class FlagAddForm extends FormBase{
         user_role_revoke_permissions($rid, $permissions);
       }
     }
-
+/*
     foreach (array_keys(user_roles(!module_exists('session_api'))) as $rid) {
       // Create an array of permissions, based on the checkboxes element name.
       $permissions = array(
@@ -363,9 +367,14 @@ class FlagAddForm extends FormBase{
       );
       user_role_change_permissions($rid, $permissions);
     }
+*/
     // @todo: when we add database caching for flags we'll have to clear the
     // cache again here.
 
     $form_state['redirect'] = FLAG_ADMIN_PATH;
+  }
+
+  public function delete(array $form, array &$form_state) {
+    $form_state['redirect'] = 'admin/structure/flag';
   }
 }
