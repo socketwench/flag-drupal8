@@ -25,6 +25,12 @@ use Drupal\flag\FlagInterface;
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\flag\Controller\FlagListController",
+ *     "form" = {
+ *       "add" = "Drupal\flag\Form\FlagAddForm",
+ *       "edit" = "Drupal\flag\Form\FlagAddForm",
+ *       "delete" = "Drupal\flag\Form\FlagAddForm"
+ *     }
+
  *   },
  *   config_prefix = "flag.flag",
  *   entity_keys = {

@@ -22,7 +22,7 @@ flag.flag_list:
 flag_add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
-    _form: '\Drupal\flag\Form\FlagAddForm'
+    _entity_form: flag_flag.add
   requirements:
     _permission: 'administer flags'
 
