@@ -67,13 +67,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public $entity_type = NULL;
 
   /**
-   * The flag's "machine readable" name.
-   *
-   * @var string
-   */
-  public $name = '';
-
-  /**
    * The flag label.
    *
    * @var string
@@ -86,6 +79,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * @var bool
    */
   public $is_global = FALSE;
+
+  /**
+   * Whether this flag is enabled.
+   *
+   * @var bool
+   */
+  public $enabled = TRUE;
 
   /**
    * The sub-types, AKA bundles, this flag applies to.
@@ -158,5 +158,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * @var int
    */
   public $weight = 0;
+
+  public function enable() {
+    $this->enabled = TRUE;
+  }
+
+  public function disable() {
+    $this->enabled = FALSE;
+  }
 
 } 

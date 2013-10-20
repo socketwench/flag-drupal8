@@ -1,9 +1,9 @@
-flag_settings:
-  path: '/admin/structure/flags'
-  defaults:
-    _content: '\Drupal\flag\Controller\FlagAdminController::content'
-  requirements:
-    _permission: 'administer flags'
+#flag_settings:
+#  path: '/admin/structure/flags'
+#  defaults:
+#    _content: '\Drupal\flag\Controller\FlagAdminController::content'
+#  requirements:
+#    _permission: 'administer flags'
 
 flag_add_page:
   path: '/admin/structure/flags/add'
@@ -13,7 +13,7 @@ flag_add_page:
     _permission: 'administer flags'
 
 flag.flag_list:
-  path: '/admin/structure/flagz/add'
+  path: '/admin/structure/flags'
   defaults:
     _entity_list: 'flag_flag'
   requirements:

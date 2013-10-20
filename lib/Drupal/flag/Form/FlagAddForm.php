@@ -13,8 +13,8 @@ use Drupal\flag\Handlers\AbstractFlag;
 
 class FlagAddForm extends EntityFormController {
 
-  public function form(array $form, array &$form_state, $entity_type = NULL) {
-    $form = parent::form($form, $form_state);
+  public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
+    $form = parent::buildForm($form, $form_state);
 
     $flag = $this->entity; //\Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
 
@@ -25,29 +25,28 @@ class FlagAddForm extends EntityFormController {
 
 
     $form['#flag'] = $flag;
-    $form['#flag_name'] = $flag->name;
+    $form['#flag_name'] = $flag->id;
 
-    $form['title'] = array(
+    $form['label'] = array(
       '#type' => 'textfield',
-      '#title' => t('Title'),
-      '#default_value' => $flag->title,
+      '#title' => t('Label'),
+      '#default_value' => $flag->label(),
       '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
       '#maxlength' => 255,
       '#required' => TRUE,
       '#weight' => -3,
     );
 
-    $form['name'] = array(
+    $form['id'] = array(
       '#type' => 'machine_name',
       '#title' => t('Machine name'),
-      '#default_value' => $flag->name,
+      '#default_value' => $flag->id(),
       '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
-      '#maxlength' => 32,
       '#weight' => -2,
       '#machine_name' => array(
-        'exists' => 'flag_get_flag',
-        'source' => array('title'),
+        'exists' => 'flag_load_by_id',
       ),
+      '#disabled' => !$flag->isNew(),
     );
 
     $form['global'] = array(
@@ -61,11 +60,11 @@ class FlagAddForm extends EntityFormController {
     // there are too many unpleasant consequences in either direction.
     // @todo: Allow this, but with a confirmation form, assuming anyone actually
     // needs this feature.
-    if (!empty($flag->id) && flag_get_flag_counts($flag->name)) {
+/*    if (!empty($flag->id) && flag_get_flag_counts($flag->id)) {
       $form['global']['#disabled'] = TRUE;
       $form['global']['#description'] .= '<br />' . t('This setting cannot be changed when flaggings exist for this flag.');
     }
-
+*/
     $form['messages'] = array(
       '#type' => 'fieldset',
       '#title' => t('Messages'),
@@ -141,11 +140,17 @@ class FlagAddForm extends EntityFormController {
       '#weight' => 10,
     );
 
+    $bundles = entity_get_bundles($entity_type);
+    $entity_bundles = array();
+    foreach ($bundles as $bundle_id => $bundle_row) {
+      $entity_bundles[$bundle_id] = $bundle_row['label'];
+    }
+
     // Flag classes will want to override this form element.
     $form['access']['types'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Flaggable types'),
-      '#options' => array(),
+      '#options' => $entity_bundles,
       '#default_value' => $flag->types,
       '#description' => t('Check any sub-types that this flag may be used on.'),
       '#required' => TRUE,
@@ -221,7 +226,7 @@ class FlagAddForm extends EntityFormController {
       '#tree' => FALSE,
       '#weight' => 20,
       // @todo: Move flag_link_type_options_states() into controller?
-      '#after_build' => array('flag_link_type_options_states'),
+//      '#after_build' => array('flag_link_type_options_states'),
     );
 
     $form['display']['link_type'] = array(
@@ -229,7 +234,7 @@ class FlagAddForm extends EntityFormController {
       '#title' => t('Link type'),
       '#options' => _flag_link_type_options(),
       // @todo: Move flag_check_link_types into controller?
-      '#after_build' => array('flag_check_link_types'),
+//      '#after_build' => array('flag_check_link_types'),
       '#default_value' => $flag->link_type,
       // Give this a high weight so additions by the flag classes for entity-
       // specific options go above.
@@ -265,7 +270,7 @@ class FlagAddForm extends EntityFormController {
       '#id' => 'link-options-confirm',
       '#weight' => 21,
     );
-/*
+
     $form['display']['link_options_confirm']['flag_confirmation'] = array(
       '#type' => 'textfield',
       '#title' => t('Flag confirmation message'),
@@ -279,18 +284,6 @@ class FlagAddForm extends EntityFormController {
       '#default_value' => isset($flag->unflag_confirmation) ? $flag->unflag_confirmation : '',
       '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
     );
-*/
-    $form['actions'] = array(
-      '#type' => 'actions',
-    );
-
-    $form['actions']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save flag'),
-      // We put this button on the form before calling $flag->options_form()
-      // to give the flag handler a chance to remove it (e.g. flag_broken).
-      '#weight' => 999,
-    );
 
     // Add our process handler to disable access to locked properties.
     //@todo: Fix reference to flag_form_locked_process, or replace entirely.
@@ -303,13 +296,19 @@ class FlagAddForm extends EntityFormController {
     return $form;
   }
 
+  protected function actions(array $form, array &$form_state) {
+    $actions = parent::actions($form, $form_state);
+    $actions['submit']['#value'] = t('Save Flag');
+    return $actions;
+  }
+
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::validate().
    */
   public function validate(array $form, array &$form_state) {
     parent::validate($form, $form_state);
 
-    $form_state['values']['title'] = trim($form_state['values']['title']);
+    $form_state['values']['label'] = trim($form_state['values']['label']);
     $form_values = $form_state['values'];
 
     if ($form_values['link_type'] == 'confirm') {
@@ -320,26 +319,32 @@ class FlagAddForm extends EntityFormController {
         form_set_error('unflag_confirmation', t('An unflag confirmation message is required when using the confirmation link type.'));
       }
     }
-
-
-    $flag = $form['#flag'];
-// @todo: Move this into the flag controller here.
-//    $errors = $flag->validate();
-    foreach ($errors as $field => $field_errors) {
-      foreach ($field_errors as $error) {
-        form_set_error($field, $error['message']);
-      }
+/*
+    if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_values['id'])) {
+      form_set_error('label', t('The flag name may only contain lowercase letters, underscores, and numbers.'));
     }
+*/
   }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   */
   public function save(array $form, array &$form_state) {
     $flag = $this->entity;
 
     $form_state['values']['title'] = trim($form_state['values']['title']);
 
+    $flag->enable();
     $status = $flag->save();
-//    $flag->enable();
-    drupal_set_message(t('Flag @title has been saved.', array('@title' => $flag->get_title())));
+    $uri = $flag->uri();
+    if ($status == SAVED_UPDATED) {
+      drupal_set_message(t('Flag %label has been updated.', array('%label' => $flag->label())));
+      watchdog('flag', 'Flag %label has been updated.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $uri['path'] . '/edit'));
+    }
+    else {
+      drupal_set_message(t('Flag %label has been added.', array('%label' => $flag->label())));
+      watchdog('flag', 'Flag %label has been added.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $uri['path'] . '/edit'));
+    }
 
     // We clear caches more vigorously if the flag was new.
 //    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
@@ -351,7 +356,7 @@ class FlagAddForm extends EntityFormController {
     // for different flag types: http://drupal.org/node/879988
 
     // If the flag machine name as changed, clean up all the obsolete permissions.
-    if ($flag->name != $form['#flag_name']) {
+    if ($flag->id != $form['#flag_name']) {
       $old_name = $form['#flag_name'];
       $permissions = array("flag $old_name", "unflag $old_name");
       foreach (array_keys(user_roles()) as $rid) {
@@ -371,9 +376,12 @@ class FlagAddForm extends EntityFormController {
     // @todo: when we add database caching for flags we'll have to clear the
     // cache again here.
 
-    $form_state['redirect'] = FLAG_ADMIN_PATH;
+    $form_state['redirect'] = 'admin/structure/flags';
   }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::delete().
+   */
   public function delete(array $form, array &$form_state) {
     $form_state['redirect'] = 'admin/structure/flag';
   }
