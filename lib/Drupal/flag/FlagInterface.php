@@ -14,4 +14,8 @@ interface FlagInterface extends ConfigEntityInterface {
 
   // todo: Add getters and setters as necessary.
 
+  public function enable();
+
+  public function disable();
+
 } 

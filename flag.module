@@ -183,12 +183,13 @@ function flag_menu() {
 
   $items[FLAG_ADMIN_PATH] = array(
     'title' => 'Flags',
-    'route_name' => 'flag_settings',
+ //   'route_name' => 'flag_settings',
     'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
-  );
-  $items[FLAG_ADMIN_PATH . '/list'] = array(
-    'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+//  );
+//  $items[FLAG_ADMIN_PATH . '/list'] = array(
+//    'title' => 'List',
+//    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'route_name' => 'flag.flag_list',
     'weight' => -10,
   );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
@@ -1793,6 +1794,10 @@ function flag_get_flag($name = NULL, $fid = NULL) {
   return FALSE;
 }
 
+function flag_load_by_id($id) {
+  return entity_load('flag_flag', $id);
+}
+
 /**
  * List all flags available.
  *
@@ -1811,6 +1816,8 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
+  return entity_load_multiple('flag_flag');
+/**
   $flags = &drupal_static(__FUNCTION__);
 
   // Retrieve a list of all flags, regardless of the parameters.
@@ -1889,6 +1896,7 @@ function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account =
   }
 
   return $filtered_flags;
+ */
 }
 
 /**
