@@ -372,7 +372,7 @@ function flag_load($flag_name, $include_disabled = FALSE) {
  */
 function _flag_menu_title($flag) {
   // The following conditional it to handle a D7 bug (@todo: link).
-  return $flag ? $flag->get_title() : '';
+  return $flag ? $flag->label : '';
 }
 
 /**

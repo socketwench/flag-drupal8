@@ -30,13 +30,16 @@ use Drupal\flag\FlagInterface;
  *       "edit" = "Drupal\flag\Form\FlagAddForm",
  *       "delete" = "Drupal\flag\Form\FlagAddForm"
  *     }
-
  *   },
+ *   bundle_of = "flagging",
  *   config_prefix = "flag.flag",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
  *     "uuid" = "uuid"
+ *   },
+ *   links = {
+ *     "edit-form" = "admin/structure/flags/manage/{flag_flag}"
  *   }
  * )
  *
