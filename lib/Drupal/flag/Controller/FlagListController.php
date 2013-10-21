@@ -17,10 +17,25 @@ class FlagListController extends ConfigEntityListController {
    * Overrides Drupal\Core\Entity\EntityListController::buildHeader().
    */
   public function buildHeader() {
-    $header['id'] = t('ID');
-    $header['label'] = t('Label');
+//    $header['id'] = t('Flag');
+    $header['label'] = t('Flag');
+    $header['roles'] = t('Roles');
+    $header['is_global'] = t('Global?');
 
     return $header + parent::buildHeader();
+  }
+
+  /**
+   * Overrides Drupal\Core\Entity\EntityListController::buildRow().
+   */
+  public function buildRow(EntityInterface $entity) {
+    $row['label'] = $this->getLabel($entity);
+
+    $row['roles'] = '&nbsp;';
+
+    $row['is_global'] = $entity->is_global ? t('Yes') : t('No');
+
+    return $row + parent::buildRow($entity);
   }
 
   public function render() {
@@ -65,15 +80,6 @@ class FlagListController extends ConfigEntityListController {
     );
 
     return $build;
-  }
-
-  /**
-   * Overrides Drupal\Core\Entity\EntityListController::buildRow().
-   */
-  public function buildRow(EntityInterface $entity) {
-    $row['label'] = $this->getLabel($entity);
-
-    return $row + parent::buildRow($entity);
   }
 
 } 

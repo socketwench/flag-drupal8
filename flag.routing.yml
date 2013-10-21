@@ -1,10 +1,3 @@
-#flag_settings:
-#  path: '/admin/structure/flags'
-#  defaults:
-#    _content: '\Drupal\flag\Controller\FlagAdminController::content'
-#  requirements:
-#    _permission: 'administer flags'
-
 flag_add_page:
   path: '/admin/structure/flags/add'
   defaults:
@@ -23,6 +16,13 @@ flag_add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
     _entity_form: flag_flag.add
+  requirements:
+    _permission: 'administer flags'
+
+flag_edit:
+  path: '/admin/structure/flags/manage/{entity_type}'
+  defaults:
+    _entity_form: flag_flag.edit
   requirements:
     _permission: 'administer flags'
 

@@ -12,7 +12,7 @@ use Drupal\Component\Annotation\Plugin;
 
 
 /**
- * Defines a Tip annotation object.
+ * Defines a Flag annotation object.
  *
  * @Annotation
  */
