@@ -1,4 +1,4 @@
 services:
-  plugin.manager.flag.flag:
-    class: Drupal\Flag\FlagPluginManager
+  plugin.manager.flag.flagtype:
+    class: Drupal\Flag\FlagTypePluginManager
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
