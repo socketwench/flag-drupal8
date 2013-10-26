@@ -13,10 +13,10 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
-class FlagPluginManager extends DefaultPluginManager {
+class FlagTypePluginManager extends DefaultPluginManager {
 
   /**
-   * Constructs a new FlagPluginManager.
+   * Constructs a new FlagTypePluginManager.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths

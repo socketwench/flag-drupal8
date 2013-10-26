@@ -11,16 +11,15 @@ namespace Drupal\flag\Plugin\Flag;
 use Drupal\core\Plugin\PluginBase;
 
 /**
- * Class FlagBase
+ * Class FlagTypeBase
  * @package Drupal\flag\Plugin\Flag
  *
  * @Flag{
- *   id = "flag_base",
- *   title = @Translation("Flag"),
- *   derivative = "Drupal\flag\Plugin\Derivative\FlagBase"
+ *   id = "flagtype_base",
+ *   title = @Translation("Flag Type"),
  * }
  */
-class FlagBase extends PluginBase{
+class FlagTypeBase extends PluginBase{
 
   /**
    * {@inheritdoc}
