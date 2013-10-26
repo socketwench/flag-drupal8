@@ -12,11 +12,11 @@ use Drupal\Component\Annotation\Plugin;
 
 
 /**
- * Defines a Flag annotation object.
+ * Defines a FlagType annotation object.
  *
  * @Annotation
  */
-class Flag extends Plugin {
+class FlagType extends Plugin {
 
   /**
    * The plugin ID.
@@ -33,15 +33,5 @@ class Flag extends Plugin {
    * @ingroup plugin_translatable
    */
   public $title;
-
-
-  /**
-   * A class to make the plugin derivative aware.
-   *
-   * @var string
-   *
-   * @see \Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator
-   */
-  public $derivative;
 
 }
