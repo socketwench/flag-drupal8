@@ -8,6 +8,7 @@
 
 namespace Drupal\flag\Entity;
 
+use Drupal\Component\Plugin\DefaultSinglePluginBag;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
@@ -161,6 +162,17 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * @var int
    */
   public $weight = 0;
+
+  protected $typesBag;
+
+  /**
+   * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
+   */
+  public function __construct(array $values, $entity_type) {
+    parent::__construct($values, $entity_type);
+
+    $this->typesBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'), $this->types, array());
+  }
 
   public function enable() {
     $this->enabled = TRUE;

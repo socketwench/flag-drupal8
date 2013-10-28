@@ -29,9 +29,9 @@ class FlagTypePluginManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/Flag/FlagBase', $namespaces, 'Drupal\flag\Annotation\Flag');
+    parent::__construct('Plugin/Flag/FlagTypeBase', $namespaces, 'Drupal\flag\Annotation\FlagType');
 
-//    $this->alterInfo($module_handler, 'tour_tips_info');
+//    $this->alterInfo($module_handler, 'flag_type_info');
     $this->setCacheBackend($cache_backend, $language_manager, 'tour');
   }
 
