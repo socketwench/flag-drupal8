@@ -22,7 +22,7 @@ class FlagAddPageForm extends FormBase{
 
   public function buildForm(array $form, array &$form_state) {
     $types = array();
-    // @todo Convert to a Drupal service?
+    // @todo Use \Drupal::service() to get a list of FlagType plugins.
     foreach (flag_fetch_definition() as $type => $info) {
       $types[$type] = $info['title'] . '<div class="description">' . $info['description'] . '</div>';
     }
