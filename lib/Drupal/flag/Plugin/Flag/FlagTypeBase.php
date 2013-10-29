@@ -14,10 +14,10 @@ use Drupal\core\Plugin\PluginBase;
  * Class FlagTypeBase
  * @package Drupal\flag\Plugin\Flag
  *
- * @Flag{
+ * @FlagType(
  *   id = "flagtype_base",
- *   title = @Translation("Flag Type"),
- * }
+ *   title = @Translation("Flag Type Base")
+ * )
  */
 class FlagTypeBase extends PluginBase {
 
@@ -25,6 +25,7 @@ class FlagTypeBase extends PluginBase {
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
+    $configuration += $this->options();
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -36,10 +37,12 @@ class FlagTypeBase extends PluginBase {
    * Declares the options this flag supports, and their default values.
    *
    * Derived classes should want to override this.
-   *//*
+   *
+   * @todo Rename to defaultConfiguration()?
+   */
   public function options() {
-
-  }*/
+    return array();
+  }
 
   /**
    * Provides a form for setting options.
