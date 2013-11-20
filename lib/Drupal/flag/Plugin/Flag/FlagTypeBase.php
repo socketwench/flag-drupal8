@@ -49,8 +49,18 @@ class FlagTypeBase extends PluginBase {
    *
    * Derived classes should want to override this.
    */
-  public function optionsForm(&$form) {
+  public function buildConfigurationForm(array $form, array &$form_state) {
+    return $form;
+  }
 
+/**
+ * Handles the form submit for this plugin.
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+public function submitConfigurationForm(array &$form, array &$form_state) {
+    // Override this
   }
 
   /**

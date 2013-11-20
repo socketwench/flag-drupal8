@@ -193,7 +193,6 @@ function flag_menu() {
     'weight' => -10,
   );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
-    'title' => 'Add flag',
     'route_name' => 'flag_add_page',
     'type' => MENU_SIBLING_LOCAL_TASK,
     'weight' => 1,
@@ -693,9 +692,10 @@ function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
  * @see flag_field_attach_submit().
  */
 function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
-  list($id) = entity_extract_ids($entity_type, $entity);
+  $id = $entity->id;
+
   // Some modules are being stupid here. Commerce!
-  if (empty($id)) {
+  if (empty($entity->id)) {
     $id = NULL;
   }
 
@@ -846,6 +846,7 @@ function flag_field_attach_save($entity_type, $entity) {
  * Implements hook_contextual_links_view_alter().
  */
 function flag_contextual_links_view_alter(&$element, $items) {
+/*
   if (isset($element['#element']['#entity_type'])) {
     $entity_type = $element['#element']['#entity_type'];
 
@@ -884,7 +885,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
         'html' => TRUE,
       );
     }
-  }
+  }*/
 }
 
 /**
@@ -897,9 +898,35 @@ function flag_contextual_links_view_alter(&$element, $items) {
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
   // Get all possible flags for this entity type.
   $flags = flag_get_flags($type);
+
+  foreach ($flags as $flag) {
+
+    if($flag->isFlagged()) {
+      $action_link_url = "/unflag";
+    }
+    else {
+      $action_link_url = "/flag";
+    }
+
+    $action_link_url .= "/" . $flag->id . "/" . $entity->id();
+
+    $entity->content['flag_' . $flag->id] = array(
+      '#markup' => '<div>' . l($flag->flag_short, $action_link_url) . '</div>',
+      '#weight' => 10,
+    );
+/*
+    $links = array(
+      '#prefix' => '<div>',
+      '#markup' => l($flag->flag_short, $action_link_url),
+      '#suffix' => '</div>',
+    );
+*/
+  }
+
+  /**
   foreach ($flags as $flag) {
     // Check if the flag outputs on entity view.
-    if (!($flag->show_as_field || $flag->shows_in_entity_links($view_mode))) {
+    if (!($flag->show_as_field)) { //} || $flag->shows_in_entity_links($view_mode))) {
       // Flag is not configured to output on entity view, so skip it to save on
       // calls to access checks.
       continue;
@@ -928,7 +955,7 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
       // The flag links are actually fully rendered theme functions.
       // The HTML attribute is set to TRUE to allow whatever the themer desires.
       $links['flag-' . $flag->name] = array(
-        'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
+        'title' => $flag->flag_short, //theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
         'html' => TRUE,
       );
     }
@@ -940,15 +967,11 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
       );
     }
   }
-
+  */
   // If any links were made, add them to the entity's links array.
-  if (isset($links)) {
-    $entity->content['links']['flag'] = array(
-      '#theme' => 'links',
-      '#links' => $links,
-      '#attributes' => array('class' => array('links', 'inline')),
-    );
-  }
+//  if (isset($links)) {
+//    $entity->content['links']['flag'] = $links;
+ // }
 }
 
 /**
