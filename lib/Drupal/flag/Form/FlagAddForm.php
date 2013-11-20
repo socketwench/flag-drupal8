@@ -332,7 +332,7 @@ class FlagAddForm extends EntityFormController {
   public function save(array $form, array &$form_state) {
     $flag = $this->entity;
 
-    $form_state['values']['title'] = trim($form_state['values']['title']);
+    $form_state['values']['label'] = trim($form_state['values']['label']);
 
     $flag->enable();
     $status = $flag->save();

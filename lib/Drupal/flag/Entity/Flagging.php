@@ -23,10 +23,9 @@ use Drupal\flag\FlaggingInterface;
  *  label = @Translation("Flagging"),
  *  module = "flag",
  *  controllers = {
- *    "storage" = "FieldableDatabaseStorageController",
- *    "form" = {
- *    }
+ *    "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *  },
+ *  base_table = "flagging",
  *  fieldable = TRUE,
  *  entity_keys = {
  *    "id" = "id",

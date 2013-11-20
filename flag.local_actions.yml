@@ -1,0 +1,5 @@
+flag_add_page_action:
+  route_name: flag_add_page
+  title: 'Add New Flag'
+  appears_on:
+    - flag.flag_list
