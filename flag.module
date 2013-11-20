@@ -217,7 +217,7 @@ function flag_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 3,
   );
-
+/*
   $items[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
     'load arguments' => array(TRUE), // Allow for disabled flags.
     'page callback' => 'drupal_get_form',
@@ -263,7 +263,7 @@ function flag_menu() {
     'file' => 'includes/flag.export.inc',
     'type' => MENU_CALLBACK,
   );
-
+*/
   $items['flag/%/%flag/%'] = array(
     'title' => 'Flag',
     'page callback' => 'flag_page',
@@ -1463,7 +1463,7 @@ function flag_flag_access_multiple($flag, $entity_ids, $account) {
 
 /**
  * Implements hook_theme().
- */
+ *//*
 function flag_theme() {
   $path = drupal_get_path('module', 'flag') . '/theme';
 
@@ -1513,7 +1513,7 @@ function flag_theme() {
     ),
   );
 }
-
+*/
 /**
  * A preprocess function for our theme('flag'). It generates the
  * variables needed there.
