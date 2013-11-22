@@ -33,6 +33,18 @@ class EntityFlagType extends FlagTypeBase {
 
   public $show_contextual_link;
 
+  public static function entityTypes() {
+    $entity_types = array();
+    foreach (entity_get_info() as $entity_id => $entity_info) {
+      $entity_types[$entity_id] = array(
+        'title' => $entity_info['label'],
+        'description' => t('@entity-type entity', array('@entity-type' => $entity_info['label'])),
+      );
+    }
+
+    return $entity_types;
+  }
+
   function options() {
     $options = parent::options();
     $options += array(

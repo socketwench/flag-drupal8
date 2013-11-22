@@ -25,6 +25,15 @@ class UserFlagType extends FlagTypeBase {
 
   public $show_on_profile;
 
+  public static function entityTypes() {
+    return array(
+      'user' => array(
+        'title' => t('Users'),
+        'description' => t('Users who have created accounts on your site.'),
+      ),
+    );
+  }
+
   function options() {
     $options = parent::options();
     $options += array(

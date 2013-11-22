@@ -8,7 +8,7 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
-use Drupal\core\Plugin\PluginBase;
+use Drupal\Component\Plugin\PluginBase;
 
 /**
  * Class FlagTypeBase
@@ -19,7 +19,7 @@ use Drupal\core\Plugin\PluginBase;
  *   title = @Translation("Flag Type Base")
  * )
  */
-class FlagTypeBase extends PluginBase {
+abstract class FlagTypeBase extends PluginBase {
 
   /**
    * {@inheritdoc}
@@ -29,8 +29,8 @@ class FlagTypeBase extends PluginBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
-  public funciton flag() {
-
+  public static function entityTypes() {
+    return array();
   }
 
   /**

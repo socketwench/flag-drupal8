@@ -25,6 +25,15 @@ class CommentFlagType extends EntityFlagType {
 
   public $access_author;
 
+  public static function entityTypes() {
+    return array(
+      'comment' => array(
+        'title' => t('Comments'),
+        'description' => t('Comments are responses to node content.'),
+      ),
+    );
+  }
+
   public function options() {
     $options = parent::options();
     $options += array(
