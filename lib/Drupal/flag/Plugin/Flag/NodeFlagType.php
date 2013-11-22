@@ -25,6 +25,15 @@ class NodeFlagType extends EntityFlagType {
 
   public $access_author;
 
+  public static function entityTypes() {
+    return array(
+      'node' => array(
+        'title' => t('Nodes'),
+        'description' => t("Nodes are a Drupal site's primary content."),
+      ),
+    );
+  }
+
   public function options() {
     $options = parent::options();
     // Use own display settings in the meanwhile.

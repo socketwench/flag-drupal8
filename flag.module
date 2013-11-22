@@ -12,111 +12,6 @@ define('FLAG_ADMIN_PATH_START', 3);
 
 use Drupal\flag\Handlers\AbstractFlag;
 
-/**
- * Implements hook_entity_info().
- */
-function flag_entity_info() {
-  $return = array(
-    'flagging' => array(
-      'label' => t('Flagging'),
-      'controller class' => 'FlaggingController',
-      'base table' => 'flagging',
-      'fieldable' => TRUE,
-      'entity keys' => array(
-        'id' => 'flagging_id',
-        'bundle' => 'flag_name',
-      ),
-      // The following tells Field UI how to extract the bundle name from a
-      // $flag object when we're visiting ?q=admin/.../manage/%flag/fields.
-      'bundle keys' => array(
-        'bundle' => 'name',
-      ),
-      'bundles' => array(),
-      // The following tells EntityAPI how to save flaggings, thus allowing use
-      // of Entity metadata wrappers (if present).
-      'save callback' => 'flagging_save',
-    ),
-  );
-
-  // Add bundle info but bypass flag_get_flags() as we cannot use it here, as
-  // it calls entity_get_info().
-  $result = db_query("SELECT name, title FROM {flag}");
-  $flag_names = $result->fetchAllKeyed();
-  foreach ($flag_names as $flag_name => $flag_title) {
-    $return['flagging']['bundles'][$flag_name] = array(
-      'label' => $flag_title,
-      'admin' => array(
-        'path' => FLAG_ADMIN_PATH . '/manage/%flag',
-        'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag_name,
-        'bundle argument' => FLAG_ADMIN_PATH_START + 1,
-        'access arguments' => array('administer flags'),
-      ),
-    );
-  }
-
-  return $return;
-}
-
-/**
- * Loads a flagging entity.
- *
- * @param $flagging_id
- *   The 'flagging_id' database serial column.
- * @param $reset
- *   Whether to reset the DrupalDefaultEntityController cache.
- *
- * @return
- *   The entity object, or FALSE if it can't be found.
- */
-function flagging_load($flagging_id, $reset = FALSE) {
-  // The flag machine name is loaded in by FlaggingController::buildQuery().
-  $result = entity_load('flagging', array($flagging_id), array(), $reset);
-  return reset($result);
-}
-
-/**
- * Saves a flagging entity.
- *
- * For a new flagging, throws an exception is the flag action is not allowed for
- * the given combination of flag, entity, and user.
- *
- * @param $flagging
- *   The flagging entity. This may have either flag_name or the flag fid set,
- *   and may also omit the uid property to use the current user.
- *
- * @throws Exception
- */
-function flagging_save($flagging) {
-  // Get the flag, either way.
-  if (isset($flagging->flag_name)) {
-    $flag = flag_get_flag($flagging->flag_name);
-  }
-  else {
-    $flag = flag_get_flag(NULL, $flagging->fid);
-  }
-
-  if (!$flag) {
-    throw new Exception('Flag not found for flagging entity.');
-  }
-
-  // Fill in properties that may be omitted.
-  $flagging->fid = $flag->fid;
-  $flagging->flag_name = $flag->name;
-
-  if (!empty($flagging->uid)) {
-    $account = user_load($flagging->uid);
-  }
-  else {
-    $account = NULL;
-  }
-
-  $result = $flag->flag('flag', $flagging->entity_id, $account, FALSE, $flagging);
-
-  if (!$result) {
-    throw new Exception('Flag action not allowed for given flagging entity properties.');
-  }
-}
-
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
 // @todo: When renaming a flag: Call field_attach_rename_bundle().
@@ -263,7 +158,6 @@ function flag_menu() {
     'file' => 'includes/flag.export.inc',
     'type' => MENU_CALLBACK,
   );
-*/
   $items['flag/%/%flag/%'] = array(
     'title' => 'Flag',
     'page callback' => 'flag_page',
@@ -282,7 +176,7 @@ function flag_menu() {
     'file' => 'includes/flag.pages.inc',
     'type' => MENU_CALLBACK,
   );
-
+*/
   return $items;
 }
 
@@ -443,34 +337,6 @@ function flag_help($path, $arg) {
 
       return $output;
   }
-}
-
-/**
- * Implements hook_init()
- *
- * @todo Figure out where Rules module, see https://drupal.org/node/1211396
- */
-function flag_init() {
-  module_load_include('inc', 'flag', 'includes/flag.actions');
-}
-
-/**
- * Implements hook_hook_info().
- */
-function flag_hook_info() {
-  $hooks['flag_type_info'] = array(
-    'group' => 'flag',
-  );
-  $hooks['flag_type_info_alter'] = array(
-    'group' => 'flag',
-  );
-  $hooks['flag_link_type_info'] = array(
-    'group' => 'flag',
-  );
-  $hooks['flag_link_type_info_alter'] = array(
-    'group' => 'flag',
-  );
-  return $hooks;
 }
 
 /**
