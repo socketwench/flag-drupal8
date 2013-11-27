@@ -18,7 +18,8 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  *
  * @FlagType(
  *   id = "flagtype_entity",
- *   title = @Translation("Flag Type Entity")
+ *   title = @Translation("Flag Type Entity"),
+ *   derivative = "Drupal\flag\Plugin\Derivative\EntityFlagType"
  * )
  */
 class EntityFlagType extends FlagTypeBase {
@@ -33,7 +34,12 @@ class EntityFlagType extends FlagTypeBase {
 
   public $show_contextual_link;
 
-  public static function entityTypes() {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
+    array_push($this->types, $plugin_definition['entity']);
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+    public static function entityTypes() {
     $entity_types = array();
     foreach (entity_get_info() as $entity_id => $entity_info) {
       $entity_types[$entity_id] = array(

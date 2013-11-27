@@ -14,6 +14,7 @@ use Drupal\flag\Handlers\AbstractFlag;
 class FlagAddForm extends EntityFormController {
 
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
+    //@todo Check all non-form_* params with check_plain().
     $form = parent::buildForm($form, $form_state);
 
     $flag = $this->entity; //\Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);

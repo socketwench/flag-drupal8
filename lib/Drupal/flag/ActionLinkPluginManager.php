@@ -26,4 +26,13 @@ class ActionLinkPluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, $language_manager, 'flag_link_type_info');
   }
 
+  public function getAllLinkTypes() {
+    $linkTypes = array();
+    foreach($this->getDefinitions() as $pluginID => $pluginDef) {
+      $linkTypes[$pluginID] = t($pluginDef['label']);
+    }
+
+    return $linkTypes;
+  }
+
 }
