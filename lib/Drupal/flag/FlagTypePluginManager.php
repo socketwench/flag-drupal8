@@ -35,4 +35,14 @@ class FlagTypePluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, $language_manager, 'flag');
   }
 
+  public function getAllFlagTypes() {
+    $flagTypes = array();
+
+    foreach ($this->getDefinitions() as $pluginID => $pluginDef) {
+      $flagTypes[$pluginID] = t($pluginDef['title']);
+    }
+
+    return $flagTypes;
+  }
+
 } 

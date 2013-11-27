@@ -21,11 +21,59 @@ class FlagAddPageForm extends FormBase{
    }
 
   public function buildForm(array $form, array &$form_state) {
+
+    $form['flag_basic_info'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Flag basic info'),
+      '#collapsable' => FALSE,
+      '#weight' => -10,
+    );
+    $form['flag_basic_info']['label'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Label'),
+      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
+      '#maxlength' => 255,
+      '#required' => TRUE,
+      '#weight' => -3,
+    );
+    $form['flag_basic_info']['id'] = array(
+      '#type' => 'machine_name',
+      '#title' => t('Machine name'),
+      '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
+      '#weight' => -2,
+      '#machine_name' => array(
+        'exists' => 'flag_load_by_id',
+        'source' => array('flag_basic_info', 'label'),
+      ),
+    );
+
+    $form['flag_type_info'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Type and Action'),
+      '#attributes' => array(
+        'class' => array('container-inline'),
+      ),
+    );
+
+    $form['flag_type_info']['flag_entity_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Flag'),
+      '#options' => \Drupal::service('plugin.manager.flag.flagtype')->getAllFlagTypes(),
+    );
+
+    $form['flag_type_info']['flag_link_type'] = array(
+      '#type' => 'select',
+      '#title' => t('using'),
+      '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
+    );
+
     $types = array();
     // @todo Use \Drupal::service() to get a list of FlagType plugins.
 
     $plugins = \Drupal::service('plugin.manager.flag.flagtype')->getDefinitions();
 
+//    print_r($plugins);
+/*
     foreach ($plugins as $type => $plugin) {
       $class = $plugin['class'];
       foreach ($class::entityTypes() as $entityID => $info) {
@@ -41,7 +89,7 @@ class FlagAddPageForm extends FormBase{
       '#required' => TRUE,
       '#options' => $types,
     );
-
+*/
     $form['actions'] = array(
       '#type' => 'actions',
     );
