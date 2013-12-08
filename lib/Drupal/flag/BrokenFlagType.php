@@ -6,7 +6,7 @@
  * Time: 8:34 PM
  */
 
-namespace Drupal\flag\Plugin\Flag;
+namespace Drupal\flag;
 
 use Drupal\flag\Plugin\Flag\FlagTypeBase;
 
