@@ -16,7 +16,7 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  *
  * @FlagType(
  *   id = "flagtype_user",
- *   title = @Translation("Flag Type User"),
+ *   title = @Translation("User"),
  *   entity = "user"
  * )
  */

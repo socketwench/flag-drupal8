@@ -21,7 +21,7 @@ class EntityFlagType extends DerivativeBase {
     $derivatives = array();
     foreach (entity_get_info() as $entity_id => $entity_info) {
       $derivatives[$entity_id] = array(
-        'title' => $entity_id . " flag type",
+        'title' => $entity_id,
         'entity' => $entity_id,
       ) + $base_plugin_def;
     }

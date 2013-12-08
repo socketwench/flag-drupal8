@@ -18,7 +18,7 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  *
  * @FlagType(
  *   id = "flagtype_node",
- *   title = @Translation("Flag Type Node")
+ *   title = @Translation("Content")
  * )
  */
 class NodeFlagType extends EntityFlagType {
