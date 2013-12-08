@@ -8,6 +8,7 @@
 
 namespace Drupal\flag;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 
 interface FlaggingInterface extends ContentEntityInterface {
 
