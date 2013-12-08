@@ -6,7 +6,7 @@
  * Time: 12:56 PM
  */
 
-namespace Drupal\flag\Plugin\Flag;
+namespace Drupal\flag;
 
 use Drupal\Component\Plugin\PluginBase;
 
