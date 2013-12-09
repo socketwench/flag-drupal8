@@ -67,29 +67,23 @@ class FlagAddPageForm extends FormBase{
       '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
     );
 
+    $role_options = array(0 => 'All users');
+    foreach (user_roles() as $rid => $role_info) {
+        $role_options[$rid] = $role_info->label;
+    }
+
+    $form['flag_type_info']['flag_role'] = array(
+      '#type' => 'select',
+      '#title' => t('for'),
+      '#options' => $role_options,
+      '#default' => 0,
+    );
+
     $types = array();
     // @todo Use \Drupal::service() to get a list of FlagType plugins.
 
     $plugins = \Drupal::service('plugin.manager.flag.flagtype')->getDefinitions();
 
-//    print_r($plugins);
-/*
-    foreach ($plugins as $type => $plugin) {
-      $class = $plugin['class'];
-      foreach ($class::entityTypes() as $entityID => $info) {
-        $types[$entityID] = $info['title'] . '<div class="description">' . $info['description'] . '</div>';
-      }
-    }
-
-    $form['type'] = array(
-      '#type' => 'radios',
-      '#title' => t('Flag type'),
-      '#default_value' => 'node',
-      '#description' => t('The type of object this flag will affect. This cannot be changed once the flag is created.'),
-      '#required' => TRUE,
-      '#options' => $types,
-    );
-*/
     $form['actions'] = array(
       '#type' => 'actions',
     );
@@ -110,6 +104,10 @@ class FlagAddPageForm extends FormBase{
   }
 
   public function submitForm(array &$form, array &$form_state) {
-    $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' . $form_state['values']['type'];
+    $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' .
+                              $form_state['values']['flag_entity_type'];
+
+    $tempstore = \Drupal::service('user.tempstore')->get('flag');
+    $tempstore->set('FlagAddPage', $form_state['values']);
   }
 } 

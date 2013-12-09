@@ -17,6 +17,9 @@ class FlagAddForm extends EntityFormController {
     //@todo Check all non-form_* params with check_plain().
     $form = parent::buildForm($form, $form_state);
 
+    $tempstore = \Drupal::service('user.tempstore')->get('flag');
+    $step1_form = $tempstore->get('FlagAddPage');
+
     $flag = $this->entity; //\Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
 
     // Mark the flag as new.
@@ -31,7 +34,7 @@ class FlagAddForm extends EntityFormController {
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => t('Label'),
-      '#default_value' => $flag->label(),
+      '#default_value' => $step1_form['label'],
       '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
       '#maxlength' => 255,
       '#required' => TRUE,
@@ -41,7 +44,7 @@ class FlagAddForm extends EntityFormController {
     $form['id'] = array(
       '#type' => 'machine_name',
       '#title' => t('Machine name'),
-      '#default_value' => $flag->id(),
+      '#default_value' => $step1_form['id'],
       '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
       '#weight' => -2,
       '#machine_name' => array(
@@ -57,15 +60,7 @@ class FlagAddForm extends EntityFormController {
       '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
       '#weight' => -1,
     );
-    // Don't allow the 'global' checkbox to be changed when flaggings exist:
-    // there are too many unpleasant consequences in either direction.
-    // @todo: Allow this, but with a confirmation form, assuming anyone actually
-    // needs this feature.
-/*    if (!empty($flag->id) && flag_get_flag_counts($flag->id)) {
-      $form['global']['#disabled'] = TRUE;
-      $form['global']['#description'] .= '<br />' . t('This setting cannot be changed when flaggings exist for this flag.');
-    }
-*/
+
     $form['messages'] = array(
       '#type' => 'fieldset',
       '#title' => t('Messages'),
@@ -114,26 +109,7 @@ class FlagAddForm extends EntityFormController {
       '#default_value' => $flag->unflag_message,
       '#description' => t('Message displayed after content has been unflagged. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
     );
-/*
-    $form['messages']['tokens_help'] = array(
-      '#title' => t('Token replacement'),
-      '#type' => 'fieldset',
-      '#description' =>
-      '<p>' . t('The above six texts may contain any of the tokens listed below. For example, <em>"Flag link text"</em> could be entered as:') . '</p>' .
-      theme('item_list', array(
-        'items' => array(
-          t('Add &lt;em&gt;[node:title]&lt;/em&gt; to your favorites'),
-          t('Add this [node:type] to your favorites'),
-          t('Vote for this proposal ([node:flag-vote-count] people have already done so)'),
-        ),
-        'attributes' => array('class' => 'token-examples'),
-      )) .
-      '<p>' . t('These tokens will be replaced with the appropriate fields from the node (or user, or comment).') . '</p>' .
-      theme('flag_tokens_browser', array('types' => $flag->get_labels_token_types())),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-*/
+
     $form['access'] = array(
       '#type' => 'fieldset',
       '#title' => t('Flag access'),
