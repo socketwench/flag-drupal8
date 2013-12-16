@@ -15,11 +15,6 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  * @package Drupal\flag\Plugin\Flag
  *
  * A dummy Flag Type to be used where the real implementation can't be found.
- *
- * @FlagType(
- *   id = "flagtype_broken",
- *   title = @Translation("Flag Type Broken")
- * )
  */
 class BrokenFlagType extends FlagTypeBase {
 

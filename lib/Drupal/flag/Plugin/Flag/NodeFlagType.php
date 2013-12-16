@@ -18,24 +18,16 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  *
  * @FlagType(
  *   id = "flagtype_node",
- *   title = @Translation("Content")
+ *   title = @Translation("Content"),
+ *   entity_type = "node"
  * )
  */
 class NodeFlagType extends EntityFlagType {
 
   public $access_author;
 
-  public static function entityTypes() {
-    return array(
-      'node' => array(
-        'title' => t('Nodes'),
-        'description' => t("Nodes are a Drupal site's primary content."),
-      ),
-    );
-  }
-
-  public function options() {
-    $options = parent::options();
+  public function defaultConfiguration() {
+    $options = parent::defaultConfiguration();
     // Use own display settings in the meanwhile.
     $options += array(
       'i18n' => 0,
@@ -46,8 +38,8 @@ class NodeFlagType extends EntityFlagType {
   /**
    * Options form extras for node flags.
    */
-  public function options_form(&$form) {
-    parent::options_form($form);
+  public function buildConfigurationForm(array $form, array &$form_state) {
+    parent::buildConfigurationForm($form, $form_state);
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -69,7 +61,7 @@ class NodeFlagType extends EntityFlagType {
         '1' => t('Flag translations of content as a group'),
         '0' => t('Flag each translation of content separately'),
       ),
-      '#default_value' => $this->i18n,
+      //'#default_value' => $this->i18n,
       '#description' => t('Flagging translations as a group effectively allows users to flag the original piece of content regardless of the translation they are viewing. Changing this setting will <strong>not</strong> update content that has been flagged already.'),
       '#access' => module_exists('translation_helpers'),
       '#weight' => 5,
@@ -79,7 +71,9 @@ class NodeFlagType extends EntityFlagType {
     $form['display']['show_on_form'] = array(
         '#title' => t('Display checkbox on node edit form'),
         '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/structure/types'))),
-      ) + $form['display']['show_on_form'];
+      );// + $form['display']['show_on_form'];
+
+    return $form;
   }
 
   function type_access_multiple($entity_ids, $account) {

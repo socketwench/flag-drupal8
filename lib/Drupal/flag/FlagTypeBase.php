@@ -8,59 +8,87 @@
 
 namespace Drupal\flag;
 
+use Drupal\flag\FlagTypePluginInterface;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Class FlagTypeBase
  * @package Drupal\flag\Plugin\Flag
- *
- * @FlagType(
- *   id = "flagtype_base",
- *   title = @Translation("Flag Type Base")
- * )
  */
-abstract class FlagTypeBase extends PluginBase {
+abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterface{
 
   /**
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
-    $configuration += $this->options();
+    $configuration += $this->defaultConfiguration();
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
-  public static function entityTypes() {
-    return array();
-  }
-
   /**
-   * Declares the options this flag supports, and their default values.
+   * Provides the default configuration values for the flag type.
    *
-   * Derived classes should want to override this.
-   *
-   * @todo Rename to defaultConfiguration()?
+   * @return array
    */
-  public function options() {
+  public function defaultConfiguration() {
     return array();
   }
 
   /**
-   * Provides a form for setting options.
+   * Returns this flag type plugin's configuration array.
    *
-   * Derived classes should want to override this.
+   * @return array
+   */
+  public function getConfiguration() {
+    return $this->configuration;
+  }
+
+  /**
+   * Replaces the plugin's configurations with those given in the parameter.
+   *
+   * @param array $configuration
+   */
+  public function setConfiguration(array $configuration) {
+    $this->configuration = $configuration;
+  }
+
+  /**
+   * Provides a form for this action link plugin settings.
+   *
+   * The form provided by this method is displayed by the FlagAddForm when creating
+   * or editing the Flag. Derived classes should want to override this.
+   *
+   * @param array $form
+   * @param array $form_state
+   * @return array
+   *   The form array
+   * @see \Drupal\flag\Form\FlagAddForm
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
     return $form;
   }
 
-/**
- * Handles the form submit for this plugin.
- *
- * @param array $form
- * @param array $form_state
- */
-public function submitConfigurationForm(array &$form, array &$form_state) {
-    // Override this
+  /**
+   * Handles the form submit for this action link plugin.
+   *
+   * Derived classes will want to override this.
+   *
+   * @param array $form
+   * @param array $form_state
+   */
+  public function submitConfigurationForm(array &$form, array &$form_state) {
+    // Override this.
+  }
+
+  /**
+   * Handles the validation for the action link plugin settings form.
+   *
+   * @param array $form
+   * @param array $form_state
+   */
+  public function validateConfigurationForm(array &$form, array &$form_state) {
+    // Override this.
   }
 
   /**

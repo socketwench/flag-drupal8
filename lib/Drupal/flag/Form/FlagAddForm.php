@@ -117,7 +117,10 @@ class FlagAddForm extends EntityFormController {
       '#weight' => 10,
     );
 
-    $bundles = entity_get_bundles($entity_type);
+    $flag_type_plugin = \Drupal::service('plugin.manager.flag.flagtype')->createInstance($step1_form['flag_entity_type']);
+    $flag_type_def = $flag_type_plugin->getPluginDefinition();
+
+    $bundles = entity_get_bundles($flag_type_def['entity_type']);
     $entity_bundles = array();
     foreach ($bundles as $bundle_id => $bundle_row) {
       $entity_bundles[$bundle_id] = $bundle_row['label'];
@@ -156,7 +159,7 @@ class FlagAddForm extends EntityFormController {
         'unflag' => array(DRUPAL_AUTHENTICATED_RID),
       );
     }
-*/
+
     $form['access']['roles'] = array(
       '#title' => t('Roles that may use this flag'),
       '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
@@ -174,20 +177,37 @@ class FlagAddForm extends EntityFormController {
     else {
       $form['access']['roles']['#description'] .= ' ' . t('Anonymous users may flag content if the <a href="http://drupal.org/project/session_api">Session API</a> module is installed.');
     }
+*/
+    foreach (user_roles() as $rid => $role_info) {
+      $access_roles_default_value = array();
+      if ($rid == $step1_form['flag_role'] || $step1_form['flag_role'] == '0') {
+        $access_roles_default_value = array('flag', 'unflag');
+      }
 
+      $form['access']['roles'][$rid] = array(
+        '#type' => 'checkboxes',
+        '#options' => array('flag' => t('Flag'), 'unflag' => t('Unflag')),
+        '#attributes' => array(
+          'class' => array('container-inline'),
+        ),
+        '#title' => $role_info->label,
+        '#default_value' => $access_roles_default_value,
+      );
+    }
+/*
     $form['access']['roles']['flag'] = array(
       '#type' => 'checkboxes',
-      '#options' => user_roles(!module_exists('session_api')),
+      '#options' => $role_options,
 //      '#default_value' => $flag->roles['flag'],
       '#parents' => array('roles', 'flag'),
     );
     $form['access']['roles']['unflag'] = array(
       '#type' => 'checkboxes',
-      '#options' => user_roles(!module_exists('session_api')),
+      '#options' => $role_options,
 //      '#default_value' => $flag->roles['unflag'],
       '#parents' => array('roles', 'unflag'),
     );
-
+*/
     $form['access']['unflag_denied_text'] = array(
       '#type' => 'textfield',
       '#title' => t('Unflag not allowed text'),
@@ -206,13 +226,14 @@ class FlagAddForm extends EntityFormController {
 //      '#after_build' => array('flag_link_type_options_states'),
     );
 
+    $form = $flag_type_plugin->buildConfigurationForm($form, $form_state);
+
     $form['display']['link_type'] = array(
       '#type' => 'radios',
       '#title' => t('Link type'),
-      '#options' => _flag_link_type_options(),
-      // @todo: Move flag_check_link_types into controller?
+      '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
 //      '#after_build' => array('flag_check_link_types'),
-      '#default_value' => $flag->link_type,
+      '#default_value' => $step1_form['flag_link_type'],
       // Give this a high weight so additions by the flag classes for entity-
       // specific options go above.
       '#weight' => 18,
@@ -225,10 +246,13 @@ class FlagAddForm extends EntityFormController {
     );
     // Add the descriptions to each ratio button element. These attach to the
     // elements when FormAPI expands them.
-    foreach (_flag_link_type_descriptions() as $key => $description) {
-      $form['display']['link_type'][$key]['#description'] = $description;
+    $action_link_plugin_defs = \Drupal::service('plugin.manager.flag.linktype')->getDefinitions();
+    foreach ($action_link_plugin_defs as $key => $info) {
+      $form['display']['link_type'][$key]['#description'] = $info['description'];
     }
 
+
+/*
     $form['display']['link_options_intro'] = array(
       // This is a hack to allow a markup element to use FormAPI states.
       // @see http://www.bywombats.com/blog/06-25-2011/using-containers-states-enabled-markup-form-elements
@@ -269,6 +293,10 @@ class FlagAddForm extends EntityFormController {
     // Allow the flag handler to make additions and changes to the form.
     // Note that the flag_broken handler will completely empty the form array!
 //    $flag->options_form($form);
+*/
+    $action_link_plugin = \Drupal::service('plugin.manager.flag.linktype')->createInstance($step1_form['flag_link_type']);
+
+    $form = $action_link_plugin->buildConfigurationForm($form, $form_state);
 
     return $form;
   }

@@ -8,7 +8,7 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
-use Drupal\flag\Plugin\Flag\FlagTypeBase;
+use Drupal\flag\FlagTypeBase;
 
 /**
  * Class EntityFlagType
@@ -35,24 +35,12 @@ class EntityFlagType extends FlagTypeBase {
   public $show_contextual_link;
 
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
-    array_push($this->types, $plugin_definition['entity']);
+    array_push($this->types, $plugin_definition['entity_type']);
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
-    public static function entityTypes() {
-    $entity_types = array();
-    foreach (entity_get_info() as $entity_id => $entity_info) {
-      $entity_types[$entity_id] = array(
-        'title' => $entity_info['label'],
-        'description' => t('@entity-type entity', array('@entity-type' => $entity_info['label'])),
-      );
-    }
-
-    return $entity_types;
-  }
-
-  function options() {
-    $options = parent::options();
+  public function defaultConfiguration() {
+    $options = parent::defaultConfiguration();
     $options += array(
       // Output the flag in the entity links.
       // This is empty for now and will get overriden for different
@@ -73,20 +61,8 @@ class EntityFlagType extends FlagTypeBase {
   /**
    * Options form extras for the generic entity flag.
    */
-  function options_form(&$form) {
-    $bundles = array();
-    $bundle_info =  entity_get_bundles($this->entity_type);
-    foreach ($bundle_info as $bundle_key => $info) {
-      $bundles[$bundle_key] = $info['label'];
-    }
-    $form['access']['types'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Bundles'),
-      '#options' => $bundles,
-      '#description' => t('Select the bundles that this flag may be used on. Leave blank to allow on all bundles for the entity type.'),
-      '#default_value' => $this->types,
-    );
-
+  public function buildConfigurationForm(array $form, array &$form_state) {
+    /*
     // Add checkboxes to show flag link on each entity view mode.
     $options = array();
     $defaults = array();
@@ -138,6 +114,8 @@ class EntityFlagType extends FlagTypeBase {
       '#access' => module_exists('contextual'),
       '#weight' => 10,
     );
+    */
+    return $form;
   }
 
 } 
