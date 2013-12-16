@@ -17,7 +17,7 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  * @FlagType(
  *   id = "flagtype_user",
  *   title = @Translation("User"),
- *   entity = "user"
+ *   entity_type = "user"
  * )
  */
 class UserFlagType extends FlagTypeBase {
@@ -26,17 +26,8 @@ class UserFlagType extends FlagTypeBase {
 
   public $show_on_profile;
 
-  public static function entityTypes() {
-    return array(
-      'user' => array(
-        'title' => t('Users'),
-        'description' => t('Users who have created accounts on your site.'),
-      ),
-    );
-  }
-
-  function options() {
-    $options = parent::options();
+  public function defaultConfiguration() {
+    $options = parent::defaultConfiguration();
     $options += array(
       'show_on_profile' => TRUE,
       'access_uid' => '',
@@ -47,8 +38,8 @@ class UserFlagType extends FlagTypeBase {
   /**
    * Options form extras for user flags.
    */
-  function options_form(&$form) {
-    parent::options_form($form);
+  public function buildConfigurationForm(array $form, array &$form_state) {
+    parent::buildConfigurationForm($form, $form_state);
     $form['access']['types'] = array(
       // A user flag doesn't support node types.
       // TODO: Maybe support roles instead of node types.
@@ -69,6 +60,8 @@ class UserFlagType extends FlagTypeBase {
       // Put this above 'show on entity'.
       '#weight' => -1,
     );
+
+    return $form;
   }
 
   function type_access_multiple($entity_ids, $account) {

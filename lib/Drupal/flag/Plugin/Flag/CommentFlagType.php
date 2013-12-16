@@ -18,24 +18,16 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  *
  * @FlagType(
  *   id = "flagtype_comment",
- *   title = @Translation("Comment")
+ *   title = @Translation("Comment"),
+ *   entity_type = "comment"
  * )
  */
 class CommentFlagType extends EntityFlagType {
 
   public $access_author;
 
-  public static function entityTypes() {
-    return array(
-      'comment' => array(
-        'title' => t('Comments'),
-        'description' => t('Comments are responses to node content.'),
-      ),
-    );
-  }
-
-  public function options() {
-    $options = parent::options();
+  public function defaultConfiguration() {
+    $options = parent::defaultConfiguration();
     $options += array(
       'access_author' => '',
     );
@@ -45,8 +37,8 @@ class CommentFlagType extends EntityFlagType {
   /**
    * Options form extras for comment flags.
    */
-  public function options_form(&$form) {
-    parent::options_form($form);
+  public function buildConfigurationForm(array $form, array &$form_state) {
+    parent::buildConfigurationForm($form, $form_state);
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -61,6 +53,8 @@ class CommentFlagType extends EntityFlagType {
       '#default_value' => $this->access_author,
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
     );
+
+    return $form;
   }
 
   public function type_access_multiple($entity_ids, $account) {

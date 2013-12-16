@@ -34,4 +34,11 @@ class FlagType extends Plugin {
    */
   public $title;
 
+  /**
+   * The entity type the flag type supports.
+   *
+   * @var string
+   */
+  public $entity_type;
+
 }

@@ -6,6 +6,8 @@
  * Time: 8:21 PM
  */
 
+namespace Drupal\flag\Plugin\ActionLink;
+
 use Drupal\flag\ActionLinkTypeBase;
 
 /**
@@ -19,6 +21,9 @@ use Drupal\flag\ActionLinkTypeBase;
  */
 class Reload extends ActionLinkTypeBase {
 
+  /**
+   * @return string
+   */
   public function buildLink() {
     return "/flag/";
   }

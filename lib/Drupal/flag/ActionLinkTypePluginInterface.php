@@ -11,6 +11,10 @@ namespace Drupal\flag;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 
+/**
+ * Interface ActionLinkTypePluginInterface
+ * @package Drupal\flag
+ */
 interface ActionLinkTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
 
   public function buildLink();
