@@ -20,13 +20,13 @@ class FlagAddForm extends EntityFormController {
     $tempstore = \Drupal::service('user.tempstore')->get('flag');
     $step1_form = $tempstore->get('FlagAddPage');
 
-    $flag = $this->entity; //\Drupal\flag\Handlers\AbstractFlag::factory_by_entity_type($entity_type);
+    $flag = $this->entity;
+    $flag->setFlagTypePlugin($step1_form['flag_entity_type']);
+    $flag->setLinkTypePlugin($step1_form['flag_link_type']);
 
     // Mark the flag as new.
     $flag->is_new = TRUE;
     $type_info = flag_fetch_definition($entity_type);
- //   drupal_set_title(t('Add new @type flag', array('@type' => $type_info['title'])));
-
 
     $form['#flag'] = $flag;
     $form['#flag_name'] = $flag->id;
@@ -117,7 +117,7 @@ class FlagAddForm extends EntityFormController {
       '#weight' => 10,
     );
 
-    $flag_type_plugin = \Drupal::service('plugin.manager.flag.flagtype')->createInstance($step1_form['flag_entity_type']);
+    $flag_type_plugin = $flag->getFlagTypePlugin();
     $flag_type_def = $flag_type_plugin->getPluginDefinition();
 
     $bundles = entity_get_bundles($flag_type_def['entity_type']);

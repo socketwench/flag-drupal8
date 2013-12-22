@@ -9,6 +9,7 @@
 namespace Drupal\flag\Entity;
 
 use Drupal\Component\Plugin\DefaultSinglePluginBag;
+use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
@@ -150,11 +151,26 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public $unflag_denied_text = '';
 
   /**
+   * The plugin ID of the flag type.
+   *
+   * @var string
+   */
+  protected $flag_type;
+
+  protected $flagTypeBag;
+
+  protected $flagTypeConfig = array();
+
+  /**
    * The link type used by the flag, as defined in hook_flag_link_type_info().
    *
    * @var string
    */
-  public $link_type = 'toggle'; //@todo Convert to plugin
+  protected $link_type;
+
+  protected $linkTypeBag;
+
+  protected $linkTypeConfig = array();
 
   /**
    * The weight of the flag.
@@ -163,15 +179,17 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public $weight = 0;
 
-  protected $typesBag;
-
   /**
    * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
    */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
 
-    $this->typesBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'), $this->types, array());
+    $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
+                                                    $this->flag_type, $this->flagTypeConfig);
+
+    $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
+                                                    $this->link_type, $this->linkTypeConfig);
   }
 
   public function enable() {
@@ -196,6 +214,65 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     if (isset($result['node'])) {
       $flagging_ids = array_keys($result['flagging']);
     }
+  }
+
+  /**
+   * Get the flag type plugin for this flag.
+   *
+   * @return FlagTypePluginInterface
+   */
+  public function getFlagTypePlugin() {
+    return $this->flagTypeBag->get($this->flag_type);
+  }
+
+  /**
+   * Set the flag type plugin.
+   *
+   * @param string $pluginID
+   *   A string containing the flag type plugin ID.
+   */
+  public function setFlagTypePlugin($pluginID) {
+    $this->flag_type = $pluginID;
+    $this->flagTypeBag->addInstanceId($pluginID);
+  }
+
+  /**
+   * Get the link type plugin for this flag.
+   *
+   * @return LinkTypePluginInterface
+   */
+  public function getLinkTypePlugin() {
+    return $this->linkTypeBag->get($this->link_type);
+  }
+
+  /**
+   * Set the link type plugin.
+   *
+   * @param string $pluginID
+   *   A string containing the link type plugin ID.
+   */
+  public function setlinkTypePlugin($pluginID) {
+    $this->link_type = $pluginID;
+    $this->linkTypeBag->addInstanceId($pluginID);
+  }
+
+  /**
+   * @param EntityStorageControllerInterface $storage_controller
+   */
+  public function preSave(EntityStorageControllerInterface $storage_controller) {
+      parent::preSave($storage_controller);
+
+      // Save the Flag Type configuration.
+      $flagTypePlugin = $this->getFlagTypePlugin();
+      if ($flagTypePlugin instanceof ConfigurablePluginInterface) {
+        $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
+      }
+
+      // Save the Link Type configuration.
+      $linkTypePlugin = $this->getLinkTypePlugin();
+      if ($linkTypePlugin instanceof ConfigurablePluginInterface) {
+        $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
+      }
   }
 
 } 
