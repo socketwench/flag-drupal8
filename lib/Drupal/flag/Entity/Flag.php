@@ -83,14 +83,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    *
    * @var bool
    */
-  public $is_global = FALSE;
+  protected $is_global = FALSE;
 
   /**
    * Whether this flag is enabled.
    *
    * @var bool
    */
-  public $enabled = TRUE;
+  protected $enabled = TRUE;
 
   /**
    * The sub-types, AKA bundles, this flag applies to.
@@ -179,6 +179,8 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public $weight = 0;
 
+  protected $roles = array();
+
   /**
    * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
    */
@@ -254,6 +256,62 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public function setlinkTypePlugin($pluginID) {
     $this->link_type = $pluginID;
     $this->linkTypeBag->addInstanceId($pluginID);
+  }
+
+  /**
+   * @return array
+   */
+  public function getPermissions() {
+    return $this->roles;
+  }
+
+  /**
+   * @param $roleID
+   * @param $canFlag
+   * @param $canUnflag
+   */
+  public function setPermission($roleID, $canFlag, $canUnflag) {
+    if (!$canFlag && !$canUnflag) {
+      unset($this->roles[$roleID]);
+    }
+    else {
+      $this->roles[$roleID] = array(
+        'flag' => $canFlag ? TRUE : FALSE,
+        'unflag' => $canUnflag ? TRUE : FALSE,
+      );
+    }
+  }
+
+  /**
+   * @param array $flagPermssions
+   */
+  public function setPermissions(array $flagRoles, array $unflagRoles) {
+    $this->roles = array();
+
+    foreach ($flagRoles as $roleID => $value) {
+      if (!empty($value)) {
+        $this->roles[$roleID]['flag'] = TRUE;
+      }
+    }
+
+    foreach ($unflagRoles as $roleID => $value) {
+      if (!empty($value)) {
+        $this->roles[$roleID]['unflag'] = TRUE;
+      }
+    }
+  }
+
+  public function isGlobal() {
+    return $this->is_global;
+  }
+
+  public function setGlobal($isGlobal = TRUE) {
+    if ($isGlobal) {
+      $this->is_global = TRUE;
+    }
+    else {
+      $this->is_global = FALSE;
+    }
   }
 
   /**

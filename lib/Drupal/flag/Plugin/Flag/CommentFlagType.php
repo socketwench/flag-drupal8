@@ -24,8 +24,6 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  */
 class CommentFlagType extends EntityFlagType {
 
-  public $access_author;
-
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     $options += array(
@@ -50,11 +48,15 @@ class CommentFlagType extends EntityFlagType {
         'node_own' => t('Users may only flag comments of nodes they own'),
         'node_others' => t('Users may only flag comments of nodes by others'),
       ),
-      '#default_value' => $this->access_author,
+      '#default_value' => $this->configuration['access_author'],
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
     );
 
     return $form;
+  }
+
+  public function submitConfigurationForm(array &$form, array &$form_state) {
+    $this->configuration['access_author'] = $form_state['value']['access']['access_author'];
   }
 
   public function type_access_multiple($entity_ids, $account) {

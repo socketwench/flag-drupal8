@@ -25,15 +25,32 @@ class FlagListController extends ConfigEntityListController {
     return $header + parent::buildHeader();
   }
 
+  protected function getFlagRoles(FlagInterface $flag) {
+    $allRoles = user_roles();
+    $out = '';
+
+    foreach ($flag->getPermissions() as $rid => $perms) {
+      $out .= $allRoles[$rid]->label;
+      $out .= ', ';
+    }
+
+    if (empty($out)) {
+      return '<em>None</em>';
+    }
+
+    return rtrim($out, ', ');
+  }
+
   /**
    * Overrides Drupal\Core\Entity\EntityListController::buildRow().
    */
   public function buildRow(EntityInterface $entity) {
+
     $row['label'] = $this->getLabel($entity);
 
-    $row['roles'] = '&nbsp;';
+    $row['roles'] = $this->getFlagRoles($entity);
 
-    $row['is_global'] = $entity->is_global ? t('Yes') : t('No');
+    $row['is_global'] = $entity->isGlobal() ? t('Yes') : t('No');
 
     return $row + parent::buildRow($entity);
   }
