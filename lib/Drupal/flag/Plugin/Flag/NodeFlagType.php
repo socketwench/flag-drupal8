@@ -24,8 +24,6 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  */
 class NodeFlagType extends EntityFlagType {
 
-  public $access_author;
-
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     // Use own display settings in the meanwhile.
@@ -49,7 +47,7 @@ class NodeFlagType extends EntityFlagType {
         'own' => t('Users may only flag content they own'),
         'others' => t('Users may only flag content of others'),
       ),
-      '#default_value' => $this->access_author,
+      '#default_value' => $this->configuration['access_author'],
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
     );
 
@@ -74,6 +72,12 @@ class NodeFlagType extends EntityFlagType {
       );// + $form['display']['show_on_form'];
 
     return $form;
+  }
+
+  public function submitConfigurationForm(array &$form, array &$form_state) {
+    $this->configuration['access_author'] = $form_state['values']['access']['access_author'];
+    $this->configuration['i18n'] = $form_state['values']['i18n'];
+    $this->configuration['show_on_form'] = $form_state['values']['display']['show_on_form'];
   }
 
   function type_access_multiple($entity_ids, $account) {

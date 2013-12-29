@@ -8,7 +8,7 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
-use Drupal\flag\Plugin\Flag\FlagTypeBase;
+use Drupal\flag\FlagTypeBase;
 
 /**
  * Class UserFlagType
@@ -21,10 +21,6 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  * )
  */
 class UserFlagType extends FlagTypeBase {
-
-  public $access_uid;
-
-  public $show_on_profile;
 
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
@@ -50,18 +46,23 @@ class UserFlagType extends FlagTypeBase {
       '#type' => 'checkbox',
       '#title' => t('Users may flag themselves'),
       '#description' => t('Disabling this option may be useful when setting up a "friend" flag, when a user flagging themself does not make sense.'),
-      '#default_value' => $this->access_uid ? 0 : 1,
+      '#default_value' => $this->configuration['access_uid'] ? 0 : 1,
     );
     $form['display']['show_on_profile'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display link on user profile page'),
       '#description' => t('Show the link formatted as a user profile element.'),
-      '#default_value' => $this->show_on_profile,
+      '#default_value' => $this->configuration['show_on_profile'],
       // Put this above 'show on entity'.
       '#weight' => -1,
     );
 
     return $form;
+  }
+
+  public function submitConfigurationForm(array &$form, array &$form_state) {
+    $this->configuration['access_uid'] = $form_state['values']['access']['access_uid'];
+    $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];
   }
 
   function type_access_multiple($entity_ids, $account) {

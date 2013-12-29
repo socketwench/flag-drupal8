@@ -13,6 +13,24 @@ use Drupal\flag\Handlers\AbstractFlag;
 
 class FlagAddForm extends EntityFormController {
 
+  protected function getRoleOptions() {
+    $role_options = array();
+
+    foreach (user_roles() as $rid => $role_info) {
+      $role_options[$rid] = $role_info->label;
+    }
+
+    return $role_options;
+  }
+
+  protected function getRoleDefault($selction) {
+    if ($selction == 0) {
+      return array_keys(user_roles());
+    }
+
+    return array($selection);
+  }
+
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
     //@todo Check all non-form_* params with check_plain().
     $form = parent::buildForm($form, $form_state);
@@ -53,10 +71,10 @@ class FlagAddForm extends EntityFormController {
       '#disabled' => !$flag->isNew(),
     );
 
-    $form['global'] = array(
+    $form['is_global'] = array(
       '#type' => 'checkbox',
       '#title' => t('Global flag'),
-      '#default_value' => $flag->is_global,
+      '#default_value' => $flag->isGlobal(),
       '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
       '#weight' => -1,
     );
@@ -159,7 +177,7 @@ class FlagAddForm extends EntityFormController {
         'unflag' => array(DRUPAL_AUTHENTICATED_RID),
       );
     }
-
+*/
     $form['access']['roles'] = array(
       '#title' => t('Roles that may use this flag'),
       '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
@@ -171,13 +189,13 @@ class FlagAddForm extends EntityFormController {
         'css' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.css'),
       ),
     );
-    if (module_exists('session_api')) {
+/*    if (module_exists('session_api')) {
       $form['access']['roles']['#description'] .= ' ' . t('Support for anonymous users is being provided by <a href="http://drupal.org/project/session_api">Session API</a>.');
     }
     else {
       $form['access']['roles']['#description'] .= ' ' . t('Anonymous users may flag content if the <a href="http://drupal.org/project/session_api">Session API</a> module is installed.');
     }
-*/
+*//*
     foreach (user_roles() as $rid => $role_info) {
       $access_roles_default_value = array();
       if ($rid == $step1_form['flag_role'] || $step1_form['flag_role'] == '0') {
@@ -194,20 +212,22 @@ class FlagAddForm extends EntityFormController {
         '#default_value' => $access_roles_default_value,
       );
     }
-/*
+*/
     $form['access']['roles']['flag'] = array(
       '#type' => 'checkboxes',
-      '#options' => $role_options,
-//      '#default_value' => $flag->roles['flag'],
+      '#title' => 'Roles that may flag',
+      '#options' => $this->getRoleOptions(),
+      '#default_value' => $this->getRoleDefault($step1_form['flag_role']),
       '#parents' => array('roles', 'flag'),
     );
     $form['access']['roles']['unflag'] = array(
       '#type' => 'checkboxes',
-      '#options' => $role_options,
-//      '#default_value' => $flag->roles['unflag'],
+      '#title' => 'Roles that may unflag',
+      '#options' => $this->getRoleOptions(),
+      '#default_value' => $this->getRoleDefault($step1_form['flag_role']),
       '#parents' => array('roles', 'unflag'),
     );
-*/
+
     $form['access']['unflag_denied_text'] = array(
       '#type' => 'textfield',
       '#title' => t('Unflag not allowed text'),
@@ -337,7 +357,8 @@ class FlagAddForm extends EntityFormController {
   public function save(array $form, array &$form_state) {
     $flag = $this->entity;
 
-    $form_state['values']['label'] = trim($form_state['values']['label']);
+    $flag->getFlagTypePlugin()->submitConfigurationForm($form, $form_state);
+    $flag->getLinkTypePlugin()->submitConfigurationForm($form, $form_state);
 
     $flag->enable();
     $status = $flag->save();

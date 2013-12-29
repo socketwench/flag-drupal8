@@ -435,7 +435,7 @@ function flag_permission() {
   $flags = flag_get_flags();
   // Provide flag and unflag permissions for each flag.
   foreach ($flags as $flag_name => $flag) {
-    $permissions += $flag->get_permissions();
+  //  $permissions += $flag->get_permissions();
   }
 
   return $permissions;
