@@ -29,7 +29,7 @@ use Drupal\flag\FlagInterface;
  *     "list" = "Drupal\flag\Controller\FlagListController",
  *     "form" = {
  *       "add" = "Drupal\flag\Form\FlagAddForm",
- *       "edit" = "Drupal\flag\Form\FlagAddForm",
+ *       "edit" = "Drupal\flag\Form\FlagEditForm",
  *       "delete" = "Drupal\flag\Form\FlagAddForm"
  *     }
  *   },
@@ -179,7 +179,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public $weight = 0;
 
-  protected $roles = array();
+  protected $roles = array(
+    'flag' => array(),
+    'unflag' => array(),
+  );
 
   /**
    * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
@@ -286,19 +289,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * @param array $flagPermssions
    */
   public function setPermissions(array $flagRoles, array $unflagRoles) {
-    $this->roles = array();
-
-    foreach ($flagRoles as $roleID => $value) {
-      if (!empty($value)) {
-        $this->roles[$roleID]['flag'] = TRUE;
-      }
-    }
-
-    foreach ($unflagRoles as $roleID => $value) {
-      if (!empty($value)) {
-        $this->roles[$roleID]['unflag'] = TRUE;
-      }
-    }
+    $this->roles = array(
+      'flag' => $flagRoles,
+      'unflag' => $unflagRoles,
+    );
   }
 
   public function isGlobal() {
