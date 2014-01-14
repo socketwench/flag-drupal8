@@ -24,13 +24,14 @@ use Drupal\flag\FlagInterface;
  *   id = "flag_flag",
  *   label = @Translation("Flag"),
  *   module = "flag",
+ *   admin_permission = "administer flags",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "list" = "Drupal\flag\Controller\FlagListController",
  *     "form" = {
  *       "add" = "Drupal\flag\Form\FlagAddForm",
  *       "edit" = "Drupal\flag\Form\FlagEditForm",
- *       "delete" = "Drupal\flag\Form\FlagAddForm"
+ *       "delete" = "Drupal\flag\Form\FlagDeleteForm"
  *     }
  *   },
  *   bundle_of = "flagging",
@@ -41,7 +42,7 @@ use Drupal\flag\FlagInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "admin/structure/flags/manage/{flag_flag}"
+ *     "edit-form" = "flag_edit"
  *   }
  * )
  *
@@ -316,15 +317,28 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
       // Save the Flag Type configuration.
       $flagTypePlugin = $this->getFlagTypePlugin();
-      if ($flagTypePlugin instanceof ConfigurablePluginInterface) {
-        $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
-      }
+      $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
 
       // Save the Link Type configuration.
       $linkTypePlugin = $this->getLinkTypePlugin();
-      if ($linkTypePlugin instanceof ConfigurablePluginInterface) {
-        $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
-      }
+      $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
+  }
+
+  public function getExportProperties() {
+    $properties = parent::getExportProperties();
+    $names = array(
+      'roles',
+      'flag_type',
+      'link_type',
+      'flagTypeConfig',
+      'linkTypeConfig',
+    );
+
+    foreach ($names as $name) {
+      $properties[$name] = $this->get($name);
+    }
+
+    return $properties;
   }
 
 } 

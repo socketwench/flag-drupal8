@@ -56,7 +56,7 @@ class CommentFlagType extends EntityFlagType {
   }
 
   public function submitConfigurationForm(array &$form, array &$form_state) {
-    $this->configuration['access_author'] = $form_state['value']['access']['access_author'];
+    $this->configuration['access_author'] = $form_state['values']['access_author'];
   }
 
   public function type_access_multiple($entity_ids, $account) {

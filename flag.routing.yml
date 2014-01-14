@@ -2,6 +2,7 @@ flag_add_page:
   path: '/admin/structure/flags/add'
   defaults:
     _form: '\Drupal\flag\Form\FlagAddPageForm'
+    _title: 'Add New Flag'
   requirements:
     _permission: 'administer flags'
 
@@ -9,6 +10,7 @@ flag.flag_list:
   path: '/admin/structure/flags'
   defaults:
     _entity_list: 'flag_flag'
+    _title: 'Flags'
   requirements:
     _permission: 'administer flags'
 
@@ -16,20 +18,31 @@ flag_add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
     _entity_form: flag_flag.add
+    _title: 'Add New Flag'
   requirements:
     _permission: 'administer flags'
 
 flag_edit:
-  path: '/admin/structure/flags/manage/{entity_type}'
+  path: '/admin/structure/flags/manage/{flag_flag}'
   defaults:
     _entity_form: flag_flag.edit
+    _title: 'Edit Flag'
   requirements:
-    _permission: 'administer flags'
+    _entity_access: 'flag_flag.update'
+
+flag_delete:
+  path: '/admin/structure/flags/manage/{flag_flag}/delete'
+  defaults:
+    _entity_form: flag_flag.delete
+    _title: 'Delete Flag'
+  requirements:
+    _entity_access: 'flag_flag.update'
 
 flag_import:
   path: '/admin/structure/flags/import'
   defaults:
     _form: '\Drupal\flag\Form\FlagImportForm'
+    _title: 'Import Flags'
   requirements:
     _permission: 'use flag import'
 
@@ -37,5 +50,6 @@ flag_export:
   path: '/admin/structure/flags/export'
   defaults:
     _form: '\Drupal\flag\Form\FlagExportForm'
+    _title: 'Export Flags'
   requirements:
     _permission: 'use flag import'
