@@ -28,8 +28,6 @@ abstract class FlagFormBase extends EntityFormController {
 
     $flag = $this->entity;
 
-    // Mark the flag as new.
-    $flag->is_new = TRUE;
     $type_info = flag_fetch_definition($entity_type);
 
     $form['#flag'] = $flag;
@@ -301,7 +299,7 @@ abstract class FlagFormBase extends EntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::delete().
    */
   public function delete(array $form, array &$form_state) {
-    $form_state['redirect'] = 'admin/structure/flag';
+    $form_state['redirect'] = 'admin/structure/flags';
   }
 
 } 

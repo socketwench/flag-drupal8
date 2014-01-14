@@ -27,9 +27,10 @@ class FlagListController extends ConfigEntityListController {
 
   protected function getFlagRoles(FlagInterface $flag) {
     $allRoles = user_roles();
+    $flagPermissions = $flag->getPermissions();
     $out = '';
 
-    foreach ($flag->getPermissions() as $rid => $perms) {
+    foreach ($flagPermissions['flag'] as $rid) {
       $out .= $allRoles[$rid]->label;
       $out .= ', ';
     }
@@ -99,4 +100,4 @@ class FlagListController extends ConfigEntityListController {
     return $build;
   }
 
-} 
+}

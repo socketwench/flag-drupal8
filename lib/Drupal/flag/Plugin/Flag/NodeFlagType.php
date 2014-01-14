@@ -75,9 +75,9 @@ class NodeFlagType extends EntityFlagType {
   }
 
   public function submitConfigurationForm(array &$form, array &$form_state) {
-    $this->configuration['access_author'] = $form_state['values']['access']['access_author'];
+    $this->configuration['access_author'] = $form_state['values']['access_author'];
     $this->configuration['i18n'] = $form_state['values']['i18n'];
-    $this->configuration['show_on_form'] = $form_state['values']['display']['show_on_form'];
+    $this->configuration['show_on_form'] = $form_state['values']['show_on_form'];
   }
 
   function type_access_multiple($entity_ids, $account) {
