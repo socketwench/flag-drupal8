@@ -151,7 +151,7 @@ abstract class FlagFormBase extends EntityFormController {
       ),
     );
 
-    $flag_permissions = $flag->getPermissions();
+    $flag_permissions = $flag->getRoles();
 
     $form['access']['roles']['flag'] = array(
       '#type' => 'checkboxes',

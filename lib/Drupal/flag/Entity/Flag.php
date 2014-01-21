@@ -10,6 +10,7 @@ namespace Drupal\flag\Entity;
 
 use Drupal\Component\Plugin\DefaultSinglePluginBag;
 use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
@@ -192,10 +193,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     parent::__construct($values, $entity_type);
 
     $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
-                                                    $this->flag_type, $this->flagTypeConfig);
+                                                    array($this->flag_type), $this->flagTypeConfig);
 
     $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
-                                                    $this->link_type, $this->linkTypeConfig);
+                                                    array($this->link_type), $this->linkTypeConfig);
   }
 
   public function enable() {
@@ -240,6 +241,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public function setFlagTypePlugin($pluginID) {
     $this->flag_type = $pluginID;
     $this->flagTypeBag->addInstanceId($pluginID);
+
+    // Get the entity type from the plugin definition.
+    $plugin = $this->getFlagTypePlugin();
+    $pluginDef = $plugin->getPluginDefinition();
+    $this->entity_type = $pluginDef['entity_type'];
   }
 
   /**
@@ -265,8 +271,29 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * @return array
    */
-  public function getPermissions() {
+  public function getRoles() {
     return $this->roles;
+  }
+
+  /**
+   * Provides permissions for this flag.
+   *
+   * @return
+   *  An array of permissions for hook_permission().
+   */
+  function getPermissions() {
+    return array(
+      "flag $this->id" => array(
+        'title' => t('Flag %flag_title', array(
+          '%flag_title' => $this->label,
+        )),
+      ),
+      "unflag $this->id" => array(
+        'title' => t('Unflag %flag_title', array(
+          '%flag_title' => $this->label,
+        )),
+      ),
+    );
   }
 
   /**
@@ -296,6 +323,22 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     );
   }
 
+  public function canFlag(AccountInterface $account) {
+    if ($account->id() == 0) {
+      return TRUE;
+    }
+
+    if (in_array($account->getRoles(), $this->roles['flag'])) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  public function canUnflag(AccountInterface $account) {
+    return TRUE;
+  }
+
   public function isGlobal() {
     return $this->is_global;
   }
@@ -313,15 +356,39 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * @param EntityStorageControllerInterface $storage_controller
    */
   public function preSave(EntityStorageControllerInterface $storage_controller) {
-      parent::preSave($storage_controller);
+    parent::preSave($storage_controller);
 
-      // Save the Flag Type configuration.
-      $flagTypePlugin = $this->getFlagTypePlugin();
-      $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
+    // Save the Flag Type configuration.
+    $flagTypePlugin = $this->getFlagTypePlugin();
+    $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
 
-      // Save the Link Type configuration.
-      $linkTypePlugin = $this->getLinkTypePlugin();
-      $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
+    // Save the Link Type configuration.
+    $linkTypePlugin = $this->getLinkTypePlugin();
+    $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
+
+    foreach ($this->roles['flag'] as $rid => $value) {
+
+      if (!empty($value)) {
+        user_role_change_permissions($rid, "flag $this->id");
+      }
+    }
+
+    foreach (user_roles() as $rid => $rinfo) {
+      $perms = array();
+
+      // Get the permissions from the $roles class variable.
+      foreach ($this->roles as $action => $roles) {
+        if (!empty($roles[$rid])) {
+          $perms["$action $this->id"] = TRUE;
+        }
+        else {
+          $perms["$action $this->id"] = FALSE;
+        }
+      }
+
+      // Assign the permissions.
+      user_role_change_permissions($rid, $perms);
+    }
   }
 
   public function getExportProperties() {
