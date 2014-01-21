@@ -26,18 +26,18 @@ class FlagListController extends ConfigEntityListController {
   }
 
   protected function getFlagRoles(FlagInterface $flag) {
-    $allRoles = user_roles();
-    $flagPermissions = $flag->getPermissions();
     $out = '';
+    $allRoles = array();
 
-    foreach ($flagPermissions['flag'] as $rid) {
-      $out .= $allRoles[$rid]->label;
-      $out .= ', ';
+    foreach ($flag->getPermissions() as $perm => $pinfo) {
+      $roles = user_roles(FALSE, $perm);
+
+      foreach ($roles as $rid => $role) {
+        $allRoles[$rid] = $role->label;
+      }
     }
 
-    if (empty($out)) {
-      return '<em>None</em>';
-    }
+    $out = implode(', ', $allRoles);
 
     return rtrim($out, ', ');
   }

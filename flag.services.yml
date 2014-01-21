@@ -5,3 +5,6 @@ services:
   plugin.manager.flag.linktype:
     class: Drupal\flag\ActionLinkPluginManager
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
+  flag:
+    class: Drupal\flag\Flag
+    arguments: ['@module_handler']

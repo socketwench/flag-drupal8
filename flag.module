@@ -11,6 +11,7 @@ define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
 use Drupal\flag\Handlers\AbstractFlag;
+use Drupal\flag\Flag;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -432,10 +433,10 @@ function flag_permission() {
     ),
   );
 
-  $flags = flag_get_flags();
+  $flags = \Drupal::service('flag')->getFlags();
   // Provide flag and unflag permissions for each flag.
   foreach ($flags as $flag_name => $flag) {
-  //  $permissions += $flag->get_permissions();
+    $permissions += $flag->getPermissions();
   }
 
   return $permissions;
@@ -475,7 +476,7 @@ function flag_flag_link($flag, $action, $entity_id) {
 function flag_field_extra_fields() {
   $extra = array();
 
-  $flags = flag_get_flags();
+  $flags = $flag_service->getFlags();
   foreach ($flags as $name => $flag) {
     // Skip flags that aren't on entities.
     if (!($flag instanceof flag_entity)) {
@@ -763,7 +764,9 @@ function flag_contextual_links_view_alter(&$element, $items) {
  */
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
   // Get all possible flags for this entity type.
-  $flags = flag_get_flags($type);
+  $flag_service = \Drupal::service('flag');
+  $flags = $flag_service->getFlags($entity->entityType(),
+                                   $entity->bundle());
 
   foreach ($flags as $flag) {
 
@@ -2328,15 +2331,6 @@ function flag_features_api() {
       'file' => drupal_get_path('module', 'flag') . '/includes/flag.features.inc',
     ),
   );
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function flag_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools' && !empty($plugin)) {
-    return "plugins/$plugin";
-  }
 }
 
 // ---------------------------------------------------------------------------

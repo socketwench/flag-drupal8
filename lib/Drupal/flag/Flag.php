@@ -8,12 +8,24 @@
 
 namespace Drupal\flag;
 
-/**
- * Static service container wrapper for Flag.
- */
-class Flag {
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Session\AccountInterface;
 
-  public static function flag($action, $flag_name, $entity_id, $account = NULL, $permissions_check = FALSE) {
+/**
+ * Flag service.
+ */
+class Flag { //@todo Rename to FlagService?
+
+  /**
+   * Constructor.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   */
+  public function __construct(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
+  }
+
+  public function flag($action, $flag_name, $entity_id, $account = NULL, $permissions_check = FALSE) {
 
   }
 
@@ -29,12 +41,58 @@ class Flag {
    *
    * @see hook_flag_type_info()
    */
-  public static function flag_fetch_definition($entity_type = NULL) {
+  public function fetchDefinition($entity_type = NULL) {
     if(!empty($entity_type)){
       return \Drupal::service('plugin.manager.flag.flagtype')->getDefinition($entity_type);
     }
 
     return \Drupal::service('plugin.manager.flag.flagtype')->getDefinitions();
+  }
+
+  /**
+   * List all flags available.
+   *
+   * If node type or account are entered, a list of all possible flags will be
+   * returned.
+   *
+   * @param $entity_type
+   *   (optional) The type of entity for which to load the flags. Usually 'node'.
+   * @param $bundle
+   *   (optional) The bundle for which to load the flags.
+   * @param $account
+   *   (optional) The user account to filter available flags. If not set, all
+   *   flags for the given entity and bundle will be returned.
+   *
+   * @return
+   *   An array of the structure [fid] = flag_object.
+   */
+  public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
+    $query = \Drupal::entityQuery('flag_flag');
+
+    if($entity_type != NULL) {
+      $query->condition('entity_type', $entity_type);
+    }
+
+    if ($bundle != NULL) {
+      $query->condition("types.$bundle", $bundle);
+    }
+
+    $result = $query->execute();
+
+    $flags = entity_load_multiple('flag_flag', $result);
+
+    if ($account == NULL) {
+      return $flags;
+    }
+
+    $filtered_flags = array();
+    foreach ($flags as $flag) {
+      if ($flag->canFlag($account) || $flag->canUnflag($account)) {
+        $filtered_flags[] = $flag;
+      }
+    }
+
+    return $filtered_flags;
   }
 
 } 
