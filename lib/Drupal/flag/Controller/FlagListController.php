@@ -10,6 +10,7 @@ namespace Drupal\flag\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListController;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\flag\FlagInterface;
 
 class FlagListController extends ConfigEntityListController {
 

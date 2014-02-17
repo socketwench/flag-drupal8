@@ -77,17 +77,6 @@ function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
  */
 function flag_menu() {
 
-  $items[FLAG_ADMIN_PATH] = array(
-    'title' => 'Flags',
- //   'route_name' => 'flag_settings',
-    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
-//  );
-//  $items[FLAG_ADMIN_PATH . '/list'] = array(
-//    'title' => 'List',
-//    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'route_name' => 'flag.flag_list',
-    'weight' => -10,
-  );
   $items[FLAG_ADMIN_PATH . '/add'] = array(
     'route_name' => 'flag_add_page',
     'type' => MENU_SIBLING_LOCAL_TASK,
@@ -178,6 +167,17 @@ function flag_menu() {
     'type' => MENU_CALLBACK,
   );
 */
+  return $items;
+}
+
+function flag_menu_link_defaults() {
+  $items['flag.admin.structure.flag'] = array(
+    'link_title' => 'Flags',
+    'parent' => 'system.admin.structure',
+    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
+    'route_name' => 'flag.flag_list',
+  );
+
   return $items;
 }
 
@@ -475,7 +475,7 @@ function flag_flag_link($flag, $action, $entity_id) {
  */
 function flag_field_extra_fields() {
   $extra = array();
-
+/*
   $flags = $flag_service->getFlags();
   foreach ($flags as $name => $flag) {
     // Skip flags that aren't on entities.
@@ -506,7 +506,7 @@ function flag_field_extra_fields() {
       }
     }
   }
-
+*/
   return $extra;
 }
 
