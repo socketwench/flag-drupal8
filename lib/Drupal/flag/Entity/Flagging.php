@@ -24,9 +24,11 @@ use Drupal\flag\FlaggingInterface;
  *  module = "flag",
  *  controllers = {
  *    "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
+ *    "access" = "Drupal\flag\FlaggingAccessController",
  *  },
  *  base_table = "flagging",
  *  fieldable = TRUE,
+ *  bundle_entity_type = "flag",
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
@@ -44,40 +46,36 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   }
 
   public static function baseFieldDefinitions($entity_type) {
-    $properties['id'] = array(
-      'label' => t('Flagging ID'),
-      'description' => t('The Flagging ID.'),
-      'type' => 'integer_field',
-      'read-only' => TRUE,
-    );
-    $properties['type'] = array(
-      'label' => t('Type'),
-      'description' => t('The flag type.'),
-      'type' => 'string_field',
-      'read-only' => TRUE,
-    );
-    $properties['uuid'] = array(
-      'label' => t('UUID'),
-      'description' => t('The node UUID.'),
-      'type' => 'uuid_field',
-      'read-only' => TRUE,
-    );
-    $properties['uid'] = array(
-      'label' => t('User ID'),
-      'description' => t('The ID of the flagging user.'),
-      'type' => 'entity_reference_field',
-      'settings' => array(
+    $fields['id'] = FieldDefinition::create('integer')
+      ->setLabel(t('Node ID'))
+      ->setDescription(t('The flagging ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['uuid'] = FieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The flagging UUID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = FieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The flag type.'))
+      ->setSetting('target_type', 'flag_flag')
+      ->setReadOnly(TRUE);
+
+    $fields['uid'] = FieldDefinition::create('entity_reference')
+      ->setLabel(t('User ID'))
+      ->setDescription(t('The user ID of the flagging user.'))
+      ->setSettings(array(
         'target_type' => 'user',
         'default_value' => 0,
-      ),
-    );
-    $properties['created'] = array(
-      'label' => t('Created'),
-      'description' => t('The time that the flagging was created.'),
-      'type' => 'integer_field',
-    );
+      ));
 
-    return $properties;
+    // @todo Convert to a "created" field in https://drupal.org/node/2145103.
+    $fields['created'] = FieldDefinition::create('integer')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the flagging was created.'));
+
+    return $fields;
   }
 
 } 

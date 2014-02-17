@@ -151,6 +151,7 @@ abstract class FlagFormBase extends EntityFormController {
       ),
     );
 
+    //@todo convert to Drupal::entityManager()->getAccessController('flagging');
     $flag_permissions = $flag->getRoles();
 
     $form['access']['roles']['flag'] = array(
@@ -252,16 +253,16 @@ abstract class FlagFormBase extends EntityFormController {
 
     $flag->enable();
     $status = $flag->save();
-    $uri = $flag->uri();
+/*    $url = $flag->url();
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Flag %label has been updated.', array('%label' => $flag->label())));
-      watchdog('flag', 'Flag %label has been updated.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $uri['path'] . '/edit'));
+      watchdog('flag', 'Flag %label has been updated.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
     }
     else {
       drupal_set_message(t('Flag %label has been added.', array('%label' => $flag->label())));
-      watchdog('flag', 'Flag %label has been added.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $uri['path'] . '/edit'));
+      watchdog('flag', 'Flag %label has been added.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
     }
-
+*/
     // We clear caches more vigorously if the flag was new.
 //    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 

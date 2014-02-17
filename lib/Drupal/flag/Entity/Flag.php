@@ -369,7 +369,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     foreach ($this->roles['flag'] as $rid => $value) {
 
       if (!empty($value)) {
-        user_role_change_permissions($rid, "flag $this->id");
+        user_role_change_permissions($rid, array("flag $this->id"));
       }
     }
 
