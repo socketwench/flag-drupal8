@@ -36,9 +36,6 @@ class FlagAddForm extends FlagFormBase {
     // Mark the flag as new.
     $flag->is_new = TRUE;
 
-    $flag->setPermissions($this->getRoleDefault($step1_form['flag_role']),
-                          $this->getRoleDefault($step1_form['flag_role']));
-
     $form = parent::buildForm($form, $form_state);
 
     return $form;
