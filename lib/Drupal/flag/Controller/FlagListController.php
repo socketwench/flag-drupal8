@@ -29,7 +29,7 @@ class FlagListController extends ConfigEntityListController {
   protected function getFlagRoles(FlagInterface $flag) {
     $out = '';
     $allRoles = array();
-    
+
     foreach ($flag->getPermissions() as $perm => $pinfo) {
       $roles = user_roles(FALSE, $perm);
 

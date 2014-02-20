@@ -87,21 +87,6 @@ function flag_menu() {
     'route_name' => 'flag_add',
     'type' => MENU_CALLBACK,
   );
-  $items[FLAG_ADMIN_PATH . '/import'] = array(
-    'title' => 'Import',
-    'route_name' => 'flag_import',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-  $items[FLAG_ADMIN_PATH . '/export'] = array(
-    'title' => 'Export',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_export_form'),
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.export.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
 /*
   $items[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
     'load arguments' => array(TRUE), // Allow for disabled flags.
