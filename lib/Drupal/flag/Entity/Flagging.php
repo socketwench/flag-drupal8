@@ -12,6 +12,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\flag\FlaggingInterface;
 
 /**
@@ -36,6 +37,9 @@ use Drupal\flag\FlaggingInterface;
  *  },
  *  bundle_keys = {
  *    "bundle" = "type"
+ *  },
+ *  links = {
+ *    "admin-form" = "flag_edit"
  *  }
  * )
  */
