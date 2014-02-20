@@ -750,7 +750,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
   // Get all possible flags for this entity type.
   $flag_service = \Drupal::service('flag');
-  $flags = $flag_service->getFlags($entity->entityType(),
+  $flags = $flag_service->getFlags($entity->getEntityTypeID(),
                                    $entity->bundle());
 
   foreach ($flags as $flag) {
