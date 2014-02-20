@@ -67,18 +67,6 @@ class FlagAddPageForm extends FormBase{
       '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
     );
 
-    $role_options = array(0 => 'All users');
-    foreach (user_roles() as $rid => $role_info) {
-        $role_options[$rid] = $role_info->label;
-    }
-
-    $form['flag_type_info']['flag_role'] = array(
-      '#type' => 'select',
-      '#title' => t('for'),
-      '#options' => $role_options,
-      '#default' => 0,
-    );
-
     $types = array();
     // @todo Use \Drupal::service() to get a list of FlagType plugins.
 

@@ -40,6 +40,10 @@ class FlagListController extends ConfigEntityListController {
 
     $out = implode(', ', $allRoles);
 
+    if (empty($out)) {
+      return '<em>None</em>';
+    }
+
     return rtrim($out, ', ');
   }
 
