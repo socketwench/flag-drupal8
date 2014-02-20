@@ -20,10 +20,6 @@ interface FlagInterface extends ConfigEntityInterface {
 
   public function getPermissions();
 
-  public function setPermission($roleID, $canFlag, $canUnflag);
-
-  public function setPermissions(array $flagRoles, array $unflagRoles);
-
   public function isGlobal();
 
   public function setGlobal($isGlobal);

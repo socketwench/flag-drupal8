@@ -181,11 +181,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public $weight = 0;
 
-  protected $roles = array(
-    'flag' => array(),
-    'unflag' => array(),
-  );
-
   /**
    * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
    */
@@ -269,13 +264,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * @return array
-   */
-  public function getRoles() {
-    return $this->roles;
-  }
-
-  /**
    * Provides permissions for this flag.
    *
    * @return
@@ -294,49 +282,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
         )),
       ),
     );
-  }
-
-  /**
-   * @param $roleID
-   * @param $canFlag
-   * @param $canUnflag
-   */
-  public function setPermission($roleID, $canFlag, $canUnflag) {
-    if (!$canFlag && !$canUnflag) {
-      unset($this->roles[$roleID]);
-    }
-    else {
-      $this->roles[$roleID] = array(
-        'flag' => $canFlag ? TRUE : FALSE,
-        'unflag' => $canUnflag ? TRUE : FALSE,
-      );
-    }
-  }
-
-  /**
-   * @param array $flagPermssions
-   */
-  public function setPermissions(array $flagRoles, array $unflagRoles) {
-    $this->roles = array(
-      'flag' => $flagRoles,
-      'unflag' => $unflagRoles,
-    );
-  }
-
-  public function canFlag(AccountInterface $account) {
-    if ($account->id() == 0) {
-      return TRUE;
-    }
-
-    if (in_array($account->getRoles(), $this->roles['flag'])) {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  public function canUnflag(AccountInterface $account) {
-    return TRUE;
   }
 
   public function isGlobal() {
@@ -365,30 +310,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     // Save the Link Type configuration.
     $linkTypePlugin = $this->getLinkTypePlugin();
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
-
-    foreach ($this->roles['flag'] as $rid => $value) {
-
-      if (!empty($value)) {
-        user_role_change_permissions($rid, array("flag $this->id"));
-      }
-    }
-
-    foreach (user_roles() as $rid => $rinfo) {
-      $perms = array();
-
-      // Get the permissions from the $roles class variable.
-      foreach ($this->roles as $action => $roles) {
-        if (!empty($roles[$rid])) {
-          $perms["$action $this->id"] = TRUE;
-        }
-        else {
-          $perms["$action $this->id"] = FALSE;
-        }
-      }
-
-      // Assign the permissions.
-      user_role_change_permissions($rid, $perms);
-    }
   }
 
   public function getExportProperties() {

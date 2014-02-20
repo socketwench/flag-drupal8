@@ -13,15 +13,6 @@ use Drupal\flag\Handlers\AbstractFlag;
 
 abstract class FlagFormBase extends EntityFormController {
 
-  protected function getRoleOptions() {
-    $role_options = array();
-
-    foreach (user_roles() as $rid => $role_info) {
-      $role_options[$rid] = $role_info->label;
-    }
-
-    return $role_options;
-  }
 
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
     $form = parent::buildForm($form, $form_state);
@@ -139,36 +130,6 @@ abstract class FlagFormBase extends EntityFormController {
       '#weight' => 10,
     );
 
-    $form['access']['roles'] = array(
-      '#title' => t('Roles that may use this flag'),
-      '#description' => t('Users may only unflag content if they have access to flag the content initially. Checking <em>authenticated user</em> will allow access for all logged-in users.'),
-      '#theme' => 'flag_form_roles',
-      '#theme_wrappers' => array('form_element'),
-      '#weight' => -2,
-      '#attached' => array(
-        'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
-        'css' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.css'),
-      ),
-    );
-
-    //@todo convert to Drupal::entityManager()->getAccessController('flagging');
-    $flag_permissions = $flag->getRoles();
-
-    $form['access']['roles']['flag'] = array(
-      '#type' => 'checkboxes',
-      '#title' => 'Roles that may flag',
-      '#options' => $this->getRoleOptions(),
-      '#default_value' => $flag_permissions['flag'],
-      '#parents' => array('roles', 'flag'),
-    );
-    $form['access']['roles']['unflag'] = array(
-      '#type' => 'checkboxes',
-      '#title' => 'Roles that may unflag',
-      '#options' => $this->getRoleOptions(),
-      '#default_value' => $flag_permissions['unflag'],
-      '#parents' => array('roles', 'unflag'),
-    );
-
     $form['access']['unflag_denied_text'] = array(
       '#type' => 'textfield',
       '#title' => t('Unflag not allowed text'),
@@ -253,7 +214,7 @@ abstract class FlagFormBase extends EntityFormController {
 
     $flag->enable();
     $status = $flag->save();
-/*    $url = $flag->url();
+    $url = $flag->url();
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Flag %label has been updated.', array('%label' => $flag->label())));
       watchdog('flag', 'Flag %label has been updated.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
@@ -262,7 +223,7 @@ abstract class FlagFormBase extends EntityFormController {
       drupal_set_message(t('Flag %label has been added.', array('%label' => $flag->label())));
       watchdog('flag', 'Flag %label has been added.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
     }
-*/
+
     // We clear caches more vigorously if the flag was new.
 //    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 
