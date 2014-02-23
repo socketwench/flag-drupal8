@@ -37,7 +37,7 @@ class NodeFlagType extends EntityFlagType {
    * Options form extras for node flags.
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
-    parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -65,19 +65,13 @@ class NodeFlagType extends EntityFlagType {
       '#weight' => 5,
     );
 
-    // Override the UI texts for nodes.
- /*   $form['display']['show_on_form'] = array(
-        '#title' => t('Display checkbox on node edit form'),
-        '#description' => t('If you elect to have a checkbox on the node edit form, you may specify its initial state in the settings form <a href="@content-types-url">for each content type</a>.', array('@content-types-url' => url('admin/structure/types'))),
-      );// + $form['display']['show_on_form'];
-*/
     return $form;
   }
 
   public function submitConfigurationForm(array &$form, array &$form_state) {
+    parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_author'] = $form_state['values']['access_author'];
     $this->configuration['i18n'] = $form_state['values']['i18n'];
-//    $this->configuration['show_on_form'] = $form_state['values']['show_on_form'];
   }
 
   function type_access_multiple($entity_ids, $account) {
@@ -99,5 +93,13 @@ class NodeFlagType extends EntityFlagType {
     }
 
     return $access;
+  }
+
+  function getAccessAuthorSetting() {
+    return $this->configuration['access_author'];
+  }
+
+  function getInternationalizationSetting() {
+    $this->configuration['i18n'];
   }
 } 

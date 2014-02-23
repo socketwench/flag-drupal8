@@ -24,18 +24,10 @@ use Drupal\flag\FlagTypeBase;
  */
 class EntityFlagType extends FlagTypeBase {
 
-  public $types = array();
-
-  public $show_in_links = array();
-
-  public $show_as_field;
-
-  public $show_on_form;
-
-  public $show_contextual_link;
+  public $entity_type = '';
 
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
-    array_push($this->types, $plugin_definition['entity_type']);
+    $this->entity_type = $plugin_definition['entity_type'];
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -52,7 +44,6 @@ class EntityFlagType extends FlagTypeBase {
       // Add a checkbox for the flag in the entity form.
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
-      'access_author' => '',
       'show_contextual_link' => FALSE,
     );
     return $options;
@@ -62,7 +53,7 @@ class EntityFlagType extends FlagTypeBase {
    * Options form extras for the generic entity flag.
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
-    /*
+
     // Add checkboxes to show flag link on each entity view mode.
     $options = array();
     $defaults = array();
@@ -94,7 +85,7 @@ class EntityFlagType extends FlagTypeBase {
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
-      '#default_value' => $this->show_on_form,
+      '#default_value' => $this->showOnForm(),
       '#weight' => 5,
     );
 
@@ -109,13 +100,35 @@ class EntityFlagType extends FlagTypeBase {
     $form['display']['show_contextual_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display in contextual links'),
-      '#default_value' => $this->show_contextual_link,
+      '#default_value' => $this->showContextualLink(),
       '#description' => t('Note that not all entity types support contextual links.'),
       '#access' => module_exists('contextual'),
       '#weight' => 10,
     );
-    */
+
     return $form;
   }
 
+  public function submitConfigurationForm(array &$form, array &$form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+    $this->configuration['show_in_links'] = $form_state['values']['show_in_links'];
+    $this->configuration['show_on_form'] = $form_state['values']['show_on_form'];
+    $this->configuration['show_contextual_link'] = $form_state['values']['show_contextual_link'];
+  }
+
+  public function showInLinks() {
+    return $this->configuration['show_in_links'];
+  }
+
+  public function showAsField() {
+    return $this->configuration['show_as_field'];
+  }
+
+  public function showOnForm() {
+    return $this->configuration['show_on_form'];
+  }
+
+  public function showContextualLink() {
+    return $this->configuration['show_contextual_link'];
+  }
 } 

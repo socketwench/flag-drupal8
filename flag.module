@@ -460,16 +460,18 @@ function flag_flag_link($flag, $action, $entity_id) {
  */
 function flag_field_extra_fields() {
   $extra = array();
-/*
+
+  $flag_service = \Drupal::service('flag');
   $flags = $flag_service->getFlags();
-  foreach ($flags as $name => $flag) {
+  foreach ($flags as $flag) {
     // Skip flags that aren't on entities.
-    if (!($flag instanceof flag_entity)) {
+    $flagTypePlugin = $flag->getFlagTypePlugin();
+    if (!($flagTypePlugin instanceof \Drupal\flag\Plugin\Flag\EntityFlagType)) {
       continue;
     }
 
     foreach ($flag->types as $bundle_name) {
-      if ($flag->show_on_form) {
+      if ($flagTypePlugin->showOnForm()) {
         $extra[$flag->entity_type][$bundle_name]['form']['flag'] = array(
           'label' => t('Flags'),
           'description' => t('Checkboxes for toggling flags'),
@@ -477,13 +479,13 @@ function flag_field_extra_fields() {
         );
       }
 
-      if ($flag->show_as_field) {
+      if ($flagTypePlugin->showAsField()) {
         $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $name] = array(
           // It would be nicer to use % as the placeholder, but the label is
           // run through check_plain() by field_ui_display_overview_form()
           // (arguably incorrectly; see http://drupal.org/node/1991292).
           'label' => t('Flag: @title', array(
-            '@title' => $flag->title,
+            '@title' => $flag->label,
           )),
           'description' => t('Individual flag link'),
           'weight' => 10,
@@ -491,7 +493,7 @@ function flag_field_extra_fields() {
       }
     }
   }
-*/
+
   return $extra;
 }
 
@@ -531,6 +533,10 @@ function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
       '#suffix' => '</div>',
     );
   }
+}
+
+function flag_node_links_alter(array &$links, NodeInterface $entity, array &$context) {
+  //@todo: Define this for handling the showOnLinks() flag mode.
 }
 
 /**
@@ -748,6 +754,10 @@ function flag_contextual_links_view_alter(&$element, $items) {
  * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
 function flag_entity_view($entity, $type, $view_mode, $langcode) {
+
+  //@todo Check $type->getComponent('flag_whateverHookFieldExtraFieldsIS').
+  // if not NULL, display it.
+
   // Get all possible flags for this entity type.
   $flag_service = \Drupal::service('flag');
   $flags = $flag_service->getFlags($entity->getEntityTypeID(),

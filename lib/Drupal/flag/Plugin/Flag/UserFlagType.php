@@ -35,7 +35,7 @@ class UserFlagType extends FlagTypeBase {
    * Options form extras for user flags.
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
-    parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
     $form['access']['types'] = array(
       // A user flag doesn't support node types.
       // TODO: Maybe support roles instead of node types.
@@ -61,6 +61,7 @@ class UserFlagType extends FlagTypeBase {
   }
 
   public function submitConfigurationForm(array &$form, array &$form_state) {
+    parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_uid'] = $form_state['values']['access']['access_uid'];
     $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];
   }
@@ -81,4 +82,11 @@ class UserFlagType extends FlagTypeBase {
     return $access;
   }
 
+  public function getAccessUidSetting() {
+    return $this->configuration['access_uid'];
+  }
+
+  public function showOnProfile() {
+    return this->configuration['show_on_profile'];
+  }
 } 

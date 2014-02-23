@@ -6,5 +6,5 @@ services:
     class: Drupal\flag\ActionLinkPluginManager
     arguments: ['@container.namespaces', '@cache.cache', '@language_manager', '@module_handler']
   flag:
-    class: Drupal\flag\Flag
+    class: Drupal\flag\FlagService
     arguments: ['@module_handler']
