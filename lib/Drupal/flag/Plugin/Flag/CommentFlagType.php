@@ -36,7 +36,7 @@ class CommentFlagType extends EntityFlagType {
    * Options form extras for comment flags.
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
-    parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -56,6 +56,7 @@ class CommentFlagType extends EntityFlagType {
   }
 
   public function submitConfigurationForm(array &$form, array &$form_state) {
+    parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_author'] = $form_state['values']['access_author'];
   }
 
@@ -81,5 +82,9 @@ class CommentFlagType extends EntityFlagType {
     }
 
     return $access;
+  }
+
+  function getAccessAuthorSetting() {
+    return $this->configuration['access_author'];
   }
 } 

@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Flag service.
  */
-class Flag { //@todo Rename to FlagService?
+class FlagService {
 
   /**
    * Constructor.
