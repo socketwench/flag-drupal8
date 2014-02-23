@@ -480,7 +480,7 @@ function flag_field_extra_fields() {
       }
 
       if ($flagTypePlugin->showAsField()) {
-        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $name] = array(
+        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $flag->label()] = array(
           // It would be nicer to use % as the placeholder, but the label is
           // run through check_plain() by field_ui_display_overview_form()
           // (arguably incorrectly; see http://drupal.org/node/1991292).
