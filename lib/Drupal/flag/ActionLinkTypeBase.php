@@ -8,8 +8,13 @@
 
 namespace Drupal\flag;
 
+use Drupal\Core\URL;
+use Drupal\Core\Entity\EntityInterface;
+use \Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\flag\FlagInterface;
 use Drupal\flag\ActionLinkTypePluginInterface;
+use Drupal\flag\FlagService;
 
 /**
  * Class ActionLinkTypeBase
@@ -28,11 +33,51 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
     $this->setConfiguration($configuration);
   }
 
+  // @todo Add display, langcode, and view mode to buildLink()?
+  public function link(FlagInterface $flag, EntityInterface $entity,
+                       EntityViewDisplayInterface $diplay, $view_mode, $langcode) {
+
+    if($flag->isFlagged()) {
+      $action_link_url = "/unflag";
+    }
+    else {
+      $action_link_url = "/flag";
+    }
+
+    $action_link_url .= "/" . $flag->id . "/" . $entity->id();
+
+    return l($flag->flag_short, $action_link_url);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  abstract public function routeName();
+
   /**
    * @return string
    */
-  public function buildLink() {
-    return "";
+  public function buildLink($action, FlagInterface $flag, EntityInterface $entity) {
+    $options = array(
+      'action' => $action,
+      'flag' => $flag->id(),
+      'entity' => $entity->id(),
+    );
+
+    return new URL($this->routeName(), $options);
+  }
+
+  public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
+    $url = $this->buildLink($action, $flag, $entity);
+
+    $url->setOption('destination', \Drupal::request()->attributes->get('_system_path'));
+    $url->setOption('alt', $flag->flag_long);
+
+    $render = $url->toRenderArray();
+    $render['#type'] = 'link';
+    $render['#title'] = $flag->flag_short;
+
+    return $render;
   }
 
   /**

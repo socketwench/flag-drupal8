@@ -9,6 +9,8 @@
 namespace Drupal\flag;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 
 interface FlagInterface extends ConfigEntityInterface {
 
@@ -17,6 +19,8 @@ interface FlagInterface extends ConfigEntityInterface {
   public function enable();
 
   public function disable();
+
+  public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL);
 
   public function getPermissions();
 

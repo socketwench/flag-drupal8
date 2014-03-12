@@ -10,6 +10,7 @@ namespace Drupal\flag\Entity;
 
 use Drupal\Component\Plugin\DefaultSinglePluginBag;
 use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
@@ -202,16 +203,17 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->enabled = FALSE;
   }
 
-  public function isFlagged(AccountInterface $account = NULL) {
+  public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
     if($account == NULL) {
       global $user;
       $account = $user;
     }
 
-    $query = \Drupal::entityQuery('flagging');
-    $query->condition('uid', $account->id());
-
-    $result = $query->execute();
+    $result = \Drupal::entityQuery('flagging')
+      ->condition('uid', $account->id())
+      ->condition('fid', $this->id())
+      ->condition('entity_id', $entity->id())
+      ->execute();
 
     if (isset($result['node'])) {
       $flagging_ids = array_keys($result['flagging']);

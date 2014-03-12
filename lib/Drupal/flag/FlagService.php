@@ -25,10 +25,6 @@ class FlagService {
     $this->moduleHandler = $module_handler;
   }
 
-  public function flag($action, $flag_name, $entity_id, $account = NULL, $permissions_check = FALSE) {
-
-  }
-
   /**
    * Get a flag type definition.
    *
@@ -93,6 +89,18 @@ class FlagService {
     }
 
     return $filtered_flags;
+  }
+
+  public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
+
+  }
+
+  public function flag(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
+
+  }
+
+  public function unflag(FlaggingInterface $flagging) {
+
   }
 
 } 

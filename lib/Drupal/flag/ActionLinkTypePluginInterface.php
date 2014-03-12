@@ -8,6 +8,8 @@
 
 namespace Drupal\flag;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\flag\FlagInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 
@@ -17,6 +19,14 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  */
 interface ActionLinkTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
 
-  public function buildLink();
+  public function buildLink($action, FlagInterface $flag, EntityInterface $entity);
+
+  public function renderLink($action, FlagInterface $flag, EntityInterface $entity);
+
+  /**
+   * @return string
+   *  A string containing the route name.
+   */
+  public function routeName();
 
 }
