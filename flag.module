@@ -12,6 +12,7 @@ define('FLAG_ADMIN_PATH_START', 3);
 
 use Drupal\flag\Handlers\AbstractFlag;
 use Drupal\flag\Flag;
+use Drupal\node\NodeInterface;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -435,7 +436,7 @@ function flag_permission() {
  */
 function flag_form_user_admin_permissions_alter(&$form, &$form_state, $form_id) {
   if (!module_exists('session_api')) {
-    $flags = flag_get_flags();
+    $flags = \Drupal::service('flag')->getFlags();
     // Disable flag and unflag permission checkboxes for anonymous users.
     foreach ($flags as $flag_name => $flag) {
       $form['checkboxes'][DRUPAL_ANONYMOUS_RID]["flag $flag_name"]['#disabled'] = TRUE;
@@ -502,7 +503,7 @@ function flag_field_extra_fields() {
  */
 function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
   global $user;
-  $flags = flag_get_flags('node', $form['#node_type']->type, $user);
+  $flags = \Drupal::service('flag')->getFlags('node', $form['#node_type']->type, $user);
   foreach ($flags as $flag) {
     if ($flag->show_on_form) {
       // To be able to process node tokens in flag labels, we create a fake
@@ -558,7 +559,7 @@ function flag_field_attach_form($entity_type, $entity, &$form, &$form_state, $la
   }
 
   // Get all possible flags for this entity type.
-  $flags = flag_get_flags($entity_type);
+  $flags = \Drupal::service('flag')->getFlags($entity_type);
 
   // Filter out flags which need to be included on the node form.
   $flags_in_form = 0;
@@ -753,7 +754,7 @@ function flag_contextual_links_view_alter(&$element, $items) {
  *
  * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
-function flag_entity_view($entity, $type, $view_mode, $langcode) {
+function flag_entity_view($entity, $display, $view_mode, $langcode) {
 
   //@todo Check $type->getComponent('flag_whateverHookFieldExtraFieldsIS').
   // if not NULL, display it.
@@ -764,27 +765,15 @@ function flag_entity_view($entity, $type, $view_mode, $langcode) {
                                    $entity->bundle());
 
   foreach ($flags as $flag) {
+    $linkTypePlugin = $flag->getLinkTypePlugin();
+    $action = 'flag';
 
-    if($flag->isFlagged()) {
-      $action_link_url = "/unflag";
+    if ($flag->isFlagged($entity)) {
+      $action = 'unflag';
     }
-    else {
-      $action_link_url = "/flag";
-    }
 
-    $action_link_url .= "/" . $flag->id . "/" . $entity->id();
-
-    $entity->content['flag_' . $flag->id] = array(
-      '#markup' => '<div>' . l($flag->flag_short, $action_link_url) . '</div>',
-      '#weight' => 10,
-    );
-/*
-    $links = array(
-      '#prefix' => '<div>',
-      '#markup' => l($flag->flag_short, $action_link_url),
-      '#suffix' => '</div>',
-    );
-*/
+    $link = $linkTypePlugin->renderLink($action, $flag, $entity);
+    $entity->content['flag_' . $flag->id] = $link;
   }
 
   /**

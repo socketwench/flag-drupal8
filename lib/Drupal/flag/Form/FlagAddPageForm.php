@@ -59,12 +59,14 @@ class FlagAddPageForm extends FormBase{
       '#type' => 'select',
       '#title' => t('Flag'),
       '#options' => \Drupal::service('plugin.manager.flag.flagtype')->getAllFlagTypes(),
+      '#default_value' => 'flagtype_node',
     );
 
     $form['flag_type_info']['flag_link_type'] = array(
       '#type' => 'select',
       '#title' => t('using'),
       '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
+      '#default_value' => 'reload',
     );
 
     $types = array();

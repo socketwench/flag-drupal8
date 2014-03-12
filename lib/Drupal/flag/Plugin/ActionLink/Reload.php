@@ -24,8 +24,8 @@ class Reload extends ActionLinkTypeBase {
   /**
    * @return string
    */
-  public function buildLink() {
-    return "/flag/";
+  public function routeName() {
+    return 'flag_link';
   }
 
 } 
