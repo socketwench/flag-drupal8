@@ -33,22 +33,6 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
     $this->setConfiguration($configuration);
   }
 
-  // @todo Add display, langcode, and view mode to buildLink()?
-  public function link(FlagInterface $flag, EntityInterface $entity,
-                       EntityViewDisplayInterface $diplay, $view_mode, $langcode) {
-
-    if($flag->isFlagged()) {
-      $action_link_url = "/unflag";
-    }
-    else {
-      $action_link_url = "/flag";
-    }
-
-    $action_link_url .= "/" . $flag->id . "/" . $entity->id();
-
-    return l($flag->flag_short, $action_link_url);
-  }
-
   /**
    * @inheritDoc
    */

@@ -8,11 +8,11 @@
 
 namespace Drupal\flag\Controller;
 
-use Drupal\Core\Config\Entity\ConfigEntityListController;
+use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
-class FlagListController extends ConfigEntityListController {
+class FlagListController extends ConfigEntityListBuilder {
 
   /**
    * Overrides Drupal\Core\Entity\EntityListController::buildHeader().

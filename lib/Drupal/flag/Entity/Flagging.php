@@ -8,6 +8,7 @@
 
 namespace Drupal\flag\Entity;
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Language\Language;
@@ -49,7 +50,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
     return $this->bundle;
   }
 
-  public static function baseFieldDefinitions($entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = FieldDefinition::create('integer')
       ->setLabel(t('Node ID'))
       ->setDescription(t('The flagging ID.'))

@@ -29,6 +29,7 @@ class NodeFlagType extends EntityFlagType {
     // Use own display settings in the meanwhile.
     $options += array(
       'i18n' => 0,
+      'access_author' => '',
     );
     return $options;
   }

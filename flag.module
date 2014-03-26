@@ -159,9 +159,9 @@ function flag_menu() {
 function flag_menu_link_defaults() {
   $items['flag.admin.structure.flag'] = array(
     'link_title' => 'Flags',
-    'parent' => 'system.admin.structure',
+    'parent' => 'system.admin_structure',
     'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
-    'route_name' => 'flag.flag_list',
+    'route_name' => 'flag_list',
   );
 
   return $items;
@@ -341,14 +341,14 @@ function flag_help($path, $arg) {
 function flag_fetch_definition($entity_type = NULL) {
   $definitions = &drupal_static(__FUNCTION__);
   if (!isset($definitions)) {
-    if ($cache = cache()->get('flag_type_info')) {
+    if ($cache = \Drupal::cache()->get('flag_type_info')) {
       $definitions = $cache->data;
     }
     else {
       $definitions = module_invoke_all('flag_type_info');
       drupal_alter('flag_type_info', $definitions);
 
-      cache()->set('flag_type_info', $definitions);
+      \Drupal::cache()->set('flag_type_info', $definitions);
     }
   }
 
@@ -2101,10 +2101,10 @@ function flag_get_link_types() {
   $link_types = &drupal_static(__FUNCTION__);
 
   if (!isset($link_types)) {
-    if ($cache = cache()->get('flag_link_type_info')) {
+    if ($cache = \Drupal::cache()->get('flag_link_type_info')) {
       $link_types = $cache->data;
     }
-    // In some rare edge cases cache()->get() can return an empty result. If it
+    // In some rare edge cases \Drupal::cache()->get() can return an empty result. If it
     // does, we make sure to fetch the link types again.
     if (empty($link_types)) {
       $link_types = array();
@@ -2125,7 +2125,7 @@ function flag_get_link_types() {
       }
       drupal_alter('flag_link_type_info', $link_types);
 
-      cache()->set('flag_link_type_info', $link_types);
+      \Drupal::cache()->set('flag_link_type_info', $link_types);
     }
   }
 
