@@ -17,9 +17,9 @@ class EntityFlagType extends DerivativeBase {
   }
 */
 
-  public function getDerivativeDefinitions(array $base_plugin_def) {
+  public function getDerivativeDefinitions($base_plugin_def) {
     $derivatives = array();
-    foreach (entity_get_info() as $entity_id => $entity_info) {
+    foreach (\Drupal::entityManager()->getDefinitions() as $entity_id => $entity_info) {
       $derivatives[$entity_id] = array(
         'title' => $entity_id,
         'entity_type' => $entity_id,

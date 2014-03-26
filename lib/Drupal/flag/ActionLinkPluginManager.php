@@ -21,9 +21,9 @@ class ActionLinkPluginManager extends DefaultPluginManager {
    * {@inheritdoc}
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, LanguageManager $language_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/ActionLink', $namespaces, 'Drupal\flag\Annotation\ActionLinkType');
-    $this->alterInfo($module_handler, 'flag_link_type_info');
-    $this->setCacheBackend($cache_backend, $language_manager, 'flag_link_type_info');
+    parent::__construct('Plugin/ActionLink', $namespaces, $module_handler, 'Drupal\flag\Annotation\ActionLinkType');
+    $this->alterInfo('flag_link_type_info');
+    $this->setCacheBackend($cache_backend, $language_manager, 'flag_link_type_plugins');
   }
 
   public function getAllLinkTypes() {

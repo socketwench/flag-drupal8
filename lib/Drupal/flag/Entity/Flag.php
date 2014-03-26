@@ -8,7 +8,7 @@
 
 namespace Drupal\flag\Entity;
 
-use Drupal\Component\Plugin\DefaultSinglePluginBag;
+use Drupal\Core\Plugin\DefaultSinglePluginBag;
 use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -22,14 +22,12 @@ use Drupal\flag\FlagInterface;
  * Class Flag
  * @package Drupal\flag\Entity
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "flag_flag",
  *   label = @Translation("Flag"),
- *   module = "flag",
  *   admin_permission = "administer flags",
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "list" = "Drupal\flag\Controller\FlagListController",
+ *     "list_builder" = "Drupal\flag\Controller\FlagListController",
  *     "form" = {
  *       "add" = "Drupal\flag\Form\FlagAddForm",
  *       "edit" = "Drupal\flag\Form\FlagEditForm",
@@ -37,14 +35,13 @@ use Drupal\flag\FlagInterface;
  *     }
  *   },
  *   bundle_of = "flagging",
- *   config_prefix = "flag.flag",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "flag_edit"
+ *     "edit-form" = "flag_edit",
+ *     "delete-form" = "flag_delete"
  *   }
  * )
  *
@@ -189,10 +186,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     parent::__construct($values, $entity_type);
 
     $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
-                                                    array($this->flag_type), $this->flagTypeConfig);
+                                                    $this->flag_type, $this->flagTypeConfig);
 
     $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
-                                                    array($this->link_type), $this->linkTypeConfig);
+                                                    $this->link_type, $this->linkTypeConfig);
   }
 
   public function enable() {

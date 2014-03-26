@@ -10,6 +10,10 @@ namespace Drupal\flag\Form;
 
 use Drupal\flag\Form\FlagFormBase;
 
+/**
+ * Class FlagAddForm
+ * @package Drupal\flag\Form
+ */
 class FlagAddForm extends FlagFormBase {
 
   protected function getRoleDefault($selction) {

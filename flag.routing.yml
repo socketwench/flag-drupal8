@@ -6,7 +6,7 @@ flag_add_page:
   requirements:
     _permission: 'administer flags'
 
-flag.flag_list:
+flag_list:
   path: '/admin/structure/flags'
   defaults:
     _entity_list: 'flag_flag'
