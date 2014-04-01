@@ -296,7 +296,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
-  public function getEntityType() {
+  public function getFlaggableEntityType() {
     return $this->entity_type;
   }
 
