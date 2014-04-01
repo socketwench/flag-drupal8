@@ -13,7 +13,7 @@ use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\flag\FlagInterface;
@@ -296,10 +296,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  public function getEntityType() {
+    return $this->entity_type;
+  }
+
   /**
    * @param EntityStorageControllerInterface $storage_controller
    */
-  public function preSave(EntityStorageControllerInterface $storage_controller) {
+  public function preSave(EntityStorageInterface $storage_controller) {
     parent::preSave($storage_controller);
 
     // Save the Flag Type configuration.
@@ -311,8 +315,8 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
   }
 
-  public function getExportProperties() {
-    $properties = parent::getExportProperties();
+  public function toArray() {
+    $properties = parent::toArray();
     $names = array(
       'roles',
       'flag_type',
