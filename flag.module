@@ -877,7 +877,7 @@ function flag_entity_delete($entity, $type) {
     return;
   }
 
-  _flag_entity_delete($entity->entityType(), $entity->id());
+  _flag_entity_delete($entity->getEntityType(), $entity->id());
 }
 
 /**
