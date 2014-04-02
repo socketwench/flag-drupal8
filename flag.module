@@ -156,17 +156,6 @@ function flag_menu() {
   return $items;
 }
 
-function flag_menu_link_defaults() {
-  $items['flag.admin.structure.flag'] = array(
-    'link_title' => 'Flags',
-    'parent' => 'system.admin_structure',
-    'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
-    'route_name' => 'flag_list',
-  );
-
-  return $items;
-}
-
 /**
  * Implements hook_admin_menu_map().
  */
