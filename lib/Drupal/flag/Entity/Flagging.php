@@ -20,12 +20,10 @@ use Drupal\flag\FlaggingInterface;
  * Class Flagging
  * @package Drupal\flag\Entity
  *
- * @EntityType(
+ * @ContentEntityType(
  *  id = "flagging",
  *  label = @Translation("Flagging"),
- *  module = "flag",
  *  controllers = {
- *    "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *    "access" = "Drupal\flag\FlaggingAccessController",
  *  },
  *  base_table = "flagging",
