@@ -202,19 +202,21 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
     if($account == NULL) {
-      global $user;
-      $account = $user;
+      $account = \Drupal::currentUser();
     }
 
     $result = \Drupal::entityQuery('flagging')
       ->condition('uid', $account->id())
       ->condition('fid', $this->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
       ->condition('entity_id', $entity->id())
       ->execute();
 
-    if (isset($result['node'])) {
-      $flagging_ids = array_keys($result['flagging']);
+    if (!empty($result)) {
+      return TRUE;
     }
+
+    return FALSE;
   }
 
   /**

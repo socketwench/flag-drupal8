@@ -34,32 +34,44 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   }
 
   /**
-   * @inheritDoc
+   * Returns a route name given an $action.
+   *
+   * @param $action
+   *  A string containing the action name.
+   * @return string
+   *  A string containing a route name.
    */
-  abstract public function routeName();
+  abstract public function routeName($action = NULL);
 
   /**
    * @return string
    */
   public function buildLink($action, FlagInterface $flag, EntityInterface $entity) {
-    $options = array(
-      'action' => $action,
-      'flag' => $flag->id(),
-      'entity' => $entity->id(),
+    $parameters = array(
+      'flag_id' => $flag->id(),
+      'entity_id' => $entity->id(),
     );
 
-    return new URL($this->routeName(), $options);
+    return new URL($this->routeName($action), $parameters);
   }
 
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $url = $this->buildLink($action, $flag, $entity);
 
-    $url->setOption('destination', \Drupal::request()->attributes->get('_system_path'));
-    $url->setOption('alt', $flag->flag_long);
+    $url->setRouteParameter('destination', \Drupal::request()->getRequestUri());
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
-    $render['#title'] = $flag->flag_short;
+
+    //@todo check if flagged, assign flag or unflag text.
+    if ($action === 'unflag') {
+      $render['#title'] = $flag->unflag_short;
+      $render['#alt'] = $flag->unflag_long;
+    }
+    else {
+      $render['#title'] = $flag->flag_short;
+      $render['#alt'] = $flag->flag_long;
+    }
 
     return $render;
   }
