@@ -15,6 +15,10 @@ use Drupal\Core\Session\AccountInterface;
 class FlaggingAccessController extends EntityAccessController {
 
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+    if ($account->id() == 1) {
+      return TRUE;
+    }
+
     switch ($operation) {
       case 'view':
       case 'flag':
@@ -31,6 +35,11 @@ class FlaggingAccessController extends EntityAccessController {
   }
 
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    if ($account->id() == 1) {
+      return TRUE;
+    }
+
+    //@todo Figure out how to handle the NULL $entity_bundle case.
     return user_access('flag ' . $entity_bundle, $account);
   }
 

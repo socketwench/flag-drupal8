@@ -54,13 +54,22 @@ flag_export:
   requirements:
     _permission: 'use flag import'
 
-flag_link:
-  path: '/flag/{action}/{flag}/{entity}'
+flag_link_flag:
+  path: '/flag/flag/{flag_id}/{entity_id}'
   defaults:
     _controller: '\Drupal\flag\Controller\ReloadLinkController::flag'
+  requirements:
+    _entity_create_access: flagging
+
+flag_link_unflag:
+  path: '/flag/unflag/{flag_id}/{entity_id}'
+  defaults:
+    _controller: '\Drupal\flag\Controller\ReloadLinkController::unflag'
+  requirements:
+    _entity_access: flagging.delete
 
 flag_confirm_form:
-  path: '/flag/confirm/{action}/{flag}/{entity}'
+  path: '/flag/confirm/{action}/{flag_id}/{entity_id}'
   defaults:
     _form: '\Drupal\flag\Form\FlaggingConfirmForm'
     _title: 'Flag Content'

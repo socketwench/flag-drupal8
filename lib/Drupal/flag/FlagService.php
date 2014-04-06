@@ -95,11 +95,21 @@ class FlagService {
 
   }
 
-  public function flag(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
+  public function flag($flag, $entity, AccountInterface $account = NULL) {
+    if (empty($account)) {
+      $account = \Drupal::currentUser();
+    }
 
+    entity_create('flagging', array(
+      'type' => 'flag_flag',
+      'uid' => $account->id(),
+      'fid' => $flag->id(),
+      'entity_id' => $entity->id(),
+      'entity_type' => $entity->getEntityTypeId(),
+    ))->save();
   }
 
-  public function unflag(FlaggingInterface $flagging) {
+  public function unflag($flagging) {
 
   }
 

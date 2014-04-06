@@ -44,13 +44,19 @@ use Drupal\flag\FlaggingInterface;
  */
 class Flagging extends ContentEntityBase implements FlaggingInterface {
 
+  protected $entity_id;
+
+  protected $entity_type;
+
+  protected $fid;
+
   public function getFlag() {
     return $this->bundle;
   }
 
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = FieldDefinition::create('integer')
-      ->setLabel(t('Node ID'))
+      ->setLabel(t('Flagging ID'))
       ->setDescription(t('The flagging ID.'))
       ->setReadOnly(TRUE);
 
@@ -58,6 +64,19 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
       ->setLabel(t('UUID'))
       ->setDescription(t('The flagging UUID.'))
       ->setReadOnly(TRUE);
+
+    $fields['fid'] = FieldDefinition::create('integer')
+      ->setLabel(t('Flag ID'))
+      ->setDescription(t('The Flag ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['entity_type'] = FieldDefinition::create('string')
+      ->setLabel(t('Entity Type'))
+      ->setDescription(t('The Entity Type.'));
+
+    $fields['entity_id'] = FieldDefinition::create('string')
+      ->setLabel(t('Entity ID'))
+      ->setDescription(t('The Entity ID.'));
 
     $fields['type'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
@@ -73,8 +92,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
         'default_value' => 0,
       ));
 
-    // @todo Convert to a "created" field in https://drupal.org/node/2145103.
-    $fields['created'] = FieldDefinition::create('integer')
+    $fields['created'] = FieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the flagging was created.'));
 

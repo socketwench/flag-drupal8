@@ -78,18 +78,15 @@ function flag_schema() {
       ),
       'fid' => array(
         'description' => 'The unique flag ID this object has been flagged with, from {flag}.',
-        'type' => 'int',
-        'size' => 'small',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => FALSE,
       ),
       'entity_type' => array(
         'description' => 'The flag type, eg "node", "comment", "user".',
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
-        'default' => '',
       ),
       'entity_id' => array(
         'description' => 'The unique ID of the object, such as either the {cid}, {uid}, or {nid}.',
