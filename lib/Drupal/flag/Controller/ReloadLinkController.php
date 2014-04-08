@@ -16,20 +16,36 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class ReloadLinkController extends ControllerBase {
 
   public function flag($flag_id, $entity_id) {
-    $flag = entity_load('flag_flag', $flag_id);
-    $entity = entity_load($flag->getFlaggableEntityType(), $entity_id);
-    \Drupal::service('flag')->flag($flag, $entity);
+    // Get the Flag Service.
+    $flagService = \Drupal::service('flag');
 
+    // Get the Flag and Entity objects.
+    $flag = $flagService->getFlagById($flag_id);
+    $entity = $flagService->getFlaggableById($flag, $entity_id);
+
+    // While we could use FlagService::flag() here, we wouldn't have the URL
+    // to redirect Drupal afterward. So we flag by object instead.
+    $flagService->flagByObject($flag, $entity);
+
+    // Get the destination.
     $destination = \Drupal::request()->get('destination', $entity->url());
 
     //@todo SECURITY HOLE. Please fix!
     return new RedirectResponse($destination);
   }
 
-  public function unflag($flag, $entity) {
-    $flag = entity_load('flag_flag', $flag_id);
-    $entity = entity_load($flag->getFlaggableEntityType(), $entity_id);
-    \Drupal::service('flag')->unflag($flag, $entity);
+  public function unflag($flag_id, $entity_id) {
+    // Get the Flag Service.
+    $flagService = \Drupal::service('flag');
+
+    // Get the Flag and Entity objects.
+    $flag = $flagService->getFlagById($flag_id);
+    $entity = $flagService->getFlaggableById($flag, $entity_id);
+
+    $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag);
+    foreach ($flaggings as $flagging) {
+      \Drupal::service('flag')->unflagByObject($flagging);
+    }
 
     $destination = \Drupal::request()->get('destination', $entity->url());
 
