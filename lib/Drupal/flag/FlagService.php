@@ -10,6 +10,9 @@ namespace Drupal\flag;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\FlagInterface;
+use Drupal\Core\Entity\EntityInterface;
+
 
 /**
  * Flag service.
@@ -92,25 +95,87 @@ class FlagService {
   }
 
   public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
+    if($account == NULL) {
+      $account = \Drupal::currentUser();
+    }
 
+    $result = \Drupal::entityQuery('flagging')
+      ->condition('uid', $account->id())
+      ->condition('fid', $flag->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->condition('entity_id', $entity->id())
+      ->execute();
+
+    $flaggings = array();
+    foreach ($result as $flagging_id) {
+      $flaggings[$flagging_id] = entity_load('flagging', $flagging_id);
+    }
+
+    return $flaggings;
   }
 
-  public function flag($flag, $entity, AccountInterface $account = NULL) {
+  public function getFlagById($flag_id) {
+    return entity_load('flag_flag', $flag_id);
+  }
+
+  public function getFlaggableById(FlagInterface $flag, $entity_id) {
+    return entity_load($flag->getFlaggableEntityType(), $entity_id);
+  }
+
+  public function flagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     if (empty($account)) {
       $account = \Drupal::currentUser();
     }
 
-    entity_create('flagging', array(
+    $flagging = entity_create('flagging', array(
       'type' => 'flag_flag',
       'uid' => $account->id(),
       'fid' => $flag->id(),
       'entity_id' => $entity->id(),
       'entity_type' => $entity->getEntityTypeId(),
-    ))->save();
+    ));
+
+    $flagging->save();
+
+    \Drupal::entityManager()
+      ->getViewBuilder($entity->getEntityTypeId())
+      ->resetCache(array(
+        $entity,
+      ));
+
+    return $flagging;
   }
 
-  public function unflag($flagging) {
+  public function flag($flag_id, $entity_id, AccountInterface $account = NULL) {
+    if (empty($account)) {
+      $account = \Drupal::currentUser();
+    }
 
+    $flag = $this->getFlagById($flag_id);
+    $entity = $this->getFlaggableById($flag, $entity_id);
+
+    return $this->flagByObject($flag, $entity, $account);
+  }
+
+  public function unflagByObject(FlaggingInterface $flagging) {
+    $flagging->delete();
+  }
+
+  public function unflag($flag_id, $entity_id, AccountInterface $account = NULL) {
+    if (empty($account)) {
+      $account = \Drupal::currentUser();
+    }
+
+    $flag = $this->getFlagById($flag_id);
+    $entity = $this->getFlaggableById($flag, $entity_id);
+
+    $out = array();
+    $flaggings = $this->getFlaggings($entity, $flag);
+    foreach ($flaggings as $flagging) {
+      $out[] = $this->unflagByObject($flagging);
+    }
+
+    return $out;
   }
 
 } 
