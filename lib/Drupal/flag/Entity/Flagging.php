@@ -44,14 +44,20 @@ use Drupal\flag\FlaggingInterface;
  */
 class Flagging extends ContentEntityBase implements FlaggingInterface {
 
-  protected $entity_id;
-
-  protected $entity_type;
-
-  protected $fid;
-
   public function getFlag() {
     return $this->bundle;
+  }
+
+  public function getFlaggableType() {
+    return $this->get('entity_type')->value;
+  }
+
+  public function getFlaggableId() {
+    return $this->get('entity_id')->value;
+  }
+
+  public function getFlaggable() {
+    return entity_load($this->getFlaggableType(), $this->getFlaggableId());
   }
 
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
