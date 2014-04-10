@@ -43,7 +43,7 @@ use Drupal\node\NodeInterface;
  * with query condition on [name] field in [flag] table.
  *
  * @see flag_query_flagging_flag_names_alter()
- */
+ *//*
 function flag_entity_query_alter(EntityFieldQuery $query) {
   $conditions = &$query->entityConditions;
 
@@ -56,13 +56,13 @@ function flag_entity_query_alter(EntityFieldQuery $query) {
     $query->addMetaData('flag_name_operator', $conditions['bundle']['operator']);
     unset($conditions['bundle']);
   }
-}
+}*/
 
 /**
  * Implements hook_query_TAG_alter() for flagging_flag_names tag.
  *
  * @see flag_entity_query_alter()
- */
+ *//*
 function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
   // Get value and operator for bundle condition from meta data.
   $value = $query->getMetaData('flag_name_value');
@@ -71,90 +71,7 @@ function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
   // apply bundle condition on [flag].[name] field.
   $query->join('flag', 'f', 'flagging.fid = f.fid');
   $query->condition('f.name', $value, $operator);
-}
-
-/**
- * Implements hook_menu().
- */
-function flag_menu() {
-
-  $items[FLAG_ADMIN_PATH . '/add'] = array(
-    'route_name' => 'flag_add_page',
-    'type' => MENU_SIBLING_LOCAL_TASK,
-    'weight' => 1,
-  );
-  $items[FLAG_ADMIN_PATH . '/add/%node_type'] = array(
-    'title' => 'Flag Add',
-    'route_name' => 'flag_add',
-    'type' => MENU_CALLBACK,
-  );
-/*
-  $items[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
-    'load arguments' => array(TRUE), // Allow for disabled flags.
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_form', FLAG_ADMIN_PATH_START + 1),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.admin.inc',
-    'type' => MENU_CALLBACK,
-    // Make the flag title the default title for descendant menu items.
-    'title callback' => '_flag_menu_title',
-    'title arguments' => array(FLAG_ADMIN_PATH_START + 1),
-  );
-  $items[FLAG_ADMIN_PATH . '/manage/%flag/edit'] = array(
-    'load arguments' => array(TRUE), // Allow for disabled flags.
-    'title' => 'Edit flag',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-  $items[FLAG_ADMIN_PATH . '/manage/%flag/export'] = array(
-    'title' => 'Export',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_export_form', FLAG_ADMIN_PATH_START + 1),
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.export.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 20,
-  );
-  $items[FLAG_ADMIN_PATH . '/manage/%flag/delete'] = array(
-    'title' => 'Delete flag',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_delete_confirm', FLAG_ADMIN_PATH_START + 1),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
-  $items[FLAG_ADMIN_PATH . '/manage/%flag/update'] = array(
-    'load arguments' => array(TRUE), // Allow for disabled flags.
-    'title' => 'Update',
-    'page callback' => 'flag_update_page',
-    'page arguments' => array(FLAG_ADMIN_PATH_START + 1),
-    'access arguments' => array('administer flags'),
-    'file' => 'includes/flag.export.inc',
-    'type' => MENU_CALLBACK,
-  );
-  $items['flag/%/%flag/%'] = array(
-    'title' => 'Flag',
-    'page callback' => 'flag_page',
-    'page arguments' => array(1, 2, 3),
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'file' => 'includes/flag.pages.inc',
-    'type' => MENU_CALLBACK,
-  );
-  $items['flag/confirm/%/%flag/%'] = array(
-    'title' => 'Flag confirm',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('flag_confirm', 2, 3, 4),
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
-    'file' => 'includes/flag.pages.inc',
-    'type' => MENU_CALLBACK,
-  );
-*/
-  return $items;
-}
+}*/
 
 /**
  * Implements hook_admin_menu_map().
@@ -235,15 +152,6 @@ function flag_load($flag_name, $include_disabled = FALSE) {
   // A menu loader has to return FALSE (not NULL) when no object is found.
   return FALSE;
 }
-
-/**
- * Menu title callback.
- */
-function _flag_menu_title($flag) {
-  // The following conditional it to handle a D7 bug (@todo: link).
-  return $flag ? $flag->label : '';
-}
-
 /**
  * Implements hook_help().
  */
@@ -363,33 +271,6 @@ function flag_get_types() {
     $types = array_keys(flag_fetch_definition());
   }
   return $types;
-}
-
-/**
- * Instantiates a new flag handler.
- *
- * A flag handler is more commonly know as "a flag". A factory method usually
- * populates this empty flag with settings loaded from the database.
- *
- * @param $entity_type
- *  The entity type to create a flag handler for. This may be FALSE if the
- *  entity type property could not be found in the flag configuration data.
- *
- * @return
- *  A flag handler object. This may be the special class BrokenFlag is there is
- *  a problem with the flag.
- */
-function flag_create_handler($entity_type) {
-  $definition = flag_fetch_definition($entity_type);
-  if (isset($definition) && class_exists($definition['handler'])) {
-    $handler = new $definition['handler'];
-  }
-  else {
-    $handler = new \Drupal\flag\Handlers\BrokenFlag();
-  }
-  $handler->entity_type = $entity_type;
-  $handler->construct();
-  return $handler;
 }
 
 /**
@@ -688,52 +569,6 @@ function flag_field_attach_save($entity_type, $entity) {
   foreach ($entity->flag as $flag_name => $state) {
     flag($state ? 'flag' : 'unflag', $flag_name, $id);
   }
-}
-
-/*
- * Implements hook_contextual_links_view_alter().
- */
-function flag_contextual_links_view_alter(&$element, $items) {
-/*
-  if (isset($element['#element']['#entity_type'])) {
-    $entity_type = $element['#element']['#entity_type'];
-
-    // Get the entity out of the element. This requires a bit of legwork.
-    if (isset($element['#element']['#entity'])) {
-      // EntityAPI entities will all have the entity in the same place.
-      $entity = $element['#element']['#entity'];
-    }
-    elseif (isset($element['#element']['#' . $entity_type])) {
-      // Node module at least puts it here.
-      $entity = $element['#element']['#' . $entity_type];
-    }
-    else {
-      // Give up.
-      return;
-    }
-
-    // Get all possible flags for this entity type.
-    $flags = flag_get_flags($entity_type);
-
-    foreach ($flags as $name => $flag) {
-      if (!$flag->show_contextual_link) {
-        continue;
-      }
-
-      list($entity_id) = entity_extract_ids($entity_type, $entity);
-      if (!$flag->access($entity_id) && (!$flag->is_flagged($entity_id) || !$flag->access($entity_id, 'flag'))) {
-        // User has no permission to use this flag or flag does not apply to this
-        // object. The link is not skipped if the user has "flag" access but
-        // not "unflag" access (this way the unflag denied message is shown).
-        continue;
-      }
-
-      $element['#links']['flag-'. $name] = array(
-        'title' => $flag->theme($flag->is_flagged($entity_id) ? 'unflag' : 'flag', $entity_id),
-        'html' => TRUE,
-      );
-    }
-  }*/
 }
 
 /**
