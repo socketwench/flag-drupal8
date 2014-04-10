@@ -315,6 +315,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     // Save the Link Type configuration.
     $linkTypePlugin = $this->getLinkTypePlugin();
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
+
+    // Reset the render cache for the entity.
+    \Drupal::entityManager()
+      ->getViewBuilder($this->getFlaggableEntityType())
+      ->resetCache();
   }
 
   public function toArray() {
