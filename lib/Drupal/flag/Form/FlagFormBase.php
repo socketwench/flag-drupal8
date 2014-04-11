@@ -190,10 +190,10 @@ abstract class FlagFormBase extends EntityFormController {
 
     if ($form_values['link_type'] == 'confirm') {
       if (empty($form_values['flag_confirmation'])) {
-        form_set_error('flag_confirmation', t('A flag confirmation message is required when using the confirmation link type.'));
+        form_set_error('flag_confirmation', array(t('A flag confirmation message is required when using the confirmation link type.')));
       }
       if (empty($form_values['unflag_confirmation'])) {
-        form_set_error('unflag_confirmation', t('An unflag confirmation message is required when using the confirmation link type.'));
+        form_set_error('unflag_confirmation', array(t('An unflag confirmation message is required when using the confirmation link type.')));
       }
     }
     /*

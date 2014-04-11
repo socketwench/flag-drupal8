@@ -9,23 +9,20 @@
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
-use Drupal\Core\EntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
 
 class FlaggingConfirmForm extends ConfirmFormBase {
 
-  protected $action;
-
   protected $entity;
 
   protected $flag;
 
-  // @todo add parameters for the entity, flag
   public function buildForm(array $form, array &$form_state,
-                            $action, FlagInterface $flag, EntityInterface $entity) {
+                            FlagInterface $flag = NULL,
+                            EntityInterface $entity = NULL) {
 
-    $this->action = $action;
     $this->flag = $flag;
     $this->entity = $entity;
   }
@@ -37,7 +34,7 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   public function getQuestion() {
     $linkType = $this->flag->getLinkTypePlugin();
 
-    if ($action == 'unflag') {
+    if (!$this->isFlagged()) {
       return $linkType->getUnflagQuestion();
     }
     else {
@@ -47,19 +44,41 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   }
 
   public function getCancelRoute() {
+/*    $destination = \Drupal::request()->get('destination');
+    if (!empty($destination)) {
+      return new URL($destination);
+    }
+*/
     return $this->entity->urlInfo();
   }
 
   public function getDescription() {
-    return $this->t('');
+    if (!$this->isFlagged()) {
+      return $this->flag->unflag_long;
+    }
+
+    return $this->flag->flag_long;
   }
 
   public function getConfirmText() {
+    if (!$this->isFlagged()) {
+      return $this->t('Unflag');
+    }
+
     return $this->t('Flag');
   }
 
-  public function submitForm(array &$form, array &$form_state) {
+  protected function isFlagged() {
+    return $this->flag->isFlagged($this->entity);
+  }
 
+  public function submitForm(array &$form, array &$form_state) {
+    if ($this->isFlagged()) {
+      \Drupal::service('flag')->unflagByObject($this->flag, $this->entity);
+    }
+    else {
+      \Drupal::service('flag')->flagByObject($this->flag, $this->entity);
+    }
   }
 
 } 
