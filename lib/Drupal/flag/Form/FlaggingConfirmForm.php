@@ -20,11 +20,12 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   protected $flag;
 
   public function buildForm(array $form, array &$form_state,
-                            FlagInterface $flag = NULL,
-                            EntityInterface $entity = NULL) {
+                            $flag_id = NULL, $entity_id = NULL) {
 
-    $this->flag = $flag;
-    $this->entity = $entity;
+    $flagService = \Drupal::service('flag');
+    $this->flag = $flagService->getFlagByID($flag_id);
+    $this->entity = $flagService->getFlaggableById($this->flag, $entity_id);
+    return parent::buildForm($form, $form_state);
   }
 
   public function getFormID() {
@@ -34,7 +35,7 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   public function getQuestion() {
     $linkType = $this->flag->getLinkTypePlugin();
 
-    if (!$this->isFlagged()) {
+    if ($this->isFlagged()) {
       return $linkType->getUnflagQuestion();
     }
     else {
@@ -44,16 +45,16 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   }
 
   public function getCancelRoute() {
-/*    $destination = \Drupal::request()->get('destination');
+    $destination = \Drupal::request()->get('destination');
     if (!empty($destination)) {
-      return new URL($destination);
+      return URL::createFromPath($destination);
     }
-*/
+
     return $this->entity->urlInfo();
   }
 
   public function getDescription() {
-    if (!$this->isFlagged()) {
+    if ($this->isFlagged()) {
       return $this->flag->unflag_long;
     }
 
@@ -61,7 +62,7 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   }
 
   public function getConfirmText() {
-    if (!$this->isFlagged()) {
+    if ($this->isFlagged()) {
       return $this->t('Unflag');
     }
 
