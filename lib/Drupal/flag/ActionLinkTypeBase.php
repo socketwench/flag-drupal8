@@ -62,6 +62,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
+    $render['#attributes']['id'] = 'flag-' . $flag->id() . '-id-' . $entity->id();
 
     //@todo check if flagged, assign flag or unflag text.
     if ($action === 'unflag') {
