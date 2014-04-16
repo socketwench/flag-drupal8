@@ -59,14 +59,32 @@ flag_link_flag:
   defaults:
     _controller: '\Drupal\flag\Controller\ReloadLinkController::flag'
   requirements:
-    _entity_create_access: flagging
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
+    _format: 'html'
+
+flag.link_flag.json:
+  path: '/flag/flag/{flag_id}/{entity_id}'
+  defaults:
+    _controller: '\Drupal\flag\Controller\AJAXLinkController::flag'
+  requirements:
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
+    _format: 'json'
 
 flag_link_unflag:
   path: '/flag/unflag/{flag_id}/{entity_id}'
   defaults:
     _controller: '\Drupal\flag\Controller\ReloadLinkController::unflag'
   requirements:
-    _entity_access: flagging.delete
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkUnflag'
+    _format: 'html'
+
+flag.link_unflag.json:
+  path: '/flag/unflag/{flag_id}/{entity_id}'
+  defaults:
+    _controller: '\Drupal\flag\Controller\AJAXLinkController::unflag'
+  requirements:
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkUnflag'
+    _format: 'json'
 
 flag_confirm_flag:
   path: '/flag/confirm/flag/{flag_id}/{entity_id}'
@@ -74,7 +92,7 @@ flag_confirm_flag:
     _form: '\Drupal\flag\Form\FlaggingConfirmForm'
     _title: 'Flag Content'
   requirements:
-    _entity_create_access: flagging
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
 
 flag_confirm_unflag:
   path: '/flag/confirm/unflag/{flag_id}/{entity_id}'
@@ -82,5 +100,6 @@ flag_confirm_unflag:
     _form: '\Drupal\flag\Form\FlaggingConfirmForm'
     _title: 'Flag Content'
   requirements:
-    _entity_access: flagging.delete
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkUnflag'
+
 

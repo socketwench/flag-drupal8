@@ -22,20 +22,6 @@ class ReloadLinkController extends ControllerBase {
 
     $flagging = \Drupal::service('flag')->flag($flag_id, $entity_id);
 
-    // If the response is coming from JavaScript, we can't return a redirect.
-    // Instead, we replace the flag link with an unflag link via JSON.
-    if ($request->request->get('js')) {
-      $response = new AjaxResponse();
-      $linkType = $flagging->getFlag()->getLinkTypePlugin();
-      $link = $linkType->renderLink('unflag', $flagging->getFlag(), $flagging->getFlaggable());
-      $linkId = '#' . $link['#attributes']['id'];
-      $html = drupal_render($link);
-      $replace = new ReplaceCommand($linkId, $html);
-      $response->addCommand($replace);
-
-      return $response;
-    }
-
     // Get the destination.
     $destination = $request->get('destination', $flagging->getFlaggable()->url());
 
@@ -44,17 +30,11 @@ class ReloadLinkController extends ControllerBase {
   }
 
   public function unflag(Request $request, $flag_id, $entity_id) {
-    // Get the Flag Service.
     $flagService = \Drupal::service('flag');
+    $flagService->unflag($flag_id, $entity_id);
 
-    // Get the Flag and Entity objects.
     $flag = $flagService->getFlagById($flag_id);
     $entity = $flagService->getFlaggableById($flag, $entity_id);
-
-    $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag);
-    foreach ($flaggings as $flagging) {
-      \Drupal::service('flag')->unflagByObject($flagging);
-    }
 
     $destination = \Drupal::request()->get('destination', $entity->url());
 
