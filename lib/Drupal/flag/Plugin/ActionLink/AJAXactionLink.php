@@ -2,7 +2,7 @@
 
 namespace Drupal\flag\Plugin\ActionLink;
 
-use Drupal\flag\Plugin\ActionLink\Reload;
+use Drupal\flag\ActionLinkTypeBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
@@ -15,7 +15,15 @@ use Drupal\flag\FlagInterface;
  *   description = "An AJAX JavaScript request will be made without reloading the page."
  * )
  */
-class AJAXactionLink extends Reload{
+class AJAXactionLink extends ActionLinkTypeBase{
+
+  public function routeName($action = NULL) {
+    if ($action === 'unflag') {
+      return 'flag.link_unflag.json';
+    }
+
+    return 'flag.link_flag.json';
+  }
 
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $render = parent::renderLink($action, $flag, $entity);

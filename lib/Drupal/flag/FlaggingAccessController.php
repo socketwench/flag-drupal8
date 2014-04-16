@@ -8,48 +8,37 @@
 
 namespace Drupal\flag;
 
+use Drupal\Core\Access\AccessInterface;
+use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityAccessController;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class FlaggingAccessController extends EntityAccessController {
 
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    if ($account->id() == 1) {
-      return TRUE;
+class FlaggingAccessController extends ControllerBase {
+
+  public function checkFlag(Request $request) {
+    $entity_id = $request->get('entity_id');
+
+    if (user_access('flag' . $entity_id)) {
+      return AccessInterface::ALLOW;
     }
 
-    switch ($operation) {
-      case 'view':
-      case 'flag':
-        return user_access('flag ' . $entity->id(), $account);
-        break;
-
-      case 'delete':
-      case 'unflag':
-        return user_access('unflag' . $entity->id(), $account);
-        break;
-    }
-
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return AccessInterface::DENY;
   }
 
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    if ($account->id() == 1) {
-      return TRUE;
+  /**
+   *
+   */
+  public function checkUnflag(Request $request) {
+    $entity_id = $request->get('entity_id');
+
+    if (user_access('unflag' . $entity_id)) {
+      return AccessInterface::ALLOW;
     }
 
-    //@todo Figure out how to handle the NULL $entity_bundle case.
-    return user_access('flag ' . $entity_bundle, $account);
-  }
-
-  public function getRoles() {
-    $roles = array();
-
-    $roles['flag'] = user_roles(FALSE, 'flag ' . $this->entityTypeId);
-    $roles['unflag'] = user_roles(FALSE, 'unflag ' . $this->entityTypeId);
-
-    return $roles;
+    return AccessInterface::DENY;
   }
 
 } 
