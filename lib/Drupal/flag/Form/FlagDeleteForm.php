@@ -24,7 +24,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
 
   public function getCancelRoute() {
     return array(
-      'route_name' => 'flag_list',
+      'route_name' => 'flag.list',
     );
   }
 
@@ -34,7 +34,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
      '%label' => $this->entity->label(),
     )));
 
-    $form_state['redirect_route']['route_name'] = 'flag_list';
+    $form_state['redirect_route']['route_name'] = 'flag.list';
   }
 
 } 
