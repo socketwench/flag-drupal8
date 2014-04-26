@@ -8,10 +8,10 @@
 
 namespace Drupal\flag\Form;
 
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\flag\Handlers\AbstractFlag;
 
-abstract class FlagFormBase extends EntityFormController {
+abstract class FlagFormBase extends EntityForm {
 
 
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {

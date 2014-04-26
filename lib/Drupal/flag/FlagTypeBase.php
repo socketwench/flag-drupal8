@@ -36,6 +36,13 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
   }
 
   /**
+   * {@inhereitdoc}
+   */
+  public function calculateDependencies() {
+    return array();
+  }
+
+  /**
    * Returns this flag type plugin's configuration array.
    *
    * @return array
