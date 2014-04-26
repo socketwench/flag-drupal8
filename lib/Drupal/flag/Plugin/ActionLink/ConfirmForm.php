@@ -24,10 +24,10 @@ class ConfirmForm extends ActionLinkTypeBase {
 
   public function routeName($action = NULL) {
     if ($action == 'unflag') {
-      return 'flag_confirm_unflag';
+      return 'flag.confirm_unflag';
     }
 
-    return 'flag_confirm_flag';
+    return 'flag.confirm_flag';
   }
 
   public function defaultConfiguration() {

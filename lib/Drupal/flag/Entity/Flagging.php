@@ -38,7 +38,7 @@ use Drupal\flag\FlaggingInterface;
  *    "bundle" = "type"
  *  },
  *  links = {
- *    "admin-form" = "flag_edit"
+ *    "admin-form" = "flag.edit"
  *  }
  * )
  */

@@ -26,10 +26,10 @@ class Reload extends ActionLinkTypeBase {
    */
   public function routeName($action = NULL) {
     if ($action === 'unflag') {
-      return 'flag_link_unflag';
+      return 'flag_link_unflag.html';
     }
 
-    return 'flag_link_flag';
+    return 'flag_link_flag.html';
   }
 
 } 

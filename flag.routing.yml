@@ -1,4 +1,4 @@
-flag_add_page:
+flag.add_page:
   path: '/admin/structure/flags/add'
   defaults:
     _form: '\Drupal\flag\Form\FlagAddPageForm'
@@ -6,7 +6,7 @@ flag_add_page:
   requirements:
     _permission: 'administer flags'
 
-flag_list:
+flag.list:
   path: '/admin/structure/flags'
   defaults:
     _entity_list: 'flag_flag'
@@ -14,7 +14,7 @@ flag_list:
   requirements:
     _permission: 'administer flags'
 
-flag_add:
+flag.add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
     _entity_form: flag_flag.add
@@ -22,7 +22,7 @@ flag_add:
   requirements:
     _permission: 'administer flags'
 
-flag_edit:
+flag.edit:
   path: '/admin/structure/flags/manage/{flag_flag}'
   defaults:
     _entity_form: flag_flag.edit
@@ -30,7 +30,7 @@ flag_edit:
   requirements:
     _entity_access: 'flag_flag.update'
 
-flag_delete:
+flag.delete:
   path: '/admin/structure/flags/manage/{flag_flag}/delete'
   defaults:
     _entity_form: flag_flag.delete
@@ -38,7 +38,7 @@ flag_delete:
   requirements:
     _entity_access: 'flag_flag.update'
 
-flag_import:
+flag.import:
   path: '/admin/structure/flags/import'
   defaults:
     _form: '\Drupal\flag\Form\FlagImportForm'
@@ -46,7 +46,7 @@ flag_import:
   requirements:
     _permission: 'use flag import'
 
-flag_export:
+flag.export:
   path: '/admin/structure/flags/export'
   defaults:
     _form: '\Drupal\flag\Form\FlagExportForm'
@@ -54,7 +54,7 @@ flag_export:
   requirements:
     _permission: 'use flag import'
 
-flag_link_flag:
+flag_link_flag.html:
   path: '/flag/flag/{flag_id}/{entity_id}'
   defaults:
     _controller: '\Drupal\flag\Controller\ReloadLinkController::flag'
@@ -70,7 +70,7 @@ flag.link_flag.json:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
     _format: 'json'
 
-flag_link_unflag:
+flag_link_unflag.html:
   path: '/flag/unflag/{flag_id}/{entity_id}'
   defaults:
     _controller: '\Drupal\flag\Controller\ReloadLinkController::unflag'
@@ -86,7 +86,7 @@ flag.link_unflag.json:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkUnflag'
     _format: 'json'
 
-flag_confirm_flag:
+flag.confirm_flag:
   path: '/flag/confirm/flag/{flag_id}/{entity_id}'
   defaults:
     _form: '\Drupal\flag\Form\FlaggingConfirmForm'
@@ -94,7 +94,7 @@ flag_confirm_flag:
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
 
-flag_confirm_unflag:
+flag.confirm_unflag:
   path: '/flag/confirm/unflag/{flag_id}/{entity_id}'
   defaults:
     _form: '\Drupal\flag\Form\FlaggingConfirmForm'

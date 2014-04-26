@@ -40,8 +40,8 @@ use Drupal\flag\FlagInterface;
  *     "label" = "label",
  *   },
  *   links = {
- *     "edit-form" = "flag_edit",
- *     "delete-form" = "flag_delete"
+ *     "edit-form" = "flag.edit",
+ *     "delete-form" = "flag.delete"
  *   }
  * )
  *
