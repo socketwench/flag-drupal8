@@ -78,6 +78,13 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   }
 
   /**
+   * {@inhereitdoc}
+   */
+  public function calculateDependencies() {
+    return array();
+  }
+
+  /**
    * Provides a form array for the action link plugin's settings form.
    * Derived classes will want to override this method.
    *
