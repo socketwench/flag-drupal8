@@ -11,7 +11,7 @@ namespace Drupal\flag\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\flag\Handlers\AbstractFlag;
 
-class FlagAddPageForm extends FormBase{
+class FlagAddPageForm extends FormBase {
 
    /**
     * {@inheritdoc}

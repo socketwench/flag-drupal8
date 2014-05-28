@@ -1,0 +1,33 @@
+id: bookmark
+entity_type: node
+label: Bookmark
+types:
+  article: article
+  page: page
+flag_short: 'Bookmark this'
+flag_long: 'Add this post to your bookmarks'
+flag_message: 'This post has been added to your bookmarks'
+unflag_short: 'Remove bookmark'
+unflag_long: 'Remove this post from your bookmarks'
+unflag_message: 'This post has been removed from your bookmarks'
+unflag_denied_text: ''
+weight: 0
+status: true
+langcode: en
+dependencies: {  }
+roles: null
+flag_type: flagtype_node
+link_type: reload
+flagTypeConfig:
+  show_in_links:
+    full: full
+    teaser: teaser
+    rss: 0
+    search_index: 0
+    search_result: 0
+  show_as_field: 1
+  show_on_form: 0
+  show_contextual_link: 0
+  i18n: null
+  access_author: ''
+linkTypeConfig: {  }
