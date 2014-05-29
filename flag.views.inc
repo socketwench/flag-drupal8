@@ -16,6 +16,46 @@ function flag_views_data() {
       'field' =>  'entity_id',
     ),
   );
+
+  $data['flagging']['uid'] = array(
+    'title' => t('User uid'),
+    'help' => t('The user that flagged an item. If you need more fields than the uid add the "Flags: User" relationship.'),
+    'relationship' => array(
+      'base' => 'users',
+      'title' => t('User'),
+      'help' => t('Relate an item to the user that flagged it.'),
+      'id' => 'standard',
+      'label' => t('Flag user'),
+    ),
+    'filter' => array(
+      'id' => 'numeric',
+    ),
+    'argument' => array(
+      'id' => 'numeric',
+    ),
+    'field' => array(
+      'id' => 'user',
+    ),
+  );
+
+  $data['flagging']['timestamp'] = array(
+    'title' => t('Flagged time'),
+    'help' => t('Display the time the content was flagged by a user.'),
+    'field' => array(
+      'id' => 'date',
+      //'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'id' => 'date',
+    ),
+    'filter' => array(
+      'id' => 'date',
+    ),
+    'argument' => array(
+      'id' => 'date',
+    ),
+  );
+
   $data['flagging']['entity_id'] = array(
     'title' => t('Entity ID'),
     'help' => t('The ID of the entity'),
@@ -43,8 +83,9 @@ function flag_views_data_alter(&$data) {
   foreach ($flags as $fid => $flag) {
     $flag_type_plugin = $flag->getFlagTypePlugin();
     $flag_type_def = $flag_type_plugin->getPluginDefinition();
+    $entity_type = $flag_type_def['entity_type'];
 
-    $info = \Drupal::entityManager()->getDefinition($flag_type_def['entity_type']);
+    $info = \Drupal::entityManager()->getDefinition($entity_type);
 
     $base_table = $info->getBaseTable();
     if ($flag_type_def['entity_type'] == 'node') {
@@ -52,7 +93,7 @@ function flag_views_data_alter(&$data) {
     }
 
     $data[$base_table]['flag_content_rel'] = array(
-      'title' => t('@entity_label flag', array('@entity_label' => $flag_type_def['entity_type'])),
+      'title' => t('@entity_label flag', array('@entity_label' => $entity_type)),
       'help' => t('Limit results to only those entity flagged by a certain flag; Or display information about the flag set on a entity.'),
       'relationship' => array(
         'group' => t('Flag'),
@@ -61,7 +102,7 @@ function flag_views_data_alter(&$data) {
         'base field' => 'entity_id',
         'relationship field' => $info->getKey('id'),
         'id' => 'flag_relationship',
-        'flag type' => $fid,
+        'flaggable' => $entity_type,
       ),
     );
 
