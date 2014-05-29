@@ -15,29 +15,40 @@ use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
  *
  * @ViewsRelationship("flag_relationship")
  */
-public class FlagViewsRelationship extends RelationshipPluginBase {
+class FlagViewsRelationship extends RelationshipPluginBase {
 
-  protected function defineOptions() {
+  public function defineOptions() {
     $options = parent::defineOptions();
-    $options['flag'] = array('default' => NULL);
+    $options['flag'] = array('default' => NULL); // @todo load first defined flag for entity.
     $options['required'] = array('default' => 1);
     $options['user_scope'] = array('default' => 'current');
     return $options;
   }
 
-  protected function buildOptionsForm(&$form, &$form_state) {
-    $entity_type = $this->definition['flag type'];
+  public function buildOptionsForm(&$form, &$form_state) {
+    $entity_type = $this->definition['flaggable'];
     $form['label']['#description'] .= ' ' . t('The name of the selected flag makes a good label.');
+
+    /*//////////////////////////////////////////////////////////////////////////
+    @todo Add Flag selection form
+
+    The Flag relationship relates a single flag to a single entity. Since
+    multiple flags may be configured for the same entity type, we need to
+    provide a form here that allows us to choose the flag.
+    //////////////////////////////////////////////////////////////////////////*/
+    $flags = \Drupal::service('flag')->getFlags($entity_type);
+
     $form['flag'] = array(
-      '#type' => $form_type,
+      '#type' => 'radios',
       '#title' => t('Flag'),
-      '#default_value' => $current_flag,
+ //     '#default_value' => current(array_keys($flags)),
       '#required' => TRUE,
     );
 
-    $flags = \Drupal::service('flag')->getFlags($entity_type)
-    foreach ($flags as $flag) {
-      $form['flag']['#options'][$flag->label()] = $flag->id();
+    foreach ($flags as $fid => $flag) {
+      if (!empty($flag)) {
+        $form['flag']['#options'][$flag->label()] = $fid;
+      }
     }
 
     $form['user_scope'] = array(
@@ -62,7 +73,7 @@ public class FlagViewsRelationship extends RelationshipPluginBase {
     parent::buildOptionsForm($form, $form_state);
   }
 
-  public query() {
+  public function query() {
     $this->ensureMyTable();
 
     $def = $this->definition;

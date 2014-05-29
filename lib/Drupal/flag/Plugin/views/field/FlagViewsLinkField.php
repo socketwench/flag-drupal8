@@ -19,6 +19,15 @@ use Drupal\views\ResultRow;
  */
 class FlagViewsLinkField extends FieldPluginBase {
 
+  public function getFlag() {
+    // When editing a view it's possible to delete the relationship (either by
+    // error or to later recreate it), so we have to guard against a missing
+    // one.
+    if (isset($this->view->relationship[$this->options['relationship']])) {
+      return $this->view->relationship[$this->options['relationship']]->getFlag();
+    }
+  }
+
   protected function defineOptions() {
     $options = parent::defineOptions();
 
