@@ -10,9 +10,10 @@ define('FLAG_API_VERSION', 3);
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
-use Drupal\flag\Handlers\AbstractFlag;
 use Drupal\flag\Flag;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -578,7 +579,10 @@ function flag_field_attach_save($entity_type, $entity) {
  *
  * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
-function flag_entity_view($entity, $display, $view_mode, $langcode) {
+function flag_entity_view(array &$build, EntityInterface $entity,
+                          EntityViewDisplayInterface $display,
+                          $view_mode, $langcode) {
+
 
   //@todo Check $type->getComponent('flag_whateverHookFieldExtraFieldsIS').
   // if not NULL, display it.
