@@ -146,6 +146,15 @@ class FlagService {
     return $flagging;
   }
 
+  /**
+   *
+   * @api
+   *
+   * @param $flag_id
+   * @param $entity_id
+   * @param AccountInterface $account
+   * @return EntityInterface
+   */
   public function flag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
       $account = \Drupal::currentUser();
@@ -157,10 +166,15 @@ class FlagService {
     return $this->flagByObject($flag, $entity, $account);
   }
 
-  public function unflagByObject(FlaggingInterface $flagging) {
-    $flagging->delete();
-  }
-
+  /**
+   *
+   * @api
+   *
+   * @param $flag_id
+   * @param $entity_id
+   * @param AccountInterface $account
+   * @return array
+   */
   public function unflag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
       $account = \Drupal::currentUser();
@@ -169,13 +183,24 @@ class FlagService {
     $flag = $this->getFlagById($flag_id);
     $entity = $this->getFlaggableById($flag, $entity_id);
 
+    return $this->unflagByObject($flag, $entity, $account);
+  }
+
+
+  public function unflagByObject(FlagInterface $flag,
+                                 EntityInterface $entity,
+                                 AccountInterface $account = NULL) {
     $out = array();
     $flaggings = $this->getFlaggings($entity, $flag);
     foreach ($flaggings as $flagging) {
-      $out[] = $this->unflagByObject($flagging);
+      $out[] = $this->unflagByFlagging($flagging);
     }
 
     return $out;
   }
 
-} 
+  public function unflagByFlagging(FlaggingInterface $flagging) {
+    $flagging->delete();
+  }
+
+}
