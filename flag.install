@@ -109,7 +109,7 @@ function flag_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'timestamp' => array(
+      'created' => array(
         'description' => 'The UNIX time stamp representing when the flag was set.',
         'type' => 'int',
         'unsigned' => TRUE,
