@@ -188,14 +188,16 @@ abstract class FlagFormBase extends EntityForm {
     $form_state['values']['label'] = trim($form_state['values']['label']);
     $form_values = $form_state['values'];
 
+    //@todo Move this to the validation method for the confirm form plugin
+    /*
     if ($form_values['link_type'] == 'confirm') {
       if (empty($form_values['flag_confirmation'])) {
-        form_set_error('flag_confirmation', array(t('A flag confirmation message is required when using the confirmation link type.')));
+        $this->setFormError('flag_confirmation', $form_state, $this->t('A flag confirmation message is required when using the confirmation link type.'));
       }
       if (empty($form_values['unflag_confirmation'])) {
-        form_set_error('unflag_confirmation', array(t('An unflag confirmation message is required when using the confirmation link type.')));
+        $this->setFormError('unflag_confirmation', $form_state, $this->t('An unflag confirmation message is required when using the confirmation link type.'));
       }
-    }
+    }*/
     /*
         if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_values['id'])) {
           form_set_error('label', t('The flag name may only contain lowercase letters, underscores, and numbers.'));
