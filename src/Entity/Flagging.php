@@ -49,7 +49,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   }
 
   public function getFlag() {
-    return entity_load($this->bundle, $this->getFlagId());
+    return entity_load('flag_flag', $this->getFlagId());
   }
 
   public function getFlaggableType() {
