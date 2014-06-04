@@ -601,7 +601,7 @@ function flag_entity_view(array &$build, EntityInterface $entity,
     }
 
     $link = $linkTypePlugin->renderLink($action, $flag, $entity);
-    $entity->content['flag_' . $flag->id] = $link;
+    $build['flag_' . $flag->id] = $link;
   }
 
   /**
