@@ -11,56 +11,6 @@
 function flag_schema() {
   $schema = array();
 /*
-  $schema['flag'] = array(
-    'description' => 'All available flags in the system.',
-    'fields' => array(
-      'fid' => array(
-        'description' => 'The unique ID for this particular flag.',
-        'type' => 'serial',
-        'size' => 'small',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'entity_type' => array(
-        'description' => 'The flag type, such as one of "node", "comment", or "user".',
-        'type' => 'varchar',
-        'length' => '128',
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'name' => array(
-        'description' => 'The machine-name for this flag.',
-        'type' => 'varchar',
-        'length' => '32',
-        'not null' => FALSE,
-        'default' => '',
-      ),
-      'title' => array(
-        'description' => 'The human-readable title for this flag.',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => FALSE,
-        'default' => '',
-      ),
-      'global' => array(
-        'description' => 'Whether this flag state should act as a single toggle to all users across the site.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => FALSE,
-        'default' => 0,
-      ),
-      'options' => array(
-        'description' => 'The options and configuration of this flag.',
-        'type' => 'text',
-        'not null' => FALSE,
-      ),
-    ),
-    'primary key' => array('fid'),
-    'unique keys' => array(
-      'name' => array('name'),
-    ),
-  );
-*/
   $schema['flagging'] = array(
     'description' => 'Objects that have been flagged.',
     'fields' => array(
@@ -135,31 +85,7 @@ function flag_schema() {
       'entity_id_fid' => array('entity_id', 'fid'),
     ),
   );
-/*
-  $schema['flag_types'] = array(
-    'description' => 'The entity bundles that are affected by a flag.',
-    'fields' => array(
-      'fid' => array(
-        'description' => 'The unqiue flag ID as defined for the flag in {flag}.',
-        'type' => 'int',
-        'size' => 'small',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'type' => array(
-        'description' => 'The entity bundles that can be flagged by this fid.',
-        'type' => 'varchar',
-        'length' => '128',
-        'not null' => TRUE,
-        'default' => '',
-      ),
-    ),
-    'indexes' => array(
-      'fid' => array('fid'),
-    ),
-  );
-
+*/
   $schema['flag_counts'] = array(
     'description' => 'The number of times an item has been flagged.',
     'fields' => array(
@@ -210,7 +136,7 @@ function flag_schema() {
       'fid_last_updated' => array('fid', 'last_updated'),
     ),
   );
-*/
+
   return $schema;
 }
 
