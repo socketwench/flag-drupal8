@@ -27,7 +27,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
 
   public function buildOptionsForm(&$form, &$form_state) {
     $entity_type = $this->definition['flaggable'];
-    $form['label']['#description'] .= ' ' . t('The name of the selected flag makes a good label.');
+    //$form['label']['#description'] .= ' ' . t('The name of the selected flag makes a good label.');
 
     /*//////////////////////////////////////////////////////////////////////////
     @todo Add Flag selection form
@@ -78,12 +78,38 @@ class FlagViewsRelationship extends RelationshipPluginBase {
       return;
     }
 
-    parent::query();
+    $this->definition['extra'][] = array(
+      'field' => 'fid',
+      'value' => $flag->id,
+      'numeric' => TRUE,
+    );
+
+    if ($this->definition['user_scope'] == 'current' && !$flag->isGlobal()) {
+      $this->definition['extra'][] = array(
+        'field' => 'uid',
+        'value' => '***CURRENT_USER***',
+        'numeric' => TRUE,
+      );
+      $flag_roles = user_roles(FALSE, "flag $flag->name");
+      if (isset($flag_roles[DRUPAL_ANONYMOUS_RID])) {
+        // Disable page caching for anonymous users.
+        drupal_page_is_cacheable(FALSE);
+
+        // Add in the SID from Session API for anonymous users.
+        $this->definition['extra'][] = array(
+          'field' => 'sid',
+          'value' => '***FLAG_CURRENT_USER_SID***',
+          'numeric' => TRUE,
+        );
+      }
+    }
+
+//    parent::query();
 
   }
 
   protected function getFlag() {
-    $flaggable = $this->options['flaggable'];
-    $this->options['flag'] = \Drupal::service('flag')->getFlag($flaggable);
+    $flaggable = $this->definition['flaggable'];
+    $this->options['flag'] = \Drupal::service('flag')->getFlags($flaggable);
   }
 }
