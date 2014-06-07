@@ -60,24 +60,40 @@ class FlagViewsLinkField extends FieldPluginBase {
     parent::buildOptionsForm($form, $form_state);
   }
 
+  public function query() {
+    // Intentionally do nothing here since we're only providing a link and not
+    // querying against a real table column.
+  }
+
   /**
    * @param ResultRow $values
    * @return string|void
    */
   public function render(ResultRow $values) {
-    $comment = $this->getEntity($values);
-    return $this->renderLink($comment, $values);
+    //$entity = $this->getEntity($values);
+    return $this->renderLink($values->_entity, $values);
   }
 
   /**
    * @param $data
    * @param ResultRow $values
    */
-  protected function renderLink($data, ResultRow $values) {
-    if ($node->access('view')) {
-      $text = !empty($this->options['text']) ? $this->options['text'] : t('View');
-      return $text;
+  protected function renderLink($entity, ResultRow $values) {
+    if (empty($entity)) { // || !$entity->access('view')) {
+      return t('N/A');
     }
+
+    $flag = $this->getFlag();
+    $linkTypePlugin = $flag->getLinkTypePlugin();
+    $action = 'flag';
+
+    if ($flag->isFlagged($entity)) {
+      $action = 'unflag';
+    }
+
+    $link = $linkTypePlugin->renderLink($action, $flag, $entity);
+
+    return $link;
   }
 
 } 

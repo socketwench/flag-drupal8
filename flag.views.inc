@@ -63,15 +63,14 @@ function flag_views_data() {
     ),
   );
 
-/*
   // Flag content links.
-  $data['flagging']['ops'] = array(
-    'title' => t('Flag link'),
-    'help' => t('Display flag/unflag link.'),
+  $data['flagging']['link_flag'] = array(
     'field' => array(
-      'handler' => 'flag_handler_field_ops',
+      'title' => t('Flag Links'),
+      'help' => t('Display flag/unflag link.'),
+      'id' => 'flag_link',
     ),
-  );*/
+  );
 
   return $data;
 }
