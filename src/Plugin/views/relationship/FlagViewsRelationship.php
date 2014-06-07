@@ -74,9 +74,16 @@ class FlagViewsRelationship extends RelationshipPluginBase {
   }
 
   public function query() {
-    $this->ensureMyTable();
+    if (!($flag = $this->getFlag())) {
+      return;
+    }
 
-    $def = $this->definition;
-    $def['table'] = 'flag';
+    parent::query();
+
+  }
+
+  protected function getFlag() {
+    $flaggable = $this->options['flaggable'];
+    $this->options['flag'] = \Drupal::service('flag')->getFlag($flaggable);
   }
 }

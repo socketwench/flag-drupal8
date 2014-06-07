@@ -38,7 +38,7 @@ function flag_views_data() {
     ),
   );
 
-  $data['flagging']['timestamp'] = array(
+  $data['flagging']['created'] = array(
     'title' => t('Flagged time'),
     'help' => t('Display the time the content was flagged by a user.'),
     'field' => array(

@@ -10,82 +10,7 @@
  */
 function flag_schema() {
   $schema = array();
-/*
-  $schema['flagging'] = array(
-    'description' => 'Objects that have been flagged.',
-    'fields' => array(
-      'id' => array(
-        'description' => 'The unique ID for this particular tag.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'uuid' => array(
-        'description' => 'Unique Key: Universally unique identifier for this entity.',
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => FALSE,
-      ),
-      'fid' => array(
-        'description' => 'The unique flag ID this object has been flagged with, from {flag}.',
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => FALSE,
-      ),
-      'entity_type' => array(
-        'description' => 'The flag type, eg "node", "comment", "user".',
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-      ),
-      'entity_id' => array(
-        'description' => 'The unique ID of the object, such as either the {cid}, {uid}, or {nid}.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'uid' => array(
-        'description' => 'The user ID by whom this object was flagged.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'sid' => array(
-        'description' => "The user's session id as stored in the session table.",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'created' => array(
-        'description' => 'The UNIX time stamp representing when the flag was set.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'disp-size' => 11,
-      ),
-      'type' => array(
-        'description' => 'The type of this node.',
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-    ),
-    'primary key' => array('id'),
-    'unique keys' => array(
-      'fid_entity_id_uid_sid' => array('fid', 'entity_id', 'uid', 'sid'),
-    ),
-    'indexes' => array(
-      'entity_type_uid_sid' => array('entity_type', 'uid', 'sid'),
-      'entity_type_entity_id_uid_sid' => array('entity_type', 'entity_id', 'uid', 'sid'),
-      'entity_id_fid' => array('entity_id', 'fid'),
-    ),
-  );
-*/
+
   $schema['flag_counts'] = array(
     'description' => 'The number of times an item has been flagged.',
     'fields' => array(
@@ -144,15 +69,6 @@ function flag_schema() {
  * Implements hook_uninstall().
  */
 function flag_uninstall() {
-  /*
-  $result = db_select('variable', 'v')
-    ->fields('v', array('name'))
-    ->condition('name', 'flag_%', 'LIKE')
-    ->execute();
-  foreach ($result as $row) {
-    variable_del($row->name);
-  }
-  */
   drupal_set_message(t('Flag has been uninstalled.'));
 }
 
@@ -160,6 +76,7 @@ function flag_uninstall() {
  * Implements hook_requirements().
  */
 function flag_requirements($phase) {
+  /*
   $requirements = array();
 
   if ($phase == 'runtime') {
@@ -191,4 +108,5 @@ function flag_requirements($phase) {
     }
   }
   return $requirements;
+  */
 }
