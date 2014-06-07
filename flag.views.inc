@@ -72,6 +72,27 @@ function flag_views_data() {
     ),
   );
 
+  // Specialized is null/is not null filter.
+  $data['flagging']['flagged'] = array(
+    'title' => t('Flagged'),
+    'real field' => 'uid',
+    'field' => array(
+      'id' => 'flag_flagged',
+      'label' => t('Flagged'),
+      'help' => t('A boolean field to show whether the flag is set or not.'),
+    ), /*
+    'filter' => array(
+      'handler' => 'flag_handler_filter_flagged',
+      'label' => t('Flagged'),
+      'help' => t('Filter to ensure content has or has not been flagged.'),
+    ),*/
+    'sort' => array(
+      'id' => 'flag_sort',
+      'label' => t('Flagged'),
+      'help' => t('Sort by whether entities have or have not been flagged.'),
+    ),
+  );
+
   return $data;
 }
 
