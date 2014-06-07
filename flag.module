@@ -283,11 +283,6 @@ function flag_permission() {
       'title' => t('Administer flags'),
       'description' => t('Create and edit site-wide flags.'),
     ),
-    'use flag import' => array(
-      'title' => t('Use flag importer'),
-      'description' => t('Access the flag import functionality.'),
-      'restrict access' => TRUE,
-    ),
   );
 
   $flags = \Drupal::service('flag')->getFlags();
