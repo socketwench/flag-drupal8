@@ -38,22 +38,6 @@ flag.delete:
   requirements:
     _entity_access: 'flag_flag.update'
 
-flag.import:
-  path: '/admin/structure/flags/import'
-  defaults:
-    _form: '\Drupal\flag\Form\FlagImportForm'
-    _title: 'Import Flags'
-  requirements:
-    _permission: 'use flag import'
-
-flag.export:
-  path: '/admin/structure/flags/export'
-  defaults:
-    _form: '\Drupal\flag\Form\FlagExportForm'
-    _title: 'Export Flags'
-  requirements:
-    _permission: 'use flag import'
-
 flag_link_flag.html:
   path: '/flag/flag/{flag_id}/{entity_id}'
   defaults:
