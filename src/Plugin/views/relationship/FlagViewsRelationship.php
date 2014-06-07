@@ -84,7 +84,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
       'numeric' => TRUE,
     );
 
-    if ($this->definition['user_scope'] == 'current' && !$flag->isGlobal()) {
+    if ($this->options['user_scope'] == 'current' && !$flag->isGlobal()) {
       $this->definition['extra'][] = array(
         'field' => 'uid',
         'value' => '***CURRENT_USER***',
@@ -108,8 +108,10 @@ class FlagViewsRelationship extends RelationshipPluginBase {
 
   }
 
-  protected function getFlag() {
+  public function getFlag() {
     $flaggable = $this->definition['flaggable'];
-    $this->options['flag'] = \Drupal::service('flag')->getFlags($flaggable);
+    $flag = \Drupal::service('flag')->getFlags($flaggable);
+    $this->options['flag'] = $flag;
+    return current($flag);
   }
 }
