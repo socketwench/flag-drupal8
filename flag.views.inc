@@ -11,7 +11,7 @@ function flag_views_data() {
   $data['flagging']['table']['group'] = t('Flag');
   $data['flagging']['table']['join'] = array(
     'node' => array(
-      'type' => 'INNER',
+      'type' => 'LEFT',
       'left_field' => 'nid',
       'field' =>  'entity_id',
     ),
@@ -39,11 +39,10 @@ function flag_views_data() {
   );
 
   $data['flagging']['created'] = array(
-    'title' => t('Flagged time'),
-    'help' => t('Display the time the content was flagged by a user.'),
+    'title' => t('Last Flagged Time'),
+    'help' => t('Display latest time the content was flagged by a user.'),
     'field' => array(
       'id' => 'date',
-      //'click sortable' => TRUE,
     ),
     'sort' => array(
       'id' => 'date',
