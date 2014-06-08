@@ -8,6 +8,8 @@
 
 namespace Drupal\flag\Plugin\views\field;
 
+use Drupal\views\ViewExecutable;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\Boolean;
 
 /**
@@ -18,27 +20,13 @@ use Drupal\views\Plugin\views\field\Boolean;
  */
 class FlagViewsFlaggedField extends Boolean {
 
-  public function defineOptions() {
-    $options = parent::defineOptions();
-    $options['value'] = array('default' => 1);
-    return $options;
-  }
+  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+    parent::init($view, $display, $options);
 
-  public function buildOptionsForm(&$form, &$form_state) {
-    parent::buildOptionsForm($form, $form_state);
-    $form['value']['#type'] = 'radios';
-    $form['value']['#title'] = t('Status');
-    $form['value']['#options'] = array(
-      1 => t('Flagged'),
-      0 => t('Not flagged'),
-      'All' => t('All'),
-    );
-    $form['value']['#default_value'] = empty($this->options['value']) ? '0' : $this->options['value'];
-    $form['value']['#description'] = '<p>' . t('This filter is only needed if the relationship used has the "Include only flagged content" option <strong>unchecked</strong>. Otherwise, this filter is useless, because all records are already limited to flagged content.') . '</p><p>' . t('By choosing <em>Not flagged</em>, it is possible to create a list of content <a href="@unflagged-url">that is specifically not flagged</a>.', array('@unflagged-url' => 'http://drupal.org/node/299335')) . '</p>';
-  }
-
-  public function query() {
-    $operator = $this->value ? 'IS NOT' : 'IS';
-    $this->query->addWhere($this->options['group'], $this->relationship . '.uid', NULL, $operator . ' NULL');
+    // Add our boolean labels.
+    $this->formats['flag'] = array(t('Flagged'), t('Not flagged'));
+    // TODO: We could probably lift the '(Un)Flagged message' strings from the
+    // flag object, but a) we need to lift that from the relationship we're on
+    // and b) they will not necessarily make sense in a static context.
   }
 }
