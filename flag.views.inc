@@ -82,12 +82,12 @@ function flag_views_data() {
       'id' => 'flag_flagged',
       'label' => t('Flagged'),
       'help' => t('A boolean field to show whether the flag is set or not.'),
-    ), /*
-    'filter' => array(
-      'handler' => 'flag_handler_filter_flagged',
+    ),
+    'id' => array(
+      'handler' => 'flag_filter',
       'label' => t('Flagged'),
       'help' => t('Filter to ensure content has or has not been flagged.'),
-    ),*/
+    ),
     'sort' => array(
       'id' => 'flag_sort',
       'label' => t('Flagged'),
