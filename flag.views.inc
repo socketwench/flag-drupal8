@@ -83,8 +83,8 @@ function flag_views_data() {
       'label' => t('Flagged'),
       'help' => t('A boolean field to show whether the flag is set or not.'),
     ),
-    'id' => array(
-      'handler' => 'flag_filter',
+    'filter' => array(
+      'id' => 'flag_filter',
       'label' => t('Flagged'),
       'help' => t('Filter to ensure content has or has not been flagged.'),
     ),
