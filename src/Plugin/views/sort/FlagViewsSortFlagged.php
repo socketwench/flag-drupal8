@@ -5,6 +5,8 @@
  * Contains the flagged content sort handler.
  */
 
+namespace Drupal\flag\Plugin\views\sort;
+
 use Drupal\views\Plugin\views\sort\SortPluginBase;
 
 /**
@@ -12,7 +14,7 @@ use Drupal\views\Plugin\views\sort\SortPluginBase;
  *
  * @ViewsSort("flag_sort")
  */
-class FlagViewsSortFlagged extends  SortPluginBase {
+class FlagViewsSortFlagged extends SortPluginBase {
 
   /**
    * Provide a list of options for the default sort form.
@@ -42,6 +44,6 @@ class FlagViewsSortFlagged extends  SortPluginBase {
   public function query() {
     $this->ensureMyTable();
 
-    $this->query->addOrderBy(NULL, "($this->tableAlias.uid IS NOT NULL)", $this->options['order']);
+    $this->query->addOrderBy(NULL, "$this->tableAlias.uid", $this->options['order']);
   }
 }

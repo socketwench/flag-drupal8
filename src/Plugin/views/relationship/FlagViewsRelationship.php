@@ -90,7 +90,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
         'value' => '***CURRENT_USER***',
         'numeric' => TRUE,
       );
-      $flag_roles = user_roles(FALSE, "flag $flag->name");
+      $flag_roles = user_roles(FALSE, "flag $flag->label");
       if (isset($flag_roles[DRUPAL_ANONYMOUS_RID])) {
         // Disable page caching for anonymous users.
         drupal_page_is_cacheable(FALSE);
