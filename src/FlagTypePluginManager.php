@@ -32,7 +32,7 @@ class FlagTypePluginManager extends DefaultPluginManager {
     parent::__construct('Plugin/Flag', $namespaces, $module_handler, 'Drupal\flag\Annotation\FlagType');
 
     //$this->alterInfo('flag_type_info');
-    $this->setCacheBackend($cache_backend, $language_manager, 'flag');
+    $this->setCacheBackend($cache_backend, 'flag');
   }
 
   public function getAllFlagTypes() {
