@@ -1,5 +1,5 @@
-flag.flag.*:
-  type: mapping
+flag.flag_flag.*:
+  type: config_entity
   label: 'Flag'
   mapping:
     id:
