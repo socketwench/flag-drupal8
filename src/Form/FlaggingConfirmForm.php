@@ -82,4 +82,4 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     }
   }
 
-} 
+}
