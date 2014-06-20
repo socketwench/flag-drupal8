@@ -220,6 +220,16 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
+   *
+   */
+  public function getPluginBags() {
+    return array(
+      'flagTypeConfig' => $this->flagTypeBag,
+      'linkTypeConfig' => $this->linkTypeBag,
+    );
+  }
+
+  /**
    * Get the flag type plugin for this flag.
    *
    * @return FlagTypePluginInterface
@@ -236,7 +246,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function setFlagTypePlugin($pluginID) {
     $this->flag_type = $pluginID;
-    $this->flagTypeBag->addInstanceId($pluginID);
+    //$this->flagTypeBag->addInstanceId($pluginID);
+
+    // Workaround for https://www.drupal.org/node/2288805
+    $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
+      $this->flag_type, $this->flagTypeConfig);
 
     // Get the entity type from the plugin definition.
     $plugin = $this->getFlagTypePlugin();
@@ -261,7 +275,12 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function setlinkTypePlugin($pluginID) {
     $this->link_type = $pluginID;
-    $this->linkTypeBag->addInstanceId($pluginID);
+
+    //$this->linkTypeBag->addInstanceId($pluginID);
+
+    // Workaround for https://www.drupal.org/node/2288805
+    $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
+      $this->link_type, $this->linkTypeConfig);
   }
 
   /**
@@ -307,7 +326,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     parent::preSave($storage_controller);
-
+/*
     // Save the Flag Type configuration.
     $flagTypePlugin = $this->getFlagTypePlugin();
     $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
@@ -315,17 +334,16 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     // Save the Link Type configuration.
     $linkTypePlugin = $this->getLinkTypePlugin();
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
-
+*/
     // Reset the render cache for the entity.
     \Drupal::entityManager()
       ->getViewBuilder($this->getFlaggableEntityType())
       ->resetCache();
   }
-
+/*
   public function toArray() {
     $properties = parent::toArray();
     $names = array(
-      'roles',
       'flag_type',
       'link_type',
       'flagTypeConfig',
@@ -338,5 +356,5 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
     return $properties;
   }
-
+*/
 } 
