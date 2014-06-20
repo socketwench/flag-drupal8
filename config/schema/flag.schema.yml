@@ -38,9 +38,9 @@ flag.flag_flag.*:
     weight:
       type: integer
       label: 'Weight'
-#    link_type:
-#      type: sequence
-#      label: 'Link Type'
-#      sequence:
-#        - type: flag.link.[plugin]
-#          label: 'Flag Link Type's
+    flag_type:
+      type: string
+      label: 'ID of the Flag Type plugin'
+    link_type:
+      type: string
+      label: 'ID of the Link Type plugin'
