@@ -9,7 +9,6 @@ display:
     id: default
     display_title: Master
     position: 0
-    provider: views
     display_options:
       access:
         type: perm
