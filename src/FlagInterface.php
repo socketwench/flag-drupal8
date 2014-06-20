@@ -10,9 +10,10 @@ namespace Drupal\flag;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityWithPluginBagsInterface;
 use Drupal\Core\Session\AccountInterface;
 
-interface FlagInterface extends ConfigEntityInterface {
+interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInterface {
 
   // todo: Add getters and setters as necessary.
 
@@ -27,4 +28,6 @@ interface FlagInterface extends ConfigEntityInterface {
   public function isGlobal();
 
   public function setGlobal($isGlobal);
+
+  public function getPluginBags();
 }
