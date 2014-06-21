@@ -44,8 +44,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   public function buildConfigurationForm(array $form, array &$form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-
-    $form['display']['link_options_confirm'] = array(
+    $form['display']['settings']['link_options_confirm'] = array(
       '#type' => 'fieldset',
       '#title' => t('Options for the "Confirmation form" link type'),
       // Any "link type" provider module must put its settings fields inside
@@ -53,10 +52,9 @@ class ConfirmForm extends ActionLinkTypeBase {
       // the machine-name of the link type. This is necessary for the
       // radiobutton's JavaScript dependency feature to work.
       '#id' => 'link-options-confirm',
-      '#weight' => 21,
     );
 
-    $form['display']['link_options_confirm']['flag_confirmation'] = array(
+    $form['display']['settings']['link_options_confirm']['flag_confirmation'] = array(
       '#type' => 'textfield',
       '#title' => t('Flag confirmation message'),
       '#default_value' => $this->configuration['flag_confirmation'],
@@ -65,7 +63,7 @@ class ConfirmForm extends ActionLinkTypeBase {
       '#required' => TRUE,
     );
 
-    $form['display']['link_options_confirm']['unflag_confirmation'] = array(
+    $form['display']['settings']['link_options_confirm']['unflag_confirmation'] = array(
       '#type' => 'textfield',
       '#title' => t('Unflag confirmation message'),
       '#default_value' => $this->configuration['unflag_confirmation'],
@@ -91,4 +89,4 @@ class ConfirmForm extends ActionLinkTypeBase {
     return $this->configuration['unflag_confirmation'];
   }
 
-} 
+}

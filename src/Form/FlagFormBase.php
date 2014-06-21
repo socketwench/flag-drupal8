@@ -44,6 +44,14 @@ abstract class FlagFormBase extends EntityForm {
         'exists' => 'flag_load_by_id',
       ),
       '#disabled' => !$flag->isNew(),
+      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#required' => TRUE,
+      '#executes_submit_callback' => TRUE,
+      '#ajax' => array(
+        'callback' => array($this, 'updateSelectedPluginType'),
+        'wrapper' => 'monitoring-sensor-plugin',
+        'method' => 'replace',
+      ),
     );
 
     $form['is_global'] = array(
@@ -110,6 +118,8 @@ abstract class FlagFormBase extends EntityForm {
       '#weight' => 10,
     );
 
+    // Switch plugin type in case a different is chosen.
+
     $flag_type_plugin = $flag->getFlagTypePlugin();
     $flag_type_def = $flag_type_plugin->getPluginDefinition();
 
@@ -148,6 +158,13 @@ abstract class FlagFormBase extends EntityForm {
 //      '#after_build' => array('flag_link_type_options_states'),
     );
 
+    $form['display']['settings'] = array(
+      '#type' => 'container',
+      '#prefix' => '<div id="link-type-settings-wrapper">',
+      '#suffix' => '</div>',
+      '#weight' => 21,
+    );
+
     $form = $flag_type_plugin->buildConfigurationForm($form, $form_state);
 
     $form['display']['link_type'] = array(
@@ -165,18 +182,57 @@ abstract class FlagFormBase extends EntityForm {
       '#attributes' => array(
         'class' => array('flag-link-options'),
       ),
+      '#limit_validation_errors' => array(array('link_type')),
+      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#required' => TRUE,
+      '#executes_submit_callback' => TRUE,
+      '#ajax' => array(
+        'callback' => array($this, 'updateSelectedPluginType'),
+        'wrapper' => 'link-type-settings-wrapper',
+        'event' => 'change',
+        'method' => 'replace',
+      ),
+    );
+    $form['display']['link_type_submit'] = array(
+      '#type' => 'submit',
+      '#value' => $this->t('Update'),
+      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#weight' => 20,
+      '#attributes' => array('class' => array('js-hide')),
     );
     // Add the descriptions to each ratio button element. These attach to the
     // elements when FormAPI expands them.
     $action_link_plugin_defs = \Drupal::service('plugin.manager.flag.linktype')->getDefinitions();
     foreach ($action_link_plugin_defs as $key => $info) {
       $form['display']['link_type'][$key]['#description'] = $info['description'];
+      $form['display']['link_type'][$key]['#submit'] = array(array($this, 'submitSelectPlugin'));
+      $form['display']['link_type'][$key]['#executes_submit_callback'] = TRUE;
+      $form['display']['link_type'][$key]['#limit_validation_errors'] = array(array('link_type'));
     }
 
     $action_link_plugin = $flag->getLinkTypePlugin();
     $form = $action_link_plugin->buildConfigurationForm($form, $form_state);
 
     return $form;
+  }
+
+  /**
+   * Handles switching the configuration type selector.
+   */
+  public function updateSelectedPluginType($form, &$form_state) {
+    return $form['display']['settings'];
+  }
+
+  /**
+   * Handles submit call when sensor type is selected.
+   */
+  public function submitSelectPlugin(array $form, array &$form_state) {
+    $this->entity = $this->buildEntity($form, $form_state);
+
+    $form_state['rebuild'] = TRUE;
+    // @todo: This is necessary because there are two different instances of the
+    //   form object. Core should handle this.
+    $form_state['build_info']['callback_object'] = $form_state['controller'];
   }
 
   /**
@@ -266,4 +322,4 @@ abstract class FlagFormBase extends EntityForm {
     $form_state['redirect'] = 'admin/structure/flags';
   }
 
-} 
+}
