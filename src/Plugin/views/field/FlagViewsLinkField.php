@@ -35,6 +35,9 @@ class FlagViewsLinkField extends FieldPluginBase {
       'default' => '',
       'translatable' => TRUE,
     );
+
+    //$options['relationship'] = array('default' => 'none');
+
 /*
     $options['link_to_entity'] = array(
       'default' => FALSE,
@@ -58,6 +61,8 @@ class FlagViewsLinkField extends FieldPluginBase {
     );
 
     parent::buildOptionsForm($form, $form_state);
+
+    $form['relationship']['#access'] = FALSE;
   }
 
   public function query() {

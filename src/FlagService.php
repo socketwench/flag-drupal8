@@ -66,7 +66,7 @@ class FlagService {
    *   An array of the structure [fid] = flag_object.
    */
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
-    $query = \Drupal::entityQuery('flag_flag');
+    $query = \Drupal::entityQuery('flag');
 
     if($entity_type != NULL) {
       $query->condition('entity_type', $entity_type);
@@ -78,7 +78,7 @@ class FlagService {
 
     $result = $query->execute();
 
-    $flags = entity_load_multiple('flag_flag', $result);
+    $flags = entity_load_multiple('flag', $result);
 
     if ($account == NULL) {
       return $flags;
@@ -115,7 +115,7 @@ class FlagService {
   }
 
   public function getFlagById($flag_id) {
-    return entity_load('flag_flag', $flag_id);
+    return entity_load('flag', $flag_id);
   }
 
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
@@ -128,7 +128,7 @@ class FlagService {
     }
 
     $flagging = entity_create('flagging', array(
-      'type' => 'flag_flag',
+      'type' => 'flag',
       'uid' => $account->id(),
       'fid' => $flag->id(),
       'entity_id' => $entity->id(),

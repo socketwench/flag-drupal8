@@ -23,7 +23,7 @@ use Drupal\flag\FlagInterface;
  * @package Drupal\flag\Entity
  *
  * @ConfigEntityType(
- *   id = "flag_flag",
+ *   id = "flag",
  *   label = @Translation("Flag"),
  *   admin_permission = "administer flags",
  *   controllers = {
@@ -185,11 +185,15 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
 
-    $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
-                                                    $this->flag_type, $this->flagTypeConfig);
+    if ($this->flag_type) {
+      $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
+                                                      $this->flag_type, $this->flagTypeConfig);
+    }
 
-    $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
-                                                    $this->link_type, $this->linkTypeConfig);
+    if ($this->link_type) {
+      $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
+                                                      $this->link_type, $this->linkTypeConfig);
+    }
   }
 
   public function enable() {
@@ -340,7 +344,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
       ->getViewBuilder($this->getFlaggableEntityType())
       ->resetCache();
   }
-/*
+
   public function toArray() {
     $properties = parent::toArray();
     $names = array(
@@ -356,5 +360,5 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
     return $properties;
   }
-*/
+
 } 

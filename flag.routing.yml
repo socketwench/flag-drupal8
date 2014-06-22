@@ -9,7 +9,7 @@ flag.add_page:
 flag.list:
   path: '/admin/structure/flags'
   defaults:
-    _entity_list: 'flag_flag'
+    _entity_list: 'flag'
     _title: 'Flags'
   requirements:
     _permission: 'administer flags'
@@ -17,26 +17,26 @@ flag.list:
 flag.add:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
-    _entity_form: flag_flag.add
+    _entity_form: flag.add
     _title: 'Add New Flag'
   requirements:
     _permission: 'administer flags'
 
 flag.edit:
-  path: '/admin/structure/flags/manage/{flag_flag}'
+  path: '/admin/structure/flags/manage/{flag}'
   defaults:
-    _entity_form: flag_flag.edit
+    _entity_form: flag.edit
     _title: 'Edit Flag'
   requirements:
-    _entity_access: 'flag_flag.update'
+    _entity_access: 'flag.update'
 
 flag.delete:
-  path: '/admin/structure/flags/manage/{flag_flag}/delete'
+  path: '/admin/structure/flags/manage/{flag}/delete'
   defaults:
-    _entity_form: flag_flag.delete
+    _entity_form: flag.delete
     _title: 'Delete Flag'
   requirements:
-    _entity_access: 'flag_flag.update'
+    _entity_access: 'flag.update'
 
 flag_link_flag.html:
   path: '/flag/flag/{flag_id}/{entity_id}'

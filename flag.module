@@ -1444,7 +1444,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
 }
 
 function flag_load_by_id($id) {
-  return entity_load('flag_flag', $id);
+  return entity_load('flag', $id);
 }
 
 /**
@@ -1465,7 +1465,7 @@ function flag_load_by_id($id) {
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
-  return entity_load_multiple('flag_flag');
+  return entity_load_multiple('flag');
 /**
   $flags = &drupal_static(__FUNCTION__);
 
