@@ -11,6 +11,10 @@ flag.flag.*:
     label:
       type: label
       label: 'Label'
+    types:
+      type: sequence
+      sequence:
+        - type: string
     is_global:
       type: boolean
       label: 'Is flag global'
