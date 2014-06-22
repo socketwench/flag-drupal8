@@ -1,4 +1,4 @@
-flag.flag_flag.*:
+flag.flag.*:
   type: config_entity
   label: 'Flag'
   mapping:

@@ -49,7 +49,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   }
 
   public function getFlag() {
-    return entity_load('flag_flag', $this->getFlagId());
+    return entity_load('flag', $this->getFlagId());
   }
 
   public function getFlaggableType() {
@@ -91,7 +91,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
     $fields['type'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The flag type.'))
-      ->setSetting('target_type', 'flag_flag')
+      ->setSetting('target_type', 'flag')
       ->setReadOnly(TRUE);
 
     $fields['uid'] = FieldDefinition::create('entity_reference')
