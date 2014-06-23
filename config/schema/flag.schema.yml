@@ -15,6 +15,9 @@ flag.flag.*:
       type: sequence
       sequence:
         - type: string
+    entity_type:
+      type: string
+      label: 'Flaggable Entity Type'
     is_global:
       type: boolean
       label: 'Is flag global'
