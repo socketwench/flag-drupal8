@@ -19,35 +19,35 @@ class FlagViewsRelationship extends RelationshipPluginBase {
 
   public function defineOptions() {
     $options = parent::defineOptions();
-    $options['flag'] = array('default' => NULL); // @todo load first defined flag for entity.
+    $options['flag'] = array('default' => NULL);
     $options['required'] = array('default' => 1);
     $options['user_scope'] = array('default' => 'current');
     return $options;
   }
 
   public function buildOptionsForm(&$form, &$form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
     $entity_type = $this->definition['flaggable'];
-    //$form['label']['#description'] .= ' ' . t('The name of the selected flag makes a good label.');
+    $form['label']['#description'] .= ' ' . t('The name of the selected flag makes a good label.');
 
-    /*//////////////////////////////////////////////////////////////////////////
-    @todo Add Flag selection form
-
-    The Flag relationship relates a single flag to a single entity. Since
-    multiple flags may be configured for the same entity type, we need to
-    provide a form here that allows us to choose the flag.
-    //////////////////////////////////////////////////////////////////////////*/
     $flags = \Drupal::service('flag')->getFlags($entity_type);
+
+    $default_value = $this->options['flag'];
+    if (!empty($flags) ) {
+      $default_value = current(array_keys($flags));
+    }
 
     $form['flag'] = array(
       '#type' => 'radios',
       '#title' => t('Flag'),
- //     '#default_value' => current(array_keys($flags)),
+      '#default_value' => $default_value,
       '#required' => TRUE,
     );
 
     foreach ($flags as $fid => $flag) {
       if (!empty($flag)) {
-        $form['flag']['#options'][$flag->label()] = $fid;
+        $form['flag']['#options'][$fid] = $flag->label();
       }
     }
 
@@ -69,8 +69,6 @@ class FlagViewsRelationship extends RelationshipPluginBase {
       );
       $form_state['no flags exist'] = TRUE;
     }
-
-    parent::buildOptionsForm($form, $form_state);
   }
 
   public function query() {
