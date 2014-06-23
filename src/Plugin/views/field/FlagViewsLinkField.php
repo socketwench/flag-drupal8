@@ -36,15 +36,12 @@ class FlagViewsLinkField extends FieldPluginBase {
       'translatable' => TRUE,
     );
 
-    //$options['relationship'] = array('default' => 'none');
-
-/*
-    $options['link_to_entity'] = array(
-      'default' => FALSE,
-      'bool' => TRUE,
-    );
-*/
-    //@todo return link type
+    // Set the default relationship handler. The first instance of the
+    // FlagViewsRelationship should always have the id "flag_content_rel", so
+    // we set that as the default.
+    //if (!isset($this->options['relationship'])) {
+    $options['relationship'] = array('default' => 'flag_content_rel');
+    //}
 
     return $options;
   }
@@ -60,9 +57,9 @@ class FlagViewsLinkField extends FieldPluginBase {
       '#default_value' => $this->options['text'],
     );
 
-    parent::buildOptionsForm($form, $form_state);
+    $form['relationship']['#default_value'] = $this->options['relationship'];
 
-    $form['relationship']['#access'] = FALSE;
+    parent::buildOptionsForm($form, $form_state);
   }
 
   public function query() {
