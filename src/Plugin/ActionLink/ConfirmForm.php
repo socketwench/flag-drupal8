@@ -33,10 +33,8 @@ class ConfirmForm extends ActionLinkTypeBase {
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
 
-    $options += array(
-      'flag_confirmation' => 'Flag this content?',
-      'unflag_confirmation' => 'Unflag this content?',
-    );
+    $options['flag_confirmation'] = 'Flag this content?';
+    $options['unflag_confirmation'] = 'Unflag this content?';
 
     return $options;
   }
