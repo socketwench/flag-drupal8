@@ -29,4 +29,17 @@ class FlagViewsFlaggedField extends Boolean {
     // flag object, but a) we need to lift that from the relationship we're on
     // and b) they will not necessarily make sense in a static context.
   }
+
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+    $options['relationship'] = array('default' => 'flag_content_rel');
+
+    return $options;
+  }
+
+  public function buildOptionsForm(&$form, &$form_state) {
+    $form['relationship']['#default_value'] = $this->options['relationship'];
+
+    parent::buildOptionsForm($form, $form_state);
+  }
 }

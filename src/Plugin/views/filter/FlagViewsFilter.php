@@ -18,11 +18,12 @@ class FlagViewsFilter extends BooleanOperator {
   public function defineOptions() {
     $options = parent::defineOptions();
     $options['value'] = array('default' => 1);
+    $options['relationship'] = array('default' => 'flag_content_rel');
+
     return $options;
   }
 
   public function buildOptionsForm(&$form, &$form_state) {
-    parent::buildOptionsForm($form, $form_state);
     $form['value']['#type'] = 'radios';
     $form['value']['#title'] = t('Status');
     $form['value']['#options'] = array(
@@ -33,6 +34,10 @@ class FlagViewsFilter extends BooleanOperator {
     );
     $form['value']['#default_value'] = empty($this->options['value']) ? '0' : $this->options['value'];
     $form['value']['#description'] = '<p>' . t('This filter is only needed if the relationship used has the "Include only flagged content" option <strong>unchecked</strong>. Otherwise, this filter is useless, because all records are already limited to flagged content.') . '</p><p>' . t('By choosing <em>Not flagged</em>, it is possible to create a list of content <a href="@unflagged-url">that is specifically not flagged</a>.', array('@unflagged-url' => 'http://drupal.org/node/299335')) . '</p>';
+
+    $form['relationship']['#default_value'] = $this->options['relationship'];
+
+    parent::buildOptionsForm($form, $form_state);
   }
 
 
