@@ -720,7 +720,7 @@ function _flag_entity_delete($entity_type, $entity_id, $fid = NULL) {
 /**
  * Implements hook_user_login().
  */
-function flag_user_login(&$edit, &$account) {
+function flag_user_login($account) {
   // Migrate anonymous flags to this user's account.
   if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
     // Get a list of flagging IDs that will be moved over.
