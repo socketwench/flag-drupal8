@@ -9,6 +9,7 @@
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Url;
 
 class FlagDeleteForm extends EntityConfirmFormBase {
 
@@ -23,9 +24,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
   }
 
   public function getCancelRoute() {
-    return array(
-      'route_name' => 'flag.list',
-    );
+    return new URL('flag.list');
   }
 
   public function submit(array $form, array &$form_state) {

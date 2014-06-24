@@ -9,6 +9,7 @@
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
+use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
@@ -38,10 +39,8 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     if ($this->isFlagged()) {
       return $linkType->getUnflagQuestion();
     }
-    else {
-      return $linkType->getFlagQuestion();
-    }
 
+    return $linkType->getFlagQuestion();
   }
 
   public function getCancelRoute() {
@@ -50,7 +49,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
       return URL::createFromPath($destination);
     }
 
-    return $this->entity->urlInfo();
+    $route_name = $this->entity->urlInfo();
+
+    return new URL($route_name['canonical']);
   }
 
   public function getDescription() {
