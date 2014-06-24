@@ -32,14 +32,21 @@ class FlagTypePluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'flag');
   }
 
+  /**
+   * Gets all flag types.
+   *
+   * @return array
+   *   Returns all flag types.
+   */
   public function getAllFlagTypes() {
-    $flagTypes = array();
+    $flag_types = array();
 
-    foreach ($this->getDefinitions() as $pluginID => $pluginDef) {
-      $flagTypes[$pluginID] = t($pluginDef['title']);
+    foreach ($this->getDefinitions() as $plugin_id => $plugin_def) {
+      $flag_types[$plugin_id] = $plugin_def['title'];
     }
+    asort($flag_types);
 
-    return $flagTypes;
+    return $flag_types;
   }
 
 } 
