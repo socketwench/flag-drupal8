@@ -1,27 +1,33 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 2/7/14
- * Time: 7:50 PM
+ * @file
+ * Contains \Drupal\flag\FlaggingAccessController.
  */
 
 namespace Drupal\flag;
 
 use Drupal\Core\Access\AccessInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityAccessController;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\Entity\Flag;
 use Symfony\Component\HttpFoundation\Request;
 
-
+/**
+ * Controls flagging access permission.
+ */
 class FlaggingAccessController extends ControllerBase {
 
+  /**
+   * Checks flagging permission.
+   *
+   * @param Request $request
+   *   The request object.
+   *
+   * @return string
+   *   Returns indication value for flagging access permission.
+   */
   public function checkFlag(Request $request) {
-    $entity_id = $request->get('entity_id');
-
-    if (user_access('flag' . $entity_id)) {
+    $flag = Flag::load($request->get('flag_id'));
+    if ($flag->hasActionAccess('flag')) {
       return AccessInterface::ALLOW;
     }
 
@@ -29,16 +35,21 @@ class FlaggingAccessController extends ControllerBase {
   }
 
   /**
+   * Checks unflagging permission.
    *
+   * @param Request $request
+   *   The request object.
+   *
+   * @return string
+   *   Returns indication value for unflagging access permission.
    */
   public function checkUnflag(Request $request) {
-    $entity_id = $request->get('entity_id');
-
-    if (user_access('unflag' . $entity_id)) {
+    $flag = Flag::load($request->get('flag_id'));
+    if ($flag->hasActionAccess('unflag')) {
       return AccessInterface::ALLOW;
     }
 
     return AccessInterface::DENY;
   }
 
-} 
+}
