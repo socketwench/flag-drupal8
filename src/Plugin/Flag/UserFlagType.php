@@ -87,6 +87,6 @@ class UserFlagType extends FlagTypeBase {
   }
 
   public function showOnProfile() {
-    return this->configuration['show_on_profile'];
+    return $this->configuration['show_on_profile'];
   }
-} 
+}
