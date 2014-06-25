@@ -10,7 +10,6 @@ define('FLAG_API_VERSION', 3);
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
-use Drupal\entity\Entity\EntityViewDisplay;
 use Drupal\flag\Flag;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -605,8 +604,6 @@ function flag_entity_view(array &$build, EntityInterface $entity,
  * Implements hook_entity_build_defaults_alter().
  */
 function flag_entity_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
-  // Get the corresponding display settings.
-  // $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
   // Add the flag ID combined with the action to the cache key if render
   // caching is enabled.
   if (isset($build['#cache']) && isset($build['#cache']['keys'])) {
