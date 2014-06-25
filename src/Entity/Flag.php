@@ -1,21 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/12/13
- * Time: 2:57 PM
+ * @file
+ * Contains \Drupal\flag\Entity\Flag.
  */
 
 namespace Drupal\flag\Entity;
 
 use Drupal\Core\Plugin\DefaultSinglePluginBag;
-use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\flag\FlagInterface;
 
 /**
@@ -326,10 +321,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * @param EntityStorageControllerInterface $storage_controller
+   * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage_controller) {
-    parent::preSave($storage_controller);
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
 /*
     // Save the Flag Type configuration.
     $flagTypePlugin = $this->getFlagTypePlugin();
@@ -361,4 +356,4 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     return $properties;
   }
 
-} 
+}
