@@ -11,8 +11,6 @@ namespace Drupal\flag\Entity;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Language\Language;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\flag\FlaggingInterface;
 
