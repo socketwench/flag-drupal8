@@ -33,7 +33,7 @@ class FlagSimpleTest extends WebTestBase {
   /**
    * @var string
    */
-  protected $flaggableTypes = 'article';
+  protected $nodeType = 'article';
 
   /**
    * @var string
@@ -72,7 +72,6 @@ class FlagSimpleTest extends WebTestBase {
       'administer flags',
     ));
     $this->drupalLogin($admin_user);
-    $this->drupalCreateContentType(array('type' => 'article'));
     $this->doTestFlagAdd();
   }
 
@@ -80,7 +79,10 @@ class FlagSimpleTest extends WebTestBase {
    * Flag creation.
    */
   public function doTestFlagAdd() {
-    // First, test with minimal value requirement.
+    // Create content type.
+    $this->drupalCreateContentType(array('type' => $this->nodeType));
+
+    // Test with minimal value requirement.
     $edit = array(
       'label' => $this->label,
       'id' => $this->id,
@@ -92,16 +94,33 @@ class FlagSimpleTest extends WebTestBase {
     $this->assertText(t('Display options'));
 
     $edit = array(
-      'types[' . $this->flaggableTypes . ']' => $this->flaggableTypes,
+      'types[' . $this->nodeType . ']' => $this->nodeType,
     );
     $this->drupalPostForm(NULL, $edit, t('Create Flag'));
 
     $this->assertText(t('Flag @this_label has been added.', array('@this_label' => $this->label)));
 
+    // Continue test process.
+    $this->doTestCreateNodeAndFlagIt();
   }
 
   /**
    * Node creation and flagging.
    */
+  public function doTestCreateNodeAndFlagIt() {
+    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node_id = $node->id();
 
+    // Now that permissions have been created for this node, create and login
+    // new user.
+    $node_user = $this->drupalCreateUser(array(
+      'flag ' . $this->id,
+      'unflag ' . $this->id,
+    ));
+    $this->drupalLogin($node_user);
+
+    $this->drupalGet('/node/' . $node_id);
+    $this->clickLink('Flag this item');
+    $this->clickLink('Unflag this item');
+  }
 }
