@@ -8,6 +8,7 @@
 namespace Drupal\flag\Tests;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\user\Entity\Role;
 
 
 /**
@@ -111,16 +112,35 @@ class FlagSimpleTest extends WebTestBase {
     $node = $this->drupalCreateNode(array('type' => $this->nodeType));
     $node_id = $node->id();
 
-    // Now that permissions have been created for this node, create and login
-    // new user.
-    $node_user = $this->drupalCreateUser(array(
-      'flag ' . $this->id,
-      'unflag ' . $this->id,
-    ));
-    $this->drupalLogin($node_user);
+    // Grant the flag permissions to the authenticated role, so that both
+    // users have the same roles and share the render cache.
+    $role = Role::load(DRUPAL_AUTHENTICATED_RID);
+    $role->grantPermission('flag ' . $this->id);
+    $role->grantPermission('unflag ' . $this->id);
+    $role->save();
+
+    // Create and login a new user.
+    $user_1 = $this->drupalCreateUser();
+    $this->drupalLogin($user_1);
 
     $this->drupalGet('/node/' . $node_id);
     $this->clickLink('Flag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Unflag this item');
+
+    // Switch user to check flagging link.
+    $user_2 = $this->drupalCreateUser();
+    $this->drupalLogin($user_2);
+    $this->drupalGet('/node/' . $node_id);
+    $this->assertResponse(200);
+    $this->assertLink('Flag this item');
+
+    // Switch back to first user and unflag.
+    $this->drupalLogin($user_1);
+    $this->drupalGet('/node/' . $node_id);
+
     $this->clickLink('Unflag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Flag this item');
   }
 }

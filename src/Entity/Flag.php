@@ -9,7 +9,6 @@
 namespace Drupal\flag\Entity;
 
 use Drupal\Core\Plugin\DefaultSinglePluginBag;
-use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
