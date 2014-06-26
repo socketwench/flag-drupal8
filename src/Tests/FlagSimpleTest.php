@@ -32,26 +32,25 @@ class FlagSimpleTest extends WebTestBase {
   protected $flagLinkType;
 
   /**
+   *
+   *
    * @var string
    */
   protected $nodeType = 'article';
 
   /**
-   * @var string
+   * User object.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
-  protected $flag_confirmation = 'Are you sure you want to flag this content?';
-
-  /**
-   * @var string
-   */
-  protected $unflag_confirmation = 'Are you sure you want to unflag this content?';
+  protected $adminUser;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('flag', 'node');
+  public static $modules = array('views', 'flag', 'node', 'field_ui');
 
   /**
    * {@inheritdoc}
@@ -69,11 +68,15 @@ class FlagSimpleTest extends WebTestBase {
    */
   public function testFlagForm() {
     // Create and log in our user.
-    $admin_user = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser(array(
       'administer flags',
+      'administer node display',
     ));
-    $this->drupalLogin($admin_user);
+
+    $this->drupalLogin($this->adminUser);
+
     $this->doTestFlagAdd();
+    $this->doTestHideFlagLinkFromTeaser();
   }
 
   /**
@@ -88,7 +91,7 @@ class FlagSimpleTest extends WebTestBase {
       'label' => $this->label,
       'id' => $this->id,
     );
-    $this->drupalPostForm('/admin/structure/flags/add', $edit, t('Continue'));
+    $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
     // Check for fieldset titles.
     $this->assertText(t('Messages'));
     $this->assertText(t('Flag access'));
@@ -123,7 +126,7 @@ class FlagSimpleTest extends WebTestBase {
     $user_1 = $this->drupalCreateUser();
     $this->drupalLogin($user_1);
 
-    $this->drupalGet('/node/' . $node_id);
+    $this->drupalGet('node/' . $node_id);
     $this->clickLink('Flag this item');
     $this->assertResponse(200);
     $this->assertLink('Unflag this item');
@@ -131,16 +134,50 @@ class FlagSimpleTest extends WebTestBase {
     // Switch user to check flagging link.
     $user_2 = $this->drupalCreateUser();
     $this->drupalLogin($user_2);
-    $this->drupalGet('/node/' . $node_id);
+    $this->drupalGet('node/' . $node_id);
     $this->assertResponse(200);
     $this->assertLink('Flag this item');
 
     // Switch back to first user and unflag.
     $this->drupalLogin($user_1);
-    $this->drupalGet('/node/' . $node_id);
+    $this->drupalGet('node/' . $node_id);
 
     $this->clickLink('Unflag this item');
     $this->assertResponse(200);
     $this->assertLink('Flag this item');
+  }
+
+  /**
+   * Node creation and flag link.
+   */
+  public function doTestHideFlagLinkFromTeaser() {
+    $this->drupalLogin($this->adminUser);
+
+    $node = $this->drupalCreateNode(array(
+      'type' => $this->nodeType,
+      'promote' => TRUE,
+    ));
+    $node_id = $node->id();
+    $node_title = $node->getTitle();
+
+    $this->drupalGet('node');
+    $this->assertText($node_title);
+    $this->assertLink('Flag this item');
+
+    // Set flag format to hidden for teaser display and post form.
+    $edit = array(
+      'fields[flag_' . $this->id . '][type]' => 'hidden',
+    );
+
+    $this->drupalPostForm('admin/structure/types/manage/' . $this->nodeType . '/display/teaser', $edit, t('Save'));
+
+    // Check if form is saved successfully.
+    $this->assertText('Your settings have been saved.');
+
+    $this->drupalGet('node');
+    $this->assertText($node_title);
+    $this->assertNoLink('Flag this item');
+
+    $this->drupalGet('node/' . $node_id);
   }
 }

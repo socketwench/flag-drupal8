@@ -10,6 +10,7 @@ define('FLAG_API_VERSION', 3);
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
+use Drupal\entity\Entity\EntityViewDisplay;
 use Drupal\flag\Flag;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -323,11 +324,10 @@ function flag_flag_link($flag, $action, $entity_id) {
 }
 
 /**
- * Implements hook_field_extra_fields().
+ * Implements hook_entity_extra_field_info().
  */
-function flag_field_extra_fields() {
+function flag_entity_extra_field_info() {
   $extra = array();
-
   $flag_service = \Drupal::service('flag');
   $flags = $flag_service->getFlags();
   foreach ($flags as $flag) {
@@ -342,12 +342,12 @@ function flag_field_extra_fields() {
         $extra[$flag->entity_type][$bundle_name]['form']['flag'] = array(
           'label' => t('Flags'),
           'description' => t('Checkboxes for toggling flags'),
-          'weight' => 10
+          'weight' => 10,
         );
       }
 
       if ($flagTypePlugin->showAsField()) {
-        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $flag->label()] = array(
+        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $flag->id()] = array(
           // It would be nicer to use % as the placeholder, but the label is
           // run through check_plain() by field_ui_display_overview_form()
           // (arguably incorrectly; see http://drupal.org/node/1991292).
@@ -571,32 +571,28 @@ function flag_field_attach_save($entity_type, $entity) {
  * Implements hook_entity_view().
  *
  * Handles the 'show_in_links' and 'show_as_field' flag options.
- *
- * Note this is broken for taxonomy terms for version of Drupal core < 7.17.
  */
-function flag_entity_view(array &$build, EntityInterface $entity,
-                          EntityViewDisplayInterface $display,
-                          $view_mode, $langcode) {
-
-
-  //@todo Check $type->getComponent('flag_whateverHookFieldExtraFieldsIS').
-  // if not NULL, display it.
-
+function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode, $langcode) {
   // Get all possible flags for this entity type.
   $flag_service = \Drupal::service('flag');
-  $flags = $flag_service->getFlags($entity->getEntityTypeID(),
-                                   $entity->bundle());
+  $flags = $flag_service->getFlags($entity->getEntityTypeID(), $entity->bundle());
 
   foreach ($flags as $flag) {
-    $linkTypePlugin = $flag->getLinkTypePlugin();
-    $action = 'flag';
+    $link_type_plugin = $flag->getLinkTypePlugin();
+    $flag_type_plugin = $flag->getFlagTypePlugin();
 
+    // Only add cache key if flag link is displayed.
+    if ($flag_type_plugin->showAsField() && !$display->getComponent('flag_' . $flag->id())) {
+      continue;
+    }
+
+    $action = 'flag';
     if ($flag->isFlagged($entity)) {
       $action = 'unflag';
     }
 
-    $link = $linkTypePlugin->renderLink($action, $flag, $entity);
-    $build['flag_' . $flag->id] = $link;
+    $link = $link_type_plugin->renderLink($action, $flag, $entity);
+    $build['flag_' . $flag->id()] = $link;
   }
 }
 
@@ -613,9 +609,18 @@ function flag_entity_build_defaults_alter(array &$build, EntityInterface $entity
     $flags = $flag_service->getFlags($entity->getEntityTypeID(),
       $entity->bundle());
 
-    foreach ($flags as $flag) {
-      $action = 'flag';
+    // Get the corresponding display settings.
+    $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
 
+    foreach ($flags as $flag) {
+      $flag_type_plugin = $flag->getFlagTypePlugin();
+
+      // Only add cache key if flag link is displayed.
+      if ($flag_type_plugin->showAsField() && !$display->getComponent('flag_' . $flag->id())) {
+        continue;
+      }
+
+      $action = 'flag';
       if ($flag->isFlagged($entity)) {
         $action = 'unflag';
       }
