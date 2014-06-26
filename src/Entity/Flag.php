@@ -354,6 +354,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     \Drupal::entityManager()
       ->getViewBuilder($this->getFlaggableEntityType())
       ->resetCache();
+    // Clear entity extra field caches.
+    \Drupal::entityManager()->clearCachedFieldDefinitions();
+
   }
 
   public function toArray() {
