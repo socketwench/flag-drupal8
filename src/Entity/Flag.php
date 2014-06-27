@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/12/13
- * Time: 2:57 PM
+ * @file
+ * Contains \Drupal\flag\Entity\Flag.
  */
 
 namespace Drupal\flag\Entity;
@@ -337,10 +335,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * @param EntityStorageControllerInterface $storage_controller
+   * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage_controller) {
-    parent::preSave($storage_controller);
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
 /*
     // Save the Flag Type configuration.
     $flagTypePlugin = $this->getFlagTypePlugin();
@@ -375,4 +373,4 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     return $properties;
   }
 
-} 
+}
