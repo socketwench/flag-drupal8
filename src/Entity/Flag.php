@@ -9,13 +9,10 @@
 namespace Drupal\flag\Entity;
 
 use Drupal\Core\Plugin\DefaultSinglePluginBag;
-use Drupal\Compontent\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\Annotation\EntityType;
-use Drupal\Core\Annotation\Translation;
 use Drupal\flag\FlagInterface;
 
 /**
@@ -308,6 +305,20 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     );
   }
 
+  /**
+   * {@inheritdoc}.
+   */
+  public function hasActionAccess($action, AccountInterface $account = NULL) {
+    if ($action === 'flag' || $action === 'unflag') {
+      $account = $account ?: \Drupal::currentUser();
+      return $account->hasPermission($action . ' ' . $this->id);
+    }
+    else {
+      // @todo: Is this the correct response?
+      return FALSE;
+    }
+  }
+
   public function isGlobal() {
     return $this->is_global;
   }
@@ -343,6 +354,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     \Drupal::entityManager()
       ->getViewBuilder($this->getFlaggableEntityType())
       ->resetCache();
+    // Clear entity extra field caches.
+    \Drupal::entityManager()->clearCachedFieldDefinitions();
+
   }
 
   public function toArray() {
