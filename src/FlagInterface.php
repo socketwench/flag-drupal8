@@ -30,4 +30,20 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
   public function setGlobal($isGlobal);
 
   public function getPluginBags();
+
+  /**
+   * User access permission for flagging actions.
+   *
+   * Checks whether a user has permission to flag/unflag or not.
+   *
+   * @param string $action
+   *   An indicator flag.
+   * @param AccountInterface $account
+   *   (optional) An AccountInterface object.
+   *
+   * @return bool|null
+   *   Returns a bool defining the users access permission for flagging action.
+   */
+  public function hasActionAccess($action, AccountInterface $account = NULL);
+
 }
