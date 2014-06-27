@@ -19,7 +19,8 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  * @FlagType(
  *   id = "flagtype_comment",
  *   title = @Translation("Comment"),
- *   entity_type = "comment"
+ *   entity_type = "comment",
+ *   provider = "comment"
  * )
  */
 class CommentFlagType extends EntityFlagType {
