@@ -15,6 +15,7 @@ use Drupal\flag\Flag;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -157,15 +158,18 @@ function flag_load($flag_name, $include_disabled = FALSE) {
 /**
  * Implements hook_help().
  */
-function flag_help($path, $arg) {
-  switch ($path) {
-    case FLAG_ADMIN_PATH:
+function flag_help($route_name, Request $request) {
+  switch ($route_name) {
+    case 'flag.list':
       $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system.') . '</p>';
       return $output;
-    case FLAG_ADMIN_PATH . '/add':
+    case 'flag.add_page':
       $output = '<p>' . t('Select the type of flag to create. An individual flag can only affect one type of object. This cannot be changed once the flag is created.') . '</p>';
       return $output;
-    case FLAG_ADMIN_PATH . '/manage/%/fields':
+    case 'field_ui.overview_flagging':
+      // @todo: Doesn't make sense at the moment, implement when form
+      // functionality is available.
+      /*
       // Get the existing link types that provide a flagging form.
       $link_types = flag_get_link_types();
       $form_link_types = array();
@@ -222,6 +226,7 @@ function flag_help($path, $arg) {
       }
 
       return $output;
+      */
   }
 }
 
