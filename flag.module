@@ -374,9 +374,11 @@ function flag_entity_extra_field_info() {
  */
 function flag_form_node_type_form_alter(&$form, &$form_state, $form_id) {
   global $user;
-  $flags = \Drupal::service('flag')->getFlags('node', $form['#node_type']->type, $user);
+  $node_type = $form_state['controller']->getEntity();
+  $flags = \Drupal::service('flag')->getFlags('node', $node_type->id(), $user);
   foreach ($flags as $flag) {
-    if ($flag->show_on_form) {
+    // @todo: Revisit when form functionality is implemented.
+    if (!empty($flag->show_on_form)) {
       // To be able to process node tokens in flag labels, we create a fake
       // node and store it in the flag's cache for replace_tokens() to find,
       // with a fake ID.
