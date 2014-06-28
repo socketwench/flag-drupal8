@@ -86,7 +86,7 @@ class FlagService {
 
     $filtered_flags = array();
     foreach ($flags as $flag) {
-      if ($flag->canFlag($account) || $flag->canUnflag($account)) {
+      if ($flag->hasActionAccess('flag ' . $flag->id(), $account) || $flag->hasActionAccess('unflag ' . $flag->id(), $account)) {
         $filtered_flags[] = $flag;
       }
     }
