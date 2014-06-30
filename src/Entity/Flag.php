@@ -11,6 +11,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\flag\Event\FlagDeleteEvent;
+use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\FlagInterface;
 
 /**
@@ -355,6 +357,15 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     // Clear entity extra field caches.
     \Drupal::entityManager()->clearCachedFieldDefinitions();
 
+  }
+
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    foreach ($entities as $entity) {
+      \Drupal::service('event_dispatcher')
+        ->dispatch(FlagEvents::FLAG_DELETED, new FlagDeleteEvent($entity));
+    }
   }
 
   public function toArray() {
