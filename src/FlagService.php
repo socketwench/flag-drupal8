@@ -10,6 +10,8 @@ namespace Drupal\flag;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\Event\FlagEvents;
+use Drupal\flag\Event\FlaggingEvent;
 use Drupal\flag\FlagInterface;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -143,6 +145,9 @@ class FlagService {
         $entity,
       ));
 
+    \Drupal::service('event_dispatcher')
+      ->dispatch(FlagEvents::ENTITY_FLAGGED, new FlaggingEvent($flag, $entity, 'flag'));
+
     return $flagging;
   }
 
@@ -190,6 +195,10 @@ class FlagService {
   public function unflagByObject(FlagInterface $flag,
                                  EntityInterface $entity,
                                  AccountInterface $account = NULL) {
+
+    \Drupal::service('event_dispatcher')
+      ->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
+
     $out = array();
     $flaggings = $this->getFlaggings($entity, $flag);
     foreach ($flaggings as $flagging) {
