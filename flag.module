@@ -17,7 +17,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\UserInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 

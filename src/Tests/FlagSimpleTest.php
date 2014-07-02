@@ -193,7 +193,7 @@ class FlagSimpleTest extends WebTestBase {
     $this->drupalGet('node/' . $node_id);
     $this->clickLink('Flag this item');
     $this->assertResponse(200);
-    $this->assertLink('Unflag this item');dfdsffsf
+    $this->assertLink('Unflag this item');
 
     $count_flags_before = \Drupal::entityQuery('flagging')
       ->condition('uid', $user_1->id())
