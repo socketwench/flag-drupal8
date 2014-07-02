@@ -193,16 +193,17 @@ class FlagSimpleTest extends WebTestBase {
     $this->drupalGet('node/' . $node_id);
     $this->clickLink('Flag this item');
     $this->assertResponse(200);
-    $this->assertLink('Unflag this item');
+    $this->assertLink('Unflag this item');dfdsffsf
 
     $count_flags_before = \Drupal::entityQuery('flagging')
       ->condition('uid', $user_1->id())
       ->condition('fid', $this->id)
       ->condition('entity_type', $node->getEntityTypeId())
       ->condition('entity_id', $node_id)
+      ->count()
       ->execute();
 
-    assertCount(1, $count_flags_before);
+    $this->assertTrue(1, $count_flags_before);
 
     $user_1->delete();
 
@@ -211,9 +212,10 @@ class FlagSimpleTest extends WebTestBase {
       ->condition('fid', $this->id)
       ->condition('entity_type', $node->getEntityTypeId())
       ->condition('entity_id', $node_id)
+      ->count()
       ->execute();
 
-    assertCount(0, $count_flags_after);
+    $this->assertTrue(0, $count_flags_after);
   }
 
   /**
