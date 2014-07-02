@@ -146,6 +146,8 @@ class FlagSimpleTest extends WebTestBase {
     $this->assertResponse(200);
     $this->assertLink('Flag this item');
 
+    // Checks that an anonymous user does not have permission to see the
+    // flag/unflag link.
     $this->drupalLogout();
     $this->drupalGet('node/' . $node_id);
     $this->assertNoLink('Flag this item');
