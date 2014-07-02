@@ -10,6 +10,8 @@ namespace Drupal\flag;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\Entity\Flag;
+use Drupal\flag\Entity\Flagging;
 use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\Event\FlaggingEvent;
 use Drupal\flag\FlagInterface;
@@ -116,10 +118,16 @@ class FlagService {
     return $flaggings;
   }
 
+  /**
+   * @todo Should not work like this, instead of the ID, the object itself should be passed along!
+   */
   public function getFlagById($flag_id) {
     return entity_load('flag', $flag_id);
   }
 
+  /**
+   * @todo Should not work like this, instead of the ID, the object itself should be passed along!
+   */
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
     return entity_load($flag->getFlaggableEntityType(), $entity_id);
   }
@@ -138,6 +146,8 @@ class FlagService {
     ));
 
     $flagging->save();
+
+    $this->incrementFlagCounts($flag, $entity);
 
     \Drupal::entityManager()
       ->getViewBuilder($entity->getEntityTypeId())
@@ -188,14 +198,13 @@ class FlagService {
     $flag = $this->getFlagById($flag_id);
     $entity = $this->getFlaggableById($flag, $entity_id);
 
+    $this->decrementFlagCounts($flag, $entity);
+
     return $this->unflagByObject($flag, $entity, $account);
   }
 
 
-  public function unflagByObject(FlagInterface $flag,
-                                 EntityInterface $entity,
-                                 AccountInterface $account = NULL) {
-
+  public function unflagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     \Drupal::service('event_dispatcher')
       ->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
 
@@ -210,6 +219,70 @@ class FlagService {
 
   public function unflagByFlagging(FlaggingInterface $flagging) {
     $flagging->delete();
+  }
+
+  /**
+   * Increments count of flagged entities.
+   *
+   * @param FlagInterface $flag
+   * @param EntityInterface $entity
+   */
+  protected function incrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
+    $count_result = db_select('flag_counts')
+      ->fields(NULL, array('fid', 'entity_id', 'entity_type', 'count'))
+      ->condition('fid', $flag->id())
+      ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute()
+      ->fetchAll();
+    var_dump($count_result);
+    if (count($count_result) == 1) {
+      db_update('flag_counts')
+        ->expression('count', 'count + 1')
+        ->condition('fid', $flag->id())
+        ->condition('entity_id', $entity->id())
+        ->execute();
+    }
+    else {
+      db_insert('flag_counts')
+        ->fields(array(
+          'fid' => $flag->id(),
+          'entity_id' => $entity->id(),
+          'entity_type' => $entity->getEntityTypeId(),
+          'count' => 1,
+        ))
+        ->execute();
+    }
+  }
+
+  /**
+   * Reverts incrementation of count of flagged entities.
+   *
+   * @param FlagInterface $flag
+   * @param EntityInterface $entity
+   */
+  protected function decrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
+    $count_result = db_select('flag_counts')
+      ->fields(NULL, array('fid', 'entity_id', 'entity_type', 'count'))
+      ->condition('fid', $flag->id())
+      ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->execute()
+      ->fetchAll();
+    var_dump($count_result);
+    if (count($count_result) == 1) {
+      db_delete('flag_counts')
+        ->condition('fid', $flag->id())
+        ->condition('entity_id', $entity->id())
+        ->execute();
+    }
+    else {
+      db_update('flag_counts')
+        ->expression('count', 'count - 1')
+        ->condition('fid', $flag->id())
+        ->condition('entity_id', $entity->id())
+        ->execute();
+    }
   }
 
 }
