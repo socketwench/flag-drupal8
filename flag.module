@@ -598,8 +598,8 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
       $action = 'unflag';
     }
 
-    // If does not have permission for this action, stop here and go to next
-    // foreach loop.
+    // If the user does not have permission, go to the next foreach loop and
+    // don't display this flag.
     if(!$flag->hasActionAccess($action)){
       continue;
     }
