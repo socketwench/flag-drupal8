@@ -176,6 +176,44 @@ class FlagSimpleTest extends WebTestBase {
     $this->assertNoLink('Flag this item');
 
     $this->drupalGet('node/' . $node_id);
+
+  }
+
+  /**
+   * Creates user, sets flags and deletes user.
+   */
+  public function doTestUserDeletion() {
+    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node_id = $node->id();
+
+    // Create and login a new user.
+    $user_1 = $this->drupalCreateUser();
+    $this->drupalLogin($user_1);
+
+    $this->drupalGet('node/' . $node_id);
+    $this->clickLink('Flag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Unflag this item');
+
+    $count_flags_before = \Drupal::entityQuery('flagging')
+      ->condition('uid', $user_1->id())
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->execute();
+
+    assertCount(1, $count_flags_before);
+
+    $user_1->delete();
+
+    $count_flags_after = \Drupal::entityQuery('flagging')
+      ->condition('uid', $user_1->id())
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->execute();
+
+    assertCount(0, $count_flags_after);
   }
 
   /**
