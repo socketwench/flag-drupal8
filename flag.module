@@ -597,6 +597,10 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
     if ($flag->isFlagged($entity)) {
       $action = 'unflag';
     }
+    //
+    if(!$flag->hasActionAccess($action)){
+      continue;
+    }
 
     $link = $link_type_plugin->renderLink($action, $flag, $entity);
     $build['flag_' . $flag->id()] = $link;

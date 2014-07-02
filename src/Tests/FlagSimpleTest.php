@@ -145,6 +145,10 @@ class FlagSimpleTest extends WebTestBase {
     $this->clickLink('Unflag this item');
     $this->assertResponse(200);
     $this->assertLink('Flag this item');
+
+    $this->drupalLogout();
+    $this->drupalGet('node/' . $node_id);
+    $this->assertNoLink('Flag this item');
   }
 
   /**
