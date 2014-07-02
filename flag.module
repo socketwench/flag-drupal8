@@ -15,7 +15,7 @@ use Drupal\flag\Flag;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -158,7 +158,7 @@ function flag_load($flag_name, $include_disabled = FALSE) {
 /**
  * Implements hook_help().
  */
-function flag_help($route_name, Request $request) {
+function flag_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'flag.list':
       $output = '<p>' . t('This page lists all the <em>flags</em> that are currently defined on this system.') . '</p>';
