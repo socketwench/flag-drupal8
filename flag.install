@@ -15,8 +15,8 @@ function flag_schema() {
     'description' => 'The number of times an item has been flagged.',
     'fields' => array(
       'fid' => array(
-        'type' => 'int',
-        'size' => 'small',
+        'type' => 'varchar',
+        'size' => '255',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
