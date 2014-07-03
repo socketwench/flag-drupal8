@@ -228,31 +228,21 @@ class FlagService {
    * @param EntityInterface $entity
    */
   protected function incrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
-    $count_result = db_select('flag_counts')
-      ->fields(NULL, array('fid', 'entity_id', 'entity_type', 'count'))
-      ->condition('fid', $flag->id())
-      ->condition('entity_id', $entity->id())
-      ->condition('entity_type', $entity->getEntityTypeId())
-      ->execute()
-      ->fetchAll();
-    var_dump($count_result);
-    if (count($count_result) == 1) {
-      db_update('flag_counts')
-        ->expression('count', 'count + 1')
-        ->condition('fid', $flag->id())
-        ->condition('entity_id', $entity->id())
-        ->execute();
-    }
-    else {
-      db_insert('flag_counts')
-        ->fields(array(
-          'fid' => $flag->id(),
-          'entity_id' => $entity->id(),
-          'entity_type' => $entity->getEntityTypeId(),
-          'count' => 1,
-        ))
-        ->execute();
-    }
+    db_merge('flag_counts')
+      ->key(array(
+        'fid' => $flag->id(),
+        'entity_id' => $entity->id(),
+        'entity_type' => $entity->getEntityTypeId(),
+        'last_updated' => time(),
+      ))
+      ->fields(array(
+        'fid' => $flag->id(),
+        'entity_id' => $entity->id(),
+        'entity_type' => $entity->getEntityTypeId(),
+        'count' => 1
+      ))
+      ->expression('count', 'count + :inc', array(':inc' => 1))
+      ->execute();
   }
 
   /**
@@ -269,17 +259,18 @@ class FlagService {
       ->condition('entity_type', $entity->getEntityTypeId())
       ->execute()
       ->fetchAll();
-    var_dump($count_result);
     if (count($count_result) == 1) {
       db_delete('flag_counts')
         ->condition('fid', $flag->id())
         ->condition('entity_id', $entity->id())
+        ->condition('entity_type', $entity->getEntityTypeId())
         ->execute();
     }
     else {
       db_update('flag_counts')
         ->expression('count', 'count - 1')
         ->condition('fid', $flag->id())
+        ->condition('entity_id', $entity->id())
         ->condition('entity_id', $entity->id())
         ->execute();
     }
