@@ -249,7 +249,7 @@ function flag_fetch_definition($entity_type = NULL) {
       $definitions = $cache->data;
     }
     else {
-      $definitions = module_invoke_all('flag_type_info');
+      $definitions = \Drupal::moduleHandler()->invokeAll('flag_type_info');
       drupal_alter('flag_type_info', $definitions);
 
       \Drupal::cache()->set('flag_type_info', $definitions);
@@ -1881,7 +1881,7 @@ function flag_reset_flag($flag, $entity_id = NULL) {
   foreach ($result as $row) {
     $rows[] = $row;
   }
-  module_invoke_all('flag_reset', $flag, $entity_id, $rows);
+  \Drupal::moduleHandler()->invokeAll('flag_reset', array($flag, $entity_id, $rows));
 
   $query = db_delete('flagging')->condition('fid' , $flag->fid);
   // Update the flag_counts table.
