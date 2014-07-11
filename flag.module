@@ -681,10 +681,10 @@ function flag_node_save($node) {
 /**
  * Implements hook_entity_delete().
  */
-function flag_entity_delete($entity, $type) {
+function flag_entity_delete(EntityInterface $entity) {
   // Node and user flags handle things through the entity type delete hooks.
   // @todo: make this configurable in the flag type definition?
-  if ($type == 'node' || $type == 'user') {
+  if ($entity->getEntityTypeId() == 'node' || $entity->getEntityTypeId() == 'user') {
     return;
   }
 
