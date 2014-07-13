@@ -26,8 +26,12 @@ install:
   # install drush globally
   - composer global require drush/drush:dev-master
   - composer global require youngj/httpserver:dev-master
+  - composer global require squizlabs/php_codesniffer:2.0.*@dev
+  - composer global require drupal/coder:dev-8.x-2.x
 
 before_script:
+  # Create a Drupal coding standard reference in PHPCS coding standards.
+  - ln -s ~/.composer/vendor/drupal/coder/coder_sniffer/Drupal ~/.composer/vendor/squizlabs/php_codesniffer/CodeSniffer/Standards
   # Remember the current flag test directory for later use in the Drupal
   # installation.
   - TESTDIR=$(pwd)
@@ -48,9 +52,6 @@ before_script:
   - ln -s $TESTDIR modules/flag
   - drush --yes pm-enable simpletest flag
 
-  # Switch to core directory where we will execute PHPUnit.
-  - cd core
-
   # Start a web server on port 8080, run in the background; wait for
   # initialization. This is temporarly disabled since there are no web tests
   # yet.
@@ -58,7 +59,9 @@ before_script:
   #- until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
 
 script:
-  # Run the Simpletests for flag.
-  - drush test-run 'flag' --uri=http://127.0.0.1:8080
+  # Run the Coder sniffer for Flag.
+  - phpcs --report=full --standard=Drupal ./modules/flag
+  # Run the Simpletests for Flag.
+  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://127.0.0.1:8080 --verbose --color "flag"
   # Run the PHPUnit tests.
-#  - ./vendor/phpunit/phpunit/phpunit ../modules/flag
+  - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/flag
