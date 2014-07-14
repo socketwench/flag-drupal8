@@ -44,7 +44,17 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   abstract public function routeName($action = NULL);
 
   /**
-   * @return string
+   * Returns a Url object for the given flag action.
+   *
+   * @param string $action
+   *   The action, flag or unflag.
+   * @param \Drupal\flag\FlagInterface $flag
+   *   The flag entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   *
+   * @return \Drupal\Core\Url
+   *   The URL object.
    */
   public function buildLink($action, FlagInterface $flag, EntityInterface $entity) {
     $parameters = array(
@@ -55,16 +65,20 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
     return new Url($this->routeName($action), $parameters);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $url = $this->buildLink($action, $flag, $entity);
 
-    $url->setRouteParameter('destination', \Drupal::request()->getRequestUri());
+    // @todo: Use whatever https://www.drupal.org/node/2302065 comes up with
+    // instead.
+    $url->setOption('destination', current_path());
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
     $render['#attributes']['id'] = 'flag-' . $flag->id() . '-id-' . $entity->id();
 
-    //@todo check if flagged, assign flag or unflag text.
     if ($action === 'unflag') {
       $render['#title'] = $flag->unflag_short;
       $render['#alt'] = $flag->unflag_long;
