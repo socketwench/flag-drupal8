@@ -14,4 +14,12 @@ interface FlaggingInterface extends ContentEntityInterface {
 
   public function getFlag();
 
+  /**
+   * Returns the flaggable entity.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The entity object.
+   */
+  public function getFlaggable();
+
 } 
