@@ -73,7 +73,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
 
     // @todo: Use whatever https://www.drupal.org/node/2302065 comes up with
     // instead.
-    $url->setOption('destination', current_path());
+    $url->setRouteParameter('destination', current_path());
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
