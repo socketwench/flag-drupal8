@@ -233,13 +233,10 @@ class FlagService {
         'fid' => $flag->id(),
         'entity_id' => $entity->id(),
         'entity_type' => $entity->getEntityTypeId(),
-        'last_updated' => time(),
       ))
       ->fields(array(
-        'fid' => $flag->id(),
-        'entity_id' => $entity->id(),
-        'entity_type' => $entity->getEntityTypeId(),
-        'count' => 1
+        'last_updated' => REQUEST_TIME,
+        'count' => 1,
       ))
       ->expression('count', 'count + :inc', array(':inc' => 1))
       ->execute();
