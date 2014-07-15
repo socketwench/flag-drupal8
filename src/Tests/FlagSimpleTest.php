@@ -12,7 +12,9 @@ use Drupal\user\Entity\Role;
 
 
 /**
- * Tests the Flag forms (add/edit/delete).
+ * Tests the Flag form actions (add/edit/delete).
+ *
+ * @group Flag
  */
 class FlagSimpleTest extends WebTestBase {
 
@@ -51,17 +53,6 @@ class FlagSimpleTest extends WebTestBase {
    * @var array
    */
   public static $modules = array('views', 'flag', 'node', 'field_ui');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Flag form/s',
-      'description' => 'Creates a flag, adds flag to node.',
-      'group' => 'Flag',
-    );
-  }
 
   /**
    * Configures test base and executes test cases.
