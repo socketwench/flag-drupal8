@@ -34,7 +34,7 @@ class FlagListController extends ConfigEntityListBuilder {
       $roles = user_roles(FALSE, $perm);
 
       foreach ($roles as $rid => $role) {
-        $allRoles[$rid] = $role->label;
+        $allRoles[$rid] = $role->label();
       }
     }
 
