@@ -52,7 +52,7 @@ before_script:
   # and manually resolving drush path.
   - mysql -e 'create database drupal'
   # Download Drupal 8 core.
-  - git clone --branch $DRUPAL_VERSION $DRUPAL_REPO drupal
+  - git clone --depth 1 --branch $DRUPAL_VERSION $DRUPAL_REPO drupal
   - cd drupal
   # Install Drupal.
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal testing
