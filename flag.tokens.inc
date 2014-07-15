@@ -186,7 +186,7 @@ function theme_flag_tokens_browser($variables) {
   $types = $variables['types'];
   $global_types = $variables['global_types'];
 
-  if (module_exists('token')) {
+  if (\Drupal::moduleHandler()->moduleExists('token')) {
     return theme('token_tree', array('token_types' => $types, 'global_types' => $global_types));
   }
   else {

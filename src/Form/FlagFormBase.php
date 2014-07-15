@@ -300,7 +300,7 @@ abstract class FlagFormBase extends EntityForm {
       }
     }
     /*
-        foreach (array_keys(user_roles(!module_exists('session_api'))) as $rid) {
+        foreach (array_keys(user_roles(!\Drupal::moduleHandler()->moduleExists('session_api'))) as $rid) {
           // Create an array of permissions, based on the checkboxes element name.
           $permissions = array(
             "flag $flag->name" => $flag->roles['flag'][$rid],
