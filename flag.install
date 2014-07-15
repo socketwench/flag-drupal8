@@ -76,11 +76,11 @@ function flag_uninstall() {
  * Implements hook_requirements().
  */
 function flag_requirements($phase) {
-
-  $requirements = array();
   /*
+  $requirements = array();
+
   if ($phase == 'runtime') {
-    if (module_exists('translation') && !module_exists('translation_helpers')) {
+    if (\Drupal::moduleHandler()->moduleExists('translation') && !\Drupal::moduleHandler()->moduleExists('translation_helpers')) {
       $requirements['flag_translation'] = array(
         'title' => t('Flag'),
         'severity' => REQUIREMENT_ERROR,
@@ -88,7 +88,7 @@ function flag_requirements($phase) {
         'value' => t('Translation helpers module not found.'),
       );
     }
-    if (module_exists('session_api')) {
+    if (\Drupal::moduleHandler()->moduleExists('session_api')) {
       if (file_exists('./robots.txt')) {
         $flag_path = url('flag') . '/';
         // We don't use url() because this may return an absolute URL when
@@ -107,6 +107,6 @@ function flag_requirements($phase) {
       }
     }
   }
-  */
   return $requirements;
+  */
 }
