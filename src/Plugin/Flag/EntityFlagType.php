@@ -102,7 +102,7 @@ class EntityFlagType extends FlagTypeBase {
       '#title' => t('Display in contextual links'),
       '#default_value' => $this->showContextualLink(),
       '#description' => t('Note that not all entity types support contextual links.'),
-      '#access' => module_exists('contextual'),
+      '#access' => \Drupal::moduleHandler()->moduleExists('contextual'),
       '#weight' => 10,
     );
 
