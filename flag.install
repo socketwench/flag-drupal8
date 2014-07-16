@@ -15,41 +15,30 @@ function flag_schema() {
     'description' => 'The number of times an item has been flagged.',
     'fields' => array(
       'fid' => array(
-        'type' => 'int',
-        'size' => 'small',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+        'type' => 'varchar',
+        'length' => '32',
       ),
       'entity_type' => array(
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
-        'not null' => TRUE,
-        'default' => '',
       ),
       'entity_id' => array(
         'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
         'disp-width' => '10',
       ),
       'count' => array(
         'description' => 'The number of times this object has been flagged for this flag.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
         'disp-width' => '10',
       ),
       'last_updated' => array(
         'description' => 'The UNIX time stamp representing when the flag was last updated.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
         'disp-size' => 11,
       )
     ),
