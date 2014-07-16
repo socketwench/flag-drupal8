@@ -171,4 +171,78 @@ class FlagSimpleTest extends WebTestBase {
 
     $this->drupalGet('node/' . $node_id);
   }
+
+  /**
+   * Flags a node using different user accounts and checks flag counts.
+   */
+  public function doTestFlagCounts() {
+    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node_id = $node->id();
+
+    // Create and login user 1.
+    $user_1 = $this->drupalCreateUser();
+    $this->drupalLogin($user_1);
+
+    // Flag node (first count).
+    $this->drupalGet('node/' . $node_id);
+    $this->clickLink('Flag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Unflag this item');
+
+    // Check for 1 flag count.
+    $count_flags_before = \Drupal::entityQuery('flag_counts')
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->count()
+      ->execute();
+    $this->assertTrue(1, $count_flags_before);
+
+    // Logout user 1, create and login user 2.
+    $user_2 = $this->drupalCreateUser();
+    $this->drupalLogin($user_2);
+
+    // Flag node (second count).
+    $this->drupalGet('node/' . $node_id);
+    $this->clickLink('Flag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Unflag this item');
+
+    // Check for 2 flag counts.
+    $count_flags_after = \Drupal::entityQuery('flag_counts')
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->count()
+      ->execute();
+    $this->assertTrue(2, $count_flags_after);
+
+    // Unflag the node again.
+    $this->drupalGet('node/' . $node_id);
+    $this->clickLink('Unflag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Flag this item');
+
+    // Check for 1 flag count.
+    $count_flags_before = \Drupal::entityQuery('flag_counts')
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->count()
+      ->execute();
+    $this->assertTrue(1, $count_flags_before);
+
+    // Delete  user 1.
+    $user_1->delete();
+
+    // Check for 0 flag counts, user deletion should lead to count decrement
+    // or row deletion.
+    $count_flags_before = \Drupal::entityQuery('flag_counts')
+      ->condition('fid', $this->id)
+      ->condition('entity_type', $node->getEntityTypeId())
+      ->condition('entity_id', $node_id)
+      ->count()
+      ->execute();
+    $this->assertTrue(0, $count_flags_before);
+  }
 }
