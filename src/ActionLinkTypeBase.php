@@ -8,7 +8,7 @@
 
 namespace Drupal\flag;
 
-use Drupal\Core\URL;
+use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityInterface;
 use \Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Plugin\PluginBase;
@@ -52,7 +52,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
       'entity_id' => $entity->id(),
     );
 
-    return new URL($this->routeName($action), $parameters);
+    return new Url($this->routeName($action), $parameters);
   }
 
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
@@ -149,4 +149,4 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
     $this->configuration = $configuration;
   }
 
-} 
+}
