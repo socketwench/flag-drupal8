@@ -31,7 +31,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
     );
   }
 
-  public function flag(Request $request, $flag_id, $entity_id) {
+  public function flag($flag_id, $entity_id) {
     /* @var \Drupal\flag\FlaggingInterface $flagging */
     $flagging = $this->flagService->flag($flag_id, $entity_id);
 
@@ -41,7 +41,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
     return $this->redirect($url_info->getRouteName(), $url_info->getRouteParameters());
   }
 
-  public function unflag(Request $request, $flag_id, $entity_id) {
+  public function unflag($flag_id, $entity_id) {
     $this->flagService->unflag($flag_id, $entity_id);
 
     $flag = $this->flagService->getFlagById($flag_id);
