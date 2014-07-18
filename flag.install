@@ -76,9 +76,8 @@ function flag_uninstall() {
  * Implements hook_requirements().
  */
 function flag_requirements($phase) {
-  /*
   $requirements = array();
-
+  /*
   if ($phase == 'runtime') {
     if (\Drupal::moduleHandler()->moduleExists('translation') && !\Drupal::moduleHandler()->moduleExists('translation_helpers')) {
       $requirements['flag_translation'] = array(
@@ -107,6 +106,6 @@ function flag_requirements($phase) {
       }
     }
   }
-  return $requirements;
   */
+  return $requirements;
 }
