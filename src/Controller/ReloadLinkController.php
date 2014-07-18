@@ -7,10 +7,6 @@
 namespace Drupal\flag\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\flag\FlagInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
