@@ -13,7 +13,24 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\flag\FlagService;
 
-class ReloadLinkController extends ControllerBase {
+class ReloadLinkController extends ControllerBase implements ContainerInjectionInterface {
+
+  /**
+   * @var Drupal\flag\FlagService
+   */
+  protected $flagService;
+
+  public function __construct(FlagService $flag)
+  {
+    $this->flagService = $flag;
+  }
+
+  public static function create(ContainerInterface $container)
+  {
+    return new static(
+      $container->get('flag')
+    );
+  }
 
   public function flag(Request $request, $flag_id, $entity_id) {
 
