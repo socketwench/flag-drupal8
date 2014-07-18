@@ -42,4 +42,4 @@ class ReloadLinkController extends ControllerBase {
     return $this->redirect($url_info->getRouteName(), $url_info->getRouteParameters());
   }
 
-} 
+}
