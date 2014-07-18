@@ -33,8 +33,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   }
 
   public function flag(Request $request, $flag_id, $entity_id) {
-
-    $flagging = \Drupal::service('flag')->flag($flag_id, $entity_id);
+    $flagging = $this->flagService->flag($flag_id, $entity_id);
 
     // Get the destination.
     $destination = $request->get('destination', $flagging->getFlaggable()->url());
@@ -44,13 +43,12 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   }
 
   public function unflag(Request $request, $flag_id, $entity_id) {
-    $flagService = \Drupal::service('flag');
-    $flagService->unflag($flag_id, $entity_id);
+    $this->flagService->unflag($flag_id, $entity_id);
 
-    $flag = $flagService->getFlagById($flag_id);
-    $entity = $flagService->getFlaggableById($flag, $entity_id);
+    $flag = $this->flagService->getFlagById($flag_id);
+    $entity = $this->flagService->getFlaggableById($flag, $entity_id);
 
-    $destination = \Drupal::request()->get('destination', $entity->url());
+    $destination = $request->get('destination', $entity->url());
 
     //@todo SECURITY HOLE. Please fix!
     return new RedirectResponse($destination);
