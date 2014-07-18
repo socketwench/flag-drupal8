@@ -94,7 +94,7 @@ function flag_admin_menu_map() {
     ),
   );
 
-  if (module_exists('field_ui')) {
+  if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
     foreach (entity_get_info() as $obj_type => $info) {
       if ($obj_type == 'flagging') {
         foreach ($info['bundles'] as $bundle_name => $bundle_info) {
@@ -198,7 +198,7 @@ function flag_help($route_name, RouteMatchInterface $route_match) {
         $output .= t("Field values may be edited when flaggings are created because this flag's link type shows a form for the flagging. However, to edit field values on existing flaggings, you will need to set your flag to use the <em>Flagging form</em> link type. This is provided by the <em><a href='!flagging-form-url'>Flagging Form</a></em> module.", array(
           '!flagging-form-url' => 'http://drupal.org/project/flagging_form',
         ));
-        if (!module_exists('flagging_form')) {
+        if (!\Drupal::moduleHandler()->moduleExists('flagging_form')) {
           $output .= ' <span class="warning">'
             . t("You do not currently have this module enabled.")
             . '</span>';
@@ -217,7 +217,7 @@ function flag_help($route_name, RouteMatchInterface $route_match) {
         $output .= '<p>' . t("Additionally, to edit field values on existing flaggings, you will need to set your flag to use the Flagging form link type. This is provided by the <em><a href='!flagging-form-url'>Flagging Form</a></em> module.", array(
           '!flagging-form-url' => 'http://drupal.org/project/flagging_form',
         ));
-        if (!module_exists('flagging_form')) {
+        if (!\Drupal::moduleHandler()->moduleExists('flagging_form')) {
           $output .= ' <span class="warning">'
             . t("You do not currently have this module enabled.")
             . '</span>';
@@ -250,7 +250,7 @@ function flag_fetch_definition($entity_type = NULL) {
     }
     else {
       $definitions = \Drupal::moduleHandler()->invokeAll('flag_type_info');
-      drupal_alter('flag_type_info', $definitions);
+      \Drupal::moduleHandler()->alter('flag_type_info', $definitions);
 
       \Drupal::cache()->set('flag_type_info', $definitions);
     }
@@ -307,7 +307,7 @@ function flag_permission() {
  * anonymous users when Session API module is not enabled.
  */
 function flag_form_user_admin_permissions_alter(&$form, &$form_state, $form_id) {
-  if (!module_exists('session_api')) {
+  if (!\Drupal::moduleHandler()->moduleExists('session_api')) {
     $flags = \Drupal::service('flag')->getFlags();
     // Disable flag and unflag permission checkboxes for anonymous users.
     foreach ($flags as $flag_name => $flag) {
@@ -759,7 +759,7 @@ function _flag_entity_delete($entity_type, $entity_id, $fid = NULL) {
  */
 function flag_user_login($account) {
   // Migrate anonymous flags to this user's account.
-  if (module_exists('session_api') && ($sid = flag_get_sid(0))) {
+  if (\Drupal::moduleHandler()->moduleExists('session_api') && ($sid = flag_get_sid(0))) {
     // Get a list of flagging IDs that will be moved over.
     $duplicate_flaggings = array();
     $flaggings = db_select('flagging', 'fc')
@@ -1903,7 +1903,7 @@ function flag_set_sid($uid = NULL, $create = TRUE) {
   // Set the sid if none has been set yet. If the caller specified to create an
   // sid and we have an invalid one (-1), create it.
   if (!isset($sids[$uid]) || ($sids[$uid] == -1 && $create)) {
-    if (module_exists('session_api') && session_api_available() && $uid == 0) {
+    if (\Drupal::moduleHandler()->moduleExists('session_api') && session_api_available() && $uid == 0) {
       // This returns one of the following:
       // - -1. This indicates that no session exists and none was created.
       // - A positive integer with the Session ID when it does exist.

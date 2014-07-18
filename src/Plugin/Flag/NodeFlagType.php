@@ -63,7 +63,7 @@ class NodeFlagType extends EntityFlagType {
       ),
       //'#default_value' => $this->i18n,
       '#description' => t('Flagging translations as a group effectively allows users to flag the original piece of content regardless of the translation they are viewing. Changing this setting will <strong>not</strong> update content that has been flagged already.'),
-      '#access' => module_exists('translation_helpers'),
+      '#access' => \Drupal::moduleHandler()->moduleExists('translation_helpers'),
       '#weight' => 5,
     );
 
