@@ -598,6 +598,12 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
       $action = 'unflag';
     }
 
+    // If the user does not have permission, go to the next foreach loop and
+    // don't display this flag.
+    if(!$flag->hasActionAccess($action)){
+      continue;
+    }
+
     $link = $link_type_plugin->renderLink($action, $flag, $entity);
     $build['flag_' . $flag->id()] = $link;
   }
