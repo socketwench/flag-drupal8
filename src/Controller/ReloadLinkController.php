@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 3/10/14
- * Time: 9:10 PM
+ * @file
+ * Contains Drupal\flag\Controller\ReloadLinkController.
  */
 
 namespace Drupal\flag\Controller;
