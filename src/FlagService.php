@@ -45,6 +45,8 @@ class FlagService {
    * @see hook_flag_type_info()
    */
   public function fetchDefinition($entity_type = NULL) {
+    //@todo Add caching, PLS!
+
     if(!empty($entity_type)){
       return \Drupal::service('plugin.manager.flag.flagtype')->getDefinition($entity_type);
     }

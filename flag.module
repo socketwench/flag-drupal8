@@ -232,56 +232,6 @@ function flag_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Get a flag type definition.
- *
- * @param $entity_type
- *   (optional) The entity type to get the definition for, or NULL to return
- *   all flag types.
- *
- * @return
- *   The flag type definition array.
- *
- * @see hook_flag_type_info()
- */
-function flag_fetch_definition($entity_type = NULL) {
-  $definitions = &drupal_static(__FUNCTION__);
-  if (!isset($definitions)) {
-    if ($cache = \Drupal::cache()->get('flag_type_info')) {
-      $definitions = $cache->data;
-    }
-    else {
-      $definitions = \Drupal::moduleHandler()->invokeAll('flag_type_info');
-      \Drupal::moduleHandler()->alter('flag_type_info', $definitions);
-
-      \Drupal::cache()->set('flag_type_info', $definitions);
-    }
-  }
-
-  if (isset($entity_type)) {
-    if (isset($definitions[$entity_type])) {
-      return $definitions[$entity_type];
-    }
-  }
-  else {
-    return $definitions;
-  }
-}
-
-/**
- * Returns all flag types defined on the system.
- *
- * @return
- *   An array of flag type names.
- */
-function flag_get_types() {
-  $types = &drupal_static(__FUNCTION__);
-  if (!isset($types)) {
-    $types = array_keys(flag_fetch_definition());
-  }
-  return $types;
-}
-
-/**
  * Implements hook_permission().
  */
 function flag_permission() {

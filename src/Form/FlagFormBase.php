@@ -19,8 +19,6 @@ abstract class FlagFormBase extends EntityForm {
 
     $flag = $this->entity;
 
-    $type_info = flag_fetch_definition($entity_type);
-
     $form['#flag'] = $flag;
     $form['#flag_name'] = $flag->id;
 
