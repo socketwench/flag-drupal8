@@ -15,7 +15,7 @@ use Drupal\flag\FlagService;
 class ReloadLinkController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
-   * @var Drupal\flag\FlagService
+   * @var \Drupal\flag\FlagService
    */
   protected $flagService;
 
