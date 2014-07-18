@@ -16,6 +16,7 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\user\UserInterface;
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
@@ -818,21 +819,21 @@ function flag_user_cancel($edit, $account, $method) {
 /**
  * Implements hook_user_delete().
  */
-function flag_user_delete($account) {
+function flag_user_delete(UserInterface $account) {
   flag_user_account_removal($account);
 }
 
 /**
  * Shared helper for user account cancellation or deletion.
- *//*
-function flag_user_account_removal($account) {
+ */
+function flag_user_account_removal(UserInterface $account) {
   // Remove flags by this user.
   $query = db_select('flagging', 'fc');
   $query->leftJoin('flag_counts', 'c', 'fc.entity_id = c.entity_id AND fc.entity_type = c.entity_type');
   $result = $query
     ->fields('fc', array('fid', 'entity_id'))
     ->fields('c', array('count'))
-    ->condition('fc.uid', $account->uid)
+    ->condition('fc.uid', $account->id())
     ->execute();
 
   foreach ($result as $flag_data) {
@@ -855,12 +856,12 @@ function flag_user_account_removal($account) {
     }
   }
   db_delete('flagging')
-    ->condition('uid', $account->uid)
+    ->condition('uid', $account->id())
     ->execute();
 
   // Remove flags that have been done to this user.
-  _flag_entity_delete('user', $account->uid);
-}*/
+  _flag_entity_delete('user', $account->id());
+}
 
 /**
  * Implements hook_user_view().
