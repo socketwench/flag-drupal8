@@ -67,7 +67,7 @@ class FlagListController extends ConfigEntityListBuilder {
     $output = "";
 
     //@todo Move this too hook_help()?
-    if (!module_exists('views')) {
+    if (!\Drupal::moduleHandler()->moduleExists('views')) {
       $output .= '<p>' . t('The <a href="@views-url">Views</a> module is not installed, or not enabled. It is recommended that you install the Views module to be able to easily produce lists of flagged content.', array('@views-url' => url('http://drupal.org/project/views'))) . '</p>';
     }
     else {
@@ -80,14 +80,14 @@ class FlagListController extends ConfigEntityListBuilder {
       $output .= '</p>';
     }
 
-    if (!module_exists('flag_actions')) {
+    if (!\Drupal::moduleHandler()->moduleExists('flag_actions')) {
       $output .= '<p>' . t('Flagging an item may trigger <em>actions</em>. However, you don\'t have the <em>Flag actions</em> module <a href="@modules-url">enabled</a>, so you won\'t be able to enjoy this feature.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'), '@modules-url' => url('admin/modules'))) . '</p>';
     }
     else {
       $output .= '<p>' . t('Flagging an item may trigger <a href="@actions-url">actions</a>.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'))) . '</p>';
     }
 
-    if (!module_exists('rules')) {
+    if (!\Drupal::moduleHandler()->moduleExists('rules')) {
       $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', array('@rules-url' => url('http://drupal.org/node/407070'))) . '</p>';
     }
     else {
