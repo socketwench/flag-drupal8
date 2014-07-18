@@ -22,4 +22,4 @@ interface FlaggingInterface extends ContentEntityInterface {
    */
   public function getFlaggable();
 
-} 
+}
