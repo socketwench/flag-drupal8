@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
 /**
  * Tests the Flag form actions (add/edit/delete).
  *
- * @group Flag
+ * @group flag
  */
 class FlagSimpleTest extends WebTestBase {
 
