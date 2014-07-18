@@ -75,7 +75,7 @@ function flag_token_info() {
   );
 
   // Add tokens for the flag count available at the node/comment/user level.
-  foreach (flag_get_types() as $flag_type) {
+  foreach (\Drupal::service('flag')->fetchDefinition() as $flag_type) {
     $flags = flag_get_flags($flag_type);
     foreach ($flags as $flag) {
       $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->name) . '-count'] = array(
@@ -155,7 +155,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
     }
   }
 
-  if (isset($data[$type]) && in_array($type, flag_get_types())) {
+  if (isset($data[$type]) && in_array($type, \Drupal::service('flag')->fetchDefinition())) {
     $flags = flag_get_flags($type);
     $object = $data[$type];
     foreach ($flags as $flag) {
