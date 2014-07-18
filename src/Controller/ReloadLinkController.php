@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * Contains Drupal\flag\Controller\ReloadLinkController.
+ * Contains \Drupal\flag\Controller\ReloadLinkController.
  */
 
 namespace Drupal\flag\Controller;
