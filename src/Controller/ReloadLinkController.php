@@ -19,6 +19,11 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    */
   protected $flagService;
 
+  /**
+   * Constructor.
+   *
+   * @param FlagService $flag
+   */
   public function __construct(FlagService $flag)
   {
     $this->flagService = $flag;
