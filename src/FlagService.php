@@ -94,7 +94,7 @@ class FlagService {
    *   (optional) The user account to filter available flags. If not set, all
    *   flags for the given entity and bundle will be returned.
    *
-   * @return
+   * @return array
    *   An array of the structure [fid] = flag_object.
    */
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
