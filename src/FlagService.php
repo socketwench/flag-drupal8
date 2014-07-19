@@ -15,7 +15,10 @@ use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\Event\FlaggingEvent;
 use Drupal\flag\FlagInterface;
 use Drupal\Core\Entity\EntityInterface;
-
+use Drupal\flag\FlagTypePluginManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Entity\EntityManagerInterface;
 
 /**
  * Flag service.
