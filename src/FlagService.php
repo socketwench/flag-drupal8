@@ -8,7 +8,6 @@
 
 namespace Drupal\flag;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\Entity\Flag;
 use Drupal\flag\Entity\Flagging;
@@ -16,20 +15,52 @@ use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\Event\FlaggingEvent;
 use Drupal\flag\FlagInterface;
 use Drupal\Core\Entity\EntityInterface;
-
+use Drupal\flag\FlagTypePluginManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Entity\EntityManagerInterface;
 
 /**
  * Flag service.
  */
 class FlagService {
 
+  /* @var FlagTypePluginManager */
+  private $flagType;
+
+  /* @var EventDispatcherInterface */
+  private $eventDispatcher;
+
+  /* @var QueryFactory */
+  private $entityQuery;
+
+  /* @var AccountInterface */
+  private $currentUser;
+
+  /* @var EntityManagerInterface */
+  private $entityManager;
+
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param FlagTypePluginManager $flagType
+   * @param EventDispatcherInterface $eventDispatcher
+   * @param QueryFactory $entityQuery
+   * @param AccountInterface $currentUser
+   * @param EntityManagerInterface $entityManager
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    FlagTypePluginManager $flagType,
+    EventDispatcherInterface $eventDispatcher,
+    QueryFactory $entityQuery,
+    AccountInterface $currentUser,
+    EntityManagerInterface $entityManager
+  ) {
+    $this->flagType = $flagType;
+    $this->eventDispatcher = $eventDispatcher;
+    $this->entityQuery = $entityQuery;
+    $this->currentUser = $currentUser;
+    $this->entityManager = $entityManager;
   }
 
   /**
@@ -39,7 +70,7 @@ class FlagService {
    *   (optional) The entity type to get the definition for, or NULL to return
    *   all flag types.
    *
-   * @return
+   * @return array
    *   The flag type definition array.
    *
    * @see hook_flag_type_info()
@@ -48,10 +79,10 @@ class FlagService {
     //@todo Add caching, PLS!
 
     if(!empty($entity_type)){
-      return \Drupal::service('plugin.manager.flag.flagtype')->getDefinition($entity_type);
+      return $this->flagType->getDefinition($entity_type);
     }
 
-    return \Drupal::service('plugin.manager.flag.flagtype')->getDefinitions();
+    return $this->flagType->getDefinitions();
   }
 
   /**
@@ -68,11 +99,11 @@ class FlagService {
    *   (optional) The user account to filter available flags. If not set, all
    *   flags for the given entity and bundle will be returned.
    *
-   * @return
+   * @return array
    *   An array of the structure [fid] = flag_object.
    */
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
-    $query = \Drupal::entityQuery('flag');
+    $query = $this->entityQuery->get('flag');
 
     if($entity_type != NULL) {
       $query->condition('entity_type', $entity_type);
@@ -102,10 +133,10 @@ class FlagService {
 
   public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
     if($account == NULL) {
-      $account = \Drupal::currentUser();
+      $account = $this->currentUser;
     }
 
-    $result = \Drupal::entityQuery('flagging')
+    $result = $this->entityQuery->get('flagging')
       ->condition('uid', $account->id())
       ->condition('fid', $flag->id())
       ->condition('entity_type', $entity->getEntityTypeId())
@@ -136,7 +167,7 @@ class FlagService {
 
   public function flagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     if (empty($account)) {
-      $account = \Drupal::currentUser();
+      $account = $this->currentUser;
     }
 
     $flagging = entity_create('flagging', array(
@@ -151,14 +182,13 @@ class FlagService {
 
     $this->incrementFlagCounts($flag, $entity);
 
-    \Drupal::entityManager()
+    $this->entityManager
       ->getViewBuilder($entity->getEntityTypeId())
       ->resetCache(array(
         $entity,
       ));
 
-    \Drupal::service('event_dispatcher')
-      ->dispatch(FlagEvents::ENTITY_FLAGGED, new FlaggingEvent($flag, $entity, 'flag'));
+    $this->eventDispatcher->dispatch(FlagEvents::ENTITY_FLAGGED, new FlaggingEvent($flag, $entity, 'flag'));
 
     return $flagging;
   }
@@ -174,7 +204,7 @@ class FlagService {
    */
   public function flag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
-      $account = \Drupal::currentUser();
+      $account = $this->currentUser;
     }
 
     $flag = $this->getFlagById($flag_id);
@@ -194,7 +224,7 @@ class FlagService {
    */
   public function unflag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
-      $account = \Drupal::currentUser();
+      $account = $this->currentUser;
     }
 
     $flag = $this->getFlagById($flag_id);
@@ -205,10 +235,8 @@ class FlagService {
     return $this->unflagByObject($flag, $entity, $account);
   }
 
-
   public function unflagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
-    \Drupal::service('event_dispatcher')
-      ->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
+    $this->eventDispatcher->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
 
     $out = array();
     $flaggings = $this->getFlaggings($entity, $flag);
