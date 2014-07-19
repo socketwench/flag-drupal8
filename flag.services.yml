@@ -7,4 +7,4 @@ services:
     arguments: ['@container.namespaces', '@cache.default', '@module_handler']
   flag:
     class: Drupal\flag\FlagService
-    arguments: ['@module_handler']
+    arguments: ['@plugin.manager.flag.flagtype', '@event_dispatcher', '@entity.query', '@current_user', '@entity.manager']
