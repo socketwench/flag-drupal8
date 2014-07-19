@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 11/7/13
- * Time: 11:05 PM
+ * @file
+ * Contains the ActionLinkTypePluginInterface.
  */
 
 namespace Drupal\flag;
@@ -19,14 +17,29 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  */
 interface ActionLinkTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
 
+  /**
+   * Returns a Url object for the given flag action.
+   *
+   * @param string $action
+   *   The action, flag or unflag.
+   * @param \Drupal\flag\FlagInterface $flag
+   *   The flag entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   *
+   * @return \Drupal\Core\Url
+   *   The URL object.
+   */
   public function buildLink($action, FlagInterface $flag, EntityInterface $entity);
 
-  public function renderLink($action, FlagInterface $flag, EntityInterface $entity);
-
   /**
-   * @return string
-   *  A string containing the route name.
+   * Generates a flag link as a render array.
+   *
+   * @param $action
+   * @param FlagInterface $flag
+   * @param EntityInterface $entity
+   * @return array
+   *  A render array of the flag link.
    */
-  public function routeName();
-
+  public function renderLink($action, FlagInterface $flag, EntityInterface $entity);
 }
