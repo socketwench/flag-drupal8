@@ -1,26 +1,50 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 3/10/14
- * Time: 9:10 PM
+ * @file
+ * Contains \Drupal\flag\Controller\ReloadLinkController.
  */
 
 namespace Drupal\flag\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\flag\FlagInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\flag\FlagService;
 
-class ReloadLinkController extends ControllerBase {
+class ReloadLinkController extends ControllerBase implements ContainerInjectionInterface {
 
-  public function flag(Request $request, $flag_id, $entity_id) {
+  /**
+   * @var \Drupal\flag\FlagService
+   */
+  protected $flagService;
+
+  /**
+   * Constructor.
+   *
+   * @param FlagService $flag
+   */
+  public function __construct(FlagService $flag)
+  {
+    $this->flagService = $flag;
+  }
+
+  /**
+   * Create.
+   *
+   * @param ContainerInterface $container
+   * @return static
+   */
+  public static function create(ContainerInterface $container)
+  {
+    return new static(
+      $container->get('flag')
+    );
+  }
+
+  public function flag($flag_id, $entity_id) {
     /* @var \Drupal\flag\FlaggingInterface $flagging */
-    $flagging = \Drupal::service('flag')->flag($flag_id, $entity_id);
+    $flagging = $this->flagService->flag($flag_id, $entity_id);
 
     // Redirect back to the entity. A passed in destination query parameter
     // will automatically override this.
@@ -28,13 +52,11 @@ class ReloadLinkController extends ControllerBase {
     return $this->redirect($url_info->getRouteName(), $url_info->getRouteParameters());
   }
 
-  public function unflag(Request $request, $flag_id, $entity_id) {
-    /* @var \Drupal\flag\FlagService $flag_service */
-    $flag_service = \Drupal::service('flag');
-    $flag_service->unflag($flag_id, $entity_id);
+  public function unflag($flag_id, $entity_id) {
+    $this->flagService->unflag($flag_id, $entity_id);
 
-    $flag = $flag_service->getFlagById($flag_id);
-    $entity = $flag_service->getFlaggableById($flag, $entity_id);
+    $flag = $this->flagService->getFlagById($flag_id);
+    $entity = $this->flagService->getFlaggableById($flag, $entity_id);
 
     // Redirect back to the entity. A passed in destination query parameter
     // will automatically override this.
