@@ -43,6 +43,11 @@ class FlagService {
   /**
    * Constructor.
    *
+   * @param FlagTypePluginManager $flagType
+   * @param EventDispatcherInterface $eventDispatcher
+   * @param QueryFactory $entityQuery
+   * @param AccountInterface $currentUser
+   * @param EntityManagerInterface $entityManager
    */
   public function __construct(
     FlagTypePluginManager $flagType,
