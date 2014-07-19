@@ -1,17 +1,25 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/20/13
- * Time: 5:57 PM
+ * @file
+ * Contains the FlaggingInterface.
  */
 
 namespace Drupal\flag;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 
+/**
+ * The interface for flagging entities.
+ *
+ * @package Drupal\flag
+ */
 interface FlaggingInterface extends ContentEntityInterface {
 
+  /**
+   * Returns the Flag content entity related to this flagging.
+   *
+   * @return \Drupal\flag\FlagInterface
+   */
   public function getFlag();
 
   /**

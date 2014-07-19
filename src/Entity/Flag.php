@@ -364,7 +364,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
   /**
    * Returns the flaggable entity type ID.
-   * 
+   *
    * @return string
    */
   public function getFlaggableEntityType() {
