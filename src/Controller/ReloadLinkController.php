@@ -29,6 +29,12 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
     $this->flagService = $flag;
   }
 
+  /**
+   * Create.
+   *
+   * @param ContainerInterface $container
+   * @return static
+   */
   public static function create(ContainerInterface $container)
   {
     return new static(
