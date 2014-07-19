@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains the AJAXactionLink class.
+ */
 
 namespace Drupal\flag\Plugin\ActionLink;
 
@@ -7,7 +11,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
 /**
- * Class Reload
+ * Provides the AJAX link type.
+ *
+ * This class is virtually a copy of the Reload link type, but modified to
+ * provide AJAX links.
  *
  * @ActionLinkType(
  *   id = "AJAX Link",
@@ -17,6 +24,9 @@ use Drupal\flag\FlagInterface;
  */
 class AJAXactionLink extends ActionLinkTypeBase{
 
+  /**
+   * {@inheritdoc}
+   */
   public function routeName($action = NULL) {
     if ($action === 'unflag') {
       return 'flag.link_unflag.json';
@@ -25,6 +35,9 @@ class AJAXactionLink extends ActionLinkTypeBase{
     return 'flag.link_flag.json';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $render = parent::renderLink($action, $flag, $entity);
     $render['#attached']['library'][] = 'core/drupal.ajax';

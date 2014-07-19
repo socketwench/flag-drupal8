@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 11/5/13
- * Time: 10:01 PM
+ * @file
+ * Contains the ActionLinkTypeBase class.
  */
 
 namespace Drupal\flag;
@@ -17,12 +15,19 @@ use Drupal\flag\ActionLinkTypePluginInterface;
 use Drupal\flag\FlagService;
 
 /**
- * Class ActionLinkTypeBase
+ * Provides a base class for all link types.
+ *
+ * Link types perform two key functions within Flag: They specify the route to
+ * use when a flag link is clicked, and generate the render array to display
+ * flag links.
+ *
  * @package Drupal\flag
  */
 abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePluginInterface {
 
   /**
+   * Build a new link type instance and sets the configuration.
+   *
    * @param array $configuration
    * @param string $plugin_id
    * @param array $plugin_definition
@@ -44,17 +49,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   abstract public function routeName($action = NULL);
 
   /**
-   * Returns a Url object for the given flag action.
-   *
-   * @param string $action
-   *   The action, flag or unflag.
-   * @param \Drupal\flag\FlagInterface $flag
-   *   The flag entity
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return \Drupal\Core\Url
-   *   The URL object.
+   * {@inheritdoc}
    */
   public function buildLink($action, FlagInterface $flag, EntityInterface $entity) {
     $parameters = array(

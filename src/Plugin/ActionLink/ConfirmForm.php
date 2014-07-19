@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 3/4/14
- * Time: 9:51 PM
+ * @file
+ * Contains the ConfirmForm link type.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;
@@ -11,7 +9,8 @@ namespace Drupal\flag\Plugin\ActionLink;
 use Drupal\flag\ActionLinkTypeBase;
 
 /**
- * Class ConfirmForm
+ * Provides the Confirm Form link type.
+ *
  * @package Drupal\flag\Plugin\ActionLink
  *
  * @ActionLinkType(
@@ -22,6 +21,9 @@ use Drupal\flag\ActionLinkTypeBase;
  */
 class ConfirmForm extends ActionLinkTypeBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function routeName($action = NULL) {
     if ($action == 'unflag') {
       return 'flag.confirm_unflag';
@@ -30,6 +32,9 @@ class ConfirmForm extends ActionLinkTypeBase {
     return 'flag.confirm_flag';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
 
@@ -39,6 +44,9 @@ class ConfirmForm extends ActionLinkTypeBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, array &$form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
@@ -73,16 +81,27 @@ class ConfirmForm extends ActionLinkTypeBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['flag_confirmation'] = $form_state['values']['flag_confirmation'];
     $this->configuration['unflag_confirmation'] = $form_state['values']['unflag_confirmation'];
   }
 
+  /**
+   * Returns the flag confirm form question when flagging.
+   * @return string
+   */
   public function getFlagQuestion() {
     return $this->configuration['flag_confirmation'];
   }
 
+  /**
+   * Returns the flag confirm form question when unflagging.
+   * @return string
+   */
   public function getUnflagQuestion() {
     return $this->configuration['unflag_confirmation'];
   }

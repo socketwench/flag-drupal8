@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 11/14/13
- * Time: 8:21 PM
+ * @file
+ * Contains the Normal Link (Reload) link type.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;
@@ -11,7 +9,7 @@ namespace Drupal\flag\Plugin\ActionLink;
 use Drupal\flag\ActionLinkTypeBase;
 
 /**
- * Class Reload
+ * Provides the Normal Link (Reload) link type.
  *
  * @ActionLinkType(
  *   id = "reload",
@@ -22,7 +20,7 @@ use Drupal\flag\ActionLinkTypeBase;
 class Reload extends ActionLinkTypeBase {
 
   /**
-   * @return string
+   * {@inheritdoc}
    */
   public function routeName($action = NULL) {
     if ($action === 'unflag') {
