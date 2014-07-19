@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/28/13
- * Time: 7:07 PM
+ * @file
+ * Contains \Drupal\flag\Plugin\Flag\CommentFlagType.
  */
 
 namespace Drupal\flag\Plugin\Flag;
@@ -25,6 +23,9 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  */
 class CommentFlagType extends EntityFlagType {
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     $options += array(
@@ -34,10 +35,13 @@ class CommentFlagType extends EntityFlagType {
   }
 
   /**
-   * Options form extras for comment flags.
+   * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
+
     $form = parent::buildConfigurationForm($form, $form_state);
+
+    /* Options form extras for comment flags. */
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -56,11 +60,17 @@ class CommentFlagType extends EntityFlagType {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_author'] = $form_state['values']['access_author'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function type_access_multiple($entity_ids, $account) {
     $access = array();
 
@@ -85,6 +95,9 @@ class CommentFlagType extends EntityFlagType {
     return $access;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function getAccessAuthorSetting() {
     return $this->configuration['access_author'];
   }
