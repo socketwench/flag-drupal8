@@ -25,20 +25,30 @@ use Drupal\Core\Entity\EntityManagerInterface;
  */
 class FlagService {
 
-  /* @var FlagTypePluginManager */
-  private $flagType;
+  /**
+   * @var FlagTypePluginManager
+   */
+  private $flagTypeMgr;
 
-  /* @var EventDispatcherInterface */
+  /**
+   * @var EventDispatcherInterface
+   */
   private $eventDispatcher;
 
-  /* @var QueryFactory */
-  private $entityQuery;
+  /*
+   * @var QueryFactory
+   */
+  private $entityQueryMgr;
 
-  /* @var AccountInterface */
+  /**
+   * @var AccountInterface
+   */
   private $currentUser;
 
-  /* @var EntityManagerInterface */
-  private $entityManager;
+  /*
+   * @var EntityManagerInterface
+   * */
+  private $entityMgr;
 
   /**
    * Constructor.
@@ -56,11 +66,11 @@ class FlagService {
     AccountInterface $currentUser,
     EntityManagerInterface $entityManager
   ) {
-    $this->flagType = $flagType;
+    $this->flagTypeMgr = $flagType;
     $this->eventDispatcher = $eventDispatcher;
-    $this->entityQuery = $entityQuery;
+    $this->entityQueryMgr = $entityQuery;
     $this->currentUser = $currentUser;
-    $this->entityManager = $entityManager;
+    $this->entityMgr = $entityManager;
   }
 
   /**
@@ -79,10 +89,10 @@ class FlagService {
     //@todo Add caching, PLS!
 
     if(!empty($entity_type)){
-      return $this->flagType->getDefinition($entity_type);
+      return $this->flagTypeMgr->getDefinition($entity_type);
     }
 
-    return $this->flagType->getDefinitions();
+    return $this->flagTypeMgr->getDefinitions();
   }
 
   /**
@@ -103,7 +113,7 @@ class FlagService {
    *   An array of the structure [fid] = flag_object.
    */
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
-    $query = $this->entityQuery->get('flag');
+    $query = $this->entityQueryMgr->get('flag');
 
     if($entity_type != NULL) {
       $query->condition('entity_type', $entity_type);
@@ -136,7 +146,7 @@ class FlagService {
       $account = $this->currentUser;
     }
 
-    $result = $this->entityQuery->get('flagging')
+    $result = $this->entityQueryMgr->get('flagging')
       ->condition('uid', $account->id())
       ->condition('fid', $flag->id())
       ->condition('entity_type', $entity->getEntityTypeId())
@@ -182,7 +192,7 @@ class FlagService {
 
     $this->incrementFlagCounts($flag, $entity);
 
-    $this->entityManager
+    $this->entityMgr
       ->getViewBuilder($entity->getEntityTypeId())
       ->resetCache(array(
         $entity,
