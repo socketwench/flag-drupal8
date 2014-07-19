@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 11/4/13
- * Time: 9:45 PM
+ * @file
+ * Contains the ActionLinkType annotation plugin.
  */
 
 namespace Drupal\flag\Annotation;

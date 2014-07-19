@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 4/13/14
- * Time: 3:28 PM
+ * @file
+ * Contains the AJAXLinkController class.
  */
 
 namespace Drupal\flag\Controller;
@@ -18,9 +16,15 @@ use Drupal\Core\Ajax\ReplaceCommand;
 class AJAXLinkController extends ControllerBase {
 
   /**
+   * Performs a flagging when called via a route.
+   *
+   * This method is invoked when a user clicks an AJAX flagging link provided
+   * by the AJAXactionLink plugin.
+   *
    * @param $flag_id
    * @param $entity_id
    * @return AjaxResponse
+   * @see \Drupal\flag\Plugin\ActionLink\AJAXactionLink
    */
   public function flag($flag_id, $entity_id) {
     $flagging = \Drupal::service('flag')->flag($flag_id, $entity_id);
@@ -32,9 +36,16 @@ class AJAXLinkController extends ControllerBase {
   }
 
   /**
+   * Performs an unflagging when called via a route.
+   *
+   * This method is invoked when a user clicks an AJAX unflagging link provided
+   * by the AJAXactionLink plugin.
+   *
    * @param $flag_id
    * @param $entity_id
    * @return AjaxResponse
+   *
+   * @see \Drupal\flag\Plugin\ActionLink\AJAXactionLink
    */
   public function unflag($flag_id, $entity_id) {
     $flagService = \Drupal::service('flag');
