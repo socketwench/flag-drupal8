@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 3/4/14
- * Time: 9:51 PM
+ * @file
+ * Contains \Drupal\flag\Plugin\ActionLink\ConfirmForm.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;
@@ -22,6 +20,9 @@ use Drupal\flag\ActionLinkTypeBase;
  */
 class ConfirmForm extends ActionLinkTypeBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function routeName($action = NULL) {
     if ($action == 'unflag') {
       return 'flag.confirm_unflag';
@@ -30,6 +31,9 @@ class ConfirmForm extends ActionLinkTypeBase {
     return 'flag.confirm_flag';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
 
@@ -39,6 +43,9 @@ class ConfirmForm extends ActionLinkTypeBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, array &$form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
@@ -73,6 +80,9 @@ class ConfirmForm extends ActionLinkTypeBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['flag_confirmation'] = $form_state['values']['flag_confirmation'];
