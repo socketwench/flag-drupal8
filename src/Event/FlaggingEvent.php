@@ -18,7 +18,7 @@ class FlaggingEvent extends FlagEventBase {
   /**
    * The Flag in question.
    *
-   * @var  Drupal\Core\Entity\EntityInterface
+   * @var  \Drupal\Core\Entity\EntityInterface
    */
   protected $entity;
 
