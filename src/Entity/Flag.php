@@ -146,25 +146,45 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public $unflag_denied_text = '';
 
   /**
-   * The plugin ID of the flag type.
+   * The ID of the FlagType plugin.
    *
    * @var string
    */
   protected $flag_type;
 
+  /**
+   * A bag to store the FlagType plugin.
+   *
+   * @var \Drupal\Core\Plugin\DefaultSinglePluginBag
+   */
   protected $flagTypeBag;
 
+  /**
+   * An array to store and load the FlagType plugin configuration.
+   * @var array
+   */
   protected $flagTypeConfig = array();
 
   /**
-   * The link type used by the flag, as defined in hook_flag_link_type_info().
+   * The ID of the ActionLink plugin.
    *
    * @var string
+   * @see \Drupal\flag\ActionLinkTypeBase
    */
   protected $link_type;
 
+  /**
+   * A bag to store the ActionLink plugin.
+   *
+   * @var \Drupal\Core\Plugin\DefaultSinglePluginBag
+   */
   protected $linkTypeBag;
 
+  /**
+   * An array to store and load the ActionLink plugin configuration.
+   *
+   * @var array
+   */
   protected $linkTypeConfig = array();
 
   /**
@@ -191,14 +211,23 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function enable() {
     $this->enabled = TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function disable() {
     $this->enabled = FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
     if($account == NULL) {
       $account = \Drupal::currentUser();
@@ -219,7 +248,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function getPluginBags() {
     return array(
@@ -283,10 +312,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Provides permissions for this flag.
-   *
-   * @return
-   *  An array of permissions for hook_permission().
+   * {@inheritdoc}
    */
   function getPermissions() {
     return array(
@@ -317,10 +343,16 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function isGlobal() {
     return $this->is_global;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setGlobal($isGlobal = TRUE) {
     if ($isGlobal) {
       $this->is_global = TRUE;
@@ -330,6 +362,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * Returns the flaggable entity type ID.
+   * 
+   * @return string
+   */
   public function getFlaggableEntityType() {
     return $this->entity_type;
   }
@@ -357,6 +394,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     parent::preDelete($storage, $entities);
 
@@ -366,7 +406,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function toArray() {
+    //@todo Do we need Flag::toArray() any longer?
     $properties = parent::toArray();
     $names = array(
       'flag_type',
