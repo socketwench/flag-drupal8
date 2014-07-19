@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 3/6/14
- * Time: 7:37 PM
+ * @file
+ * Contains the FlaggingConfirmForm.
  */
 
 namespace Drupal\flag\Form;
@@ -14,12 +12,26 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
 
+/**
+ * Provides the form page for the Confirm Form link type.
+ * @package Drupal\flag\Form
+ * @see \Drupal\flag\Plugin\ActionLink\ConfirmForm
+ */
 class FlaggingConfirmForm extends ConfirmFormBase {
 
+  /**
+   * @var \Drupal\Core\Entity\EntityInterface
+   */
   protected $entity;
 
+  /**
+   * @var \Drupal\flag\Entity\Flag
+   */
   protected $flag;
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, array &$form_state,
                             $flag_id = NULL, $entity_id = NULL) {
 
@@ -29,10 +41,16 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return parent::buildForm($form, $form_state);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormID() {
     return 'flag_flagging_confirm_form';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getQuestion() {
     $linkType = $this->flag->getLinkTypePlugin();
 
@@ -43,6 +61,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return $linkType->getFlagQuestion();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getCancelRoute() {
     $destination = \Drupal::request()->get('destination');
     if (!empty($destination)) {
@@ -54,6 +75,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return new URL($route_name['canonical']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDescription() {
     if ($this->isFlagged()) {
       return $this->flag->unflag_long;
@@ -62,6 +86,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return $this->flag->flag_long;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getConfirmText() {
     if ($this->isFlagged()) {
       return $this->t('Unflag');
@@ -74,6 +101,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return $this->flag->isFlagged($this->entity);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, array &$form_state) {
     if ($this->isFlagged()) {
       \Drupal::service('flag')->unflagByObject($this->flag, $this->entity);
