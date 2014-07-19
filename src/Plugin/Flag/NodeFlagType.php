@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/28/13
- * Time: 6:58 PM
+ * @file
+ * Contains \Drupal\flag\Plugin\Flag\NodeFlagType.
  */
 
 namespace Drupal\flag\Plugin\Flag;
@@ -25,6 +23,9 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
  */
 class NodeFlagType extends EntityFlagType {
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     // Use own display settings in the meanwhile.
@@ -36,10 +37,12 @@ class NodeFlagType extends EntityFlagType {
   }
 
   /**
-   * Options form extras for node flags.
+   * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
+
+    /* Options form extras for node flags. */
 
     $form['access']['access_author'] = array(
       '#type' => 'radios',
@@ -70,12 +73,18 @@ class NodeFlagType extends EntityFlagType {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_author'] = $form_state['values']['access_author'];
     $this->configuration['i18n'] = $form_state['values']['i18n'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function type_access_multiple($entity_ids, $account) {
     $access = array();
 
