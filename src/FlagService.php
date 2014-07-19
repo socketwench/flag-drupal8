@@ -65,7 +65,7 @@ class FlagService {
    *   (optional) The entity type to get the definition for, or NULL to return
    *   all flag types.
    *
-   * @return
+   * @return array
    *   The flag type definition array.
    *
    * @see hook_flag_type_info()
