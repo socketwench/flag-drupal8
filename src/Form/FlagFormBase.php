@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 1/3/14
- * Time: 9:24 PM
+ * @file
+ * Contains the FlagFormBase class.
  */
 
 namespace Drupal\flag\Form;
@@ -11,9 +9,20 @@ namespace Drupal\flag\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\flag\Handlers\AbstractFlag;
 
+/**
+ * Provides the base flag add/edit form.
+ *
+ * Since both the add and edit flag forms are largely the same, the majority of
+ * functionality is done in this class. It generates the form, validates the
+ * input, and handles the submit.
+ *
+ * @package Drupal\flag\Form
+ */
 abstract class FlagFormBase extends EntityForm {
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
     $form = parent::buildForm($form, $form_state);
 

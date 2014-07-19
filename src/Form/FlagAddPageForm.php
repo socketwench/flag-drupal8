@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 9/28/13
- * Time: 3:03 PM
+ * @file
+ * Contains the FlagAddPageForm class.
  */
 
 namespace Drupal\flag\Form;
@@ -11,15 +9,28 @@ namespace Drupal\flag\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\flag\Handlers\AbstractFlag;
 
+/**
+ * Provides the flag add page.
+ *
+ * Flags are created in a two step process. This form provides a simple form
+ * that allows the administrator to select key values that are necessary to
+ * initialize the flag entity. Most importantly, this includes the FlagType.
+ *
+ * @package Drupal\flag\Form
+ * @see \Drupal\flag\FlagTypeBase
+ */
 class FlagAddPageForm extends FormBase {
 
-   /**
-    * {@inheritdoc}
-    */
-   public function getFormID() {
-     return 'flag_add_page';
-   }
+  /**
+  * {@inheritdoc}
+  */
+  public function getFormID() {
+   return 'flag_add_page';
+  }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, array &$form_state) {
 
     $form['flag_basic_info'] = array(
@@ -70,7 +81,6 @@ class FlagAddPageForm extends FormBase {
     );
 
     $types = array();
-    // @todo Use \Drupal::service() to get a list of FlagType plugins.
 
     $plugins = \Drupal::service('plugin.manager.flag.flagtype')->getDefinitions();
 
@@ -86,6 +96,9 @@ class FlagAddPageForm extends FormBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateForm(array &$form, array &$form_state) {
     /*
     $flag = AbstractFlag::factory_by_entity_type($form_state['values']['type']);
@@ -95,6 +108,9 @@ class FlagAddPageForm extends FormBase {
     */
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, array &$form_state) {
     $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' .
                               $form_state['values']['flag_entity_type'];

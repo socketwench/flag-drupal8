@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 9/28/13
- * Time: 10:23 PM
+ * @file
+ * Contains the FlagAddForm class.
  */
 
 namespace Drupal\flag\Form;
@@ -11,19 +9,20 @@ namespace Drupal\flag\Form;
 use Drupal\flag\Form\FlagFormBase;
 
 /**
- * Class FlagAddForm
+ * Provides the flag add form.
+ *
+ * Like FlagEditForm, this class derives from FlagFormBase. This class modifies
+ * the base class behavior in two key ways: It alters the text of the submit
+ * button, and form where default values are loaded.
+ *
  * @package Drupal\flag\Form
+ * @see \Drupal\flag\Form\FlagFormBase
  */
 class FlagAddForm extends FlagFormBase {
 
-  protected function getRoleDefault($selction) {
-    if ($selction == 0) {
-      return array_keys(user_roles());
-    }
-
-    return array($selection);
-  }
-
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
     //@todo Check all non-form_* params with check_plain().
 
@@ -45,6 +44,9 @@ class FlagAddForm extends FlagFormBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function actions(array $form, array &$form_state) {
     $actions = parent::actions($form, $form_state);
     $actions['submit']['#value'] = t('Create Flag');
