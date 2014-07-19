@@ -25,6 +25,21 @@ use Drupal\Core\Entity\EntityManagerInterface;
  */
 class FlagService {
 
+  /* @var FlagTypePluginManager */
+  private $flagType;
+
+  /* @var EventDispatcherInterface */
+  private $eventDispatcher;
+
+  /* @var QueryFactory */
+  private $entityQuery;
+
+  /* @var AccountInterface */
+  private $currentUser;
+
+  /* @var EntityManagerInterface */
+  private $entityManager;
+
   /**
    * Constructor.
    *
