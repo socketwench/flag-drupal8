@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \Drupal\flag\Plugin\ActionLink\AJAXactionLink.
+ */
 
 namespace Drupal\flag\Plugin\ActionLink;
 
@@ -17,6 +21,9 @@ use Drupal\flag\FlagInterface;
  */
 class AJAXactionLink extends ActionLinkTypeBase{
 
+  /**
+   * {@inheritdoc}
+   */
   public function routeName($action = NULL) {
     if ($action === 'unflag') {
       return 'flag.link_unflag.json';
@@ -25,6 +32,9 @@ class AJAXactionLink extends ActionLinkTypeBase{
     return 'flag.link_flag.json';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $render = parent::renderLink($action, $flag, $entity);
     $render['#attached']['library'][] = 'core/drupal.ajax';
