@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/12/13
- * Time: 9:23 PM
+ * @file
+ * Contains the FlagListController class.
  */
 
 namespace Drupal\flag\Controller;
@@ -12,6 +10,11 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
 
+/**
+ * Provides a entity list page for Flags.
+ *
+ * @package Drupal\flag\Controller
+ */
 class FlagListController extends ConfigEntityListBuilder {
 
   /**
@@ -26,6 +29,12 @@ class FlagListController extends ConfigEntityListBuilder {
     return $header + parent::buildHeader();
   }
 
+  /**
+   * Creates a displayable string of roles that may use the flag.
+   *
+   * @param FlagInterface $flag
+   * @return string
+   */
   protected function getFlagRoles(FlagInterface $flag) {
     $out = '';
     $allRoles = array();
@@ -61,6 +70,11 @@ class FlagListController extends ConfigEntityListBuilder {
     return $row + parent::buildRow($entity);
   }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityListController::render().
+   *
+   * We override the render() method to add helpful text below the entity list.
+   */
   public function render() {
     $build['table'] = parent::render();
 

@@ -16,7 +16,7 @@ use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\FlagInterface;
 
 /**
- * Class Flag
+ * Provides the Flag configuration entity.
  * @package Drupal\flag\Entity
  *
  * @ConfigEntityType(
@@ -44,8 +44,6 @@ use Drupal\flag\FlagInterface;
  *
  */
 class Flag extends ConfigEntityBase implements FlagInterface {
-
-  //@todo Add AccessController, ListController, and form controllers. See \Drupal\contact\Entity\Category
 
   /**
    * The flag ID.
