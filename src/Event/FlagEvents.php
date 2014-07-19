@@ -1,16 +1,13 @@
 <?php
 /**
  * @file
- * Contains the FlagEvents class.
+ * Contains \Drupal\flag\Event\FlagEvents.
  */
-
 namespace Drupal\flag\Event;
-
 
 /**
  * Contains all events thrown in the Flag module.
  *
- * @package Drupal\flag\Event
  */
 final class FlagEvents {
 
