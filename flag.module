@@ -11,7 +11,7 @@ define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
 
 use Drupal\entity\Entity\EntityViewDisplay;
-use Drupal\flag\Flag;
+use Drupal\flag\Entity\Flag;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -1376,87 +1376,7 @@ function flag_load_by_id($id) {
  *   An array of the structure [fid] = flag_object.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
-  return entity_load_multiple('flag');
-/**
-  $flags = &drupal_static(__FUNCTION__);
-
-  // Retrieve a list of all flags, regardless of the parameters.
-  if (!isset($flags)) {
-    $flags = array();
-
-    // Database flags.
-    $query = db_select('flag', 'f');
-    $query->leftJoin('flag_types', 'fn', 'fn.fid = f.fid');
-    $result = $query
-      ->fields('f', array('fid', 'entity_type', 'name', 'title', 'global', 'options'))
-      ->fields('fn', array('type'))
-      ->execute();
-    foreach ($result as $row) {
-      if (!isset($flags[$row->name])) {
-        $flags[$row->name] = AbstractFlag::factory_by_row($row);
-      }
-      else {
-        $flags[$row->name]->types[] = $row->type;
-      }
-    }
-
-    // Add code-based flags provided by modules.
-    $default_flags = flag_get_default_flags();
-    foreach ($default_flags as $name => $default_flag) {
-      // Insert new enabled flags into the database to give them an FID.
-      if ($default_flag->status && !isset($flags[$name])) {
-        $default_flag->save();
-        $flags[$name] = $default_flag;
-      }
-
-      if (isset($flags[$name])) {
-        // Ensure overridden flags are associated with their parent module.
-        $flags[$name]->module = $default_flag->module;
-
-        // Update the flag with any properties that are "locked" by the code version.
-        if (isset($default_flag->locked)) {
-          $flags[$name]->locked = $default_flag->locked;
-          foreach ($default_flag->locked as $property) {
-            $flags[$name]->$property = $default_flag->$property;
-          }
-        }
-      }
-    }
-
-    // Sort the list of flags by weight.
-    uasort($flags, '_flag_compare_weight');
-
-    foreach ($flags as $flag) {
-      // Allow modules implementing hook_flag_alter(&$flag) to modify each flag.
-      drupal_alter('flag', $flag);
-    }
-  }
-
-  // Make a variable copy to filter types and account.
-  $filtered_flags = $flags;
-
-  // Filter out flags based on type and subtype.
-  if (isset($entity_type) || isset($content_subtype)) {
-    foreach ($filtered_flags as $name => $flag) {
-      if (!$flag->access_entity_enabled($entity_type, $content_subtype)) {
-        unset($filtered_flags[$name]);
-      }
-    }
-  }
-
-  // Filter out flags based on account permissions.
-  if (isset($account) && $account->uid != 1) {
-    foreach ($filtered_flags as $name => $flag) {
-      // We test against the 'flag' action, which is the minimum permission to
-      // use a flag.
-      if (!$flag->user_access('flag', $account)) {
-        unset($filtered_flags[$name]);
-      }
-    }
-  }
-
-  return $filtered_flags;
- */
+  return \Drupal::service('flag')->getFlags($entity_type, $content_subtype, $account);
 }
 
 /**
