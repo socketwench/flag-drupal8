@@ -8,7 +8,6 @@
 
 namespace Drupal\flag;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\Entity\Flag;
 use Drupal\flag\Entity\Flagging;
