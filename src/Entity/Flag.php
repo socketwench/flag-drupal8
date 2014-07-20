@@ -177,7 +177,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public $weight = 0;
 
   /**
-   * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
+   * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
@@ -193,14 +193,23 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function enable() {
     $this->enabled = TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function disable() {
     $this->enabled = FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
     if($account == NULL) {
       $account = \Drupal::currentUser();
@@ -221,7 +230,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function getPluginBags() {
     return array(
@@ -231,19 +240,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Get the flag type plugin for this flag.
-   *
-   * @return FlagTypePluginInterface
+   * {@inheritdoc}
    */
   public function getFlagTypePlugin() {
     return $this->flagTypeBag->get($this->flag_type);
   }
 
   /**
-   * Set the flag type plugin.
-   *
-   * @param string $pluginID
-   *   A string containing the flag type plugin ID.
+   * {@inheritdoc}
    */
   public function setFlagTypePlugin($pluginID) {
     $this->flag_type = $pluginID;
@@ -260,19 +264,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Get the link type plugin for this flag.
-   *
-   * @return LinkTypePluginInterface
+   * {@inheritdoc}
    */
   public function getLinkTypePlugin() {
     return $this->linkTypeBag->get($this->link_type);
   }
 
   /**
-   * Set the link type plugin.
-   *
-   * @param string $pluginID
-   *   A string containing the link type plugin ID.
+   * {@inheritdoc}
    */
   public function setlinkTypePlugin($pluginID) {
     $this->link_type = $pluginID;
@@ -285,10 +284,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Provides permissions for this flag.
-   *
-   * @return
-   *  An array of permissions for hook_permission().
+   * {@inheritdoc}.
    */
   function getPermissions() {
     return array(
@@ -319,10 +315,16 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}.
+   */
   public function isGlobal() {
     return $this->is_global;
   }
 
+  /**
+   * {@inheritdoc}.
+   */
   public function setGlobal($isGlobal = TRUE) {
     if ($isGlobal) {
       $this->is_global = TRUE;
@@ -332,6 +334,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}.
+   */
   public function getFlaggableEntityType() {
     return $this->entity_type;
   }
@@ -359,6 +364,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     parent::preDelete($storage, $entities);
 
@@ -368,6 +376,9 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function toArray() {
     $properties = parent::toArray();
     $names = array(
