@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Contains Flag module javascript.
+ */
 (function ($) {
 
 /**
