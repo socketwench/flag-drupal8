@@ -2,6 +2,7 @@
  * @file
  * Contains Flag module javascript.
  */
+
 (function ($) {
 
 /**
@@ -79,7 +80,8 @@ Drupal.flagLink = function(context) {
       success: function (data) {
         data.link = $wrapper.get(0);
         $.event.trigger('flagGlobalBeforeLinkUpdate', [data]);
-        if (!data.preventDefault) { // A handler may cancel updating the link.
+        if (!data.preventDefault) {
+          // A handler may cancel updating the link.
           data.link = updateLink(element, data.newLink);
         }
 
@@ -174,11 +176,13 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
  * Written by Klaus Hartl.
  */
 Drupal.flagCookie = function(name, value, options) {
-  if (typeof value != 'undefined') { // name and value given, set cookie
+  if (typeof value != 'undefined') {
+    // name and value given, set cookie
     options = options || {};
     if (value === null) {
       value = '';
-      options = $.extend({}, options); // clone object since it's unexpected behavior if the expired property were changed
+      // clone object since it's unexpected behavior if the expired property were changed
+      options = $.extend({}, options);
       options.expires = -1;
     }
     var expires = '';
@@ -190,7 +194,9 @@ Drupal.flagCookie = function(name, value, options) {
       } else {
         date = options.expires;
       }
-      expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+
+      // use expires attribute, max-age is not supported by IE
+      expires = '; expires=' + date.toUTCString();
     }
     // NOTE Needed to parenthesize options.path and options.domain
     // in the following expressions, otherwise they evaluate to undefined
