@@ -67,7 +67,7 @@ class UserFlagType extends FlagTypeBase {
     $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];
   }
 
-  function type_access_multiple($entity_ids, $account) {
+  public function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // Exclude anonymous.

@@ -100,7 +100,7 @@ function flag_views_data() {
     'help' => t('The number of times a piece of content is flagged by any user.'),
     'field' => array(
       'id' => 'numeric',
-//      'click sortable' => TRUE,
+      // 'click sortable' => TRUE,
     ),
     /*'sort' => array(
       'id' => 'groupby_numeric',

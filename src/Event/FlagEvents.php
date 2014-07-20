@@ -7,7 +7,6 @@ namespace Drupal\flag\Event;
 
 /**
  * Contains all events thrown in the Flag module.
- *
  */
 final class FlagEvents {
 

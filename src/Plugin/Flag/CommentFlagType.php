@@ -85,7 +85,7 @@ class CommentFlagType extends EntityFlagType {
     return $access;
   }
 
-  function getAccessAuthorSetting() {
+  public function getAccessAuthorSetting() {
     return $this->configuration['access_author'];
   }
 } 

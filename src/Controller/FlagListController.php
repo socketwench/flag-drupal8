@@ -21,7 +21,6 @@ class FlagListController extends ConfigEntityListBuilder {
    * Overrides Drupal\Core\Entity\EntityListController::buildHeader().
    */
   public function buildHeader() {
-//    $header['id'] = t('Flag');
     $header['label'] = t('Flag');
     $header['roles'] = t('Roles');
     $header['is_global'] = t('Global?');
@@ -109,7 +108,6 @@ class FlagListController extends ConfigEntityListBuilder {
     }
 
     $output .= '<p>' . t('To learn about the various ways to use flags, please check out the <a href="@handbook-url">Flag module handbook</a>.', array('@handbook-url' => 'http://drupal.org/handbook/modules/flag')) . '</p>';
-
 
     $build['markup'] = array(
       '#type' => 'markup',

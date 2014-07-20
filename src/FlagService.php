@@ -88,7 +88,7 @@ class FlagService {
   public function fetchDefinition($entity_type = NULL) {
     //@todo Add caching, PLS!
 
-    if(!empty($entity_type)){
+    if (!empty($entity_type)) {
       return $this->flagTypeMgr->getDefinition($entity_type);
     }
 
@@ -115,7 +115,7 @@ class FlagService {
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
     $query = $this->entityQueryMgr->get('flag');
 
-    if($entity_type != NULL) {
+    if ($entity_type != NULL) {
       $query->condition('entity_type', $entity_type);
     }
 
@@ -142,7 +142,7 @@ class FlagService {
   }
 
   public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
-    if($account == NULL) {
+    if ($account == NULL) {
       $account = $this->currentUser;
     }
 

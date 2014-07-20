@@ -229,7 +229,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
-    if($account == NULL) {
+    if ($account == NULL) {
       $account = \Drupal::currentUser();
     }
 
@@ -314,7 +314,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * {@inheritdoc}
    */
-  function getPermissions() {
+  public function getPermissions() {
     return array(
       "flag $this->id" => array(
         'title' => t('Flag %flag_title', array(
@@ -376,7 +376,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-/*
+    /*
     // Save the Flag Type configuration.
     $flagTypePlugin = $this->getFlagTypePlugin();
     $this->set('flagTypeConfig', $flagTypePlugin->getConfiguration());
@@ -384,7 +384,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     // Save the Link Type configuration.
     $linkTypePlugin = $this->getLinkTypePlugin();
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
-*/
+    */
     // Reset the render cache for the entity.
     \Drupal::entityManager()
       ->getViewBuilder($this->getFlaggableEntityType())

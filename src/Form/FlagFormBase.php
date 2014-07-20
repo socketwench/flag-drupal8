@@ -162,7 +162,7 @@ abstract class FlagFormBase extends EntityForm {
       '#tree' => FALSE,
       '#weight' => 20,
       // @todo: Move flag_link_type_options_states() into controller?
-//      '#after_build' => array('flag_link_type_options_states'),
+      // '#after_build' => array('flag_link_type_options_states'),
     );
 
     $form['display']['settings'] = array(
@@ -178,7 +178,7 @@ abstract class FlagFormBase extends EntityForm {
       '#type' => 'radios',
       '#title' => t('Link type'),
       '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
-//      '#after_build' => array('flag_check_link_types'),
+      // '#after_build' => array('flag_check_link_types'),
       '#default_value' => $flag->getLinkTypePlugin()->getPluginId(),
       // Give this a high weight so additions by the flag classes for entity-
       // specific options go above.
@@ -290,7 +290,7 @@ abstract class FlagFormBase extends EntityForm {
     }
 
     // We clear caches more vigorously if the flag was new.
-//    _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
+    // _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 
     // Save permissions.
     // This needs to be done after the flag cache has been cleared, so that
