@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/27/13
- * Time: 9:03 PM
+ * @file
+ * Contains \Drupal\flag\Plugin\Flag\EntityFlagType.
  */
 
 namespace Drupal\flag\Plugin\Flag;
@@ -24,13 +22,24 @@ use Drupal\flag\FlagTypeBase;
  */
 class EntityFlagType extends FlagTypeBase {
 
+  /**
+   * The entity type defined in plugin definition.
+   *
+   * @var string
+   */
   public $entity_type = '';
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
     $this->entity_type = $plugin_definition['entity_type'];
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     $options += array(
@@ -50,9 +59,11 @@ class EntityFlagType extends FlagTypeBase {
   }
 
   /**
-   * Options form extras for the generic entity flag.
+   * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
+
+    /* Options form extras for the generic entity flag. */
 
     // Add checkboxes to show flag link on each entity view mode.
     $options = array();
@@ -112,6 +123,9 @@ class EntityFlagType extends FlagTypeBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['show_in_links'] = $form_state['values']['show_in_links'];
