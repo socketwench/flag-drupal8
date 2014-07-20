@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/27/13
- * Time: 9:32 PM
+ * @file
+ * Contains \Drupal\flag\Plugin\Flag\UserFlagType.
  */
 
 namespace Drupal\flag\Plugin\Flag;
@@ -23,6 +21,9 @@ use Drupal\flag\FlagTypeBase;
  */
 class UserFlagType extends FlagTypeBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     $options += array(
@@ -33,10 +34,13 @@ class UserFlagType extends FlagTypeBase {
   }
 
   /**
-   * Options form extras for user flags.
+   * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, array &$form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
+
+    /* Options form extras for user flags */
+
     $form['access']['types'] = array(
       // A user flag doesn't support node types.
       // TODO: Maybe support roles instead of node types.
@@ -61,12 +65,18 @@ class UserFlagType extends FlagTypeBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, array &$form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_uid'] = $form_state['values']['access']['access_uid'];
     $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function type_access_multiple($entity_ids, $account) {
     $access = array();
 
