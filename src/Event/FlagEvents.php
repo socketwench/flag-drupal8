@@ -3,6 +3,7 @@
  * @file
  * Contains \Drupal\flag\Event\FlagEvents.
  */
+
 namespace Drupal\flag\Event;
 
 /**

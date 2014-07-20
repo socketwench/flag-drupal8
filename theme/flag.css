@@ -1,4 +1,3 @@
-
 .flag-message {
   position: absolute;
   top: 1.7em;
@@ -10,7 +9,7 @@
 }
 
 .flag-message.flag-failure-message {
-  border: 1px solid ;
+  border: 1px solid;
   border-color: #ed5;
   color: #840;
   background-color: #fffce5;
