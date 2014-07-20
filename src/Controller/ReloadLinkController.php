@@ -29,8 +29,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    *
    * @param FlagService $flag
    */
-  public function __construct(FlagService $flag)
-  {
+  public function __construct(FlagService $flag) {
     $this->flagService = $flag;
   }
 
@@ -40,8 +39,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    * @param ContainerInterface $container
    * @return static
    */
-  public static function create(ContainerInterface $container)
-  {
+  public static function create(ContainerInterface $container) {
     return new static(
       $container->get('flag')
     );

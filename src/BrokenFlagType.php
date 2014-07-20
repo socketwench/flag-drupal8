@@ -18,7 +18,7 @@ use Drupal\flag\Plugin\Flag\FlagTypeBase;
  */
 class BrokenFlagType extends FlagTypeBase {
 
-  function options_form(&$form) {
+  public function options_form(&$form) {
     drupal_set_message(t("The module providing this flag wasn't found, or this flag type, %type, isn't valid.", array('%type' => $this->entity_type)), 'error');
     $form = array();
   }

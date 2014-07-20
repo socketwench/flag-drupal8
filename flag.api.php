@@ -80,7 +80,7 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
       $count = count($flags[$flag->name]);
       if ($count >= 2) {
         // Users may flag only 2 nodes with this flag.
-        return(array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
+        return (array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
       }
     }
   }

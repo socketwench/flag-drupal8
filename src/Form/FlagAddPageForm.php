@@ -22,8 +22,8 @@ use Drupal\flag\Handlers\AbstractFlag;
 class FlagAddPageForm extends FormBase {
 
   /**
-  * {@inheritdoc}
-  */
+   * {@inheritdoc}
+   */
   public function getFormID() {
    return 'flag_add_page';
   }

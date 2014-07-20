@@ -21,7 +21,7 @@ class FlagViewsSortFlagged extends SortPluginBase {
    *
    * Should be overridden by classes that don't override sort_form.
    */
-  function sortOptions() {
+  protected function sortOptions() {
     return array(
       'ASC' => t('Unflagged first'),
       'DESC' => t('Flagged first'),
@@ -31,7 +31,7 @@ class FlagViewsSortFlagged extends SortPluginBase {
   /**
    * Display whether or not the sort order is ascending or descending
    */
-  function adminSummary() {
+  public function adminSummary() {
     if (!empty($this->options['exposed'])) {
       return t('Exposed');
     }

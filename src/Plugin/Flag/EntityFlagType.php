@@ -77,11 +77,12 @@ class EntityFlagType extends FlagTypeBase {
       '#description' => t('Show the flag link as a pseudofield, which can be ordered among other entity elements in the "Manage display" settings for the entity type.'),
       '#default_value' => isset($this->show_as_field) ? $this->show_as_field : TRUE,
     );
- /*   if (empty($entity_info['fieldable'])) {
+    /*
+    if (empty($entity_info['fieldable'])) {
       $form['display']['show_as_field']['#disabled'] = TRUE;
       $form['display']['show_as_field']['#description'] = t("This entity type is not fieldable.");
     }
-*/
+    */
     $form['display']['show_on_form'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
@@ -93,11 +94,13 @@ class EntityFlagType extends FlagTypeBase {
     // require the entity to be fielable. Since this is a potential DX
     // headscratcher for a developer wondering where this option has gone,
     // we disable it and explain why.
- /*   if (empty($entity_info['fieldable'])) {
+    /*
+    if (empty($entity_info['fieldable'])) {
       $form['display']['show_on_form']['#disabled'] = TRUE;
       $form['display']['show_on_form']['#description'] = t('This is only possible on entities which are fieldable.');
     }
-*/    $form['display']['show_contextual_link'] = array(
+    */
+    $form['display']['show_contextual_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display in contextual links'),
       '#default_value' => $this->showContextualLink(),

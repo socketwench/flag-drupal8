@@ -76,7 +76,7 @@ class NodeFlagType extends EntityFlagType {
     $this->configuration['i18n'] = $form_state['values']['i18n'];
   }
 
-  function type_access_multiple($entity_ids, $account) {
+  public function type_access_multiple($entity_ids, $account) {
     $access = array();
 
     // If all subtypes are allowed, we have nothing to say here.
@@ -97,11 +97,11 @@ class NodeFlagType extends EntityFlagType {
     return $access;
   }
 
-  function getAccessAuthorSetting() {
+  public function getAccessAuthorSetting() {
     return $this->configuration['access_author'];
   }
 
-  function getInternationalizationSetting() {
+  public function getInternationalizationSetting() {
     $this->configuration['i18n'];
   }
-} 
+}

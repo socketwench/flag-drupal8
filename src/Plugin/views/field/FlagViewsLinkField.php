@@ -79,7 +79,8 @@ class FlagViewsLinkField extends FieldPluginBase {
    * @param ResultRow $values
    */
   protected function renderLink($entity, ResultRow $values) {
-    if (empty($entity)) { // || !$entity->access('view')) {
+    // if (empty($entity) || !$entity->access('view')) {
+    if (empty($entity)) {
       return t('N/A');
     }
 
