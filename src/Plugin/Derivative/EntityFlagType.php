@@ -6,12 +6,12 @@
 
 namespace Drupal\flag\Plugin\Derivative;
 
-use Drupal\Component\Plugin\Derivative\DerivativeBase;
+use Drupal\Component\Plugin\Derivative\DeriverBase;
 
 /**
  * Derivative class for entity flag types plugin.
  */
-class EntityFlagType extends DerivativeBase {
+class EntityFlagType extends DeriverBase {
   /*
   public function __construct($base_plugin_id,
   EntityStorageControllerInterface $storageController) {
