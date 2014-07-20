@@ -2,6 +2,7 @@
  * @file
  * Contains flag admin javascript.
  */
+
 (function ($) {
 
 /**
