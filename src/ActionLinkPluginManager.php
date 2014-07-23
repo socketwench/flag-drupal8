@@ -13,7 +13,10 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Manages image effect plugins.
+ * Plugin manager for link types.
+ * @package Drupal\flag
+ *
+ * @see Drupal\flag\ActionLinkTypeBase
  */
 class ActionLinkPluginManager extends DefaultPluginManager {
 
@@ -26,6 +29,10 @@ class ActionLinkPluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'flag_link_type_plugins');
   }
 
+  /**
+   * Get an array of all link type labels keyed by plugin ID.
+   * @return array
+   */
   public function getAllLinkTypes() {
     $linkTypes = array();
     foreach ($this->getDefinitions() as $pluginID => $pluginDef) {
