@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 5/15/14
- * Time: 9:26 PM
+ * @file
+ * Contains views API hooks for Flag module.
  */
 
 function flag_views_data() {

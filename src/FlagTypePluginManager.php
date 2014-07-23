@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/6/13
- * Time: 4:57 PM
+ * @file
+ * Contains the FlagTypePluginManager class.
  */
 
 namespace Drupal\flag;

@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/27/13
- * Time: 8:34 PM
+ * @file
+ * Contains the BrokenFlagType class.
  */
 
 namespace Drupal\flag;

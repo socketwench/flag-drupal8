@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/5/13
- * Time: 12:56 PM
+ * @file
+ * Contains the FlagTypeBase class.
  */
 
 namespace Drupal\flag;

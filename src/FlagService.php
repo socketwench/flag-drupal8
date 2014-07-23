@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 10/28/13
- * Time: 9:15 PM
+ * @file
+ * Contains the FlagService class.
  */
 
 namespace Drupal\flag;

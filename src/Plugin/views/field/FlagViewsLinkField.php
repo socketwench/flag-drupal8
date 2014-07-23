@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 5/11/14
- * Time: 9:50 PM
+ * @file
+ * Contains the FlagViewsLinkField class.
  */
 
 namespace Drupal\flag\Plugin\views\field;
