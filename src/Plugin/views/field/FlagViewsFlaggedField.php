@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 6/7/14
- * Time: 5:28 PM
+ * @file
+ * Contains the FlagViewsFlaggedField class.
  */
 
 namespace Drupal\flag\Plugin\views\field;

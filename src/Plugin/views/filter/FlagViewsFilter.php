@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Contains the FlagViewsFilter class.
  */
 
 namespace Drupal\flag\Plugin\views\filter;

@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: tess
- * Date: 5/13/14
- * Time: 8:46 PM
+ * @file
+ * Contains the FlagViewsRelationship class.
  */
 
 namespace Drupal\flag\Plugin\views\relationship;
