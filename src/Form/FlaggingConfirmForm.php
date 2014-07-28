@@ -1,16 +1,13 @@
 <?php
 /**
  * @file
- * Contains the FlaggingConfirmForm.
+ * Contains \Drupal\flag\Form\FlaggingConfirmForm.
  */
 
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Url;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\flag\FlagInterface;
-
 
 /**
  * Provides the form page for the Confirm Form link type.
@@ -25,7 +22,7 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   protected $entity;
 
   /**
-   * @var \Drupal\flag\Entity\Flag
+   * @var \Drupal\flag\FlagInterface
    */
   protected $flag;
 
@@ -64,15 +61,13 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     $destination = \Drupal::request()->get('destination');
     if (!empty($destination)) {
-      return URL::createFromPath($destination);
+      return Url::createFromPath($destination);
     }
 
-    $route_name = $this->entity->urlInfo();
-
-    return new URL($route_name['canonical']);
+    return $this->entity->urlInfo();
   }
 
   /**
