@@ -64,15 +64,15 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     $destination = \Drupal::request()->get('destination');
     if (!empty($destination)) {
-      return URL::createFromPath($destination);
+      return Url::createFromPath($destination);
     }
 
     $route_name = $this->entity->urlInfo();
 
-    return new URL($route_name['canonical']);
+    return new Url($route_name['canonical']);
   }
 
   /**
