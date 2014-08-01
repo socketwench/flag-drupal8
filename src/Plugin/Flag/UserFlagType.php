@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\Flag;
 
 use Drupal\flag\FlagTypeBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class UserFlagType
@@ -36,7 +37,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     /* Options form extras for user flags */
@@ -68,7 +69,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_uid'] = $form_state['values']['access']['access_uid'];
     $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];

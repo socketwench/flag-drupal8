@@ -8,6 +8,7 @@ namespace Drupal\flag\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\flag\Handlers\AbstractFlag;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the base flag add/edit form.
@@ -23,7 +24,7 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $entity_type = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $entity_type = NULL) {
     $form = parent::buildForm($form, $form_state);
 
     $flag = $this->entity;
@@ -226,7 +227,7 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * Handles switching the configuration type selector.
    */
-  public function updateSelectedPluginType($form, &$form_state) {
+  public function updateSelectedPluginType($form, $form_state) {
     return $form['display']['settings'];
   }
 
@@ -245,7 +246,7 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::validate().
    */
-  public function validate(array $form, array &$form_state) {
+  public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
     $form_state['values']['label'] = trim($form_state['values']['label']);
@@ -271,7 +272,7 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     $flag = $this->entity;
 
     $flag->getFlagTypePlugin()->submitConfigurationForm($form, $form_state);
@@ -325,7 +326,7 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::delete().
    */
-  public function delete(array $form, array &$form_state) {
+  public function delete(array $form, FormStateInterface $form_state) {
     $form_state['redirect'] = 'admin/structure/flags';
   }
 

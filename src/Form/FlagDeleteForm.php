@@ -8,6 +8,7 @@ namespace Drupal\flag\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Url;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the flag delete form.
@@ -47,7 +48,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message(t('Flag %label was deleted.', array(
      '%label' => $this->entity->label(),

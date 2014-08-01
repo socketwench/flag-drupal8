@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\Flag;
 
 use Drupal\flag\Plugin\Flag\EntityFlagType;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class CommentFlagType
@@ -37,7 +38,7 @@ class CommentFlagType extends EntityFlagType {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
 
     $form = parent::buildConfigurationForm($form, $form_state);
 
@@ -63,7 +64,7 @@ class CommentFlagType extends EntityFlagType {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['access_author'] = $form_state['values']['access_author'];
   }

@@ -13,6 +13,7 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\flag\FlagInterface;
 use Drupal\flag\ActionLinkTypePluginInterface;
 use Drupal\flag\FlagService;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a base class for all link types.
@@ -102,7 +103,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * @return array
    *   The configuration form array.
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return $form;
   }
 
@@ -113,7 +114,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * @param array $form
    * @param array $form_state
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
@@ -124,7 +125,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * @param array $form
    * @param array $form_state
    */
-  public function validateConfigurationForm(array &$form, array &$form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
