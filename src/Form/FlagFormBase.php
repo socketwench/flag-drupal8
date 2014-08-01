@@ -227,14 +227,14 @@ abstract class FlagFormBase extends EntityForm {
   /**
    * Handles switching the configuration type selector.
    */
-  public function updateSelectedPluginType($form, $form_state) {
+  public function updateSelectedPluginType($form, FormStateInterface $form_state) {
     return $form['display']['settings'];
   }
 
   /**
    * Handles submit call when sensor type is selected.
    */
-  public function submitSelectPlugin(array $form, array &$form_state) {
+  public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
     $this->entity = $this->buildEntity($form, $form_state);
 
     $form_state['rebuild'] = TRUE;
