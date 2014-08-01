@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\views\filter;
 
 use Drupal\views\Plugin\views\filter\BooleanOperator;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FlagViewsFilter
@@ -24,7 +25,7 @@ class FlagViewsFilter extends BooleanOperator {
     return $options;
   }
 
-  public function buildOptionsForm(&$form, &$form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['value']['#type'] = 'radios';
     $form['value']['#title'] = t('Status');
     $form['value']['#options'] = array(

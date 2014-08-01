@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\views\relationship;
 
 use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FlagViewsRelationship
@@ -23,7 +24,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     return $options;
   }
 
-  public function buildOptionsForm(&$form, &$form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
     $entity_type = $this->definition['flaggable'];

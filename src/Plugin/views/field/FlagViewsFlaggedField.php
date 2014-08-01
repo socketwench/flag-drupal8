@@ -9,6 +9,7 @@ namespace Drupal\flag\Plugin\views\field;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\Boolean;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FlagViewsFlaggedField
@@ -35,7 +36,7 @@ class FlagViewsFlaggedField extends Boolean {
     return $options;
   }
 
-  public function buildOptionsForm(&$form, &$form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['relationship']['#default_value'] = $this->options['relationship'];
 
     parent::buildOptionsForm($form, $form_state);
