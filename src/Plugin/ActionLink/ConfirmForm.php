@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\ActionLink;
 
 use Drupal\flag\ActionLinkTypeBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the Confirm Form link type.
@@ -47,7 +48,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $form['display']['settings']['link_options_confirm'] = array(
@@ -84,7 +85,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['flag_confirmation'] = $form_state['values']['flag_confirmation'];
     $this->configuration['unflag_confirmation'] = $form_state['values']['unflag_confirmation'];

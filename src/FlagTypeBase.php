@@ -9,6 +9,7 @@ namespace Drupal\flag;
 use Drupal\flag\FlagTypePluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FlagTypeBase
@@ -65,12 +66,12 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * or editing the Flag. Derived classes should want to override this.
    *
    * @param array $form
-   * @param array $form_state
+   * @param FormStateInterface $form_state
    * @return array
    *   The form array
    * @see \Drupal\flag\Form\FlagAddForm
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return $form;
   }
 
@@ -82,7 +83,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * @param array $form
    * @param array $form_state
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
@@ -92,7 +93,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * @param array $form
    * @param array $form_state
    */
-  public function validateConfigurationForm(array &$form, array &$form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
