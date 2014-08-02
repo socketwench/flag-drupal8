@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagDeleteForm.
+ * Contains \Drupal\flag\Form\FlagDeleteForm.
  */
 
 namespace Drupal\flag\Form;
@@ -40,8 +40,8 @@ class FlagDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
-    return new URL('flag.list');
+  public function getCancelUrl() {
+    return new Url('flag.list');
   }
 
   /**
@@ -53,7 +53,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
      '%label' => $this->entity->label(),
     )));
 
-    $form_state['redirect_route']['route_name'] = 'flag.list';
+    $form_state['redirect_route'] = $this->getCancelUrl();
   }
 
-} 
+}
