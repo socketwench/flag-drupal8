@@ -8,6 +8,7 @@ namespace Drupal\flag\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\flag\Handlers\AbstractFlag;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the flag add page.
@@ -31,7 +32,7 @@ class FlagAddPageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['flag_basic_info'] = array(
       '#type' => 'fieldset',
@@ -99,7 +100,7 @@ class FlagAddPageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     /*
     $flag = AbstractFlag::factory_by_entity_type($form_state['values']['type']);
     if (get_class($flag) == 'BrokenFlag') {
@@ -111,7 +112,7 @@ class FlagAddPageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' .
                               $form_state['values']['flag_entity_type'];
 
