@@ -75,16 +75,16 @@ function flag_token_info() {
   );
 
   // Add tokens for the flag count available at the node/comment/user level.
-  foreach (\Drupal::service('flag')->fetchDefinition() as $flag_type) {
-    $flags = flag_get_flags($flag_type);
+  foreach (array_keys(\Drupal::service('flag')->fetchDefinition()) as $flag_type) {
+    $flags = \Drupal::service('flag')->getFlags($flag_type);
     foreach ($flags as $flag) {
-      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->name) . '-count'] = array(
-        'name' => t('@flag flag count', array('@flag' => $flag->get_title())),
-        'description' => t('Total flag count for flag @flag', array('@flag' => $flag->get_title())),
+      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->id()) . '-count'] = array(
+        'name' => t('@flag flag count', array('@flag' => $flag->label())),
+        'description' => t('Total flag count for flag @flag', array('@flag' => $flag->label())),
       );
-      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->name) . '-link'] = array(
-        'name' => t('@flag flag link', array('@flag' => $flag->get_title())),
-        'description' => t('Flag/unflag link for @flag', array('@flag' => $flag->get_title())),
+      $tokens[$flag_type]['flag-' . str_replace('_', '-', $flag->id()) . '-link'] = array(
+        'name' => t('@flag flag link', array('@flag' => $flag->label())),
+        'description' => t('Flag/unflag link for @flag', array('@flag' => $flag->label())),
       );
     }
   }
