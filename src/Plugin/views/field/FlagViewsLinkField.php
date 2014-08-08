@@ -8,6 +8,7 @@ namespace Drupal\flag\Plugin\views\field;
 
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FlagViewsLinkField
@@ -46,7 +47,7 @@ class FlagViewsLinkField extends FieldPluginBase {
    * @param $form
    * @param $form_state
    */
-  public function buildOptionsForm(&$form, &$form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['text'] = array(
       '#type' => 'textfield',
       '#title' => t('Text to display'),

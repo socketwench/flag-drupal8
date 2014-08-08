@@ -14,7 +14,7 @@ env:
     - MODULE_NAME='flag'
     - MODULE_TEST_GROUP='flag'
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
-    - DRUPAL_VERSION='8.x'
+    - DRUPAL_VERSION='8.0.x'
     - PHPCS_VERSION='2.0.*@dev'
     - CODER_VERSION='dev-8.x-2.x'
 

@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\Flag;
 
 use Drupal\flag\FlagTypeBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class EntityFlagType
@@ -61,7 +62,7 @@ class EntityFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, array &$form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
 
     /* Options form extras for the generic entity flag. */
 
@@ -126,7 +127,7 @@ class EntityFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, array &$form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['show_in_links'] = $form_state['values']['show_in_links'];
     $this->configuration['show_as_field'] = $form_state['values']['show_as_field'];
