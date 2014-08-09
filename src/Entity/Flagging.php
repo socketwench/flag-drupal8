@@ -20,9 +20,6 @@ use Drupal\flag\FlaggingInterface;
  * @ContentEntityType(
  *  id = "flagging",
  *  label = @Translation("Flagging"),
- *  controllers = {
- *    "access" = "Drupal\flag\FlaggingAccessController",
- *  },
  *  base_table = "flagging",
  *  fieldable = TRUE,
  *  bundle_entity_type = "flag",
@@ -131,4 +128,4 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
     return $fields;
   }
 
-} 
+}
