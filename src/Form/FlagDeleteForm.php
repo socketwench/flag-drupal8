@@ -54,7 +54,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
      '%label' => $this->entity->label(),
     )));
 
-    $form_state['redirect_route'] = $this->getCancelUrl();
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }
