@@ -56,12 +56,16 @@ function flag_views_data() {
   );
 
   $data['flagging']['entity_id'] = array(
-    'title' => t('Entity ID'),
-    'help' => t('The ID of the entity'),
+    'title' => t('Flaggable ID'),
+    'help' => t('The unique ID of the object that has been flagged.'),
     'sort' => array(
       'id' => 'standard',
     ),
+    'argument' => array(
+      'id' => 'FlagViewsFlaggableArgument',
+    ),
   );
+
 
   // Flag content links.
   $data['flagging']['link_flag'] = array(
