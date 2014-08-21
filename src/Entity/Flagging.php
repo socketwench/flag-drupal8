@@ -22,16 +22,11 @@ use Drupal\flag\FlaggingInterface;
  *  base_table = "flagging",
  *  fieldable = TRUE,
  *  bundle_entity_type = "flag",
+ *  field_ui_base_route = "flag.edit",
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
  *    "uuid" = "uuid"
- *  },
- *  bundle_keys = {
- *    "bundle" = "type"
- *  },
- *  links = {
- *    "admin-form" = "flag.edit"
  *  }
  * )
  */
