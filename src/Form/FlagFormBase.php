@@ -320,14 +320,14 @@ abstract class FlagFormBase extends EntityForm {
     // @todo: when we add database caching for flags we'll have to clear the
     // cache again here.
 
-    $form_state['redirect'] = 'admin/structure/flags';
+    $form_state->setRedirect('flag.list');
   }
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::delete().
    */
   public function delete(array $form, FormStateInterface $form_state) {
-    $form_state['redirect'] = 'admin/structure/flags';
+    $form_state->setRedirect('flag_list');
   }
 
 }
