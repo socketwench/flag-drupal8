@@ -8,8 +8,7 @@ namespace Drupal\flag\Entity;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\flag\FlaggingInterface;
 
 /**
@@ -23,16 +22,11 @@ use Drupal\flag\FlaggingInterface;
  *  base_table = "flagging",
  *  fieldable = TRUE,
  *  bundle_entity_type = "flag",
+ *  field_ui_base_route = "flag.edit",
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
  *    "uuid" = "uuid"
- *  },
- *  bundle_keys = {
- *    "bundle" = "type"
- *  },
- *  links = {
- *    "admin-form" = "flag.edit"
  *  }
  * )
  */
@@ -84,36 +78,36 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['id'] = FieldDefinition::create('integer')
+    $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Flagging ID'))
       ->setDescription(t('The flagging ID.'))
       ->setReadOnly(TRUE);
 
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The flagging UUID.'))
       ->setReadOnly(TRUE);
 
-    $fields['fid'] = FieldDefinition::create('string')
+    $fields['fid'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Flag ID'))
       ->setDescription(t('The Flag ID.'))
       ->setReadOnly(TRUE);
 
-    $fields['entity_type'] = FieldDefinition::create('string')
+    $fields['entity_type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Entity Type'))
       ->setDescription(t('The Entity Type.'));
 
-    $fields['entity_id'] = FieldDefinition::create('string')
+    $fields['entity_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Entity ID'))
       ->setDescription(t('The Entity ID.'));
 
-    $fields['type'] = FieldDefinition::create('entity_reference')
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The flag type.'))
       ->setSetting('target_type', 'flag')
       ->setReadOnly(TRUE);
 
-    $fields['uid'] = FieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
       ->setDescription(t('The user ID of the flagging user.'))
       ->setSettings(array(
@@ -121,7 +115,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
         'default_value' => 0,
       ));
 
-    $fields['created'] = FieldDefinition::create('created')
+    $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the flagging was created.'));
 
