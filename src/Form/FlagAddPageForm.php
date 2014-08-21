@@ -113,10 +113,9 @@ class FlagAddPageForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state['redirect'] = FLAG_ADMIN_PATH . '/add/' .
-                              $form_state['values']['flag_entity_type'];
+    $form_state->setRedirect('flag.add', array('entity_type' => $form_state->getValue('flag_entity_type')));
 
     $tempstore = \Drupal::service('user.tempstore')->get('flag');
-    $tempstore->set('FlagAddPage', $form_state['values']);
+    $tempstore->set('FlagAddPage', $form_state->getValues());
   }
-} 
+}
