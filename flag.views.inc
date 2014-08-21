@@ -4,6 +4,10 @@
  * Contains views API hooks for Flag module.
  */
 
+/**
+ * Implements hook_views_data().
+ * @return array
+ */
 function flag_views_data() {
   $data = array();
   $data['flagging']['table']['group'] = t('Flag');
@@ -13,7 +17,7 @@ function flag_views_data() {
     'node' => array(
       'type' => 'LEFT',
       'left_field' => 'nid',
-      'field' =>  'entity_id',
+      'field' => 'entity_id',
     ),
   );
 
@@ -65,7 +69,6 @@ function flag_views_data() {
       'id' => 'FlagViewsFlaggableArgument',
     ),
   );
-
 
   // Flag content links.
   $data['flagging']['link_flag'] = array(
@@ -120,7 +123,7 @@ function flag_views_data() {
     'help' => t('The time a piece of content was most recently flagged by any user.'),
     'field' => array(
       'id' => 'date',
-      //'click sortable' => TRUE,
+      // 'click sortable' => TRUE,
     ),
     /*'sort' => array(
       'id' => 'date',
@@ -136,6 +139,10 @@ function flag_views_data() {
   return $data;
 }
 
+/**
+ * Implements hook_views_data_alter().
+ * @param $data
+ */
 function flag_views_data_alter(&$data) {
   $flags = \Drupal::service('flag')->getFlags();
 
