@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements of hook_token_info().
+ * Implements hook_token_info().
  */
 function flag_token_info() {
   $types = array();
@@ -183,12 +183,12 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
 /**
  * Returns HTML for a tokens browser.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - types: An array naming the types of tokens to show.
  *   - global_types: Whether to show global tokens.
  */
-function theme_flag_tokens_browser($variables) {
+function theme_flag_tokens_browser(array $variables) {
   $types = $variables['types'];
   $global_types = $variables['global_types'];
 
