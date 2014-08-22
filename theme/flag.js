@@ -51,7 +51,7 @@ Drupal.flagLink = function(context) {
    * A click handler that is attached to all <A class="flag"> elements.
    */
   function flagClick(event) {
-    // Prevent the default browser click handler
+    // Prevent the default browser click handler.
     event.preventDefault();
 
     // 'this' won't point to the element when it's inside the ajax closures,
@@ -71,7 +71,7 @@ Drupal.flagLink = function(context) {
     // Hide any other active messages.
     $('span.flag-message:visible').fadeOut();
 
-    // Send POST request
+    // Send POST request.
     $.ajax({
       type: 'POST',
       url: element.href,
@@ -100,7 +100,7 @@ Drupal.flagLink = function(context) {
         $.event.trigger('flagGlobalAfterLinkUpdate', [data]);
       },
       error: function (xmlhttp) {
-        alert('An HTTP error '+ xmlhttp.status +' occurred.\n'+ element.href);
+        alert('An HTTP error ' + xmlhttp.status +'  occurred.\n' + element.href);
         $wrapper.removeClass('flag-waiting');
       }
     });
@@ -177,11 +177,12 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
  */
 Drupal.flagCookie = function(name, value, options) {
   if (typeof value != 'undefined') {
-    // name and value given, set cookie
+    // Name and value given, set cookie.
     options = options || {};
     if (value === null) {
       value = '';
-      // clone object since it's unexpected behavior if the expired property were changed
+      // Clone object since it's unexpected behavior if the expired property
+      // were changed.
       options = $.extend({}, options);
       options.expires = -1;
     }
@@ -195,7 +196,7 @@ Drupal.flagCookie = function(name, value, options) {
         date = options.expires;
       }
 
-      // use expires attribute, max-age is not supported by IE
+      // Use expires attribute, max-age is not supported by IE.
       expires = '; expires=' + date.toUTCString();
     }
     // NOTE Needed to parenthesize options.path and options.domain
@@ -206,7 +207,7 @@ Drupal.flagCookie = function(name, value, options) {
     var secure = options.secure ? '; secure' : '';
     document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
   } else {
-    // only name given, get cookie
+    // Only name given, get cookie.
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
       var cookies = document.cookie.split(';');
