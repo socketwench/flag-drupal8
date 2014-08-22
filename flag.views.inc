@@ -6,7 +6,9 @@
 
 /**
  * Implements hook_views_data().
+ *
  * @return array
+ *  An array of views data.
  */
 function flag_views_data() {
   $data = array();
@@ -141,9 +143,10 @@ function flag_views_data() {
 
 /**
  * Implements hook_views_data_alter().
- * @param $data
+ * @param array $data
+ *  An array of views data.
  */
-function flag_views_data_alter(&$data) {
+function flag_views_data_alter(array &$data) {
   $flags = \Drupal::service('flag')->getFlags();
 
   foreach ($flags as $fid => $flag) {
