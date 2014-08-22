@@ -5,6 +5,9 @@
  * Hooks provided by the Flag module.
  */
 
+use Drupal\flag\FlagInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\FlaggingInterface;
 /**
  * @addtogroup hooks
  * @{
@@ -15,19 +18,22 @@
  *
  * This hook may be placed in a $module.flag.inc file.
  *
- * @param $definitions
+ * @param array $definitions
  *  An array of flag definitions returned by hook_flag_type_info().
  */
-function hook_flag_type_info_alter(&$definitions) {
+function hook_flag_type_info_alter(array &$definitions) {
 
 }
 
 /**
  * Allow modules to alter a flag when it is initially loaded.
  *
+ * @param \Drupal\flag\FlagInterface $flag
+ *  The flag to alter.
+ *
  * @see flag_get_flags().
  */
-function hook_flag_alter(&$flag) {
+function hook_flag_alter(FlagInterface &$flag) {
 
 }
 
@@ -38,30 +44,30 @@ function hook_flag_alter(&$flag) {
  * them here so that their additions to the flag admin form are saved into the
  * flag object.
  *
- * @param $options
+ * @param array $options
  *  The array of default options for the flag type, with the options for the
  *  flag's link type merged in.
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *  The flag object.
  *
  * @see flag_flag::options()
  */
-function hook_flag_options_alter(&$options, $flag) {
+function hook_flag_options_alter(array &$options, FlagInterface $flag) {
 
 }
 
 /**
  * Perform custom validation on a flag before flagging/unflagging.
  *
- * @param $action
+ * @param string $action
  *  The action about to be carried out. Either 'flag' or 'unflag'.
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *  The flag object.
- * @param $entity_id
+ * @param int $entity_id
  *  The id of the entity the user is trying to flag or unflag.
- * @param $account
+ * @param \Drupal\Core\Session\AccountInterface $account
  *  The user account performing the action.
- * @param $flagging
+ * @param \Drupal\flag\FlaggingInterface $flagging
  *  The flagging entity.
  *
  * @return
@@ -70,7 +76,9 @@ function hook_flag_options_alter(&$options, $flag) {
  *   drupal_access_denied will be called and a 403 will be returned.
  *   If validation is successful, do not return a value.
  */
-function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permission_check, $flagging) {
+function hook_flag_validate($action, FlagInterface $flag, $entity_id,
+                            AccountInterface $account, $skip_permission_check,
+                            FlaggingInterface $flagging) {
   // We're only operating on the "test" flag, and users may always unflag.
   if ($flag->name == 'test' && $action == 'flag') {
     // Get all flags set by the current user.
@@ -92,13 +100,13 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
  * Called when displaying a single entity view or edit page.  For flag access
  * checks from within Views, implement hook_flag_access_multiple().
  *
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *  The flag object.
- * @param $entity_id
+ * @param int $entity_id
  *  The id of the entity in question.
- * @param $action
+ * @param string $action
  *  The action to test. Either 'flag' or 'unflag'.
- * @param $account
+ * @param \Drupal\Core\Session\AccountInterface $account
  *  The user on whose behalf to test the flagging action.
  *
  * @return
@@ -113,7 +121,9 @@ function hook_flag_validate($action, $flag, $entity_id, $account, $skip_permissi
  * @see hook_flag_access_multiple()
  * @see flag_flag:access()
  */
-function hook_flag_access($flag, $entity_id, $action, $account) {
+function hook_flag_access(FlagInterface $flag,
+                          $entity_id, $action,
+                          AccountInterface $account) {
 
 }
 
@@ -123,11 +133,11 @@ function hook_flag_access($flag, $entity_id, $action, $account) {
  * Called when preparing a View or list of multiple flaggable entities.
  * For flag access checks for individual entities, see hook_flag_access().
  *
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *  The flag object.
- * @param $entity_ids
+ * @param array $entity_ids
  *  An array of object ids to check access.
- * @param $account
+ * @param \Drupal\Core\Session\AccountInterface $account
  *  The user on whose behalf to test the flagging action.
  *
  * @return
@@ -137,37 +147,39 @@ function hook_flag_access($flag, $entity_id, $action, $account) {
  * @see hook_flag_access()
  * @see flag_flag:access_multiple()
  */
-function hook_flag_access_multiple($flag, $entity_ids, $account) {
+function hook_flag_access_multiple(FlagInterface $flag,
+                                   array $entity_ids,
+                                   AccountInterface $account) {
 
 }
 
 /**
  * Act when a flag is reset.
  *
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *  The flag object.
- * @param $entity_id
+ * @param int $entity_id
  *  The entity ID on which all flaggings are to be removed. May be NULL, in
  *  which case all of this flag's entities are to be unflagged.
- * @param $rows
+ * @param array $rows
  *  Database rows from the {flagging} table.
  *
  * @see flag_reset_flag()
  */
-function hook_flag_reset($flag, $entity_id, $rows) {
+function hook_flag_reset(FlagInterface $flag, $entity_id, array $rows) {
 
 }
 
 /**
  * Alter the javascript structure that describes the flag operation.
  *
- * @param $flag
+ * @param \Drupal\flag\FlagInterface $flag
  *   The full flag object.
- * @param $entity_id
+ * @param int $entity_id
  *   The ID of the node, comment, user or other object being flagged.
  *
  * @see flag_build_javascript_info()
  */
-function hook_flag_javascript_info_alter() {
+function hook_flag_javascript_info_alter(FlagInterface $flag, $entity_id) {
 
 }
