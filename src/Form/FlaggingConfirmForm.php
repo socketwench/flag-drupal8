@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the form page for the Confirm Form link type.
- * 
+ *
  * @package Drupal\flag\Form
  * @see \Drupal\flag\Plugin\ActionLink\ConfirmForm
  */

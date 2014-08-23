@@ -19,7 +19,7 @@ use Drupal\flag\FlaggingInterface;
  * This hook may be placed in a $module.flag.inc file.
  *
  * @param array $definitions
- *  An array of flag definitions returned by hook_flag_type_info().
+ *   An array of flag definitions returned by hook_flag_type_info().
  */
 function hook_flag_type_info_alter(array &$definitions) {
 
@@ -29,9 +29,9 @@ function hook_flag_type_info_alter(array &$definitions) {
  * Allow modules to alter a flag when it is initially loaded.
  *
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag to alter.
+ *   The flag to alter.
  *
- * @see flag_get_flags().
+ * @see flag_get_flags()
  */
 function hook_flag_alter(FlagInterface &$flag) {
 
@@ -45,10 +45,10 @@ function hook_flag_alter(FlagInterface &$flag) {
  * flag object.
  *
  * @param array $options
- *  The array of default options for the flag type, with the options for the
- *  flag's link type merged in.
+ *   The array of default options for the flag type, with the options for the
+ *   flag's link type merged in.
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag object.
+ *   The flag object.
  *
  * @see flag_flag::options()
  */
@@ -60,17 +60,17 @@ function hook_flag_options_alter(array &$options, FlagInterface $flag) {
  * Perform custom validation on a flag before flagging/unflagging.
  *
  * @param string $action
- *  The action about to be carried out. Either 'flag' or 'unflag'.
+ *   The action about to be carried out. Either 'flag' or 'unflag'.
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag object.
+ *   The flag object.
  * @param int $entity_id
- *  The id of the entity the user is trying to flag or unflag.
+ *   The id of the entity the user is trying to flag or unflag.
  * @param \Drupal\Core\Session\AccountInterface $account
- *  The user account performing the action.
+ *   The user account performing the action.
  * @param \Drupal\flag\FlaggingInterface $flagging
- *  The flagging entity.
+ *   The flagging entity.
  *
- * @return
+ * @return array|null
  *   Optional array: textual error with the error-name as the key.
  *   If the error name is 'access-denied' and javascript is disabled,
  *   drupal_access_denied will be called and a 403 will be returned.
@@ -101,15 +101,15 @@ function hook_flag_validate($action, FlagInterface $flag, $entity_id,
  * checks from within Views, implement hook_flag_access_multiple().
  *
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag object.
+ *   The flag object.
  * @param int $entity_id
- *  The id of the entity in question.
+ *   The id of the entity in question.
  * @param string $action
- *  The action to test. Either 'flag' or 'unflag'.
+ *   The action to test. Either 'flag' or 'unflag'.
  * @param \Drupal\Core\Session\AccountInterface $account
- *  The user on whose behalf to test the flagging action.
+ *   The user on whose behalf to test the flagging action.
  *
- * @return
+ * @return boolean|null
  *   One of the following values:
  *     - TRUE: User has access to the flag.
  *     - FALSE: User does not have access to the flag.
@@ -134,13 +134,13 @@ function hook_flag_access(FlagInterface $flag,
  * For flag access checks for individual entities, see hook_flag_access().
  *
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag object.
+ *   The flag object.
  * @param array $entity_ids
- *  An array of object ids to check access.
+ *   An array of object ids to check access.
  * @param \Drupal\Core\Session\AccountInterface $account
- *  The user on whose behalf to test the flagging action.
+ *   The user on whose behalf to test the flagging action.
  *
- * @return
+ * @return array
  *   An array whose keys are the object IDs and values are booleans indicating
  *   access.
  *
@@ -157,12 +157,12 @@ function hook_flag_access_multiple(FlagInterface $flag,
  * Act when a flag is reset.
  *
  * @param \Drupal\flag\FlagInterface $flag
- *  The flag object.
+ *   The flag object.
  * @param int $entity_id
- *  The entity ID on which all flaggings are to be removed. May be NULL, in
- *  which case all of this flag's entities are to be unflagged.
+ *   The entity ID on which all flaggings are to be removed. May be NULL, in
+ *   which case all of this flag's entities are to be unflagged.
  * @param array $rows
- *  Database rows from the {flagging} table.
+ *   Database rows from the {flagging} table.
  *
  * @see flag_reset_flag()
  */

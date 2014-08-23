@@ -78,7 +78,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function type_access_multiple($entity_ids, $account) {
+  public function typeAccessMultiple($entity_ids, $account) {
     $access = array();
 
     // Exclude anonymous.

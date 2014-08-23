@@ -86,7 +86,7 @@ class NodeFlagType extends EntityFlagType {
   /**
    * {@inheritdoc}
    */
-  public function type_access_multiple($entity_ids, $account) {
+  public function typeAccessMultiple($entity_ids, $account) {
     $access = array();
 
     // If all subtypes are allowed, we have nothing to say here.

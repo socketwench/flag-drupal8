@@ -12,7 +12,8 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 
 /**
- * Interface ActionLinkTypePluginInterface
+ * Provides an interface for link type plugins.
+ *
  * @package Drupal\flag
  */
 interface ActionLinkTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
@@ -35,9 +36,12 @@ interface ActionLinkTypePluginInterface extends PluginFormInterface, Configurabl
   /**
    * Generates a flag link as a render array.
    *
-   * @param $action
+   * @param string $action
+   *   The action to perform, 'flag' and 'unflag'.
    * @param FlagInterface $flag
+   *   The flag entity.
    * @param EntityInterface $entity
+   *   The entity for which to create a flag link.
    * @return array
    *  A render array of the flag link.
    */

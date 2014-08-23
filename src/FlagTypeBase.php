@@ -12,10 +12,11 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class FlagTypeBase
+ * Provides a base class for flag type plugins.
+ *
  * @package Drupal\flag\Plugin\Flag
  */
-abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterface{
+abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterface {
 
   /**
    * {@inheritdoc}
@@ -29,6 +30,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * Provides the default configuration values for the flag type.
    *
    * @return array
+   *   The flag type's default plugin configuration.
    */
   public function defaultConfiguration() {
     return array();
@@ -45,6 +47,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * Returns this flag type plugin's configuration array.
    *
    * @return array
+   *   The plugin configuration array.
    */
   public function getConfiguration() {
     return $this->configuration;
@@ -54,6 +57,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * Replaces the plugin's configurations with those given in the parameter.
    *
    * @param array $configuration
+   *   The plugin configuration array.
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration;
@@ -62,11 +66,13 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
   /**
    * Provides a form for this action link plugin settings.
    *
-   * The form provided by this method is displayed by the FlagAddForm when creating
-   * or editing the Flag. Derived classes should want to override this.
+   * The form provided by this method is displayed by the FlagAddForm when
+   * creating or editing the Flag. Derived classes should override this.
    *
    * @param array $form
+   *   The form array.
    * @param FormStateInterface $form_state
+   *   The form state.
    * @return array
    *   The form array
    * @see \Drupal\flag\Form\FlagAddForm
@@ -81,7 +87,9 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * Derived classes will want to override this.
    *
    * @param array $form
-   * @param array $form_state
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
@@ -91,7 +99,9 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    * Handles the validation for the action link plugin settings form.
    *
    * @param array $form
-   * @param array $form_state
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
@@ -102,13 +112,13 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    *
    * @abstract
    *
-   * @return
-   *  An array keyed by entity ids, whose values represent the access to the
-   *  corresponding entity. The access value may be FALSE if access should be
-   *  denied, or NULL (or not set) if there is no restriction to  be made. It
-   *  should NOT be TRUE.
+   * @return array
+   *   An array keyed by entity ids, whose values represent the access to the
+   *   corresponding entity. The access value may be FALSE if access should be
+   *   denied, or NULL (or not set) if there is no restriction to  be made. It
+   *   should NOT be TRUE.
    */
-  public function type_access_multiple($entity_ids, $account) {
+  public function typeAccessMultiple($entity_ids, $account) {
     return array();
   }
-} 
+}
