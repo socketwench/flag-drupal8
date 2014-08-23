@@ -9,6 +9,7 @@ namespace Drupal\flag\Plugin\views\field;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a views field to flag or unflag the selected content.
@@ -22,6 +23,12 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class FlagViewsLinkField extends FieldPluginBase {
 
+  /**
+   * A helper method to retrieve the flag entity from the views relationship.
+   *
+   * @return FlagInterface|null
+   *   The flag selected by the views relationship.
+   */
   public function getFlag() {
     // When editing a view it's possible to delete the relationship (either by
     // error or to later recreate it), so we have to guard against a missing
@@ -88,10 +95,11 @@ class FlagViewsLinkField extends FieldPluginBase {
    *   The entity object.
    * @param ResultRow $values
    *   The current result row.
+   *
    * @return array
    *   The render array for the flag link.
    */
-  protected function renderLink($entity, ResultRow $values) {
+  protected function renderLink(EntityInterface $entity, ResultRow $values) {
     if (empty($entity)) {
       return t('N/A');
     }

@@ -67,7 +67,6 @@ class FlagViewsFlaggableArgument extends Numeric {
       ->condition('o.' . $entity_keys['id'], $this->value, 'IN')
       ->execute();
 
-
     foreach ($result as $title) {
       $titles[] = String::check_plain($title->$entity_keys['label']);
     }

@@ -98,7 +98,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * Specifies if users are able to flag themselves.
    *
-   * @return boolean|mixed
+   * @return bool|mixed
    *   TRUE if users are able to flag themselves, FALSE otherwise.
    */
   public function getAccessUidSetting() {
@@ -108,7 +108,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * Specifies if the flag link should appear on the user profile.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the flag link appears on the user profile, FALSE otherwise.
    */
   public function showOnProfile() {
