@@ -9,13 +9,11 @@ namespace Drupal\flag\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Class ActionLinkType
- * @package Drupal\action_link\Annotation
- *
  * Defines an ActionLink annotation object.
  *
- * @Annotation
+ * @package Drupal\action_link\Annotation
  *
+ * @Annotation
  */
 class ActionLinkType extends Plugin {
 
@@ -36,10 +34,10 @@ class ActionLinkType extends Plugin {
   public $label;
 
   /**
-   * The plugin description
+   * The plugin description.
    *
    * @var string
    */
   public $description;
 
-} 
+}
