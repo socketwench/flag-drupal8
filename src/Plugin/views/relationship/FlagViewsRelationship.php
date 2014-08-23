@@ -10,12 +10,15 @@ use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class FlagViewsRelationship
+ * Provides a views relationship to select flag content by a flag.
  *
  * @ViewsRelationship("flag_relationship")
  */
 class FlagViewsRelationship extends RelationshipPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function defineOptions() {
     $options = parent::defineOptions();
     $options['flag'] = array('default' => NULL);
@@ -24,6 +27,9 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -33,7 +39,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     $flags = \Drupal::service('flag')->getFlags($entity_type);
 
     $default_value = $this->options['flag'];
-    if (!empty($flags) ) {
+    if (!empty($flags)) {
       $default_value = current(array_keys($flags));
     }
 
@@ -70,6 +76,9 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     if (!($flag = $this->getFlag())) {
       return;
@@ -102,9 +111,14 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     }
 
     // parent::query();
-
   }
 
+  /**
+   * Get the flag of the relationship.
+   *
+   * @return FlagInterface|null
+   *   The flag being selected by in the view.
+   */
   public function getFlag() {
     $flaggable = $this->definition['flaggable'];
     $flag = \Drupal::service('flag')->getFlags($flaggable);

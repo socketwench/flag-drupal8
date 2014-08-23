@@ -100,7 +100,7 @@ Drupal.flagLink = function(context) {
         $.event.trigger('flagGlobalAfterLinkUpdate', [data]);
       },
       error: function (xmlhttp) {
-        alert('An HTTP error ' + xmlhttp.status +'  occurred.\n' + element.href);
+        alert('An HTTP error ' + xmlhttp.status + '  occurred.\n' + element.href);
         $wrapper.removeClass('flag-waiting');
       }
     });
@@ -128,7 +128,6 @@ String.prototype.flagNameToCSS = function() {
  */
 Drupal.flagAnonymousLinkTemplates = function(context) {
   // Swap in current links. Cookies are set by PHP's setcookie() upon flagging.
-
   var templates = Drupal.settings.flag.templates;
 
   // Build a list of user-flags.

@@ -10,7 +10,8 @@ use Drupal\flag\FlagTypeBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class UserFlagType
+ * Provides a flag type for user entities.
+ *
  * @package Drupal\flag\Plugin\Flag
  *
  * @FlagType(
@@ -51,14 +52,14 @@ class UserFlagType extends FlagTypeBase {
     $form['access']['access_uid'] = array(
       '#type' => 'checkbox',
       '#title' => t('Users may flag themselves'),
-      '#description' => t('Disabling this option may be useful when setting up a "friend" flag, when a user flagging themself does not make sense.'),
-      '#default_value' => $this->configuration['access_uid'] ? 0 : 1,
+      '#description' => t('Disabling this option may be useful when setting up a "friend" flag, when a user flagging themselves does not make sense.'),
+      '#default_value' => $this->getAccessUidSetting() ? 0 : 1,
     );
     $form['display']['show_on_profile'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display link on user profile page'),
       '#description' => t('Show the link formatted as a user profile element.'),
-      '#default_value' => $this->configuration['show_on_profile'],
+      '#default_value' => $this->showOnProfile(),
       // Put this above 'show on entity'.
       '#weight' => -1,
     );
@@ -94,10 +95,22 @@ class UserFlagType extends FlagTypeBase {
     return $access;
   }
 
+  /**
+   * Specifies if users are able to flag themselves.
+   *
+   * @return boolean|mixed
+   *   TRUE if users are able to flag themselves, FALSE otherwise.
+   */
   public function getAccessUidSetting() {
     return $this->configuration['access_uid'];
   }
 
+  /**
+   * Specifies if the flag link should appear on the user profile.
+   *
+   * @return boolean
+   *   TRUE if the flag link appears on the user profile, FALSE otherwise.
+   */
   public function showOnProfile() {
     return $this->configuration['show_on_profile'];
   }
