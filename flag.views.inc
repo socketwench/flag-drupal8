@@ -8,7 +8,7 @@
  * Implements hook_views_data().
  *
  * @return array
- *   An array of flag views data.
+ *   The views provided by the flag module.
  */
 function flag_views_data() {
   $data = array();
@@ -145,7 +145,7 @@ function flag_views_data() {
  * Implements hook_views_data_alter().
  *
  * @param array $data
- *   An array of views data.
+ *   The views data to alter.
  */
 function flag_views_data_alter(array &$data) {
   $flags = \Drupal::service('flag')->getFlags();

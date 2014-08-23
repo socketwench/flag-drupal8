@@ -18,7 +18,7 @@ class FlaggingEvent extends FlagEventBase {
   /**
    * The Flag in question.
    *
-   * @var  \Drupal\Core\Entity\EntityInterface
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $entity;
 
@@ -30,11 +30,13 @@ class FlaggingEvent extends FlagEventBase {
   protected $action;
 
   /**
+   * Builds a new FlaggingEvent.
+   *
    * @param \Drupal\flag\FlagInterface $flag
    *   The flag.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be acted upon.
-   * @param string
+   * @param string $action
    *   The action to perform. One of 'flag' or 'unflag'
    */
   public function __construct(FlagInterface $flag, EntityInterface $entity, $action) {
@@ -44,4 +46,4 @@ class FlaggingEvent extends FlagEventBase {
     $this->action = $action;
   }
 
-} 
+}

@@ -52,18 +52,21 @@ class FlagService {
    * Constructor.
    *
    * @param FlagTypePluginManager $flagType
+   *   The flag type plugin manager.
    * @param EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher service.
    * @param QueryFactory $entityQuery
+   *   The entity query factory.
    * @param AccountInterface $currentUser
+   *   The current user.
    * @param EntityManagerInterface $entityManager
+   *   The entity manager.
    */
-  public function __construct(
-    FlagTypePluginManager $flagType,
-    EventDispatcherInterface $eventDispatcher,
-    QueryFactory $entityQuery,
-    AccountInterface $currentUser,
-    EntityManagerInterface $entityManager
-  ) {
+  public function __construct(FlagTypePluginManager $flagType,
+                              EventDispatcherInterface $eventDispatcher,
+                              QueryFactory $entityQuery,
+                              AccountInterface $currentUser,
+                              EntityManagerInterface $entityManager) {
     $this->flagTypeMgr = $flagType;
     $this->eventDispatcher = $eventDispatcher;
     $this->entityQueryMgr = $entityQuery;
@@ -74,7 +77,7 @@ class FlagService {
   /**
    * Get a flag type definition.
    *
-   * @param $entity_type
+   * @param string $entity_type
    *   (optional) The entity type to get the definition for, or NULL to return
    *   all flag types.
    *
@@ -99,11 +102,11 @@ class FlagService {
    * If node type or account are entered, a list of all possible flags will be
    * returned.
    *
-   * @param $entity_type
+   * @param string $entity_type
    *   (optional) The type of entity for which to load the flags. Usually 'node'.
-   * @param $bundle
+   * @param string $bundle
    *   (optional) The bundle for which to load the flags.
-   * @param $account
+   * @param AccountInterface $account
    *   (optional) The user account to filter available flags. If not set, all
    *   flags for the given entity and bundle will be returned.
    *
@@ -139,6 +142,19 @@ class FlagService {
     return $filtered_flags;
   }
 
+  /**
+   * Get all flaggings for the given entity, flag, and optionally, user.
+   *
+   * @param EntityInterface $entity
+   *   The flaggable entity.
+   * @param FlagInterface $flag
+   *   The flag entity.
+   * @param AccountInterface $account
+   *   Optional. The account of the flagging user. If NULL, flaggings for any
+   *   user will be returned.
+   * @return array
+   *   An array of flaggings.
+   */
   public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
     if ($account == NULL) {
       $account = $this->currentUser;
@@ -160,19 +176,44 @@ class FlagService {
   }
 
   /**
-   * @todo Should not work like this, instead of the ID, the object itself should be passed along!
+   * Load the flag entity given the ID.
+   *
+   * @param int $flag_id
+   *   The ID of the flag to load.
+   * @return FlagInterface|null
+   *   The flag entity.
    */
   public function getFlagById($flag_id) {
     return entity_load('flag', $flag_id);
   }
 
   /**
-   * @todo Should not work like this, instead of the ID, the object itself should be passed along!
+   * Loads the flaggable entity given the flag entity and entity ID.
+   *
+   * @param FlagInterface $flag
+   *   The flag entity.
+   * @param int $entity_id
+   *   The ID of the flaggable entity.
+   * @return EntityInterface|null
+   *   The flaggable entity object.
    */
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
     return entity_load($flag->getFlaggableEntityType(), $entity_id);
   }
 
+  /**
+   * Flags the given entity given the flag and entity objects.
+   *
+   * @param FlagInterface $flag
+   *   The flag entity.
+   * @param EntityInterface $entity
+   *   The entity to flag.
+   * @param AccountInterface $account
+   *   Optional. The account of the user flagging the entity. If not given,
+   *   the current user is used.
+   * @return FlaggingInterface|null
+   *   The flagging.
+   */
   public function flagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     if (empty($account)) {
       $account = $this->currentUser;
@@ -202,13 +243,19 @@ class FlagService {
   }
 
   /**
+   * Flags an entity given the flag ID and entity ID.
    *
    * @api
    *
-   * @param $flag_id
-   * @param $entity_id
+   * @param int $flag_id
+   *   The ID of the flag.
+   * @param int $entity_id
+   *   The ID of the entity to flag.
    * @param AccountInterface $account
-   * @return EntityInterface
+   *   Optional. The account of user flagging the entity. If not given, the
+   *   current user is used.
+   * @return FlaggingInterface|null
+   *   The flagging entity.
    */
   public function flag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
@@ -222,13 +269,18 @@ class FlagService {
   }
 
   /**
+   * Unflags an entity given the flag ID and entity ID.
    *
    * @api
    *
-   * @param $flag_id
-   * @param $entity_id
+   * @param int $flag_id
+   *   The ID of the flag.
+   * @param int $entity_id
+   *   The ID of the flagged entity to unflag.
    * @param AccountInterface $account
+   *   Optional. The account of the user that created the flagging.
    * @return array
+   *   An array of flagging IDs to delete.
    */
   public function unflag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
@@ -243,18 +295,38 @@ class FlagService {
     return $this->unflagByObject($flag, $entity, $account);
   }
 
+  /**
+   * Unflags the given entity for the given flag.
+   *
+   * @param FlagInterface $flag
+   *   The flag being unflagged.
+   * @param EntityInterface $entity
+   *   The entity to unflag.
+   * @param AccountInterface $account
+   *   Optional. The account of the user that created the flagging.
+   * @return array
+   *   An array of flagging IDs to delete.
+   */
   public function unflagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     $this->eventDispatcher->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
 
     $out = array();
-    $flaggings = $this->getFlaggings($entity, $flag);
+    $flaggings = $this->getFlaggings($entity, $flag, $account);
     foreach ($flaggings as $flagging) {
-      $out[] = $this->unflagByFlagging($flagging);
+      $out[] = $flagging->id();
+
+      $this->unflagByFlagging($flagging);
     }
 
     return $out;
   }
 
+  /**
+   * Deletes the given flagging.
+   *
+   * @param FlaggingInterface $flagging
+   *   The flagging to delete.
+   */
   public function unflagByFlagging(FlaggingInterface $flagging) {
     $flagging->delete();
   }
@@ -263,7 +335,9 @@ class FlagService {
    * Increments count of flagged entities.
    *
    * @param FlagInterface $flag
+   *    The flag to increment.
    * @param EntityInterface $entity
+   *    The flaggable entity.
    */
   protected function incrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
     db_merge('flag_counts')
@@ -284,7 +358,9 @@ class FlagService {
    * Reverts incrementation of count of flagged entities.
    *
    * @param FlagInterface $flag
+   *    The flag to decrement.
    * @param EntityInterface $entity
+   *   The flaggable entity.
    */
   protected function decrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
     $count_result = db_select('flag_counts')
