@@ -20,6 +20,8 @@ use Drupal\flag\FlagService;
 class ReloadLinkController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
+   * The flag service.
+   *
    * @var \Drupal\flag\FlagService
    */
   protected $flagService;
@@ -28,6 +30,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    * Constructor.
    *
    * @param FlagService $flag
+   *   The flag service.
    */
   public function __construct(FlagService $flag) {
     $this->flagService = $flag;
@@ -37,7 +40,9 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    * Create.
    *
    * @param ContainerInterface $container
-   * @return static
+   *   The container object.
+   * @return ReloadLinkController
+   *   The reload link controller.
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -48,9 +53,12 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   /**
    * Performs a flagging when called via a route.
    *
-   * @param $flag_id
-   * @param $entity_id
+   * @param int $flag_id
+   *   The flag ID.
+   * @param int $entity_id
+   *   The flaggable ID.
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   The response object.
    *
    * @see \Drupal\flag\Plugin\Reload
    */
@@ -67,9 +75,12 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   /**
    * Performs a flagging when called via a route.
    *
-   * @param $flag_id
-   * @param $entity_id
+   * @param int $flag_id
+   *   The flag ID.
+   * @param int $entity_id
+   *   The flagging ID.
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   The response object.
    *
    * @see \Drupal\flag\Plugin\Reload
    */
@@ -86,3 +97,4 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   }
 
 }
+

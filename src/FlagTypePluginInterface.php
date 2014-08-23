@@ -14,5 +14,5 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  * @package Drupal\flag
  */
 interface FlagTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
-  public function type_access_multiple($entity_ids, $account);
+  public function typeAccessMultiple($entity_ids, $account);
 } 
