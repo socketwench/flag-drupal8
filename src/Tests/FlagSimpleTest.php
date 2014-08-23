@@ -19,22 +19,28 @@ use Drupal\user\Entity\Role;
 class FlagSimpleTest extends WebTestBase {
 
   /**
+   * The label of the flag to create for the test.
+   *
    * @var string
    */
   protected $label = 'Test label 123';
 
   /**
+   * The ID of the flag to create for the test.
+   *
    * @var string
    */
   protected $id = 'test_label_123';
 
   /**
+   * The flag link type.
+   *
    * @var string
    */
   protected $flagLinkType;
 
   /**
-   *
+   * The node type to use in the test.
    *
    * @var string
    */

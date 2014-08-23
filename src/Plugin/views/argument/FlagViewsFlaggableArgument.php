@@ -11,7 +11,8 @@ use Drupal\views\Plugin\views\argument\Numeric;
 use Drupal\Component\Utility\String;
 
 /**
- * Class FlagViewsFlaggableArgument
+ * Provides an argument handler to get the title of flaggble content.
+ *
  * @package Drupal\flag\Plugin\views\argument
  *
  * @ViewsArgument("FlagViewsFlaggableArgument")
@@ -25,12 +26,21 @@ class FlagViewsFlaggableArgument extends Numeric {
    */
   protected $database;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->database = $database;
   }
 
+  /**
+   * Helper method to retrieve the flag entity from the views relationship.
+   *
+   * @return FlagInterface|null
+   *   The flag entity selected in the relationship.
+   */
   public function getFlag() {
     // When editing a view it's possible to delete the relationship (either by
     // error or to later recreate it), so we have to guard against a missing
@@ -40,28 +50,29 @@ class FlagViewsFlaggableArgument extends Numeric {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function titleQuery() {
     $titles = array();
 
     $flag = $this->getFlag();
-    $entityType = $flag->getFlaggableEntityType();
+    $entity_type = $flag->getFlaggableEntityType();
 
-    $def = \Drupal::entityManager()->getDefinition($entityType);
-    $baseTable = $def->getBaseTable();
-    $entityKeys = $def->getKeys();
-    $idKey = $entityKeys['id'];
+    $def = \Drupal::entityManager()->getDefinition($entity_type);
+    $entity_keys = $def->getKeys();
 
     $result = $this->database->select($def->getBaseTable(), 'o')
-      ->fields('o', $entityKeys['label'])
-      ->condition('o.' . $entityKeys['id'], $this->value, 'IN')
+      ->fields('o', $entity_keys['label'])
+      ->condition('o.' . $entity_keys['id'], $this->value, 'IN')
       ->execute();
 
 
     foreach ($result as $title) {
-      $titles[] = String::check_plain($title->$entityKeys['label']);
+      $titles[] = String::check_plain($title->$entity_keys['label']);
     }
 
     return $titles;
   }
 
-} 
+}

@@ -11,7 +11,11 @@ use Drupal\views\ResultRow;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class FlagViewsLinkField
+ * Provides a views field to flag or unflag the selected content.
+ *
+ * Unlike FlagViewsFlaggedField, this views field handler provides an
+ * actionable link to flag or unflag the selected content.
+ *
  * @package Drupal\flag\Plugin\views\field
  *
  * @ViewsField("flag_link")
@@ -27,6 +31,9 @@ class FlagViewsLinkField extends FieldPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -44,8 +51,7 @@ class FlagViewsLinkField extends FieldPluginBase {
   }
 
   /**
-   * @param $form
-   * @param $form_state
+   * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['text'] = array(
@@ -59,41 +65,48 @@ class FlagViewsLinkField extends FieldPluginBase {
     parent::buildOptionsForm($form, $form_state);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     // Intentionally do nothing here since we're only providing a link and not
     // querying against a real table column.
   }
 
   /**
-   * @param ResultRow $values
-   * @return string|void
+   * {@inheritdoc}
    */
   public function render(ResultRow $values) {
-    //$entity = $this->getEntity($values);
+    // $entity = $this->getEntity($values);
     return $this->renderLink($values->_entity, $values);
   }
 
   /**
-   * @param $data
+   * Creates a render array for flag links.
+   *
+   * @param EntityInterface $entity
+   *   The entity object.
    * @param ResultRow $values
+   *   The current result row.
+   * @return array
+   *   The render array for the flag link.
    */
   protected function renderLink($entity, ResultRow $values) {
-    // if (empty($entity) || !$entity->access('view')) {
     if (empty($entity)) {
       return t('N/A');
     }
 
     $flag = $this->getFlag();
-    $linkTypePlugin = $flag->getLinkTypePlugin();
+    $link_type_plugin = $flag->getLinkTypePlugin();
     $action = 'flag';
 
     if ($flag->isFlagged($entity)) {
       $action = 'unflag';
     }
 
-    $link = $linkTypePlugin->renderLink($action, $flag, $entity);
+    $link = $link_type_plugin->renderLink($action, $flag, $entity);
 
     return $link;
   }
 
-} 
+}

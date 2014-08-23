@@ -12,13 +12,21 @@ use Drupal\views\Plugin\views\field\Boolean;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class FlagViewsFlaggedField
+ * Provides a views field to show if the selected content is flagged or not.
+ *
+ * This field differs from FlagViewsLinkField in that it is display only. It
+ * does not provide an actionable link, but rather inherits from the Boolean
+ * views field handler.
+ *
  * @package Drupal\flag\Plugin\views\field
  *
  * @ViewsField("flag_flagged")
  */
 class FlagViewsFlaggedField extends Boolean {
 
+  /**
+   * {@inheritdoc}
+   */
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
 
@@ -29,6 +37,9 @@ class FlagViewsFlaggedField extends Boolean {
     // and b) they will not necessarily make sense in a static context.
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['relationship'] = array('default' => 'flag_content_rel');
@@ -36,6 +47,9 @@ class FlagViewsFlaggedField extends Boolean {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['relationship']['#default_value'] = $this->options['relationship'];
 
