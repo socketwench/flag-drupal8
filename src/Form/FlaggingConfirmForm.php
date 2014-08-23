@@ -12,17 +12,22 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the form page for the Confirm Form link type.
+ * 
  * @package Drupal\flag\Form
  * @see \Drupal\flag\Plugin\ActionLink\ConfirmForm
  */
 class FlaggingConfirmForm extends ConfirmFormBase {
 
   /**
+   * The flaggable entity.
+   *
    * @var \Drupal\Core\Entity\EntityInterface
    */
   protected $entity;
 
   /**
+   * The flag entity.
+   *
    * @var \Drupal\flag\FlagInterface
    */
   protected $flag;
@@ -33,9 +38,9 @@ class FlaggingConfirmForm extends ConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state,
                             $flag_id = NULL, $entity_id = NULL) {
 
-    $flagService = \Drupal::service('flag');
-    $this->flag = $flagService->getFlagByID($flag_id);
-    $this->entity = $flagService->getFlaggableById($this->flag, $entity_id);
+    $flag_service = \Drupal::service('flag');
+    $this->flag = $flag_service->getFlagByID($flag_id);
+    $this->entity = $flag_service->getFlaggableById($this->flag, $entity_id);
     return parent::buildForm($form, $form_state);
   }
 
@@ -50,13 +55,13 @@ class FlaggingConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    $linkType = $this->flag->getLinkTypePlugin();
+    $link_type = $this->flag->getLinkTypePlugin();
 
     if ($this->isFlagged()) {
-      return $linkType->getUnflagQuestion();
+      return $link_type->getUnflagQuestion();
     }
 
-    return $linkType->getFlagQuestion();
+    return $link_type->getFlagQuestion();
   }
 
   /**
@@ -93,6 +98,12 @@ class FlaggingConfirmForm extends ConfirmFormBase {
     return $this->t('Flag');
   }
 
+  /**
+   * Helper method to determine if the entity has been flagged or not.
+   *
+   * @return bool
+   *   TRUE if the current entity is flagged, FALSE otherwise.
+   */
   protected function isFlagged() {
     return $this->flag->isFlagged($this->entity);
   }
