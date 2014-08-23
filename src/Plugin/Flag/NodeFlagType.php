@@ -53,7 +53,7 @@ class NodeFlagType extends EntityFlagType {
         'own' => t('Users may only flag content they own'),
         'others' => t('Users may only flag content of others'),
       ),
-      '#default_value' => $this->configuration['access_author'],
+      '#default_value' => $this->getAccessAuthorSetting(),
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
     );
 
@@ -65,7 +65,7 @@ class NodeFlagType extends EntityFlagType {
         '1' => t('Flag translations of content as a group'),
         '0' => t('Flag each translation of content separately'),
       ),
-      //'#default_value' => $this->i18n,
+      '#default_value' => $this->getInternationalizationSetting(),
       '#description' => t('Flagging translations as a group effectively allows users to flag the original piece of content regardless of the translation they are viewing. Changing this setting will <strong>not</strong> update content that has been flagged already.'),
       '#access' => \Drupal::moduleHandler()->moduleExists('translation_helpers'),
       '#weight' => 5,
@@ -107,11 +107,28 @@ class NodeFlagType extends EntityFlagType {
     return $access;
   }
 
+  /**
+   * Returns the flag type access author setting.
+   *
+   * @return string
+   *   The access author setting can be one of three values:
+   *   - '' = No additional restrictions.
+   *   - 'own' = Users may only flag content they own.
+   *   - 'others' = Users may only flag content of others.
+   */
   public function getAccessAuthorSetting() {
     return $this->configuration['access_author'];
   }
 
+  /**
+   * Returns the internationalization setting for the flag type.
+   *
+   * @return int
+   *   The internationalization setting can be one of two values:
+   *   - 1 = Flag translations of content as a group.
+   *   - 0 = Flag each translation of content separately.
+   */
   public function getInternationalizationSetting() {
-    $this->configuration['i18n'];
+    return $this->configuration['i18n'];
   }
 }
