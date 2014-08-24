@@ -29,4 +29,4 @@ class FlagEditForm extends FlagFormBase {
     return $actions;
   }
 
-} 
+}
