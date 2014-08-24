@@ -27,7 +27,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
    */
   public function getQuestion() {
     return t('Are you sure you want to delete the Flag %label?', array(
-      '%label' => $this->entity->label()
+      '%label' => $this->entity->label(),
     ));
   }
 
