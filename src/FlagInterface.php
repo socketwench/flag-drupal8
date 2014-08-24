@@ -18,7 +18,7 @@ use Drupal\Core\Session\AccountInterface;
  */
 interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInterface {
 
-  //@todo: Add getters and setters as necessary.
+  /* @todo: Add getters and setters as necessary. */
 
   /**
    * Enables the Flag for use.
@@ -34,8 +34,12 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
    * Returns true of there's a flagging for this flag and the given entity.
    *
    * @param EntityInterface $entity
+   *   The flaggable entity.
    * @param AccountInterface $account
-   * @return boolean
+   *   Optional. The account of the user that flagged the entity.
+   *
+   * @return bool
+   *   True if the given entity is flagged, FALSE otherwise.
    */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL);
 
@@ -48,6 +52,7 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
    * permission.
    *
    * @return array
+   *   An array of permissions.
    *
    * @see \Drupal\flag\Entity\Flag::getPermissions()
    */
@@ -61,17 +66,19 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
    * once for all users.
    *
    * @return boolean
+   *   TRUE if the flag is global, FALSE otherwise.
    */
   public function isGlobal();
 
   /**
    * Sets the flag as global or not.
    *
-   * @param $isGlobal
+   * @param bool $is_global
    *  TRUE to mark the flag as global, FALSE for the default behavior.
+   *
    * @see \Drupal\flag\Entity\Flag::isGlobal()
    */
-  public function setGlobal($isGlobal);
+  public function setGlobal($is_global);
 
   /**
    * {@inheritdoc}

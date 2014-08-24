@@ -353,8 +353,8 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * {@inheritdoc}
    */
-  public function setGlobal($isGlobal = TRUE) {
-    if ($isGlobal) {
+  public function setGlobal($is_global = TRUE) {
+    if ($is_global) {
       $this->is_global = TRUE;
     }
     else {
