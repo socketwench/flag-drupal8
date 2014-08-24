@@ -10,7 +10,8 @@ use Drupal\flag\FlagTypeBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class EntityFlagType
+ * Provides a flag type for all entity types.
+ *
  * @package Drupal\flag\Plugin\Flag
  *
  * Base entity flag handler.
@@ -72,7 +73,7 @@ class EntityFlagType extends FlagTypeBase {
     $view_modes = \Drupal::entityManager()->getViewModes($this->entity_type);
     foreach ($view_modes as $name => $view_mode) {
       $options[$name] = t('Display on @name view mode', array('@name' => $view_mode['label']));
-      $defaults[$name] = !empty($this->show_in_links[$name]) ? $name : 0;
+      $defaults[$name] = $this->showInLinks($name);
     }
 
     $form['display']['show_in_links'] = array(
@@ -87,7 +88,7 @@ class EntityFlagType extends FlagTypeBase {
       '#type' => 'checkbox',
       '#title' => t('Display link as field'),
       '#description' => t('Show the flag link as a pseudofield, which can be ordered among other entity elements in the "Manage display" settings for the entity type.'),
-      '#default_value' => isset($this->show_as_field) ? $this->show_as_field : TRUE,
+      '#default_value' => $this->showAsField(),
     );
     /*
     if (empty($entity_info['fieldable'])) {
@@ -135,19 +136,54 @@ class EntityFlagType extends FlagTypeBase {
     $this->configuration['show_contextual_link'] = $form_state['values']['show_contextual_link'];
   }
 
-  public function showInLinks() {
-    return $this->configuration['show_in_links'];
+  /**
+   * Return the show in links setting given a view mode.
+   *
+   * @param string $name
+   *   The name of the view mode.
+   *
+   * @return mixed
+   *   The name of the view mode if the flag appears in links, 0 otherwise.
+   */
+  public function showInLinks($name) {
+    if (!empty($this->configuration['show_in_links'][$name])) {
+      return $name;
+    }
+
+    return 0;
   }
 
+  /**
+   * Returns the show as field setting.
+   *
+   * @return bool
+   *   TRUE if the flag should appear as a psudofield, FALSE otherwise.
+   */
   public function showAsField() {
-    return $this->configuration['show_as_field'];
+    if (!empty($this->configuration['show_as_field'])) {
+      return $this->configuration['show_as_field'];
+    }
+
+    return TRUE;
   }
 
+  /**
+   * Returns the show on form setting.
+   *
+   * @return bool
+   *   TRUE if the flag should appear on the entity form, FALSE otherwise.
+   */
   public function showOnForm() {
     return $this->configuration['show_on_form'];
   }
 
+  /**
+   * Returns the show on contextual link setting.
+   *
+   * @return bool
+   *   TRUE if the flag should appear in contextual links, FALSE otherwise.
+   */
   public function showContextualLink() {
     return $this->configuration['show_contextual_link'];
   }
-} 
+}
