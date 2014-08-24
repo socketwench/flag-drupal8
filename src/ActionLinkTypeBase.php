@@ -30,8 +30,11 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * Build a new link type instance and sets the configuration.
    *
    * @param array $configuration
+   *   The configuration array with which to initialize this plugin.
    * @param string $plugin_id
+   *   The ID with which to initialize this plugin.
    * @param array $plugin_definition
+   *   The plugin definition array.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -42,8 +45,9 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   /**
    * Returns a route name given an $action.
    *
-   * @param $action
-   *  A string containing the action name.
+   * @param string|null $action
+   *   A string containing the action name.
+   *
    * @return string
    *  A string containing a route name.
    */
@@ -88,7 +92,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   }
 
   /**
-   * {@inhereitdoc}
+   * {@inheritdoc}
    */
   public function calculateDependencies() {
     return array();
@@ -96,42 +100,52 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
 
   /**
    * Provides a form array for the action link plugin's settings form.
+   *
    * Derived classes will want to override this method.
    *
    * @param array $form
-   * @param array $form_state
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    * @return array
-   *   The configuration form array.
+   *   The modified form array.
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return $form;
   }
 
   /**
-   * Processes the action link setting form submit. Derived classes will want to
-   * override this method.
+   * Processes the action link setting form submit.
+   *
+   * Derived classes will want to override this method.
    *
    * @param array $form
-   * @param array $form_state
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
   /**
-   * Validates the action link setting form. Derived classes will want to override
-   * this method.
+   * Validates the action link setting form.
+   *
+   * Derived classes will want to override this method.
    *
    * @param array $form
-   * @param array $form_state
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Override this.
   }
 
   /**
-   * Provides the action link plugin's default configuration. Derived classes
-   * will want to override this method.
+   * Provides the action link plugin's default configuration.
+   *
+   * Derived classes will want to override this method.
    *
    * @return array
    *   The plugin configuration array.
@@ -141,17 +155,18 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   }
 
   /**
-   * Provides the action link plugin's current configuraiton array.
+   * Provides the action link plugin's current configuration array.
    *
    * @return array
-   *   An array containing the plugin's currnt configuration.
+   *   An array containing the plugin's current configuration.
    */
   public function getConfiguration() {
     return $this->configuration;
   }
 
   /**
-   * Replaces the plugin's current configuration with that given in the parameter.
+   * Updates the plugin's current configuration.
+   *
    * @param array $configuration
    *   An array containing the plugin's configuration.
    */
