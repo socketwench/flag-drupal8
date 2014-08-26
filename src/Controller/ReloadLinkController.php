@@ -41,6 +41,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    *
    * @param ContainerInterface $container
    *   The container object.
+   * 
    * @return ReloadLinkController
    *   The reload link controller.
    */
@@ -57,6 +58,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    *   The flag ID.
    * @param int $entity_id
    *   The flaggable ID.
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   The response object.
    *
@@ -79,6 +81,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    *   The flag ID.
    * @param int $entity_id
    *   The flagging ID.
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   The response object.
    *
@@ -97,4 +100,3 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
   }
 
 }
-
