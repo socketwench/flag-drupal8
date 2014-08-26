@@ -32,21 +32,24 @@ class FlagListController extends ConfigEntityListBuilder {
    * Creates a displayable string of roles that may use the flag.
    *
    * @param FlagInterface $flag
+   *   The flag entity.
+   *
    * @return string
+   *   An HTML sting of roles.
    */
   protected function getFlagRoles(FlagInterface $flag) {
     $out = '';
-    $allRoles = array();
+    $all_roles = array();
 
     foreach ($flag->getPermissions() as $perm => $pinfo) {
       $roles = user_roles(FALSE, $perm);
 
       foreach ($roles as $rid => $role) {
-        $allRoles[$rid] = $role->label();
+        $all_roles[$rid] = $role->label();
       }
     }
 
-    $out = implode(', ', $allRoles);
+    $out = implode(', ', $all_roles);
 
     if (empty($out)) {
       return '<em>None</em>';
@@ -79,7 +82,7 @@ class FlagListController extends ConfigEntityListBuilder {
 
     $output = "";
 
-    //@todo Move this too hook_help()?
+    // @todo Move this too hook_help()?
     if (!\Drupal::moduleHandler()->moduleExists('views')) {
       $output .= '<p>' . t('The <a href="@views-url">Views</a> module is not installed, or not enabled. It is recommended that you install the Views module to be able to easily produce lists of flagged content.', array('@views-url' => url('http://drupal.org/project/views'))) . '</p>';
     }
