@@ -24,21 +24,29 @@ use Drupal\Core\Entity\EntityManagerInterface;
 class FlagService {
 
   /**
+   * The flag type plugin manager injected into the service.
+   *
    * @var FlagTypePluginManager
    */
   private $flagTypeMgr;
 
   /**
+   * The event dispatcher injected into the service.
+   *
    * @var EventDispatcherInterface
    */
   private $eventDispatcher;
 
-  /*
+  /**
+   * The entity query manager injected into the service.
+   *
    * @var QueryFactory
    */
   private $entityQueryMgr;
 
   /**
+   * The current user injected into the service.
+   *
    * @var AccountInterface
    */
   private $currentUser;
@@ -51,27 +59,27 @@ class FlagService {
   /**
    * Constructor.
    *
-   * @param FlagTypePluginManager $flagType
+   * @param FlagTypePluginManager $flag_type
    *   The flag type plugin manager.
-   * @param EventDispatcherInterface $eventDispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
-   * @param QueryFactory $entityQuery
+   * @param QueryFactory $entity_query
    *   The entity query factory.
-   * @param AccountInterface $currentUser
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param EntityManagerInterface $entityManager
+   * @param EntityManagerInterface $entity_manager
    *   The entity manager.
    */
-  public function __construct(FlagTypePluginManager $flagType,
-                              EventDispatcherInterface $eventDispatcher,
-                              QueryFactory $entityQuery,
-                              AccountInterface $currentUser,
-                              EntityManagerInterface $entityManager) {
-    $this->flagTypeMgr = $flagType;
-    $this->eventDispatcher = $eventDispatcher;
-    $this->entityQueryMgr = $entityQuery;
-    $this->currentUser = $currentUser;
-    $this->entityMgr = $entityManager;
+  public function __construct(FlagTypePluginManager $flag_type,
+                              EventDispatcherInterface $event_dispatcher,
+                              QueryFactory $entity_query,
+                              AccountInterface $current_user,
+                              EntityManagerInterface $entity_manager) {
+    $this->flagTypeMgr = $flag_type;
+    $this->eventDispatcher = $event_dispatcher;
+    $this->entityQueryMgr = $entity_query;
+    $this->currentUser = $current_user;
+    $this->entityMgr = $entity_manager;
   }
 
   /**
@@ -87,8 +95,7 @@ class FlagService {
    * @see hook_flag_type_info()
    */
   public function fetchDefinition($entity_type = NULL) {
-    //@todo Add caching, PLS!
-
+    // @todo Add caching, PLS!
     if (!empty($entity_type)) {
       return $this->flagTypeMgr->getDefinition($entity_type);
     }
@@ -103,7 +110,7 @@ class FlagService {
    * returned.
    *
    * @param string $entity_type
-   *   (optional) The type of entity for which to load the flags. Usually 'node'.
+   *   (optional) The type of entity for which to load the flags.
    * @param string $bundle
    *   (optional) The bundle for which to load the flags.
    * @param AccountInterface $account
@@ -152,6 +159,7 @@ class FlagService {
    * @param AccountInterface $account
    *   Optional. The account of the flagging user. If NULL, flaggings for any
    *   user will be returned.
+   *
    * @return array
    *   An array of flaggings.
    */
@@ -180,6 +188,7 @@ class FlagService {
    *
    * @param int $flag_id
    *   The ID of the flag to load.
+   *
    * @return FlagInterface|null
    *   The flag entity.
    */
@@ -194,6 +203,7 @@ class FlagService {
    *   The flag entity.
    * @param int $entity_id
    *   The ID of the flaggable entity.
+   *
    * @return EntityInterface|null
    *   The flaggable entity object.
    */
@@ -211,6 +221,7 @@ class FlagService {
    * @param AccountInterface $account
    *   Optional. The account of the user flagging the entity. If not given,
    *   the current user is used.
+   *
    * @return FlaggingInterface|null
    *   The flagging.
    */
@@ -245,8 +256,6 @@ class FlagService {
   /**
    * Flags an entity given the flag ID and entity ID.
    *
-   * @api
-   *
    * @param int $flag_id
    *   The ID of the flag.
    * @param int $entity_id
@@ -254,8 +263,11 @@ class FlagService {
    * @param AccountInterface $account
    *   Optional. The account of user flagging the entity. If not given, the
    *   current user is used.
+   *
    * @return FlaggingInterface|null
    *   The flagging entity.
+   *
+   * @api
    */
   public function flag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
@@ -271,16 +283,17 @@ class FlagService {
   /**
    * Unflags an entity given the flag ID and entity ID.
    *
-   * @api
-   *
    * @param int $flag_id
    *   The ID of the flag.
    * @param int $entity_id
    *   The ID of the flagged entity to unflag.
    * @param AccountInterface $account
    *   Optional. The account of the user that created the flagging.
+   *
    * @return array
    *   An array of flagging IDs to delete.
+   *
+   * @api
    */
   public function unflag($flag_id, $entity_id, AccountInterface $account = NULL) {
     if (empty($account)) {
@@ -304,6 +317,7 @@ class FlagService {
    *   The entity to unflag.
    * @param AccountInterface $account
    *   Optional. The account of the user that created the flagging.
+   *
    * @return array
    *   An array of flagging IDs to delete.
    */
