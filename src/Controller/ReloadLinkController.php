@@ -41,7 +41,7 @@ class ReloadLinkController extends ControllerBase implements ContainerInjectionI
    *
    * @param ContainerInterface $container
    *   The container object.
-   * 
+   *
    * @return ReloadLinkController
    *   The reload link controller.
    */
