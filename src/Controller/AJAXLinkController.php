@@ -8,7 +8,6 @@ namespace Drupal\flag\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\flag\FlagInterface;
-use Drupal\flag\FlaggingInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -30,6 +29,7 @@ class AJAXLinkController extends ControllerBase {
    *   The flag ID.
    * @param int $entity_id
    *   The flaggable ID.
+   *
    * @return AjaxResponse
    *   The response object.
    *
@@ -54,6 +54,7 @@ class AJAXLinkController extends ControllerBase {
    *   The flag ID.
    * @param int $entity_id
    *   The entity ID to unflag.
+   *
    * @return AjaxResponse
    *   The response object.
    *
@@ -78,6 +79,7 @@ class AJAXLinkController extends ControllerBase {
    *   The flag entity.
    * @param EntityInterface $entity
    *   The entity object.
+   *
    * @return AjaxResponse
    *   The response object.
    */
