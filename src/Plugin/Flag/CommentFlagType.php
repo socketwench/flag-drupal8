@@ -10,10 +10,9 @@ use Drupal\flag\Plugin\Flag\EntityFlagType;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class CommentFlagType
- * @package Drupal\flag\Plugin\Flag
+ * Provides a flag type for comments.
  *
- * Implements a comment flag.
+ * @package Drupal\flag\Plugin\Flag
  *
  * @FlagType(
  *   id = "flagtype_comment",
@@ -102,4 +101,4 @@ class CommentFlagType extends EntityFlagType {
   public function getAccessAuthorSetting() {
     return $this->configuration['access_author'];
   }
-} 
+}
