@@ -48,4 +48,4 @@ class EntityFlagType extends DeriverBase {
 
     return $derivatives;
   }
-} 
+}
