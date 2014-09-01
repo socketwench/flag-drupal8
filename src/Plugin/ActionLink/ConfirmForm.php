@@ -51,7 +51,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $form['display']['settings']['link_options_confirm'] = array(
+    $form['display']['settings']['link_options_confirm'] = [
       '#type' => 'fieldset',
       '#title' => t('Options for the "Confirmation form" link type'),
       // Any "link type" provider module must put its settings fields inside
@@ -59,25 +59,25 @@ class ConfirmForm extends ActionLinkTypeBase {
       // the machine-name of the link type. This is necessary for the
       // radiobutton's JavaScript dependency feature to work.
       '#id' => 'link-options-confirm',
-    );
+    ];
 
-    $form['display']['settings']['link_options_confirm']['flag_confirmation'] = array(
+    $form['display']['settings']['link_options_confirm']['flag_confirmation'] = [
       '#type' => 'textfield',
       '#title' => t('Flag confirmation message'),
       '#default_value' => $this->configuration['flag_confirmation'],
       '#description' => t('Message displayed if the user has clicked the "flag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to flag this content?"'),
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
-    );
+    ];
 
-    $form['display']['settings']['link_options_confirm']['unflag_confirmation'] = array(
+    $form['display']['settings']['link_options_confirm']['unflag_confirmation'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag confirmation message'),
       '#default_value' => $this->configuration['unflag_confirmation'],
       '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }
@@ -94,6 +94,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   /**
    * Returns the flag confirm form question when flagging.
    * @return string
+   *   A string containing the flag question to display.
    */
   public function getFlagQuestion() {
     return $this->configuration['flag_confirmation'];
@@ -102,6 +103,7 @@ class ConfirmForm extends ActionLinkTypeBase {
   /**
    * Returns the flag confirm form question when unflagging.
    * @return string
+   *   A string containing the unflag question to display.
    */
   public function getUnflagQuestion() {
     return $this->configuration['unflag_confirmation'];

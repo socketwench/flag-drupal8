@@ -12,7 +12,8 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Base Event from which other flag event are defined.
  */
-abstract class FlagEventBase extends Event{
+
+abstract class FlagEventBase extends Event {
 
   /**
    * The Flag in question.
@@ -22,6 +23,8 @@ abstract class FlagEventBase extends Event{
   protected $flag;
 
   /**
+   * Build the flag event class.
+   *
    * @param \Drupal\flag\FlagInterface $flag
    *   The flag to be acted upon.
    */
@@ -29,4 +32,4 @@ abstract class FlagEventBase extends Event{
     $this->flag = $flag;
   }
 
-} 
+}

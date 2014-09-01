@@ -39,7 +39,7 @@ class FlagListController extends ConfigEntityListBuilder {
    */
   protected function getFlagRoles(FlagInterface $flag) {
     $out = '';
-    $all_roles = array();
+    $all_roles = [];
 
     foreach ($flag->getPermissions() as $perm => $pinfo) {
       $roles = user_roles(FALSE, $perm);
@@ -84,38 +84,38 @@ class FlagListController extends ConfigEntityListBuilder {
 
     // @todo Move this too hook_help()?
     if (!\Drupal::moduleHandler()->moduleExists('views')) {
-      $output .= '<p>' . t('The <a href="@views-url">Views</a> module is not installed, or not enabled. It is recommended that you install the Views module to be able to easily produce lists of flagged content.', array('@views-url' => url('http://drupal.org/project/views'))) . '</p>';
+      $output .= '<p>' . t('The <a href="@views-url">Views</a> module is not installed, or not enabled. It is recommended that you install the Views module to be able to easily produce lists of flagged content.', ['@views-url' => url('http://drupal.org/project/views')]) . '</p>';
     }
     else {
       $output .= '<p>';
-      $output .= t('Lists of flagged content can be displayed using views. You can configure these in the <a href="@views-url">Views administration section</a>.', array('@views-url' => url('admin/structure/views')));
+      $output .= t('Lists of flagged content can be displayed using views. You can configure these in the <a href="@views-url">Views administration section</a>.', ['@views-url' => url('admin/structure/views')]);
       if (flag_get_flag('bookmarks')) {
-        $output .= ' ' . t('Flag module automatically provides a few <a href="@views-url">default views for the <em>bookmarks</em> flag</a>. You can use these as templates by cloning these views and then customizing as desired.', array('@views-url' => url('admin/structure/views', array('query' => array('tag' => 'flag')))));
+        $output .= ' ' . t('Flag module automatically provides a few <a href="@views-url">default views for the <em>bookmarks</em> flag</a>. You can use these as templates by cloning these views and then customizing as desired.', ['@views-url' => url('admin/structure/views', ['query' => ['tag' => 'flag']])]);
       }
-      $output .= ' ' . t('The <a href="@flag-handbook-url">Flag module handbook</a> contains extensive <a href="@customize-url">documentation on creating customized views</a> using flags.', array('@flag-handbook-url' => 'http://drupal.org/handbook/modules/flag', '@customize-url' => 'http://drupal.org/node/296954'));
+      $output .= ' ' . t('The <a href="@flag-handbook-url">Flag module handbook</a> contains extensive <a href="@customize-url">documentation on creating customized views</a> using flags.', ['@flag-handbook-url' => 'http://drupal.org/handbook/modules/flag', '@customize-url' => 'http://drupal.org/node/296954']);
       $output .= '</p>';
     }
 
     if (!\Drupal::moduleHandler()->moduleExists('flag_actions')) {
-      $output .= '<p>' . t('Flagging an item may trigger <em>actions</em>. However, you don\'t have the <em>Flag actions</em> module <a href="@modules-url">enabled</a>, so you won\'t be able to enjoy this feature.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'), '@modules-url' => url('admin/modules'))) . '</p>';
+      $output .= '<p>' . t('Flagging an item may trigger <em>actions</em>. However, you don\'t have the <em>Flag actions</em> module <a href="@modules-url">enabled</a>, so you won\'t be able to enjoy this feature.', ['@actions-url' => url(FLAG_ADMIN_PATH . '/actions'), '@modules-url' => url('admin/modules')]) . '</p>';
     }
     else {
-      $output .= '<p>' . t('Flagging an item may trigger <a href="@actions-url">actions</a>.', array('@actions-url' => url(FLAG_ADMIN_PATH . '/actions'))) . '</p>';
+      $output .= '<p>' . t('Flagging an item may trigger <a href="@actions-url">actions</a>.', ['@actions-url' => url(FLAG_ADMIN_PATH . '/actions')]) . '</p>';
     }
 
     if (!\Drupal::moduleHandler()->moduleExists('rules')) {
-      $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', array('@rules-url' => url('http://drupal.org/node/407070'))) . '</p>';
+      $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', ['@rules-url' => url('http://drupal.org/node/407070')]) . '</p>';
     }
     else {
-      $output .= '<p>' . t('Flagging an item may trigger <a href="@rules-url">rules</a>.', array('@rules-url' => url('admin/config/workflow/rules'))) . '</p>';
+      $output .= '<p>' . t('Flagging an item may trigger <a href="@rules-url">rules</a>.', ['@rules-url' => url('admin/config/workflow/rules')]) . '</p>';
     }
 
-    $output .= '<p>' . t('To learn about the various ways to use flags, please check out the <a href="@handbook-url">Flag module handbook</a>.', array('@handbook-url' => 'http://drupal.org/handbook/modules/flag')) . '</p>';
+    $output .= '<p>' . t('To learn about the various ways to use flags, please check out the <a href="@handbook-url">Flag module handbook</a>.', ['@handbook-url' => 'http://drupal.org/handbook/modules/flag']) . '</p>';
 
-    $build['markup'] = array(
+    $build['markup'] = [
       '#type' => 'markup',
       '#markup' => $output,
-    );
+    ];
 
     return $build;
   }

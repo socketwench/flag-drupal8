@@ -35,7 +35,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   /**
    * Gets the flag ID for the parent flag.
    * @return string
-   *  The flag ID.
+   *   The flag ID.
    */
   public function getFlagId() {
     return $this->get('fid')->value;
@@ -45,6 +45,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
    * Gets the parent flag entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface|\Drupal\flag\FlagInterface
+   *   The flag related this this flagging.
    */
   public function getFlag() {
     return entity_load('flag', $this->getFlagId());
@@ -53,6 +54,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   /**
    * Gets the entity type of the flaggable.
    * @return string
+   *   A string containing the flaggable type ID.
    */
   public function getFlaggableType() {
     return $this->get('entity_type')->value;
@@ -61,6 +63,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   /**
    * Gets the entity ID of the flaggable.
    * @return string
+   *   A string containing the flaggable ID.
    */
   public function getFlaggableId() {
     return $this->get('entity_id')->value;
@@ -68,7 +71,9 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
 
   /**
    * Gets the flaggable entity.
+   *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The flaggable entity.
    */
   public function getFlaggable() {
     return entity_load($this->getFlaggableType(), $this->getFlaggableId());
@@ -110,10 +115,10 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
       ->setDescription(t('The user ID of the flagging user.'))
-      ->setSettings(array(
+      ->setSettings([
         'target_type' => 'user',
         'default_value' => 0,
-      ));
+      ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

@@ -67,6 +67,8 @@ function hook_flag_options_alter(array &$options, FlagInterface $flag) {
  *   The id of the entity the user is trying to flag or unflag.
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The user account performing the action.
+ * @param bool $skip_permission_check
+ *   TRUE to skip the permission check, FALSE otherwise.
  * @param \Drupal\flag\FlaggingInterface $flagging
  *   The flagging entity.
  *
@@ -79,19 +81,6 @@ function hook_flag_options_alter(array &$options, FlagInterface $flag) {
 function hook_flag_validate($action, FlagInterface $flag, $entity_id,
                             AccountInterface $account, $skip_permission_check,
                             FlaggingInterface $flagging) {
-  // We're only operating on the "test" flag, and users may always unflag.
-  if ($flag->name == 'test' && $action == 'flag') {
-    // Get all flags set by the current user.
-    $flags = flag_get_user_flags('node', NULL, $account->uid, $sid = NULL, $reset = FALSE);
-    // Check if this user has any flags of this type set.
-    if (isset($flags['test'])) {
-      $count = count($flags[$flag->name]);
-      if ($count >= 2) {
-        // Users may flag only 2 nodes with this flag.
-        return (array('access-denied' => t('You may only flag 2 nodes with the test flag.')));
-      }
-    }
-  }
 }
 
 /**

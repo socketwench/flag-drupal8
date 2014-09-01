@@ -22,7 +22,7 @@ use Drupal\flag\FlagInterface;
  *   description = "An AJAX JavaScript request will be made without reloading the page."
  * )
  */
-class AJAXactionLink extends ActionLinkTypeBase{
+class AJAXactionLink extends ActionLinkTypeBase {
 
   /**
    * {@inheritdoc}
@@ -45,4 +45,4 @@ class AJAXactionLink extends ActionLinkTypeBase{
     return $render;
   }
 
-} 
+}

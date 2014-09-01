@@ -86,31 +86,31 @@ function flag_admin_menu_map() {
     return;
   }
 
-  $map = array();
-  $map[FLAG_ADMIN_PATH . '/manage/%flag'] = array(
+  $map = [];
+  $map[FLAG_ADMIN_PATH . '/manage/%flag'] = [
     'parent' => FLAG_ADMIN_PATH,
-    'arguments' => array(
-      array(
+    'arguments' => [
+      [
         '%flag' => array_keys(flag_get_flags()),
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
     foreach (entity_get_info() as $obj_type => $info) {
       if ($obj_type == 'flagging') {
         foreach ($info['bundles'] as $bundle_name => $bundle_info) {
           if (isset($bundle_info['admin'])) {
-            $fields = array();
+            $fields = [];
 
             foreach (field_info_instances($obj_type, $bundle_name) as $field) {
               $fields[] = $field['field_name'];
             }
 
-            $arguments = array(
-              '%flag' => array($bundle_name),
+            $arguments = [
+              '%flag' => [$bundle_name],
               '%field_ui_menu' => $fields,
-            );
+            ];
 
             $path = $bundle_info['admin']['path'];
             $map["$path/fields/%field_ui_menu"]['parent'] = "$path/fields";

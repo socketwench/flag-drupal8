@@ -30,4 +30,4 @@ class Reload extends ActionLinkTypeBase {
     return 'flag_link_flag.html';
   }
 
-} 
+}

@@ -15,10 +15,12 @@ use Drupal\flag\Event\FlagEventBase;
 class FlagDeleteEvent extends FlagEventBase {
 
   /**
+   * Build the flag delete event.
+   *
    * @param \Drupal\flag\FlagInterface $flag
    *   The flag to delete.
    */
   public function __construct(FlagInterface $flag) {
     parent::__construct($flag);
   }
-} 
+}

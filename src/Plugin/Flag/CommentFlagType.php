@@ -6,7 +6,6 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
-use Drupal\flag\Plugin\Flag\EntityFlagType;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -28,9 +27,9 @@ class CommentFlagType extends EntityFlagType {
    */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
-    $options += array(
+    $options += [
       'access_author' => '',
-    );
+    ];
     return $options;
   }
 
@@ -43,19 +42,19 @@ class CommentFlagType extends EntityFlagType {
 
     /* Options form extras for comment flags. */
 
-    $form['access']['access_author'] = array(
+    $form['access']['access_author'] = [
       '#type' => 'radios',
       '#title' => t('Flag access by content authorship'),
-      '#options' => array(
+      '#options' => [
         '' => t('No additional restrictions'),
         'comment_own' => t('Users may only flag own comments'),
         'comment_others' => t('Users may only flag comments by others'),
         'node_own' => t('Users may only flag comments of nodes they own'),
         'node_others' => t('Users may only flag comments of nodes by others'),
-      ),
+      ],
       '#default_value' => $this->configuration['access_author'],
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
-    );
+    ];
 
     return $form;
   }
@@ -72,7 +71,7 @@ class CommentFlagType extends EntityFlagType {
    * {@inheritdoc}
    */
   public function typeAccessMultiple($entity_ids, $account) {
-    $access = array();
+    $access = [];
 
     // If all subtypes are allowed, we have nothing to say here.
     if (empty($this->types)) {
@@ -84,7 +83,7 @@ class CommentFlagType extends EntityFlagType {
     $query = db_select('comment', 'c');
     $query->innerJoin('node', 'n', 'c.nid = n.nid');
     $result = $query
-      ->fields('c', array('cid'))
+      ->fields('c', ['cid'])
       ->condition('c.cid', $entity_ids, 'IN')
       ->condition('n.type', $this->types, 'NOT IN')
       ->execute();

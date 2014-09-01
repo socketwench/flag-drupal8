@@ -36,6 +36,8 @@ class FlagViewsLinkField extends FieldPluginBase {
     if (isset($this->view->relationship[$this->options['relationship']])) {
       return $this->view->relationship[$this->options['relationship']]->getFlag();
     }
+
+    return NULL;
   }
 
   /**
@@ -44,10 +46,10 @@ class FlagViewsLinkField extends FieldPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    $options['text'] = array(
+    $options['text'] = [
       'default' => '',
       'translatable' => TRUE,
-    );
+    ];
 
     // Set the default relationship handler. The first instance of the
     // FlagViewsRelationship should always have the id "flag_content_rel", so
@@ -61,11 +63,11 @@ class FlagViewsLinkField extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
-    $form['text'] = array(
+    $form['text'] = [
       '#type' => 'textfield',
       '#title' => t('Text to display'),
       '#default_value' => $this->options['text'],
-    );
+    ];
 
     $form['relationship']['#default_value'] = $this->options['relationship'];
 

@@ -32,7 +32,7 @@ abstract class FlagFormBase extends EntityForm {
     $form['#flag'] = $flag;
     $form['#flag_name'] = $flag->id;
 
-    $form['label'] = array(
+    $form['label'] = [
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#default_value' => $flag->label,
@@ -40,91 +40,91 @@ abstract class FlagFormBase extends EntityForm {
       '#maxlength' => 255,
       '#required' => TRUE,
       '#weight' => -3,
-    );
+    ];
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#title' => t('Machine name'),
       '#default_value' => $flag->id,
       '#description' => t('The machine-name for this flag. It may be up to 32 characters long and may only contain lowercase letters, underscores, and numbers. It will be used in URLs and in all API calls.'),
       '#weight' => -2,
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => 'flag_load_by_id',
-      ),
+      ],
       '#disabled' => !$flag->isNew(),
-      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#submit' => [[$this, 'submitSelectPlugin']],
       '#required' => TRUE,
       '#executes_submit_callback' => TRUE,
-      '#ajax' => array(
-        'callback' => array($this, 'updateSelectedPluginType'),
+      '#ajax' => [
+        'callback' => [$this, 'updateSelectedPluginType'],
         'wrapper' => 'monitoring-sensor-plugin',
         'method' => 'replace',
-      ),
-    );
+      ],
+    ];
 
-    $form['is_global'] = array(
+    $form['is_global'] = [
       '#type' => 'checkbox',
       '#title' => t('Global flag'),
       '#default_value' => $flag->isGlobal(),
       '#description' => t('If checked, flag is considered "global" and each entity is either flagged or not. If unchecked, each user has individual flags on entities.'),
       '#weight' => -1,
-    );
+    ];
 
-    $form['messages'] = array(
+    $form['messages'] = [
       '#type' => 'fieldset',
       '#title' => t('Messages'),
-    );
+    ];
 
-    $form['messages']['flag_short'] = array(
+    $form['messages']['flag_short'] = [
       '#type' => 'textfield',
       '#title' => t('Flag link text'),
       '#default_value' => !empty($flag->flag_short) ? $flag->flag_short : t('Flag this item'),
       '#description' => t('The text for the "flag this" link for this flag.'),
       '#required' => TRUE,
-    );
+    ];
 
-    $form['messages']['flag_long'] = array(
+    $form['messages']['flag_long'] = [
       '#type' => 'textfield',
       '#title' => t('Flag link description'),
       '#default_value' => $flag->flag_long,
       '#description' => t('The description of the "flag this" link. Usually displayed on mouseover.'),
-    );
+    ];
 
-    $form['messages']['flag_message'] = array(
+    $form['messages']['flag_message'] = [
       '#type' => 'textfield',
       '#title' => t('Flagged message'),
       '#default_value' => $flag->flag_message,
       '#description' => t('Message displayed after flagging content. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
-    );
+    ];
 
-    $form['messages']['unflag_short'] = array(
+    $form['messages']['unflag_short'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag link text'),
       '#default_value' => !empty($flag->unflag_short) ? $flag->unflag_short : t('Unflag this item'),
       '#description' => t('The text for the "unflag this" link for this flag.'),
       '#required' => TRUE,
-    );
+    ];
 
-    $form['messages']['unflag_long'] = array(
+    $form['messages']['unflag_long'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag link description'),
       '#default_value' => $flag->unflag_long,
       '#description' => t('The description of the "unflag this" link. Usually displayed on mouseover.'),
-    );
+    ];
 
-    $form['messages']['unflag_message'] = array(
+    $form['messages']['unflag_message'] = [
       '#type' => 'textfield',
       '#title' => t('Unflagged message'),
       '#default_value' => $flag->unflag_message,
       '#description' => t('Message displayed after content has been unflagged. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
-    );
+    ];
 
-    $form['access'] = array(
+    $form['access'] = [
       '#type' => 'fieldset',
       '#title' => t('Flag access'),
       '#tree' => FALSE,
       '#weight' => 10,
-    );
+    ];
 
     // Switch plugin type in case a different is chosen.
 
@@ -138,7 +138,7 @@ abstract class FlagFormBase extends EntityForm {
     }
 
     // Flag classes will want to override this form element.
-    $form['access']['types'] = array(
+    $form['access']['types'] = [
       '#type' => 'checkboxes',
       '#title' => t('Flaggable types'),
       '#options' => $entity_bundles,
@@ -146,17 +146,17 @@ abstract class FlagFormBase extends EntityForm {
       '#description' => t('Check any sub-types that this flag may be used on.'),
       '#required' => TRUE,
       '#weight' => 10,
-    );
+    ];
 
-    $form['access']['unflag_denied_text'] = array(
+    $form['access']['unflag_denied_text'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag not allowed text'),
       '#default_value' => $flag->unflag_denied_text,
       '#description' => t('If a user is allowed to flag but not unflag, this text will be displayed after flagging. Often this is the past-tense of the link text, such as "flagged".'),
       '#weight' => -1,
-    );
+    ];
 
-    $form['display'] = array(
+    $form['display'] = [
       '#type' => 'fieldset',
       '#title' => t('Display options'),
       '#description' => t('Flags are usually controlled through links that allow users to toggle their behavior. You can choose how users interact with flags by changing options here. It is legitimate to have none of the following checkboxes ticked, if, for some reason, you wish <a href="@placement-url">to place the the links on the page yourself</a>.', array('@placement-url' => 'http://drupal.org/node/295383')),
@@ -164,18 +164,18 @@ abstract class FlagFormBase extends EntityForm {
       '#weight' => 20,
       // @todo: Move flag_link_type_options_states() into controller?
       // '#after_build' => array('flag_link_type_options_states'),
-    );
+    ];
 
-    $form['display']['settings'] = array(
+    $form['display']['settings'] = [
       '#type' => 'container',
       '#prefix' => '<div id="link-type-settings-wrapper">',
       '#suffix' => '</div>',
       '#weight' => 21,
-    );
+    ];
 
     $form = $flag_type_plugin->buildConfigurationForm($form, $form_state);
 
-    $form['display']['link_type'] = array(
+    $form['display']['link_type'] = [
       '#type' => 'radios',
       '#title' => t('Link type'),
       '#options' => \Drupal::service('plugin.manager.flag.linktype')->getAllLinkTypes(),
@@ -184,38 +184,38 @@ abstract class FlagFormBase extends EntityForm {
       // Give this a high weight so additions by the flag classes for entity-
       // specific options go above.
       '#weight' => 18,
-      '#attached' => array(
-        'js' => array(drupal_get_path('module', 'flag') . '/theme/flag-admin.js'),
-      ),
-      '#attributes' => array(
-        'class' => array('flag-link-options'),
-      ),
-      '#limit_validation_errors' => array(array('link_type')),
-      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#attached' => [
+        'js' => [drupal_get_path('module', 'flag') . '/theme/flag-admin.js'],
+      ],
+      '#attributes' => [
+        'class' => ['flag-link-options'],
+      ],
+      '#limit_validation_errors' => [['link_type']],
+      '#submit' => [[$this, 'submitSelectPlugin']],
       '#required' => TRUE,
       '#executes_submit_callback' => TRUE,
-      '#ajax' => array(
-        'callback' => array($this, 'updateSelectedPluginType'),
+      '#ajax' => [
+        'callback' => [$this, 'updateSelectedPluginType'],
         'wrapper' => 'link-type-settings-wrapper',
         'event' => 'change',
         'method' => 'replace',
-      ),
-    );
-    $form['display']['link_type_submit'] = array(
+      ],
+    ];
+    $form['display']['link_type_submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Update'),
-      '#submit' => array(array($this, 'submitSelectPlugin')),
+      '#submit' => [[$this, 'submitSelectPlugin']],
       '#weight' => 20,
-      '#attributes' => array('class' => array('js-hide')),
-    );
+      '#attributes' => ['class' => ['js-hide']],
+    ];
     // Add the descriptions to each ratio button element. These attach to the
     // elements when FormAPI expands them.
     $action_link_plugin_defs = \Drupal::service('plugin.manager.flag.linktype')->getDefinitions();
     foreach ($action_link_plugin_defs as $key => $info) {
       $form['display']['link_type'][$key]['#description'] = $info['description'];
-      $form['display']['link_type'][$key]['#submit'] = array(array($this, 'submitSelectPlugin'));
+      $form['display']['link_type'][$key]['#submit'] = [[$this, 'submitSelectPlugin']];
       $form['display']['link_type'][$key]['#executes_submit_callback'] = TRUE;
-      $form['display']['link_type'][$key]['#limit_validation_errors'] = array(array('link_type'));
+      $form['display']['link_type'][$key]['#limit_validation_errors'] = [['link_type']];
     }
 
     $action_link_plugin = $flag->getLinkTypePlugin();
@@ -238,8 +238,8 @@ abstract class FlagFormBase extends EntityForm {
     $this->entity = $this->buildEntity($form, $form_state);
 
     $form_state['rebuild'] = TRUE;
-    // @todo: This is necessary because there are two different instances of the
-    //   form object. Core should handle this.
+    // This is necessary because there are two different instances of the form
+    // object. Core should handle this.
     $form_state['build_info']['callback_object'] = $form_state['controller'];
   }
 
@@ -252,7 +252,7 @@ abstract class FlagFormBase extends EntityForm {
     $form_state['values']['label'] = trim($form_state['values']['label']);
     $form_values = $form_state['values'];
 
-    //@todo Move this to the validation method for the confirm form plugin
+    // @todo Move this to the validation method for the confirm form plugin
     /*
     if ($form_values['link_type'] == 'confirm') {
       if (empty($form_values['flag_confirmation'])) {
@@ -282,12 +282,12 @@ abstract class FlagFormBase extends EntityForm {
     $status = $flag->save();
     $url = $flag->url();
     if ($status == SAVED_UPDATED) {
-      drupal_set_message(t('Flag %label has been updated.', array('%label' => $flag->label())));
-      watchdog('flag', 'Flag %label has been updated.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
+      drupal_set_message(t('Flag %label has been updated.', ['%label' => $flag->label()]));
+      watchdog('flag', 'Flag %label has been updated.', ['%label' => $flag->label()], WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
     }
     else {
-      drupal_set_message(t('Flag %label has been added.', array('%label' => $flag->label())));
-      watchdog('flag', 'Flag %label has been added.', array('%label' => $flag->label()), WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
+      drupal_set_message(t('Flag %label has been added.', ['%label' => $flag->label()]));
+      watchdog('flag', 'Flag %label has been added.', ['%label' => $flag->label()], WATCHDOG_NOTICE, l(t('Edit'), $url . '/edit'));
     }
 
     // We clear caches more vigorously if the flag was new.
@@ -296,13 +296,13 @@ abstract class FlagFormBase extends EntityForm {
     // Save permissions.
     // This needs to be done after the flag cache has been cleared, so that
     // the new permissions are picked up by hook_permission().
-    // This may need to move to the flag class when we implement extra permissions
-    // for different flag types: http://drupal.org/node/879988
+    // This may need to move to the flag class when we implement extra
+    // permissions for different flag types: http://drupal.org/node/879988
 
-    // If the flag machine name as changed, clean up all the obsolete permissions.
+    // If the flag ID has changed, clean up all the obsolete permissions.
     if ($flag->id != $form['#flag_name']) {
       $old_name = $form['#flag_name'];
-      $permissions = array("flag $old_name", "unflag $old_name");
+      $permissions = ["flag $old_name", "unflag $old_name"];
       foreach (array_keys(user_roles()) as $rid) {
         user_role_revoke_permissions($rid, $permissions);
       }

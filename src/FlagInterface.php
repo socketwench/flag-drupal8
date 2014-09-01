@@ -65,7 +65,7 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
    * user being able to flag or unflag the entity, a global flag may be flagged
    * once for all users.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the flag is global, FALSE otherwise.
    */
   public function isGlobal();
@@ -74,7 +74,7 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
    * Sets the flag as global or not.
    *
    * @param bool $is_global
-   *  TRUE to mark the flag as global, FALSE for the default behavior.
+   *   TRUE to mark the flag as global, FALSE for the default behavior.
    *
    * @see \Drupal\flag\Entity\Flag::isGlobal()
    */

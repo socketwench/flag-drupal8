@@ -23,13 +23,13 @@ class EntityFlagType extends DeriverBase {
    *
    * @var array
    */
-  protected $ignoredEntities = array(
+  protected $ignoredEntities = [
     'flag_flag',
     'flagging',
     'node',
     'user',
     'comment',
-  );
+  ];
 
   /**
    * {@inheritdoc}
@@ -40,10 +40,10 @@ class EntityFlagType extends DeriverBase {
       if (in_array($entity_id, $this->ignoredEntities)) {
         continue;
       }
-      $derivatives[$entity_id] = array(
+      $derivatives[$entity_id] = [
         'title' => $entity_type->getLabel(),
         'entity_type' => $entity_id,
-      ) + $base_plugin_def;
+      ] + $base_plugin_def;
     }
 
     return $derivatives;
