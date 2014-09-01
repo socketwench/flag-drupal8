@@ -23,7 +23,7 @@ use Drupal\flag\FlagInterface;
  *   id = "flag",
  *   label = @Translation("Flag"),
  *   admin_permission = "administer flags",
- *   controllers = {
+ *   handlers = {
  *     "list_builder" = "Drupal\flag\Controller\FlagListController",
  *     "form" = {
  *       "add" = "Drupal\flag\Form\FlagAddForm",
