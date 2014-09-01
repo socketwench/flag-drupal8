@@ -33,14 +33,14 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    *   The flag type's default plugin configuration.
    */
   public function defaultConfiguration() {
-    return array();
+    return [];
   }
 
   /**
-   * {@inhereitdoc}
+   * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array();
+    return [];
   }
 
   /**
@@ -73,6 +73,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
    *   The form array.
    * @param FormStateInterface $form_state
    *   The form state.
+   *
    * @return array
    *   The form array
    * @see \Drupal\flag\Form\FlagAddForm
@@ -108,17 +109,9 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
   }
 
   /**
-   * Implements access_multiple() implemented by each child class.
-   *
-   * @abstract
-   *
-   * @return array
-   *   An array keyed by entity ids, whose values represent the access to the
-   *   corresponding entity. The access value may be FALSE if access should be
-   *   denied, or NULL (or not set) if there is no restriction to  be made. It
-   *   should NOT be TRUE.
+   * {@inheritdoc}
    */
   public function typeAccessMultiple($entity_ids, $account) {
-    return array();
+    return [];
   }
 }

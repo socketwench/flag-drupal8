@@ -26,9 +26,9 @@ class FlagDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete the Flag %label?', array(
+    return t('Are you sure you want to delete the Flag %label?', [
       '%label' => $this->entity->label(),
-    ));
+    ]);
   }
 
   /**
@@ -50,9 +50,9 @@ class FlagDeleteForm extends EntityConfirmFormBase {
    */
   public function submit(array $form, FormStateInterface $form_state) {
     $this->entity->delete();
-    drupal_set_message(t('Flag %label was deleted.', array(
+    drupal_set_message(t('Flag %label was deleted.', [
      '%label' => $this->entity->label(),
-    )));
+    ]));
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }

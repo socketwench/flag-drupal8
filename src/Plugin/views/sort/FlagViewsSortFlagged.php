@@ -22,10 +22,10 @@ class FlagViewsSortFlagged extends SortPluginBase {
    * Should be overridden by classes that don't override sort_form.
    */
   protected function sortOptions() {
-    return array(
+    return [
       'ASC' => t('Unflagged first'),
       'DESC' => t('Flagged first'),
-    );
+    ];
   }
 
   /**

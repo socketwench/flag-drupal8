@@ -9,47 +9,47 @@
  * Implements hook_schema().
  */
 function flag_schema() {
-  $schema = array();
+  $schema = [];
 
-  $schema['flag_counts'] = array(
+  $schema['flag_counts'] = [
     'description' => 'The number of times an item has been flagged.',
-    'fields' => array(
-      'fid' => array(
+    'fields' => [
+      'fid' => [
         'type' => 'varchar',
         'length' => '32',
-      ),
-      'entity_type' => array(
+      ],
+      'entity_type' => [
         'description' => 'The flag type, usually one of "node", "comment", "user".',
         'type' => 'varchar',
         'length' => '128',
-      ),
-      'entity_id' => array(
+      ],
+      'entity_id' => [
         'description' => 'The unique ID of the content, usually either the {cid}, {uid}, or {nid}.',
         'type' => 'int',
         'unsigned' => TRUE,
         'disp-width' => '10',
-      ),
-      'count' => array(
+      ],
+      'count' => [
         'description' => 'The number of times this object has been flagged for this flag.',
         'type' => 'int',
         'unsigned' => TRUE,
         'disp-width' => '10',
-      ),
-      'last_updated' => array(
+      ],
+      'last_updated' => [
         'description' => 'The UNIX time stamp representing when the flag was last updated.',
         'type' => 'int',
         'unsigned' => TRUE,
         'disp-size' => 11,
-      )
-    ),
-    'primary key' => array('fid', 'entity_id'),
-    'indexes' => array(
-      'fid_entity_type' => array('fid', 'entity_type'),
-      'entity_type_entity_id' => array('entity_type', 'entity_id'),
-      'fid_count' => array('fid', 'count'),
-      'fid_last_updated' => array('fid', 'last_updated'),
-    ),
-  );
+      ],
+    ],
+    'primary key' => ['fid', 'entity_id'],
+    'indexes' => [
+      'fid_entity_type' => ['fid', 'entity_type'],
+      'entity_type_entity_id' => ['entity_type', 'entity_id'],
+      'fid_count' => ['fid', 'count'],
+      'fid_last_updated' => ['fid', 'last_updated'],
+    ],
+  ];
 
   return $schema;
 }

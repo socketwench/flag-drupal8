@@ -6,109 +6,106 @@
 
 /**
  * Implements hook_views_data().
- *
- * @return array
- *   The views provided by the flag module.
  */
 function flag_views_data() {
-  $data = array();
+  $data = [];
   $data['flagging']['table']['group'] = t('Flag');
   $data['flag_counts']['table']['group'] = t('Flaggings');
 
-  $data['flagging']['table']['join'] = array(
-    'node' => array(
+  $data['flagging']['table']['join'] = [
+    'node' => [
       'type' => 'LEFT',
       'left_field' => 'nid',
       'field' => 'entity_id',
-    ),
-  );
+    ],
+  ];
 
-  $data['flagging']['uid'] = array(
+  $data['flagging']['uid'] = [
     'title' => t('User uid'),
     'help' => t('The user that flagged an item. If you need more fields than the uid add the "Flags: User" relationship.'),
-    'relationship' => array(
+    'relationship' => [
       'base' => 'users',
       'title' => t('User'),
       'help' => t('Relate an item to the user that flagged it.'),
       'id' => 'standard',
       'label' => t('Flag user'),
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'field' => array(
+    ],
+    'field' => [
       'id' => 'user',
-    ),
-  );
+    ],
+  ];
 
-  $data['flagging']['created'] = array(
+  $data['flagging']['created'] = [
     'title' => t('Last Flagged Time'),
     'help' => t('Display latest time the content was flagged by a user.'),
-    'field' => array(
+    'field' => [
       'id' => 'date',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'date',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'date',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'date',
-    ),
-  );
+    ],
+  ];
 
-  $data['flagging']['entity_id'] = array(
+  $data['flagging']['entity_id'] = [
     'title' => t('Flaggable ID'),
     'help' => t('The unique ID of the object that has been flagged.'),
-    'sort' => array(
+    'sort' => [
       'id' => 'standard',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'FlagViewsFlaggableArgument',
-    ),
-  );
+    ],
+  ];
 
   // Flag content links.
-  $data['flagging']['link_flag'] = array(
-    'field' => array(
+  $data['flagging']['link_flag'] = [
+    'field' => [
       'title' => t('Flag Links'),
       'help' => t('Display flag/unflag link.'),
       'id' => 'flag_link',
-    ),
-  );
+    ],
+  ];
 
   // Specialized is null/is not null filter.
-  $data['flagging']['flagged'] = array(
+  $data['flagging']['flagged'] = [
     'title' => t('Flagged'),
     'real field' => 'uid',
-    'field' => array(
+    'field' => [
       'id' => 'flag_flagged',
       'label' => t('Flagged'),
       'help' => t('A boolean field to show whether the flag is set or not.'),
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'flag_filter',
       'label' => t('Flagged'),
       'help' => t('Filter to ensure content has or has not been flagged.'),
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'flag_sort',
       'label' => t('Flagged'),
       'help' => t('Sort by whether entities have or have not been flagged.'),
-    ),
-  );
+    ],
+  ];
 
-  $data['flag_counts']['count'] = array(
+  $data['flag_counts']['count'] = [
     'title' => t('Flag counter'),
     'help' => t('The number of times a piece of content is flagged by any user.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
       // 'click sortable' => TRUE,
-    ),
+    ],
     /*'sort' => array(
       'id' => 'groupby_numeric',
     ),
@@ -118,15 +115,15 @@ function flag_views_data() {
     'argument' => array(
       'id' => 'numeric',
     ),*/
-  );
+  ];
 
-  $data['flag_counts']['last_updated'] = array(
+  $data['flag_counts']['last_updated'] = [
     'title' => t('Time last flagged'),
     'help' => t('The time a piece of content was most recently flagged by any user.'),
-    'field' => array(
+    'field' => [
       'id' => 'date',
       // 'click sortable' => TRUE,
-    ),
+    ],
     /*'sort' => array(
       'id' => 'date',
     ),
@@ -136,16 +133,13 @@ function flag_views_data() {
     'argument' => array(
       'id' => 'date',
     ),*/
-  );
+  ];
 
   return $data;
 }
 
 /**
  * Implements hook_views_data_alter().
- *
- * @param array $data
- *   The views data to alter.
  */
 function flag_views_data_alter(array &$data) {
   $flags = \Drupal::service('flag')->getFlags();
@@ -162,10 +156,10 @@ function flag_views_data_alter(array &$data) {
       $base_table = $info->getDataTable();
     }
 
-    $data[$base_table]['flag_content_rel'] = array(
-      'title' => t('@entity_label flag', array('@entity_label' => $entity_type)),
+    $data[$base_table]['flag_content_rel'] = [
+      'title' => t('@entity_label flag', ['@entity_label' => $entity_type]),
       'help' => t('Limit results to only those entity flagged by a certain flag; Or display information about the flag set on a entity.'),
-      'relationship' => array(
+      'relationship' => [
         'group' => t('Flag'),
         'label' => t('Flags'),
         'base' => 'flagging',
@@ -173,8 +167,8 @@ function flag_views_data_alter(array &$data) {
         'relationship field' => $info->getKey('id'),
         'id' => 'flag_relationship',
         'flaggable' => $entity_type,
-      ),
-    );
+      ],
+    ];
 
   }
 }

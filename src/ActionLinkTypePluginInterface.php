@@ -42,8 +42,9 @@ interface ActionLinkTypePluginInterface extends PluginFormInterface, Configurabl
    *   The flag entity.
    * @param EntityInterface $entity
    *   The entity for which to create a flag link.
+   *
    * @return array
-   *  A render array of the flag link.
+   *   A render array of the flag link.
    */
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity);
 }

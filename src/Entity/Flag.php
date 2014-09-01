@@ -94,7 +94,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    *
    * @var array
    */
-  public $types = array();
+  public $types = [];
 
   /**
    * The text for the "flag this" link for this flag.
@@ -163,7 +163,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * An array to store and load the FlagType plugin configuration.
    * @var array
    */
-  protected $flagTypeConfig = array();
+  protected $flagTypeConfig = [];
 
   /**
    * The ID of the ActionLink plugin.
@@ -185,7 +185,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    *
    * @var array
    */
-  protected $linkTypeConfig = array();
+  protected $linkTypeConfig = [];
 
   /**
    * The weight of the flag.
@@ -195,7 +195,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public $weight = 0;
 
   /**
-   * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct();
+   * Overrides \Drupal\Core\Config\Entity\ConfigEntityBase::__construct().
    */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
@@ -251,16 +251,17 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function getPluginBags() {
-    return array(
+    return [
       'flagTypeConfig' => $this->flagTypeBag,
       'linkTypeConfig' => $this->linkTypeBag,
-    );
+    ];
   }
 
   /**
    * Get the flag type plugin for this flag.
    *
-   * @return FlagTypePluginInterface
+   * @return \Drupal\flag\FlagTypePluginInterface
+   *   The flag type plugin for this flag.
    */
   public function getFlagTypePlugin() {
     return $this->flagTypeBag->get($this->flag_type);
@@ -269,12 +270,12 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * Set the flag type plugin.
    *
-   * @param string $pluginID
+   * @param string $plugin_id
    *   A string containing the flag type plugin ID.
    */
-  public function setFlagTypePlugin($pluginID) {
-    $this->flag_type = $pluginID;
-    //$this->flagTypeBag->addInstanceId($pluginID);
+  public function setFlagTypePlugin($plugin_id) {
+    $this->flag_type = $plugin_id;
+    // $this->flagTypeBag->addInstanceId($pluginID);
 
     // Workaround for https://www.drupal.org/node/2288805
     $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
@@ -282,14 +283,15 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
     // Get the entity type from the plugin definition.
     $plugin = $this->getFlagTypePlugin();
-    $pluginDef = $plugin->getPluginDefinition();
-    $this->entity_type = $pluginDef['entity_type'];
+    $plugin_def = $plugin->getPluginDefinition();
+    $this->entity_type = $plugin_def['entity_type'];
   }
 
   /**
    * Get the link type plugin for this flag.
    *
-   * @return LinkTypePluginInterface
+   * @return \Drupal\flag\ActionLinkTypePluginInterface
+   *   The link type plugin for the flag.
    */
   public function getLinkTypePlugin() {
     return $this->linkTypeBag->get($this->link_type);
@@ -298,13 +300,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * Set the link type plugin.
    *
-   * @param string $pluginID
+   * @param string $plugin_id
    *   A string containing the link type plugin ID.
    */
-  public function setlinkTypePlugin($pluginID) {
-    $this->link_type = $pluginID;
+  public function setlinkTypePlugin($plugin_id) {
+    $this->link_type = $plugin_id;
 
-    //$this->linkTypeBag->addInstanceId($pluginID);
+    // $this->linkTypeBag->addInstanceId($pluginID);
 
     // Workaround for https://www.drupal.org/node/2288805
     $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
@@ -315,22 +317,22 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function getPermissions() {
-    return array(
-      "flag $this->id" => array(
-        'title' => t('Flag %flag_title', array(
+    return [
+      "flag $this->id" => [
+        'title' => t('Flag %flag_title', [
           '%flag_title' => $this->label,
-        )),
-      ),
-      "unflag $this->id" => array(
-        'title' => t('Unflag %flag_title', array(
+        ]),
+      ],
+      "unflag $this->id" => [
+        'title' => t('Unflag %flag_title', [
           '%flag_title' => $this->label,
-        )),
-      ),
-    );
+        ]),
+      ],
+    ];
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function hasActionAccess($action, AccountInterface $account = NULL) {
     if ($action === 'flag' || $action === 'unflag') {
@@ -366,6 +368,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * Returns the flaggable entity type ID.
    *
    * @return string
+   *   The flaggable entity ID.
    */
   public function getFlaggableEntityType() {
     return $this->entity_type;
@@ -386,6 +389,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->set('linkTypeConfig', $linkTypePlugin->getConfiguration());
     */
     // Reset the render cache for the entity.
+    // @todo Inject the entity manager into the object?
     \Drupal::entityManager()
       ->getViewBuilder($this->getFlaggableEntityType())
       ->resetCache();
@@ -410,14 +414,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function toArray() {
-    //@todo Do we need Flag::toArray() any longer?
+    // @todo Do we need Flag::toArray() any longer?
     $properties = parent::toArray();
-    $names = array(
+    $names = [
       'flag_type',
       'link_type',
       'flagTypeConfig',
       'linkTypeConfig',
-    );
+    ];
 
     foreach ($names as $name) {
       $properties[$name] = $this->get($name);

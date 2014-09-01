@@ -44,19 +44,19 @@ class EntityFlagType extends FlagTypeBase {
    */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
-    $options += array(
+    $options += [
       // Output the flag in the entity links.
       // This is empty for now and will get overriden for different
       // entities.
       // @see hook_entity_view().
-      'show_in_links' => array(),
+      'show_in_links' => [],
       // Output the flag as individual pseudofields.
       'show_as_field' => FALSE,
       // Add a checkbox for the flag in the entity form.
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
       'show_contextual_link' => FALSE,
-    );
+    ];
     return $options;
   }
 
@@ -68,40 +68,40 @@ class EntityFlagType extends FlagTypeBase {
     /* Options form extras for the generic entity flag. */
 
     // Add checkboxes to show flag link on each entity view mode.
-    $options = array();
-    $defaults = array();
+    $options = [];
+    $defaults = [];
     $view_modes = \Drupal::entityManager()->getViewModes($this->entity_type);
     foreach ($view_modes as $name => $view_mode) {
-      $options[$name] = t('Display on @name view mode', array('@name' => $view_mode['label']));
+      $options[$name] = t('Display on @name view mode', ['@name' => $view_mode['label']]);
       $defaults[$name] = $this->showInLinks($name);
     }
 
-    $form['display']['show_in_links'] = array(
+    $form['display']['show_in_links'] = [
       '#type' => 'checkboxes',
       '#title' => t('Display in entity links'),
       '#description' => t('Show the flag link with the other links on the entity.'),
       '#options' => $options,
       '#default_value' => $defaults,
-    );
+    ];
 
-    $form['display']['show_as_field'] = array(
+    $form['display']['show_as_field'] = [
       '#type' => 'checkbox',
       '#title' => t('Display link as field'),
       '#description' => t('Show the flag link as a pseudofield, which can be ordered among other entity elements in the "Manage display" settings for the entity type.'),
       '#default_value' => $this->showAsField(),
-    );
+    ];
     /*
     if (empty($entity_info['fieldable'])) {
       $form['display']['show_as_field']['#disabled'] = TRUE;
       $form['display']['show_as_field']['#description'] = t("This entity type is not fieldable.");
     }
     */
-    $form['display']['show_on_form'] = array(
+    $form['display']['show_on_form'] = [
       '#type' => 'checkbox',
       '#title' => t('Display checkbox on entity edit form'),
       '#default_value' => $this->showOnForm(),
       '#weight' => 5,
-    );
+    ];
 
     // We use FieldAPI to put the flag checkbox on the entity form, so therefore
     // require the entity to be fielable. Since this is a potential DX
@@ -113,14 +113,14 @@ class EntityFlagType extends FlagTypeBase {
       $form['display']['show_on_form']['#description'] = t('This is only possible on entities which are fieldable.');
     }
     */
-    $form['display']['show_contextual_link'] = array(
+    $form['display']['show_contextual_link'] = [
       '#type' => 'checkbox',
       '#title' => t('Display in contextual links'),
       '#default_value' => $this->showContextualLink(),
       '#description' => t('Note that not all entity types support contextual links.'),
       '#access' => \Drupal::moduleHandler()->moduleExists('contextual'),
       '#weight' => 10,
-    );
+    ];
 
     return $form;
   }

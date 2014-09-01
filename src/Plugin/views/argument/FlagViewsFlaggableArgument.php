@@ -9,6 +9,8 @@ namespace Drupal\flag\Plugin\views\argument;
 
 use Drupal\views\Plugin\views\argument\Numeric;
 use Drupal\Component\Utility\String;
+use Drupal\Core\Database\Connection;
+use Drupal\flag\FlagInterface;
 
 /**
  * Provides an argument handler to get the title of flaggble content.
@@ -48,13 +50,15 @@ class FlagViewsFlaggableArgument extends Numeric {
     if (isset($this->view->relationship[$this->options['relationship']])) {
       return $this->view->relationship[$this->options['relationship']]->getFlag();
     }
+
+    return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function titleQuery() {
-    $titles = array();
+    $titles = [];
 
     $flag = $this->getFlag();
     $entity_type = $flag->getFlaggableEntityType();
@@ -68,7 +72,7 @@ class FlagViewsFlaggableArgument extends Numeric {
       ->execute();
 
     foreach ($result as $title) {
-      $titles[] = String::check_plain($title->$entity_keys['label']);
+      $titles[] = String::checkPlain($title->$entity_keys['label']);
     }
 
     return $titles;

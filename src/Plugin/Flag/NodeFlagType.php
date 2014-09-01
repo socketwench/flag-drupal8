@@ -29,10 +29,10 @@ class NodeFlagType extends EntityFlagType {
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
     // Use own display settings in the meanwhile.
-    $options += array(
+    $options += [
       'i18n' => 0,
       'access_author' => '',
-    );
+    ];
     return $options;
   }
 
@@ -44,31 +44,31 @@ class NodeFlagType extends EntityFlagType {
 
     /* Options form extras for node flags. */
 
-    $form['access']['access_author'] = array(
+    $form['access']['access_author'] = [
       '#type' => 'radios',
       '#title' => t('Flag access by content authorship'),
-      '#options' => array(
+      '#options' => [
         '' => t('No additional restrictions'),
         'own' => t('Users may only flag content they own'),
         'others' => t('Users may only flag content of others'),
-      ),
+      ],
       '#default_value' => $this->getAccessAuthorSetting(),
       '#description' => t("Restrict access to this flag based on the user's ownership of the content. Users must also have access to the flag through the role settings."),
-    );
+    ];
 
     // Support for i18n flagging requires Translation helpers module.
-    $form['i18n'] = array(
+    $form['i18n'] = [
       '#type' => 'radios',
       '#title' => t('Internationalization'),
-      '#options' => array(
+      '#options' => [
         '1' => t('Flag translations of content as a group'),
         '0' => t('Flag each translation of content separately'),
-      ),
+      ],
       '#default_value' => $this->getInternationalizationSetting(),
       '#description' => t('Flagging translations as a group effectively allows users to flag the original piece of content regardless of the translation they are viewing. Changing this setting will <strong>not</strong> update content that has been flagged already.'),
       '#access' => \Drupal::moduleHandler()->moduleExists('translation_helpers'),
       '#weight' => 5,
-    );
+    ];
 
     return $form;
   }
@@ -86,7 +86,7 @@ class NodeFlagType extends EntityFlagType {
    * {@inheritdoc}
    */
   public function typeAccessMultiple($entity_ids, $account) {
-    $access = array();
+    $access = [];
 
     // If all subtypes are allowed, we have nothing to say here.
     if (empty($this->types)) {
@@ -95,7 +95,7 @@ class NodeFlagType extends EntityFlagType {
 
     // Ensure that only flaggable node types are granted access. This avoids a
     // node_load() on every type, usually done by applies_to_entity_id().
-    $result = db_select('node', 'n')->fields('n', array('nid'))
+    $result = db_select('node', 'n')->fields('n', ['nid'])
       ->condition('nid', array_keys($entity_ids), 'IN')
       ->condition('type', $this->types, 'NOT IN')
       ->execute();

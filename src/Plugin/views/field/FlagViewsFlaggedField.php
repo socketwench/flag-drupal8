@@ -24,6 +24,7 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class FlagViewsFlaggedField extends Boolean {
 
+  // @todo: Define the FlagViewsFlaggedField::formats variable?
   /**
    * {@inheritdoc}
    */
@@ -31,7 +32,7 @@ class FlagViewsFlaggedField extends Boolean {
     parent::init($view, $display, $options);
 
     // Add our boolean labels.
-    $this->formats['flag'] = array(t('Flagged'), t('Not flagged'));
+    $this->formats['flag'] = [t('Flagged'), t('Not flagged')];
     // TODO: We could probably lift the '(Un)Flagged message' strings from the
     // flag object, but a) we need to lift that from the relationship we're on
     // and b) they will not necessarily make sense in a static context.
@@ -42,7 +43,7 @@ class FlagViewsFlaggedField extends Boolean {
    */
   protected function defineOptions() {
     $options = parent::defineOptions();
-    $options['relationship'] = array('default' => 'flag_content_rel');
+    $options['relationship'] = ['default' => 'flag_content_rel'];
 
     return $options;
   }

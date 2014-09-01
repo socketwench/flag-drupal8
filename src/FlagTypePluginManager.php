@@ -10,6 +10,10 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
+/**
+ * Class FlagTypePluginManager
+ * @package Drupal\flag
+ */
 class FlagTypePluginManager extends DefaultPluginManager {
 
   /**
@@ -37,7 +41,7 @@ class FlagTypePluginManager extends DefaultPluginManager {
    *   Returns all flag types.
    */
   public function getAllFlagTypes() {
-    $flag_types = array();
+    $flag_types = [];
 
     foreach ($this->getDefinitions() as $plugin_id => $plugin_def) {
       $flag_types[$plugin_id] = $plugin_def['title'];

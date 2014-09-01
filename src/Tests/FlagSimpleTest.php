@@ -65,10 +65,10 @@ class FlagSimpleTest extends WebTestBase {
    */
   public function testFlagForm() {
     // Create and log in our user.
-    $this->adminUser = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser([
       'administer flags',
       'administer node display',
-    ));
+    ]);
 
     $this->drupalLogin($this->adminUser);
 
@@ -81,25 +81,25 @@ class FlagSimpleTest extends WebTestBase {
    */
   public function doTestFlagAdd() {
     // Create content type.
-    $this->drupalCreateContentType(array('type' => $this->nodeType));
+    $this->drupalCreateContentType(['type' => $this->nodeType]);
 
     // Test with minimal value requirement.
-    $edit = array(
+    $edit = [
       'label' => $this->label,
       'id' => $this->id,
-    );
+    ];
     $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
     // Check for fieldset titles.
     $this->assertText(t('Messages'));
     $this->assertText(t('Flag access'));
     $this->assertText(t('Display options'));
 
-    $edit = array(
+    $edit = [
       'types[' . $this->nodeType . ']' => $this->nodeType,
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, t('Create Flag'));
 
-    $this->assertText(t('Flag @this_label has been added.', array('@this_label' => $this->label)));
+    $this->assertText(t('Flag @this_label has been added.', ['@this_label' => $this->label]));
 
     // Continue test process.
     $this->doTestCreateNodeAndFlagIt();
@@ -109,7 +109,7 @@ class FlagSimpleTest extends WebTestBase {
    * Node creation and flagging.
    */
   public function doTestCreateNodeAndFlagIt() {
-    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node = $this->drupalCreateNode(['type' => $this->nodeType]);
     $node_id = $node->id();
 
     // Grant the flag permissions to the authenticated role, so that both
@@ -156,10 +156,10 @@ class FlagSimpleTest extends WebTestBase {
   public function doTestHideFlagLinkFromTeaser() {
     $this->drupalLogin($this->adminUser);
 
-    $node = $this->drupalCreateNode(array(
+    $node = $this->drupalCreateNode([
       'type' => $this->nodeType,
       'promote' => TRUE,
-    ));
+    ]);
     $node_id = $node->id();
     $node_title = $node->getTitle();
 
@@ -168,9 +168,9 @@ class FlagSimpleTest extends WebTestBase {
     $this->assertLink('Flag this item');
 
     // Set flag format to hidden for teaser display and post form.
-    $edit = array(
+    $edit = [
       'fields[flag_' . $this->id . '][type]' => 'hidden',
-    );
+    ];
 
     $this->drupalPostForm('admin/structure/types/manage/' . $this->nodeType . '/display/teaser', $edit, t('Save'));
 
@@ -189,7 +189,7 @@ class FlagSimpleTest extends WebTestBase {
    * Creates user, sets flags and deletes user.
    */
   public function doTestUserDeletion() {
-    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node = $this->drupalCreateNode(['type' => $this->nodeType]);
     $node_id = $node->id();
 
     // Create and login a new user.
@@ -228,7 +228,7 @@ class FlagSimpleTest extends WebTestBase {
    * Flags a node using different user accounts and checks flag counts.
    */
   public function doTestFlagCounts() {
-    $node = $this->drupalCreateNode(array('type' => $this->nodeType));
+    $node = $this->drupalCreateNode(['type' => $this->nodeType]);
     $node_id = $node->id();
 
     // Create and login user 1.

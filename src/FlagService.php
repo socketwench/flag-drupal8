@@ -139,7 +139,7 @@ class FlagService {
       return $flags;
     }
 
-    $filtered_flags = array();
+    $filtered_flags = [];
     foreach ($flags as $flag) {
       if ($flag->hasActionAccess('flag ' . $flag->id(), $account) || $flag->hasActionAccess('unflag ' . $flag->id(), $account)) {
         $filtered_flags[] = $flag;
@@ -175,7 +175,7 @@ class FlagService {
       ->condition('entity_id', $entity->id())
       ->execute();
 
-    $flaggings = array();
+    $flaggings = [];
     foreach ($result as $flagging_id) {
       $flaggings[$flagging_id] = entity_load('flagging', $flagging_id);
     }
@@ -230,13 +230,13 @@ class FlagService {
       $account = $this->currentUser;
     }
 
-    $flagging = entity_create('flagging', array(
+    $flagging = entity_create('flagging', [
       'type' => 'flag',
       'uid' => $account->id(),
       'fid' => $flag->id(),
       'entity_id' => $entity->id(),
       'entity_type' => $entity->getEntityTypeId(),
-    ));
+    ]);
 
     $flagging->save();
 
@@ -244,9 +244,9 @@ class FlagService {
 
     $this->entityMgr
       ->getViewBuilder($entity->getEntityTypeId())
-      ->resetCache(array(
+      ->resetCache([
         $entity,
-      ));
+      ]);
 
     $this->eventDispatcher->dispatch(FlagEvents::ENTITY_FLAGGED, new FlaggingEvent($flag, $entity, 'flag'));
 
@@ -324,7 +324,7 @@ class FlagService {
   public function unflagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     $this->eventDispatcher->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
 
-    $out = array();
+    $out = [];
     $flaggings = $this->getFlaggings($entity, $flag, $account);
     foreach ($flaggings as $flagging) {
       $out[] = $flagging->id();
@@ -349,22 +349,22 @@ class FlagService {
    * Increments count of flagged entities.
    *
    * @param FlagInterface $flag
-   *    The flag to increment.
+   *   The flag to increment.
    * @param EntityInterface $entity
-   *    The flaggable entity.
+   *   The flaggable entity.
    */
   protected function incrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
     db_merge('flag_counts')
-      ->key(array(
+      ->key([
         'fid' => $flag->id(),
         'entity_id' => $entity->id(),
         'entity_type' => $entity->getEntityTypeId(),
-      ))
-      ->fields(array(
+      ])
+      ->fields([
         'last_updated' => REQUEST_TIME,
         'count' => 1,
-      ))
-      ->expression('count', 'count + :inc', array(':inc' => 1))
+      ])
+      ->expression('count', 'count + :inc', [':inc' => 1])
       ->execute();
   }
 
@@ -372,13 +372,13 @@ class FlagService {
    * Reverts incrementation of count of flagged entities.
    *
    * @param FlagInterface $flag
-   *    The flag to decrement.
+   *   The flag to decrement.
    * @param EntityInterface $entity
    *   The flaggable entity.
    */
   protected function decrementFlagCounts(FlagInterface $flag, EntityInterface $entity) {
     $count_result = db_select('flag_counts')
-      ->fields(NULL, array('fid', 'entity_id', 'entity_type', 'count'))
+      ->fields(NULL, ['fid', 'entity_id', 'entity_type', 'count'])
       ->condition('fid', $flag->id())
       ->condition('entity_id', $entity->id())
       ->condition('entity_type', $entity->getEntityTypeId())

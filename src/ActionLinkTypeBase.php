@@ -49,7 +49,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    *   A string containing the action name.
    *
    * @return string
-   *  A string containing a route name.
+   *   A string containing a route name.
    */
   abstract public function routeName($action = NULL);
 
@@ -57,10 +57,10 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * {@inheritdoc}
    */
   public function buildLink($action, FlagInterface $flag, EntityInterface $entity) {
-    $parameters = array(
+    $parameters = [
       'flag_id' => $flag->id(),
       'entity_id' => $entity->id(),
-    );
+    ];
 
     return new Url($this->routeName($action), $parameters);
   }
@@ -95,7 +95,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array();
+    return [];
   }
 
   /**
@@ -107,6 +107,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    *   The form array.
    * @param FormStateInterface $form_state
    *   The form state.
+   *
    * @return array
    *   The modified form array.
    */
@@ -151,7 +152,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
    *   The plugin configuration array.
    */
   public function defaultConfiguration() {
-    return array();
+    return [];
   }
 
   /**

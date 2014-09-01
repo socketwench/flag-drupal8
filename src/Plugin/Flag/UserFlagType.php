@@ -28,10 +28,10 @@ class UserFlagType extends FlagTypeBase {
    */
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
-    $options += array(
+    $options += [
       'show_on_profile' => TRUE,
       'access_uid' => '',
-    );
+    ];
     return $options;
   }
 
@@ -43,26 +43,26 @@ class UserFlagType extends FlagTypeBase {
 
     /* Options form extras for user flags */
 
-    $form['access']['types'] = array(
+    $form['access']['types'] = [
       // A user flag doesn't support node types.
       // TODO: Maybe support roles instead of node types.
       '#type' => 'value',
       '#value' => array(0 => 0),
-    );
-    $form['access']['access_uid'] = array(
+    ];
+    $form['access']['access_uid'] = [
       '#type' => 'checkbox',
       '#title' => t('Users may flag themselves'),
       '#description' => t('Disabling this option may be useful when setting up a "friend" flag, when a user flagging themselves does not make sense.'),
       '#default_value' => $this->getAccessUidSetting() ? 0 : 1,
-    );
-    $form['display']['show_on_profile'] = array(
+    ];
+    $form['display']['show_on_profile'] = [
       '#type' => 'checkbox',
       '#title' => t('Display link on user profile page'),
       '#description' => t('Show the link formatted as a user profile element.'),
       '#default_value' => $this->showOnProfile(),
       // Put this above 'show on entity'.
       '#weight' => -1,
-    );
+    ];
 
     return $form;
   }
@@ -80,7 +80,7 @@ class UserFlagType extends FlagTypeBase {
    * {@inheritdoc}
    */
   public function typeAccessMultiple($entity_ids, $account) {
-    $access = array();
+    $access = [];
 
     // Exclude anonymous.
     if (array_key_exists(0, $entity_ids)) {
