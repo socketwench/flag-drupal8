@@ -17,6 +17,7 @@ use Drupal\flag\FlagInterface;
 
 /**
  * Provides the Flag configuration entity.
+ *
  * @package Drupal\flag\Entity
  *
  * @ConfigEntityType(
@@ -41,7 +42,6 @@ use Drupal\flag\FlagInterface;
  *     "delete-form" = "flag.delete"
  *   }
  * )
- *
  */
 class Flag extends ConfigEntityBase implements FlagInterface {
 
@@ -161,6 +161,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
   /**
    * An array to store and load the FlagType plugin configuration.
+   *
    * @var array
    */
   protected $flagTypeConfig = [];
@@ -276,7 +277,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   public function setFlagTypePlugin($plugin_id) {
     $this->flag_type = $plugin_id;
     // $this->flagTypeBag->addInstanceId($pluginID);
-
     // Workaround for https://www.drupal.org/node/2288805
     $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
       $this->flag_type, $this->flagTypeConfig);
@@ -307,7 +307,6 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->link_type = $plugin_id;
 
     // $this->linkTypeBag->addInstanceId($pluginID);
-
     // Workaround for https://www.drupal.org/node/2288805
     $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
       $this->link_type, $this->linkTypeConfig);

@@ -7,6 +7,7 @@
 namespace Drupal\flag\Plugin\Flag;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a flag type for comments.
@@ -70,7 +71,7 @@ class CommentFlagType extends EntityFlagType {
   /**
    * {@inheritdoc}
    */
-  public function typeAccessMultiple($entity_ids, $account) {
+  public function typeAccessMultiple(array $entity_ids, AccountInterface $account) {
     $access = [];
 
     // If all subtypes are allowed, we have nothing to say here.

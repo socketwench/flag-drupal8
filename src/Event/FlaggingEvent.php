@@ -37,7 +37,7 @@ class FlaggingEvent extends FlagEventBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be acted upon.
    * @param string $action
-   *   The action to perform. One of 'flag' or 'unflag'
+   *   The action to perform. One of 'flag' or 'unflag'.
    */
   public function __construct(FlagInterface $flag, EntityInterface $entity, $action) {
     parent::__construct($flag);

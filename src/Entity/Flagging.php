@@ -34,6 +34,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
 
   /**
    * Gets the flag ID for the parent flag.
+   *
    * @return string
    *   The flag ID.
    */
@@ -53,6 +54,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
 
   /**
    * Gets the entity type of the flaggable.
+   *
    * @return string
    *   A string containing the flaggable type ID.
    */
@@ -62,6 +64,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
 
   /**
    * Gets the entity ID of the flaggable.
+   *
    * @return string
    *   A string containing the flaggable ID.
    */

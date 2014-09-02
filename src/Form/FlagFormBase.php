@@ -249,24 +249,10 @@ abstract class FlagFormBase extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     parent::validate($form, $form_state);
 
-    $form_state['values']['label'] = trim($form_state['values']['label']);
-    $form_values = $form_state['values'];
-
     // @todo Move this to the validation method for the confirm form plugin
-    /*
-    if ($form_values['link_type'] == 'confirm') {
-      if (empty($form_values['flag_confirmation'])) {
-        $this->setFormError('flag_confirmation', $form_state, $this->t('A flag confirmation message is required when using the confirmation link type.'));
-      }
-      if (empty($form_values['unflag_confirmation'])) {
-        $this->setFormError('unflag_confirmation', $form_state, $this->t('An unflag confirmation message is required when using the confirmation link type.'));
-      }
-    }*/
-    /*
-        if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_values['id'])) {
-          form_set_error('label', t('The flag name may only contain lowercase letters, underscores, and numbers.'));
-        }
-    */
+    $flag = $this->entity;
+    $flag->getFlagTypePlugin()->validateConfigurationForm($form, $form_state);
+    $flag->getLinkTypePlugin()->validateConfigurationForm($form, $form_state);
   }
 
   /**

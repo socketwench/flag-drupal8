@@ -6,6 +6,7 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\FlagTypeBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -79,7 +80,7 @@ class UserFlagType extends FlagTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function typeAccessMultiple($entity_ids, $account) {
+  public function typeAccessMultiple(array $entity_ids, AccountInterface $account) {
     $access = [];
 
     // Exclude anonymous.

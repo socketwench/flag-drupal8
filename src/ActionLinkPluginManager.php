@@ -14,6 +14,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Plugin manager for link types.
+ *
  * @package Drupal\flag
  *
  * @see Drupal\flag\ActionLinkTypeBase

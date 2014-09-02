@@ -85,6 +85,26 @@ class ConfirmForm extends ActionLinkTypeBase {
   /**
    * {@inheritdoc}
    */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $form_values = $form_state['values'];
+
+    if ($form_values['link_type'] == 'confirm') {
+      if (empty($form_values['flag_confirmation'])) {
+        $form_state->setErrorByName('flag_confirmation', 'A flag confirmation message is required when using the confirmation link type.');
+      }
+      if (empty($form_values['unflag_confirmation'])) {
+        $form_state->setErrorByName('unflag_confirmation', 'An unflag confirmation message is required when using the confirmation link type.');
+      }
+    }
+
+    if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_values['id'])) {
+      $form_state->setErrorByName('label', 'The flag name may only contain lowercase letters, underscores, and numbers.');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['flag_confirmation'] = $form_state['values']['flag_confirmation'];
@@ -93,6 +113,7 @@ class ConfirmForm extends ActionLinkTypeBase {
 
   /**
    * Returns the flag confirm form question when flagging.
+   *
    * @return string
    *   A string containing the flag question to display.
    */
@@ -102,6 +123,7 @@ class ConfirmForm extends ActionLinkTypeBase {
 
   /**
    * Returns the flag confirm form question when unflagging.
+   *
    * @return string
    *   A string containing the unflag question to display.
    */

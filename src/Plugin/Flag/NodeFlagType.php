@@ -6,6 +6,7 @@
 
 namespace Drupal\flag\Plugin\Flag;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\Plugin\Flag\EntityFlagType;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -85,7 +86,7 @@ class NodeFlagType extends EntityFlagType {
   /**
    * {@inheritdoc}
    */
-  public function typeAccessMultiple($entity_ids, $account) {
+  public function typeAccessMultiple(array $entity_ids, AccountInterface $account) {
     $access = [];
 
     // If all subtypes are allowed, we have nothing to say here.
