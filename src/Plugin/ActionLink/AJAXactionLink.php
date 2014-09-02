@@ -19,7 +19,8 @@ use Drupal\flag\FlagInterface;
  * @ActionLinkType(
  *   id = "AJAX Link",
  *   label = @Translation("AJAX link"),
- *   description = "An AJAX JavaScript request will be made without reloading the page."
+ *   description = "An AJAX JavaScript request will be made without reloading
+ *     the page."
  * )
  */
 class AJAXactionLink extends ActionLinkTypeBase {

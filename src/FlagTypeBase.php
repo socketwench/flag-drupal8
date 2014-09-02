@@ -10,6 +10,7 @@ use Drupal\flag\FlagTypePluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a base class for flag type plugins.
@@ -111,7 +112,7 @@ abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function typeAccessMultiple($entity_ids, $account) {
+  public function typeAccessMultiple(array $entity_ids, AccountInterface $account) {
     return [];
   }
 }

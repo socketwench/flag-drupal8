@@ -11,7 +11,8 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class FlagTypePluginManager
+ * The plugin manager for flag type plugins.
+ *
  * @package Drupal\flag
  */
 class FlagTypePluginManager extends DefaultPluginManager {

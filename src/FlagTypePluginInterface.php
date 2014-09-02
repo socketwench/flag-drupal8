@@ -8,6 +8,7 @@ namespace Drupal\flag;
 
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides an interface for all flag type plugins.
@@ -23,7 +24,7 @@ interface FlagTypePluginInterface extends PluginFormInterface, ConfigurablePlugi
    *
    * @param array $entity_ids
    *   An array of entity IDs.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   An account to test for access.
    *
    * @return array
@@ -32,5 +33,5 @@ interface FlagTypePluginInterface extends PluginFormInterface, ConfigurablePlugi
    *   denied, or NULL (or not set) if there is no restriction to  be made. It
    *   should NOT be TRUE.
    */
-  public function typeAccessMultiple($entity_ids, $account);
+  public function typeAccessMultiple(array $entity_ids, AccountInterface $account);
 }
