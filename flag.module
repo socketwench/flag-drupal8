@@ -326,7 +326,7 @@ function flag_entity_extra_field_info() {
  */
 function flag_form_node_type_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   global $user;
-  $node_type = $form_state['controller']->getEntity();
+  $node_type = $form_state->getFormObject()->getEntity();
   $flags = \Drupal::service('flag')->getFlags('node', $node_type->id(), $user);
   foreach ($flags as $flag) {
     // @todo: Revisit when form functionality is implemented.
