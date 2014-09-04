@@ -586,46 +586,6 @@ function flag_entity_build_defaults_alter(array &$build, EntityInterface $entity
 }
 
 /**
- * Implements hook_node_insert().
- */
-function flag_node_insert($node) {
-  flag_node_save($node);
-}
-
-/**
- * Implements hook_node_update().
- */
-function flag_node_update($node) {
-  flag_node_save($node);
-}
-
-/**
- * Shared saving routine between flag_node_insert() and flag_node_update().
- */
-function flag_node_save($node) {
-  // Response to the flag checkboxes added to the form in flag_form_alter().
-  $remembered = FALSE;
-  if (isset($node->flag)) {
-    foreach ($node->flag as $name => $state) {
-      $flag = flag_get_flag($name);
-      // Flagging may trigger actions. We want actions to get the current
-      // node, not a stale database-loaded one:
-      if (!$remembered) {
-        $flag->remember_entity($node->nid, $node);
-        // Actions may modify a node, and we don't want to overwrite this
-        // modification:
-        $remembered = TRUE;
-      }
-
-      $action = $state ? 'flag' : 'unflag';
-      // Pass TRUE for $skip_permission_check so that flags that have been
-      // passed through as hidden form values are saved.
-      $flag->flag($action, $node->nid, NULL, TRUE);
-    }
-  }
-}
-
-/**
  * Implements hook_entity_delete().
  */
 function flag_entity_delete(EntityInterface $entity) {
