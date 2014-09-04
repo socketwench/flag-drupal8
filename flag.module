@@ -1317,38 +1317,6 @@ function flag_get_flag_counts($flag_name, $reset = FALSE) {
 }
 
 /**
- * Load a single flag either by name or by flag ID.
- *
- * @param $name
- *  (optional) The flag name.
- * @param $fid
- *  (optional) The the flag id.
- *
- * @return
- *  The flag object, or FALSE if no matching flag was found.
- */
-function flag_get_flag($name = NULL, $fid = NULL) {
-  $flags = flag_get_flags();
-  if (isset($name)) {
-    if (isset($flags[$name])) {
-      return $flags[$name];
-    }
-  }
-  elseif (isset($fid)) {
-    foreach ($flags as $flag) {
-      if ($flag->fid == $fid) {
-        return $flag;
-      }
-    }
-  }
-  return FALSE;
-}
-
-function flag_load_by_id($id) {
-  return entity_load('flag', $id);
-}
-
-/**
  * List all flags available.
  *
  * If node type or account are entered, a list of all possible flags will be

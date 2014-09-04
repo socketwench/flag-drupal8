@@ -31,7 +31,7 @@ function hook_flag_type_info_alter(array &$definitions) {
  * @param \Drupal\flag\FlagInterface $flag
  *   The flag to alter.
  *
- * @see flag_get_flags()
+ * @see \Drupal\flag\FlagService::getFlags()
  */
 function hook_flag_alter(FlagInterface &$flag) {
 
