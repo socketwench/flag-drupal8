@@ -153,9 +153,11 @@ class FlagService {
    * Get all flaggings for the given entity, flag, and optionally, user.
    *
    * @param EntityInterface $entity
-   *   The flaggable entity.
+   *   Optional. The flaggable entity. If NULL, flaggins for any entity will be
+   *   returned.
    * @param FlagInterface $flag
-   *   The flag entity.
+   *   Optional. The flag entity. If NULL, flaggings for any flag will be
+   *   returned.
    * @param AccountInterface $account
    *   Optional. The account of the flagging user. If NULL, flaggings for any
    *   user will be returned.
@@ -163,17 +165,23 @@ class FlagService {
    * @return array
    *   An array of flaggings.
    */
-  public function getFlaggings(EntityInterface $entity, FlagInterface $flag, AccountInterface $account = NULL) {
-    if ($account == NULL) {
-      $account = $this->currentUser;
+  public function getFlaggings(EntityInterface $entity = NULL, FlagInterface $flag = NULL, AccountInterface $account = NULL) {
+    $query = $this->entityQueryMgr->get('flagging');
+
+    if (!empty($account)) {
+      $query = $query->condition('uid', $account->id());
     }
 
-    $result = $this->entityQueryMgr->get('flagging')
-      ->condition('uid', $account->id())
-      ->condition('fid', $flag->id())
-      ->condition('entity_type', $entity->getEntityTypeId())
-      ->condition('entity_id', $entity->id())
-      ->execute();
+    if (!empty($flag)) {
+      $query = $query->condition('fid', $flag->id());
+    }
+
+    if (!empty($entity)) {
+      $query = $query->condition('entity_type', $entity->getEntityTypeId())
+                     ->condition('entity_id', $entity->id());
+    }
+
+    $result = $query->execute();
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
@@ -209,6 +217,36 @@ class FlagService {
    */
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
     return entity_load($flag->getFlaggableEntityType(), $entity_id);
+  }
+
+  /**
+   * Get a list of users that have flagged an entity.
+   *
+   * @param EntityInterface $entity
+   *   The entity object.
+   * @param FlagInterface $flag
+   *   Optional. The flag entity to which to restrict results.
+   *
+   * @return array
+   *   An array of users who have flagged the entity.
+   */
+  public function getFlaggingUsers(EntityInterface $entity, FlagInterface $flag = NULL) {
+    $query = $this->entityQueryMgr->get('users')
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->condition('entity_id', $entity->id());
+
+    if (!empty($flag)) {
+      $query = $query->condition('fid', $flag->id());
+    }
+
+    $result = $query->execute();
+
+    $flaggings = [];
+    foreach ($result as $flagging_id) {
+      $flaggings[$flagging_id] = entity_load('flagging', $flagging_id);
+    }
+
+    return $flaggings;
   }
 
   /**

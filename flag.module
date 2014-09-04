@@ -79,52 +79,6 @@ function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
 }*/
 
 /**
- * Implements hook_admin_menu_map().
- */
-function flag_admin_menu_map() {
-  if (!user_access('administer flags')) {
-    return;
-  }
-
-  $map = [];
-  $map[FLAG_ADMIN_PATH . '/manage/%flag'] = [
-    'parent' => FLAG_ADMIN_PATH,
-    'arguments' => [
-      [
-        '%flag' => array_keys(flag_get_flags()),
-      ],
-    ],
-  ];
-
-  if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
-    foreach (entity_get_info() as $obj_type => $info) {
-      if ($obj_type == 'flagging') {
-        foreach ($info['bundles'] as $bundle_name => $bundle_info) {
-          if (isset($bundle_info['admin'])) {
-            $fields = [];
-
-            foreach (field_info_instances($obj_type, $bundle_name) as $field) {
-              $fields[] = $field['field_name'];
-            }
-
-            $arguments = [
-              '%flag' => [$bundle_name],
-              '%field_ui_menu' => $fields,
-            ];
-
-            $path = $bundle_info['admin']['path'];
-            $map["$path/fields/%field_ui_menu"]['parent'] = "$path/fields";
-            $map["$path/fields/%field_ui_menu"]['arguments'][] = $arguments;
-          }
-        }
-      }
-    }
-  }
-
-  return $map;
-}
-
-/**
  * Menu loader for '%flag' arguments.
  *
  * @param $flag_name
@@ -599,44 +553,6 @@ function flag_entity_delete(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_node_delete().
- */
-function flag_node_delete($node) {
-  foreach (flag_get_flags('node') as $flag) {
-    // @todo: Update comments below and perhaps also flag_node_translation_change?
-    // If the flag is being tracked by translation set and the node is part
-    // of a translation set, don't delete the flagging record.
-    // Instead, data will be updated in hook_node_translation_change(), below.
-    _flag_entity_delete('node', $node->id());
-  }
-}
-
-/**
- * Implements hook_node_translation_change().
- *
- * (Hook provided by translation_helpers module.)
- */
-function flag_node_translation_change($node) {
-  if (isset($node->translation_change)) {
-    // If there is only one node remaining, track by nid rather than tnid.
-    // Otherwise, use the new tnid.
-    $entity_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
-    foreach (flag_get_flags('node') as $flag) {
-      if ($flag->i18n) {
-        db_update('flagging')->fields(['entity_id' => $entity_id])
-          ->condition('fid', $flag->fid)
-          ->condition('entity_id', $node->translation_change['old_tnid'])
-          ->execute();
-        db_update('flag_counts')->fields(['entity_id' => $entity_id])
-          ->condition('fid', $flag->fid)
-          ->condition('entity_id', $node->translation_change['old_tnid'])
-          ->execute();
-      }
-    }
-  }
-}
-
-/**
  * Deletes flagging records for the entity.
  *
  * @param $entity_type
@@ -794,48 +710,6 @@ function flag_user_view($account, $view_mode) {
     );
   }
 }*/
-
-/**
- * Implements hook_session_api_cleanup().
- *
- * Clear out anonymous user flaggings during Session API cleanup.
- */
-function flag_session_api_cleanup($arg = 'run') {
-  // Session API 1.1 version:
-  if ($arg == 'run') {
-    $query = db_select('flagging', 'fc');
-    $query->leftJoin('session_api', 's', 'fc.sid = s.sid');
-    $result = $query
-      ->fields('fc', array('sid'))
-      ->condition('fc.sid', 0, '<>')
-      ->isNull('s.sid')
-      ->execute();
-    foreach ($result as $row) {
-      db_delete('flagging')
-        ->condition('sid', $row->sid)
-        ->execute();
-    }
-  }
-  // Session API 1.2+ version.
-  elseif (is_array($arg)) {
-    $outdated_sids = $arg;
-    db_delete('flagging')->condition('sid', $outdated_sids, 'IN')->execute();
-  }
-}
-
-/**
- * Implements hook_field_attach_delete_bundle().
- *
- * Delete any flags' applicability to the deleted bundle.
- */
-function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
-  // This query can't use db_delete() because that doesn't support a
-  // subquery: see http://drupal.org/node/1267508.
-  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flag} WHERE entity_type = :entity_type)", [
-    ':bundle' => $bundle,
-    ':entity_type' => $entity_type,
-  ]);
-}
 
 /**
  * Implements hook_flag_access().
@@ -1116,42 +990,6 @@ function template_process_flag(&$variables) {
   $variables['message_classes'] = implode(' ', $variables['message_classes_array']);
 }
 
-/**
- * Return an array of flag names keyed by fid.
- */
-function _flag_get_flag_names() {
-  $flags = flag_get_flags();
-  $flag_names = [];
-  foreach ($flags as $flag) {
-    $flag_names[$flag->fid] = $flag->name;
-  }
-  return $flag_names;
-}
-
-/**
- * Return an array of flag link types suitable for a select list or radios.
- */
-function _flag_link_type_options() {
-  $options = [];
-  $types = flag_get_link_types();
-  foreach ($types as $type_name => $type) {
-    $options[$type_name] = $type['title'];
-  }
-  return $options;
-}
-
-/**
- * Return an array of flag link type descriptions.
- */
-function _flag_link_type_descriptions() {
-  $options = [];
-  $types = flag_get_link_types();
-  foreach ($types as $type_name => $type) {
-    $options[$type_name] = $type['description'];
-  }
-  return $options;
-}
-
 // ---------------------------------------------------------------------------
 // Non-Views public API
 
@@ -1370,129 +1208,6 @@ function flag_get_flag_flagging_data($flag_name) {
     ->condition('fid', $flag->fid)
     ->execute();
   return $result->fetchAllAssoc('flagging_id');
-}
-
-/**
- * Find what a user has flagged, either a single entity or on the entire site.
- *
- * @param $entity_type
- *   The type of entity that will be retrieved. Usually 'node'.
- * @param $entity_id
- *   (optional) The entity ID to check for flagging. If none given, all
- *   entities flagged by this user will be returned.
- * @param $uid
- *   (optional) The user ID whose flags we're checking. If none given, the
- *   current user will be used.
- * @param $sid
- *   (optional) The user SID (provided by Session API) whose flags we're
- *   checking. If none given, the current user will be used. The SID is 0 for
- *   logged in users.
- *
- * @return
- *   If returning a single item's flags (that is, when $entity_id isn't NULL),
- *   an array of the structure
- *   [flag_name] => (flagging_id => [flagging_id], uid => [uid], entity_id => [entity_id], timestamp => [timestamp], ...)
- *
- *   If returning all items' flags, an array of arrays for each flag:
- *   [flag_name] => [entity_id] => Object from above.
- *
- */
-function flag_get_user_flags($entity_type, $entity_id = NULL, $uid = NULL, $sid = NULL) {
-  $flagged_content = &drupal_static(__FUNCTION__);
-
-  $uid = !isset($uid) ? $GLOBALS['user']->uid : $uid;
-  $sid = !isset($sid) ? flag_get_sid($uid) : $sid;
-
-  if (isset($entity_id)) {
-    if (!isset($flagged_content[$uid][$sid][$entity_type][$entity_id])) {
-      $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid][$entity_type][$entity_id] = array();
-      $result = db_select('flagging', 'fc')
-        ->fields('fc')
-        ->condition('entity_type', $entity_type)
-        ->condition('entity_id', $entity_id)
-        ->condition(db_or()
-          ->condition('uid', $uid)
-          ->condition('uid', 0)
-        )
-        ->condition('sid', $sid)
-        ->execute();
-
-      foreach ($result as $flagging_data) {
-        $flagged_content[$uid][$sid][$entity_type][$entity_id][$flag_names[$flagging_data->fid]] = $flagging_data;
-      }
-    }
-    return $flagged_content[$uid][$sid][$entity_type][$entity_id];
-  }
-
-  else {
-    if (!isset($flagged_content[$uid][$sid][$entity_type]['all'])) {
-      $flag_names = _flag_get_flag_names();
-      $flagged_content[$uid][$sid][$entity_type]['all'] = array();
-      $result = db_select('flagging', 'fc')
-        ->fields('fc')
-        ->condition('entity_type', $entity_type)
-        ->condition(db_or()
-          ->condition('uid', $uid)
-          ->condition('uid', 0)
-        )
-        ->condition('sid', $sid)
-        ->execute();
-      foreach ($result as $flagging_data) {
-        $flagged_content[$uid][$sid][$entity_type]['all'][$flag_names[$flagging_data->fid]][$flagging_data->entity_id] = $flagging_data;
-      }
-    }
-    return $flagged_content[$uid][$sid][$entity_type]['all'];
-  }
-
-}
-
-/**
- * Return a list of users who have flagged an entity.
- *
- * @param $entity_type
- *   The type of entity that will be retrieved. Usually 'node'.
- * @param $entity_id
- *   The entity ID to check for flagging.
- * @param $flag_name
- *   (optional) The name of a flag if wanting a list specific to a single flag.
- *
- * @return
- *   If no flag name is given, an array of flagging data, keyed by the user
- *   ID that flagged the entity. Each flagging array is structured as
- *   an array of flag information for each flag, keyed by the flag name. If
- *   a flag name is specified, only the information for that flag is returned.
- *   If no flags were found an empty array is returned.
- */
-function flag_get_entity_flags($entity_type, $entity_id, $flag_name = NULL) {
-  $entity_flags = &drupal_static(__FUNCTION__, array());
-
-  if (!isset($entity_flags[$entity_type][$entity_id])) {
-    $flag_names = _flag_get_flag_names();
-    $result = db_select('flagging', 'fc')
-      ->fields('fc')
-      ->condition('entity_type', $entity_type)
-      ->condition('entity_id', $entity_id)
-      ->orderBy('timestamp', 'DESC')
-      ->execute();
-    $entity_flags[$entity_type][$entity_id] = array();
-    foreach ($result as $flagging_data) {
-      // Build a list of flaggings for all flags by user.
-      $entity_flags[$entity_type][$entity_id]['users'][$flagging_data->uid][$flag_names[$flagging_data->fid]] = $flagging_data;
-      // Build a list of flaggings for each individual flag.
-      $entity_flags[$entity_type][$entity_id]['flags'][$flag_names[$flagging_data->fid]][$flagging_data->uid] = $flagging_data;
-    }
-  }
-  if (empty($entity_flags[$entity_type][$entity_id])) {
-    return array();
-  }
-  if (isset($flag_name)) {
-    if (isset($entity_flags[$entity_type][$entity_id]['flags'][$flag_name])) {
-      return $entity_flags[$entity_type][$entity_id]['flags'][$flag_name];
-    }
-    return array();
-  }
-  return $entity_flags[$entity_type][$entity_id]['users'];
 }
 
 /**
@@ -1737,82 +1452,6 @@ function flag_get_sid($uid = NULL, $create = FALSE) {
 }
 
 // ---------------------------------------------------------------------------
-// Drupal Core operations
-
-/**
- * Implements hook_node_operations().
- *
- * Add additional options on the admin/build/node page.
- */
-function flag_node_operations() {
-  global $user;
-
-  $flags = flag_get_flags('node', NULL, $user);
-  $operations = array();
-
-  foreach ($flags as $flag) {
-    $operations['flag_' . $flag->name] = array(
-      'label' => $flag->get_label('flag_short'),
-      'callback' => 'flag_nodes',
-      'callback arguments' => array('flag', $flag->name),
-      'behavior' => array(),
-    );
-    $operations['unflag_' . $flag->name] = array(
-      'label' => $flag->get_label('unflag_short'),
-      'callback' => 'flag_nodes',
-      'callback arguments' => array('unflag', $flag->name),
-      'behavior' => array(),
-    );
-  }
-  return $operations;
-}
-
-/**
- * Callback function for hook_node_operations().
- */
-function flag_nodes($nodes, $action, $flag_name) {
-  $performed = FALSE;
-  foreach ($nodes as $nid) {
-    $performed |= flag($action, $flag_name, $nid);
-  }
-  if ($performed) {
-    drupal_set_message(t('The update has been performed.'));
-  }
-}
-
-/**
- * Implements hook_user_operations().
- */
-function flag_user_operations() {
-  global $user;
-
-  $flags = flag_get_flags('user', NULL, $user);
-  $operations = array();
-
-  foreach ($flags as $flag) {
-    $operations['flag_' . $flag->name] = array(
-      'label' => $flag->get_label('flag_short'),
-      'callback' => 'flag_users',
-      'callback arguments' => array('flag', $flag->name),
-    );
-    $operations['unflag_' . $flag->name] = array(
-      'label' => $flag->get_label('unflag_short'),
-      'callback' => 'flag_users',
-      'callback arguments' => array('unflag', $flag->name),
-    );
-  }
-  return $operations;
-}
-/**
- * Callback function for hook_user_operations().
- */
-function flag_users($users, $action, $flag_name) {
-  foreach ($users as $uid) {
-    flag($action, $flag_name, $uid);
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Contrib integration hooks
 
 /**
@@ -1841,43 +1480,6 @@ function flag_features_api() {
 
 // ---------------------------------------------------------------------------
 // Entity Metadata callbacks
-
-/**
- * Getter callback that returns whether the given entity is flagged.
- */
-function flag_properties_get_flagging_boolean($entity, array $options, $name, $entity_type, $property_info) {
-  list($entity_id,) = entity_extract_ids($entity_type, $entity);
-
-  $flagging_data = flag_get_user_flags($entity_type, $entity_id);
-  return isset($flagging_data[$property_info['flag_name']]);
-}
-
-/**
- * Getter callback that returns entities the given user flagged.
- */
-function flag_properties_get_flagged_entities($entity, array $options, $name, $entity_type, $property_info) {
-  // Need the entity type the flag applies to.
-  $flag_entity_type = $property_info['flag_entity_type'];
-
-  $flagging_data = flag_get_user_flags($flag_entity_type, NULL, $entity->uid);
-
-  $flag_name = $property_info['flag_name'];
-  if (isset($flagging_data[$flag_name])) {
-    return array_keys($flagging_data[$flag_name]);
-  }
-  return array();
-}
-
-/**
- * Getter callback that returns users who flagged the given entity.
- */
-function flag_properties_get_flagging_users($entity, array $options, $name, $entity_type, $property_info) {
-  list($entity_id,) = entity_extract_ids($entity_type, $entity);
-
-  $flagging_data = flag_get_entity_flags($entity_type, $entity_id, $property_info['flag_name']);
-
-  return array_keys($flagging_data);
-}
 
 /**
  * Getter callback that returns the SID of the user that is being retrieved.
