@@ -89,7 +89,7 @@ class FlagListController extends ConfigEntityListBuilder {
     else {
       $output .= '<p>';
       $output .= t('Lists of flagged content can be displayed using views. You can configure these in the <a href="@views-url">Views administration section</a>.', ['@views-url' => url('admin/structure/views')]);
-      if (flag_get_flag('bookmarks')) {
+      if (\Drupal::service('flag')->getFlagById('bookmarks')) {
         $output .= ' ' . t('Flag module automatically provides a few <a href="@views-url">default views for the <em>bookmarks</em> flag</a>. You can use these as templates by cloning these views and then customizing as desired.', ['@views-url' => url('admin/structure/views', ['query' => ['tag' => 'flag']])]);
       }
       $output .= ' ' . t('The <a href="@flag-handbook-url">Flag module handbook</a> contains extensive <a href="@customize-url">documentation on creating customized views</a> using flags.', ['@flag-handbook-url' => 'http://drupal.org/handbook/modules/flag', '@customize-url' => 'http://drupal.org/node/296954']);
