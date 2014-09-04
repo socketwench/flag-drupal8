@@ -236,12 +236,12 @@ function flag_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_permission().
  */
 function flag_permission() {
-  $permissions = array(
-    'administer flags' => array(
+  $permissions = [
+    'administer flags' => [
       'title' => t('Administer flags'),
       'description' => t('Create and edit site-wide flags.'),
-    ),
-  );
+    ],
+  ];
 
   $flags = \Drupal::service('flag')->getFlags();
   // Provide flag and unflag permissions for each flag.
@@ -270,21 +270,10 @@ function flag_form_user_admin_permissions_alter(&$form, FormStateInterface $form
 }
 
 /**
- * Implements hook_flag_link().
- */
-function flag_flag_link($flag, $action, $entity_id) {
-  $token = flag_get_token($entity_id);
-  return array(
-    'href' => 'flag/' . ($flag->link_type == 'confirm' ? 'confirm/' : '') . "$action/$flag->name/$entity_id",
-    'query' => drupal_get_destination() + ($flag->link_type == 'confirm' ? array() : array('token' => $token)),
-  );
-}
-
-/**
  * Implements hook_entity_extra_field_info().
  */
 function flag_entity_extra_field_info() {
-  $extra = array();
+  $extra = [];
   $flag_service = \Drupal::service('flag');
   $flags = $flag_service->getFlags();
   foreach ($flags as $flag) {
@@ -296,24 +285,24 @@ function flag_entity_extra_field_info() {
 
     foreach ($flag->types as $bundle_name) {
       if ($flagTypePlugin->showOnForm()) {
-        $extra[$flag->entity_type][$bundle_name]['form']['flag'] = array(
+        $extra[$flag->entity_type][$bundle_name]['form']['flag'] = [
           'label' => t('Flags'),
           'description' => t('Checkboxes for toggling flags'),
           'weight' => 10,
-        );
+        ];
       }
 
       if ($flagTypePlugin->showAsField()) {
-        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $flag->id()] = array(
+        $extra[$flag->entity_type][$bundle_name]['display']['flag_' . $flag->id()] = [
           // It would be nicer to use % as the placeholder, but the label is
           // run through check_plain() by field_ui_display_overview_form()
           // (arguably incorrectly; see http://drupal.org/node/1991292).
-          'label' => t('Flag: @title', array(
+          'label' => t('Flag: @title', [
             '@title' => $flag->label,
-          )),
+          ]),
           'description' => t('Individual flag link'),
           'weight' => 10,
-        );
+        ];
       }
     }
   }
@@ -334,30 +323,30 @@ function flag_form_node_type_form_alter(&$form, FormStateInterface $form_state, 
       // To be able to process node tokens in flag labels, we create a fake
       // node and store it in the flag's cache for replace_tokens() to find,
       // with a fake ID.
-      $flag->remember_entity('fake', (object) array(
+      $flag->remember_entity('fake', (object) [
         'nid' => NULL,
         'type' => $form['#node_type']->type,
         'title' => '',
-      ));
+      ]);
       $var = 'flag_' . $flag->name . '_default';
-      $form['workflow']['flag'][$var] = array(
+      $form['workflow']['flag'][$var] = [
         '#type' => 'checkbox',
         '#title' => $flag->get_label('flag_short', 'fake'),
         '#default_value' => variable_get($var . '_' . $form['#node_type']->type, 0),
         '#return_value' => 1,
-      );
+      ];
     }
   }
 
   if (isset($form['workflow']['flag'])) {
-    $form['workflow']['flag'] += array(
+    $form['workflow']['flag'] += [
       '#type' => 'item',
       '#title' => t('Default flags'),
-      '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', array('@flag-url' => url(FLAG_ADMIN_PATH))),
+      '#description' => t('Above are the <a href="@flag-url">flags</a> you elected to show on the node editing form. You may specify their initial state here.', ['@flag-url' => url(FLAG_ADMIN_PATH)]),
       // Make the spacing a bit more compact:
       '#prefix' => '<div class="form-checkboxes">',
       '#suffix' => '</div>',
-    );
+    ];
   }
 }
 
@@ -426,15 +415,15 @@ function flag_field_attach_form($entity_type, $entity, &$form, FormStateInterfac
       continue;
     }
 
-    $form['flag'][$flag->name] = array(
+    $form['flag'][$flag->name] = [
       '#type' => 'checkbox',
       '#title' => $flag->get_label('flag_short', $id),
       '#description' => $flag->get_label('flag_long', $id),
       '#default_value' => $flag_status,
       '#return_value' => 1,
       // Used by our drupalSetSummary() on vertical tabs.
-      '#attributes' => array('title' => $flag->get_title()),
-    );
+      '#attributes' => ['title' => $flag->get_title()],
+    ];
 
     // If the user does not have access to the flag, set as a value.
     if (!$access) {
@@ -448,29 +437,29 @@ function flag_field_attach_form($entity_type, $entity, &$form, FormStateInterfac
   }
 
   if ($flags_in_form) {
-    $form['flag'] += array(
+    $form['flag'] += [
       '#weight' => 1,
       '#tree' => TRUE,
-    );
+    ];
   }
   if ($flags_visible) {
-    $form['flag'] += array(
+    $form['flag'] += [
       '#type' => 'fieldset',
       '#title' => t('Flags'),
       '#collapsible' => TRUE,
-    );
+    ];
 
     if ($entity_type == 'node') {
       // Turn the fieldset into a vertical tab.
-      $form['flag'] += array(
+      $form['flag'] += [
         '#group' => 'additional_settings',
-        '#attributes' => array('class' => array('flag-fieldset')),
-        '#attached' => array(
-          'js' => array(
+        '#attributes' => ['class' => ['flag-fieldset']],
+        '#attached' => [
+          'js' => [
             'vertical-tabs' => drupal_get_path('module', 'flag') . '/theme/flag-admin.js',
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
     }
   }
 }
@@ -674,11 +663,11 @@ function flag_node_translation_change($node) {
     $entity_id = $node->translation_change['new_tnid'] == 0 ? $node->translation_change['remaining_nid'] : $node->translation_change['new_tnid'];
     foreach (flag_get_flags('node') as $flag) {
       if ($flag->i18n) {
-        db_update('flagging')->fields(array('entity_id' => $entity_id))
+        db_update('flagging')->fields(['entity_id' => $entity_id])
           ->condition('fid', $flag->fid)
           ->condition('entity_id', $node->translation_change['old_tnid'])
           ->execute();
-        db_update('flag_counts')->fields(array('entity_id' => $entity_id))
+        db_update('flag_counts')->fields(['entity_id' => $entity_id])
           ->condition('fid', $flag->fid)
           ->condition('entity_id', $node->translation_change['old_tnid'])
           ->execute();
@@ -719,9 +708,9 @@ function flag_user_login($account) {
   // Migrate anonymous flags to this user's account.
   if (\Drupal::moduleHandler()->moduleExists('session_api') && ($sid = flag_get_sid(0))) {
     // Get a list of flagging IDs that will be moved over.
-    $duplicate_flaggings = array();
+    $duplicate_flaggings = [];
     $flaggings = db_select('flagging', 'fc')
-      ->fields('fc', array('flagging_id', 'fid', 'entity_id'))
+      ->fields('fc', ['flagging_id', 'fid', 'entity_id'])
       ->condition('uid', 0)
       ->condition('sid', $sid)
       ->execute()
@@ -734,10 +723,10 @@ function flag_user_login($account) {
       // subsequent db_delete() call.
       try {
         db_update('flagging')
-          ->fields(array(
+          ->fields([
             'uid' => $account->uid,
             'sid' => 0,
-          ))
+          ])
           ->condition('flagging_id', $flagging_id)
           ->execute();
       }
@@ -782,8 +771,8 @@ function flag_user_account_removal(UserInterface $account) {
   $query = db_select('flagging', 'fc');
   $query->leftJoin('flag_counts', 'c', 'fc.entity_id = c.entity_id AND fc.entity_type = c.entity_type');
   $result = $query
-    ->fields('fc', array('fid', 'entity_id'))
-    ->fields('c', array('count'))
+    ->fields('fc', ['fid', 'entity_id'])
+    ->fields('c', ['count'])
     ->condition('fc.uid', $account->id())
     ->execute();
 
@@ -792,9 +781,9 @@ function flag_user_account_removal(UserInterface $account) {
     if ($flag_data->count > 0) {
       $flag_data->count--;
       db_update('flag_counts')
-        ->fields(array(
+        ->fields([
           'count' => $flag_data->count,
-        ))
+        ])
         ->condition('fid', $flag_data->fid)
         ->condition('entity_id', $flag_data->entity_id)
         ->execute();
@@ -882,10 +871,10 @@ function flag_session_api_cleanup($arg = 'run') {
 function flag_field_attach_delete_bundle($entity_type, $bundle, $instances) {
   // This query can't use db_delete() because that doesn't support a
   // subquery: see http://drupal.org/node/1267508.
-  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flag} WHERE entity_type = :entity_type)", array(
+  db_query("DELETE FROM {flag_types} WHERE type = :bundle AND fid IN (SELECT fid FROM {flag} WHERE entity_type = :entity_type)", [
     ':bundle' => $bundle,
     ':entity_type' => $entity_type,
-  ));
+  ]);
 }
 
 /**
@@ -1113,12 +1102,12 @@ function template_preprocess_flag(&$variables) {
   $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
   $variables['flag_name_css'] = $flag_css_name;
 
-  $variables['flag_wrapper_classes_array'] = array();
+  $variables['flag_wrapper_classes_array'] = [];
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
   $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name;
   $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name . '-' . $entity_id;
 
-  $variables['flag_classes_array'] = array();
+  $variables['flag_classes_array'] = [];
   $variables['flag_classes_array'][] = 'flag';
   if (isset($link['href'])) {
     $variables['flag_classes_array'][] = $variables['action'] . '-action';
@@ -1131,7 +1120,7 @@ function template_preprocess_flag(&$variables) {
     $link['attributes']['class'] = is_string($link['attributes']['class']) ? array_filter(explode(' ', $link['attributes']['class'])) : $link['attributes']['class'];
     $variables['flag_classes_array'] = array_merge($variables['flag_classes_array'], $link['attributes']['class']);
   }
-  $variables['message_classes_array'] = array();
+  $variables['message_classes_array'] = [];
   if ($variables['after_flagging']) {
     $variables['message_classes_array'][] = 'flag-message';
     if ($errors) {
@@ -1172,7 +1161,7 @@ function template_process_flag(&$variables) {
  */
 function _flag_get_flag_names() {
   $flags = flag_get_flags();
-  $flag_names = array();
+  $flag_names = [];
   foreach ($flags as $flag) {
     $flag_names[$flag->fid] = $flag->name;
   }
@@ -1183,7 +1172,7 @@ function _flag_get_flag_names() {
  * Return an array of flag link types suitable for a select list or radios.
  */
 function _flag_link_type_options() {
-  $options = array();
+  $options = [];
   $types = flag_get_link_types();
   foreach ($types as $type_name => $type) {
     $options[$type_name] = $type['title'];
@@ -1195,7 +1184,7 @@ function _flag_link_type_options() {
  * Return an array of flag link type descriptions.
  */
 function _flag_link_type_descriptions() {
-  $options = array();
+  $options = [];
   $types = flag_get_link_types();
   foreach ($types as $type_name => $type) {
     $options[$type_name] = $type['description'];
@@ -1223,9 +1212,9 @@ function flag_get_entity_flag_counts($flag, $entity_type) {
   // We check to see if the flag count is already in the cache,
   // if it's not, run the query.
   if (!isset($counts[$flag->name][$entity_type])) {
-    $counts[$flag->name][$entity_type] = array();
+    $counts[$flag->name][$entity_type] = [];
     $result = db_select('flagging', 'f')
-      ->fields('f', array('fid'))
+      ->fields('f', ['fid'])
       ->condition('fid', $flag->fid)
       ->condition('entity_type', $entity_type)
       ->countQuery()
@@ -1254,9 +1243,9 @@ function flag_get_user_flag_counts($flag, $user) {
   // We check to see if the flag count is already in the cache,
   // if it's not, run the query.
   if (!isset($counts[$flag->name][$user->uid])) {
-    $counts[$flag->name][$user->uid] = array();
+    $counts[$flag->name][$user->uid] = [];
     $result = db_select('flagging', 'f')
-      ->fields('f', array('fid'))
+      ->fields('f', ['fid'])
       ->condition('fid', $flag->fid)
       ->condition('uid', $user->uid)
       ->countQuery()
@@ -1283,12 +1272,12 @@ function flag_get_counts($entity_type, $entity_id) {
   $counts = &drupal_static(__FUNCTION__);
 
   if (!isset($counts[$entity_type][$entity_id])) {
-    $counts[$entity_type][$entity_id] = array();
+    $counts[$entity_type][$entity_id] = [];
     $query = db_select('flag', 'f');
     $query->leftJoin('flag_counts', 'fc', 'f.fid = fc.fid');
     $result = $query
-      ->fields('f', array('name'))
-      ->fields('fc', array('count'))
+      ->fields('f', ['name'])
+      ->fields('fc', ['count'])
       ->condition('fc.entity_type', $entity_type)
       ->condition('fc.entity_id', $entity_id)
       ->execute();
