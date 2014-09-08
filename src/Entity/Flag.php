@@ -44,6 +44,7 @@ use Drupal\flag\FlagInterface;
  * )
  */
 class Flag extends ConfigEntityBase implements FlagInterface {
+  // @todo: Define flag reset method.
 
   /**
    * The flag ID.
@@ -101,49 +102,49 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    *
    * @var string
    */
-  public $flag_short = '';
+  protected $flag_short = '';
 
   /**
    * The description of the "flag this" link.
    *
    * @var string
    */
-  public $flag_long = '';
+  protected $flag_long = '';
 
   /**
    * Message displayed after flagging an entity.
    *
    * @var string
    */
-  public $flag_message = '';
+  protected $flag_message = '';
 
   /**
    * The text for the "unflag this" link for this flag.
    *
    * @var string
    */
-  public $unflag_short = '';
+  protected $unflag_short = '';
 
   /**
    * The description of the "unflag this" link.
    *
    * @var string
    */
-  public $unflag_long = '';
+  protected $unflag_long = '';
 
   /**
    * Message displayed after flagging an entity.
    *
    * @var string
    */
-  public $unflag_message = '';
+  protected $unflag_message = '';
 
   /**
    * Message displayed if users aren't allowed to unflag.
    *
    * @var string
    */
-  public $unflag_denied_text = '';
+  protected $unflag_denied_text = '';
 
   /**
    * The ID of the FlagType plugin.
@@ -251,6 +252,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFlaggableEntityType() {
+    return $this->entity_type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPluginBags() {
     return [
       'flagTypeConfig' => $this->flagTypeBag,
@@ -259,20 +267,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Get the flag type plugin for this flag.
-   *
-   * @return \Drupal\flag\FlagTypePluginInterface
-   *   The flag type plugin for this flag.
+   * {@inheritdoc}
    */
   public function getFlagTypePlugin() {
     return $this->flagTypeBag->get($this->flag_type);
   }
 
   /**
-   * Set the flag type plugin.
-   *
-   * @param string $plugin_id
-   *   A string containing the flag type plugin ID.
+   * {@inheritdoc}
    */
   public function setFlagTypePlugin($plugin_id) {
     $this->flag_type = $plugin_id;
@@ -288,20 +290,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Get the link type plugin for this flag.
-   *
-   * @return \Drupal\flag\ActionLinkTypePluginInterface
-   *   The link type plugin for the flag.
+   * {@inheritdoc}
    */
   public function getLinkTypePlugin() {
     return $this->linkTypeBag->get($this->link_type);
   }
 
   /**
-   * Set the link type plugin.
-   *
-   * @param string $plugin_id
-   *   A string containing the link type plugin ID.
+   * {@inheritdoc}
    */
   public function setlinkTypePlugin($plugin_id) {
     $this->link_type = $plugin_id;
@@ -364,15 +360,116 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   }
 
   /**
-   * Returns the flaggable entity type ID.
-   *
-   * @return string
-   *   The flaggable entity ID.
+   * {@inheritdoc}
    */
-  public function getFlaggableEntityType() {
-    return $this->entity_type;
+  public function setFlagShortText($text) {
+    $this->flag_short;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getFlagShortText() {
+    return $this->flag_short;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFlagLongText() {
+    return $this->flag_long;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFlagLongText($flag_long) {
+    $this->flag_long = $flag_long;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFlagMessage() {
+    return $this->flag_message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFlagMessage($flag_message) {
+    $this->flag_message = $flag_message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUnflagLongText() {
+    return $this->unflag_long;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnflagLongText($unflag_long) {
+    $this->unflag_long = $unflag_long;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUnflagMessage() {
+    return $this->unflag_message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnflagMessage($unflag_message) {
+    $this->unflag_message = $unflag_message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUnflagShortText() {
+    return $this->unflag_short;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnflagShortText($unflag_short) {
+    $this->unflag_short = $unflag_short;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUnflagDeniedText() {
+    return $this->unflag_denied_text;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnflagDeniedText($unflag_denied_text) {
+    $this->unflag_denied_text = $unflag_denied_text;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWeight() {
+    return $this->weight;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWeight($weight) {
+    $this->weight = $weight;
+  }
   /**
    * {@inheritdoc}
    */

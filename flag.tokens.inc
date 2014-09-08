@@ -99,6 +99,7 @@ function flag_token_info() {
  * Implements hook_tokens().
  */
 function flag_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  /*
   $replacements = array();
   $sanitize = !empty($options['sanitize']);
   $langcode = isset($options['language']) ? $options['language']->language : NULL;
@@ -162,7 +163,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
   }
 
   if (isset($data[$type]) && in_array($type, \Drupal::service('flag')->fetchDefinition())) {
-    $flags = flag_get_flags($type);
+    $flags = \Drupal::service('flag')->getFlags($type);
     $object = $data[$type];
     foreach ($flags as $flag) {
       foreach ($tokens as $name => $original) {
@@ -178,6 +179,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
     }
   }
   return $replacements;
+  */
 }
 
 /**

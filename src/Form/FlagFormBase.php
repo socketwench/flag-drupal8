@@ -7,8 +7,8 @@
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\flag\Handlers\AbstractFlag;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\flag\FlagInterface;
 
 /**
  * Provides the base flag add/edit form.
@@ -75,10 +75,11 @@ abstract class FlagFormBase extends EntityForm {
       '#title' => t('Messages'),
     ];
 
+    $flag_short = $flag->getFlagShortText();
     $form['messages']['flag_short'] = [
       '#type' => 'textfield',
       '#title' => t('Flag link text'),
-      '#default_value' => !empty($flag->flag_short) ? $flag->flag_short : t('Flag this item'),
+      '#default_value' => !empty($flag_short) ? $flag_short : t('Flag this item'),
       '#description' => t('The text for the "flag this" link for this flag.'),
       '#required' => TRUE,
     ];
@@ -86,21 +87,22 @@ abstract class FlagFormBase extends EntityForm {
     $form['messages']['flag_long'] = [
       '#type' => 'textfield',
       '#title' => t('Flag link description'),
-      '#default_value' => $flag->flag_long,
+      '#default_value' => $flag->getFlagLongText(),
       '#description' => t('The description of the "flag this" link. Usually displayed on mouseover.'),
     ];
 
     $form['messages']['flag_message'] = [
       '#type' => 'textfield',
       '#title' => t('Flagged message'),
-      '#default_value' => $flag->flag_message,
+      '#default_value' => $flag->getFlagMessage(),
       '#description' => t('Message displayed after flagging content. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
     ];
 
+    $unflag_short = $flag->getUnflagShortText();
     $form['messages']['unflag_short'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag link text'),
-      '#default_value' => !empty($flag->unflag_short) ? $flag->unflag_short : t('Unflag this item'),
+      '#default_value' => !empty($unflag_short) ? $unflag_short : t('Unflag this item'),
       '#description' => t('The text for the "unflag this" link for this flag.'),
       '#required' => TRUE,
     ];
@@ -108,14 +110,14 @@ abstract class FlagFormBase extends EntityForm {
     $form['messages']['unflag_long'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag link description'),
-      '#default_value' => $flag->unflag_long,
+      '#default_value' => $flag->getUnflagLongText(),
       '#description' => t('The description of the "unflag this" link. Usually displayed on mouseover.'),
     ];
 
     $form['messages']['unflag_message'] = [
       '#type' => 'textfield',
       '#title' => t('Unflagged message'),
-      '#default_value' => $flag->unflag_message,
+      '#default_value' => $flag->getUnflagMessage(),
       '#description' => t('Message displayed after content has been unflagged. If JavaScript is enabled, it will be displayed below the link. If not, it will be displayed in the message area.'),
     ];
 
@@ -132,7 +134,7 @@ abstract class FlagFormBase extends EntityForm {
     $flag_type_def = $flag_type_plugin->getPluginDefinition();
 
     $bundles = entity_get_bundles($flag_type_def['entity_type']);
-    $entity_bundles = array();
+    $entity_bundles = [];
     foreach ($bundles as $bundle_id => $bundle_row) {
       $entity_bundles[$bundle_id] = $bundle_row['label'];
     }
@@ -151,7 +153,7 @@ abstract class FlagFormBase extends EntityForm {
     $form['access']['unflag_denied_text'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag not allowed text'),
-      '#default_value' => $flag->unflag_denied_text,
+      '#default_value' => $flag->getUnflagDeniedText(),
       '#description' => t('If a user is allowed to flag but not unflag, this text will be displayed after flagging. Often this is the past-tense of the link text, such as "flagged".'),
       '#weight' => -1,
     ];
