@@ -160,11 +160,7 @@ class EntityFlagType extends FlagTypeBase {
    *   TRUE if the flag should appear as a psudofield, FALSE otherwise.
    */
   public function showAsField() {
-    if (!empty($this->configuration['show_as_field'])) {
-      return $this->configuration['show_as_field'];
-    }
-
-    return TRUE;
+    return $this->configuration['show_as_field'];
   }
 
   /**
