@@ -127,7 +127,7 @@ class FlagService {
       $query->condition('entity_type', $entity_type);
     }
 
-    if ($bundle != NULL) {
+    if ($bundle != NULL && $entity_type != $bundle) {
       $query->condition("types.$bundle", $bundle);
     }
 

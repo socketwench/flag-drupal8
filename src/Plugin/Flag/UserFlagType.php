@@ -7,7 +7,7 @@
 namespace Drupal\flag\Plugin\Flag;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\flag\FlagTypeBase;
+use Drupal\flag\Plugin\Flag\EntityFlagType;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -22,7 +22,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   provider = "user"
  * )
  */
-class UserFlagType extends FlagTypeBase {
+class UserFlagType extends EntityFlagType {
 
   /**
    * {@inheritdoc}
