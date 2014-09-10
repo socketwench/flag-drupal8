@@ -45,25 +45,4 @@ Drupal.behaviors.flagRoles.attach = function(context) {
   }
 };
 
-/**
- * Vertical tabs integration.
- */
-Drupal.behaviors.flagSummary = {};
-
-Drupal.behaviors.flagSummary.attach = function (context) {
-  $('fieldset.flag-fieldset', context).drupalSetSummary(function(context) {
-    var flags = [];
-    $('input:checkbox:checked', context).each(function() {
-      flags.push(this.title);
-    });
-
-    if (flags.length) {
-      return flags.join(', ');
-    }
-    else {
-      return Drupal.t('No flags');
-    }
-  });
-};
-
 })(jQuery);
