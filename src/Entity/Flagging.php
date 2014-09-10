@@ -23,6 +23,13 @@ use Drupal\flag\FlaggingInterface;
  *  fieldable = TRUE,
  *  bundle_entity_type = "flag",
  *  field_ui_base_route = "flag.edit",
+ *  controllers = {
+ *     "form" = {
+ *       "add" = "Drupal\flag\Form\FlaggingForm",
+ *       "edit" = "Drupal\flag\Form\FlaggingForm",
+ *       "delete" = "Drupal\flag\Form\FlaggingConfirmForm",
+ *     }
+ *  },
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
