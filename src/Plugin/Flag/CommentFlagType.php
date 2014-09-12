@@ -65,7 +65,7 @@ class CommentFlagType extends EntityFlagType {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['access_author'] = $form_state['values']['access_author'];
+    $this->configuration['access_author'] = $form_state->getValue('access_author');
   }
 
   /**
