@@ -233,7 +233,7 @@ abstract class FlagFormBase extends EntityForm {
     $action_link_plugin = $flag->getLinkTypePlugin();
     $form = $action_link_plugin->buildConfigurationForm($form, $form_state);
 
-    $form_state['rebuild'] = TRUE;
+    $form_state->setRebuild();
 
     return $form['display']['settings'];
   }
@@ -242,7 +242,7 @@ abstract class FlagFormBase extends EntityForm {
    * Handles submit call when sensor type is selected.
    */
   public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
-    $form_state['rebuild'] = TRUE;
+    $form_state->setRebuild();
   }
 
   /**

@@ -102,11 +102,11 @@ class FlagAddPageForm extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     /*
-    $flag = AbstractFlag::factory_by_entity_type($form_state['values']['type']);
+    $flag = AbstractFlag::factory_by_entity_type($form_state->getValue('type'));
     if (get_class($flag) == 'BrokenFlag') {
       form_set_error('type',
                      t("This flag type, %type, isn't valid.",
-                     array('%type' => $form_state['values']['type'])));
+                     array('%type' => $form_state->getValue('type'))));
     }
     */
   }

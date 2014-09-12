@@ -73,8 +73,8 @@ class UserFlagType extends EntityFlagType {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['access_uid'] = $form_state['values']['access']['access_uid'];
-    $this->configuration['show_on_profile'] = $form_state['values']['display']['show_on_profile'];
+    $this->configuration['access_uid'] = $form_state->getValue(['access', 'access_uid']);
+    $this->configuration['show_on_profile'] = $form_state->getValue(['display', 'show_on_profile']);
   }
 
   /**
