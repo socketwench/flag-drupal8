@@ -89,7 +89,7 @@ flag.confirm_unflag:
 flag.field_entry:
   path: '/flag/details/flag/{flag_id}/{entity_id}'
   defaults:
-    _form: '\Drupal\flag\Form\FlaggingForm'
+    _entity_form: flagging.add
     _title: 'Enter Flag Details'
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
