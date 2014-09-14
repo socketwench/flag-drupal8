@@ -130,10 +130,10 @@ class EntityFlagType extends FlagTypeBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['show_in_links'] = $form_state['values']['show_in_links'];
-    $this->configuration['show_as_field'] = $form_state['values']['show_as_field'];
-    $this->configuration['show_on_form'] = $form_state['values']['show_on_form'];
-    $this->configuration['show_contextual_link'] = $form_state['values']['show_contextual_link'];
+    $this->configuration['show_in_links'] = $form_state->getValue('show_in_links');
+    $this->configuration['show_as_field'] = $form_state->getValue('show_as_field');
+    $this->configuration['show_on_form'] = $form_state->getValue('show_on_form');
+    $this->configuration['show_contextual_link'] = $form_state->getValue('show_contextual_link');
   }
 
   /**

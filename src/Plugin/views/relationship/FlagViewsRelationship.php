@@ -72,7 +72,6 @@ class FlagViewsRelationship extends RelationshipPluginBase {
           '#markup' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', ['%type' => $entity_type, '@create-url' => url(FLAG_ADMIN_PATH)]) . '</p>',
         ],
       ];
-      $form_state['no flags exist'] = TRUE;
     }
   }
 
