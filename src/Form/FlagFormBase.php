@@ -183,7 +183,7 @@ abstract class FlagFormBase extends EntityForm {
         'class' => ['flag-link-options'],
       ],
       '#limit_validation_errors' => [['link_type']],
-      '#submit' => [[$this, 'submitSelectPlugin']],
+      '#submit' => ['::submitSelectPlugin'],
       '#required' => TRUE,
       '#executes_submit_callback' => TRUE,
       '#ajax' => [
@@ -196,7 +196,7 @@ abstract class FlagFormBase extends EntityForm {
     $form['display']['link_type_submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Update'),
-      '#submit' => [[$this, 'submitSelectPlugin']],
+      '#submit' => ['::submitSelectPlugin'],
       '#weight' => 20,
       '#attributes' => ['class' => ['js-hide']],
     ];
@@ -242,7 +242,9 @@ abstract class FlagFormBase extends EntityForm {
    * Handles submit call when sensor type is selected.
    */
   public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
-    $form_state['rebuild'] = TRUE;
+    $this->entity = $this->buildEntity($form, $form_state);
+
+    $form_state->setRebuild(TRUE);
   }
 
   /**
