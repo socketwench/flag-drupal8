@@ -46,6 +46,17 @@ class FieldEntryFormController extends ControllerBase {
     return $form;
   }
 
+  public function edit($flag_id, $entity_id) {
+    $account = $this->currentUser();
+    $flag = \Drupal::service('flag')->getFlagById($flag_id);
+    $entity = \Drupal::service('flag')->getFlaggableById($entity_id);
+    $flagging = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
+
+    $form = $this->entityFormBuilder()->getForm($flagging, 'edit');
+
+    return $form;
+  }
+
   /**
    * Performs an unflagging when called via a route.
    *
@@ -60,6 +71,10 @@ class FieldEntryFormController extends ControllerBase {
    * @see \Drupal\flag\Plugin\ActionLink\AJAXactionLink
    */
   public function unflag($flag_id, $entity_id) {
+    $account = $this->currentUser();
+    $flag = Flag::load($flag_id);
+
+
   }
 
   /**
