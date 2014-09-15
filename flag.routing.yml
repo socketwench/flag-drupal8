@@ -94,5 +94,10 @@ flag.field_entry:
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
 
-
-
+flag.field_entry.edit:
+  path: '/flag/details/edit/{flag_id}/{entity_id}'
+  defaults:
+    _content: '\Drupal\flag\Controller\FieldEntryFormController::edit'
+    _title: 'Enter Flag Details'
+  requirements:
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'

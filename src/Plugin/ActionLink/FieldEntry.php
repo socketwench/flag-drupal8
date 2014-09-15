@@ -25,7 +25,7 @@ class FieldEntry extends ActionLinkTypeBase {
    */
   public function routeName($action = NULL) {
     if ($action == 'unflag') {
-      return 'flag.confirm_unflag';
+      return 'flag.field_entry.edit';
     }
 
     return 'flag.field_entry';
