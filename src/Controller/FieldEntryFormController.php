@@ -7,6 +7,7 @@ namespace Drupal\flag\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\flag\FlagInterface;
+use Drupal\flag\Entity\Flag;
 
 /**
  * Provides a controller for the Field Entry link type.
@@ -29,6 +30,20 @@ class FieldEntryFormController extends ControllerBase {
    * @see \Drupal\flag\Plugin\ActionLink\AJAXactionLink
    */
   public function flag($flag_id, $entity_id) {
+    $account = $this->currentUser();
+    $flag = Flag::load($flag_id);
+
+    $flagging = $this->entityManager()->getStorage('flagging')->create([
+      'fid' => $flag->id(),
+      'entity_type' => $flag->getFlaggableEntityType(),
+      'entity_id' => $entity_id,
+      'type' => $flag->id(),
+      'uid' => $account->id(),
+    ]);
+
+    $form = $this->entityFormBuilder()->getForm($flagging);
+
+    return $form;
   }
 
   /**
