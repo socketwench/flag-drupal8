@@ -22,7 +22,6 @@ use Drupal\flag\FlaggingInterface;
  *  bundle_label = @Translation("Flagging"),
  *  handlers = {
  *     "form" = {
- *       "default" = "Drupal\flag\Form\FlaggingForm",
  *       "add" = "Drupal\flag\Form\FlaggingForm",
  *       "edit" = "Drupal\flag\Form\FlaggingForm",
  *       "delete" = "Drupal\flag\Form\FlaggingConfirmForm"

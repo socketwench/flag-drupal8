@@ -41,7 +41,7 @@ class FieldEntryFormController extends ControllerBase {
       'uid' => $account->id(),
     ]);
 
-    $form = $this->entityFormBuilder()->getForm($flagging);
+    $form = $this->entityFormBuilder()->getForm($flagging, 'add');
 
     return $form;
   }
