@@ -101,3 +101,11 @@ flag.field_entry.edit:
     _title: 'Enter Flag Details'
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
+
+flag.field_entry.delete:
+  path: '/flag/details/unflag/{flag_id}/{entity_id}'
+  defaults:
+    _content: '\Drupal\flag\Controller\FieldEntryFormController::unflag'
+    _title: 'Unflag content'
+  requirements:
+    _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
