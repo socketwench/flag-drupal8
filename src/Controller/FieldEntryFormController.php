@@ -49,8 +49,10 @@ class FieldEntryFormController extends ControllerBase {
   public function edit($flag_id, $entity_id) {
     $account = $this->currentUser();
     $flag = \Drupal::service('flag')->getFlagById($flag_id);
-    $entity = \Drupal::service('flag')->getFlaggableById($entity_id);
-    $flagging = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
+    $entity = \Drupal::service('flag')->getFlaggableById($flag, $entity_id);
+    $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
+    
+    $flagging = array_values($flaggings)[0];
 
     $form = $this->entityFormBuilder()->getForm($flagging, 'edit');
 

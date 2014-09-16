@@ -27,6 +27,13 @@ class FlaggingForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  public function actions(array $form, FormStateInterface $form_state) {
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $entity = parent::submit($form, $form_state);
     // $form_state->setRedirect('content_entity_example.contact_list');

@@ -36,7 +36,7 @@ use Drupal\flag\FlaggingInterface;
  *    "uuid" = "uuid"
  *  },
  *  bundle_entity_type = "flag",
- *  field_ui_base_route = "flag.edit"
+ *  field_ui_base_route = "flag.edit",
  * )
  */
 class Flagging extends ContentEntityBase implements FlaggingInterface {
