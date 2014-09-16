@@ -28,7 +28,25 @@ class FlaggingForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function actions(array $form, FormStateInterface $form_state) {
+    $actions = parent::actions($form, $form_state);
+    $actions['submit']['#value'] = $this->t('Update details');
 
+    $route_info = $this->entity->urlInfo('delete-form');
+    $actions['delete'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Delete Flagging'),
+      //'#access' => $this->entity->access('delete'),
+      '#attributes' => [
+        'class' => ['button', 'button--danger'],
+      ],
+    ];
+    $actions['delete'] += $route_info->toRenderArray();
+
+    $actions['delete']['#route_parameters']['flag_id'] = $this->entity->getFlagId();
+    $actions['delete']['#route_parameters']['entity_id'] = $this->entity->getFlaggableId();
+
+
+    return $actions;
   }
 
   /**

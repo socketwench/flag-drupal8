@@ -6,7 +6,7 @@
 namespace Drupal\flag\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\flag\FlagInterface;
+use Drupal\flag\FlaggingInterface;
 use Drupal\flag\Entity\Flag;
 
 /**
@@ -41,22 +41,24 @@ class FieldEntryFormController extends ControllerBase {
       'uid' => $account->id(),
     ]);
 
-    $form = $this->entityFormBuilder()->getForm($flagging, 'add');
-
-    return $form;
+    return $this->getForm($flagging, 'add');
   }
 
+  /**
+   * Return the flagging edit form.
+   *
+   * @param string $flag_id
+   *   The flag ID.
+   * @param mixed $entity_id
+   *   The entity ID.
+   *
+   * @return array
+   *   The flagging edit form.
+   */
   public function edit($flag_id, $entity_id) {
-    $account = $this->currentUser();
-    $flag = \Drupal::service('flag')->getFlagById($flag_id);
-    $entity = \Drupal::service('flag')->getFlaggableById($flag, $entity_id);
-    $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
-    
-    $flagging = array_values($flaggings)[0];
+    $flagging = $this->getFlagging($flag_id, $entity_id);
 
-    $form = $this->entityFormBuilder()->getForm($flagging, 'edit');
-
-    return $form;
+    return $this->getForm($flagging, 'edit');
   }
 
   /**
@@ -73,19 +75,43 @@ class FieldEntryFormController extends ControllerBase {
    * @see \Drupal\flag\Plugin\ActionLink\AJAXactionLink
    */
   public function unflag($flag_id, $entity_id) {
+    $flagging = $this->getFlagging($flag_id, $entity_id);
+
+    return $this->getForm($flagging, 'delete');
+  }
+
+  /**
+   * Get a flagging that already exists.
+   *
+   * @param string $flag_id
+   *   The flag ID.
+   * @param mixed $entity_id
+   *   The flaggable ID.
+   *
+   * @return FlaggingInterface|null
+   *   The flagging or NULL.
+   */
+  protected function getFlagging($flag_id, $entity_id) {
     $account = $this->currentUser();
-    $flag = Flag::load($flag_id);
+    $flag = \Drupal::service('flag')->getFlagById($flag_id);
+    $entity = \Drupal::service('flag')->getFlaggableById($flag, $entity_id);
+    $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
 
-
+    return array_values($flaggings)[0];
   }
 
   /**
    * Get the flag's field entry form.
    *
-   * @param FlagInterface $flag
-   *   The flag from which to get the form.
+   * @param FlaggingInterface $flagging
+   *   The flagging from which to get the form.
+   * @param string|null $operation
+   *   The operation identifying the form variant to return.
+   *
+   * return array
+   *   The form array.
    */
-  protected function getForm(FlagInterface $flag) {
-    $form = \Drupal::service('entity.form_builder')->getForm($flag, 'default');
+  protected function getForm(FlaggingInterface $flagging, $operation = 'default') {
+    return $this->entityFormBuilder()->getForm($flagging, $operation);
   }
 }
