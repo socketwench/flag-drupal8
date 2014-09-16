@@ -81,10 +81,10 @@ class FlaggingConfirmForm extends ConfirmFormBase {
    */
   public function getDescription() {
     if ($this->isFlagged()) {
-      return $this->flag->unflag_long;
+      return $this->flag->getUnflagLongText();
     }
 
-    return $this->flag->flag_long;
+    return $this->flag->getFlagLongText();
   }
 
   /**
