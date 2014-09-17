@@ -81,6 +81,40 @@ class FieldEntryFormController extends ControllerBase {
   }
 
   /**
+   * Title callback when creating a new flagging.
+   *
+   * @param int $flag_id
+   *   The flag ID.
+   * @param int $entity_id
+   *   The entity ID to unflag.
+   *
+   * @return string
+   *   The flag field entry form title.
+   */
+  public function flagTitle($flag_id, $entity_id) {
+    $flag = \Drupal::service('flag')->getFlagById($flag_id);
+    $link_type = $flag->getLinkTypePlugin();
+    return $link_type->getFlagQuestion();
+  }
+
+  /**
+   * Title callback when editing an existing flagging.
+   *
+   * @param int $flag_id
+   *   The flag ID.
+   * @param int $entity_id
+   *   The entity ID to unflag.
+   *
+   * @return string
+   *   The flag field entry form title.
+   */
+  public function editTitle($flag_id, $entity_id) {
+    $flag = \Drupal::service('flag')->getFlagById($flag_id);
+    $link_type = $flag->getLinkTypePlugin();
+    return $link_type->getEditFlaggingTitle();
+  }
+
+  /**
    * Get a flagging that already exists.
    *
    * @param string $flag_id
