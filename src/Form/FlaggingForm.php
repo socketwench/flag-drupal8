@@ -21,6 +21,7 @@ class FlaggingForm extends ContentEntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
+
     return $form;
   }
 
@@ -49,7 +50,6 @@ class FlaggingForm extends ContentEntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $entity = parent::submit($form, $form_state);
-    // $form_state->setRedirect('content_entity_example.contact_list');
 
     return $entity;
   }
