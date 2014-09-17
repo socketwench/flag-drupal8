@@ -31,20 +31,15 @@ class FlaggingForm extends ContentEntityForm {
     $actions = parent::actions($form, $form_state);
     $actions['submit']['#value'] = $this->t('Update details');
 
-    $route_info = $this->entity->urlInfo('delete-form');
-    $actions['delete'] = [
-      '#type' => 'link',
-      '#title' => $this->t('Delete Flagging'),
-      //'#access' => $this->entity->access('delete'),
-      '#attributes' => [
-        'class' => ['button', 'button--danger'],
-      ],
-    ];
-    $actions['delete'] += $route_info->toRenderArray();
+    // Customize the delete link.
+    if (isset($actions['delete'])) {
+      // @todo Why does the access call always fail?
+      unset($actions['delete']['#access']);
 
-    $actions['delete']['#route_parameters']['flag_id'] = $this->entity->getFlagId();
-    $actions['delete']['#route_parameters']['entity_id'] = $this->entity->getFlaggableId();
-
+      $actions['delete']['#title'] = $this->t('Delete Flagging');
+      $actions['delete']['#route_parameters']['flag_id'] = $this->entity->getFlagId();
+      $actions['delete']['#route_parameters']['entity_id'] = $this->entity->getFlaggableId();
+    }
 
     return $actions;
   }
