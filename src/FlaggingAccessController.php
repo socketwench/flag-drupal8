@@ -6,7 +6,7 @@
 
 namespace Drupal\flag;
 
-use Drupal\Core\Access\AccessInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\flag\Entity\Flag;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,13 +25,9 @@ class FlaggingAccessController extends ControllerBase {
    * @return string
    *   Returns indication value for flagging access permission.
    */
-  public function checkFlag(Request $request) {
-    $flag = Flag::load($request->get('flag_id'));
-    if ($flag->hasActionAccess('flag')) {
-      return AccessInterface::ALLOW;
-    }
-
-    return AccessInterface::DENY;
+  public function checkFlag($flag_id) {
+    $flag = Flag::load($flag_id);
+    return AccessResult::allowedIf($flag->hasActionAccess('flag'));
   }
 
   /**
@@ -43,13 +39,9 @@ class FlaggingAccessController extends ControllerBase {
    * @return string
    *   Returns indication value for unflagging access permission.
    */
-  public function checkUnflag(Request $request) {
-    $flag = Flag::load($request->get('flag_id'));
-    if ($flag->hasActionAccess('unflag')) {
-      return AccessInterface::ALLOW;
-    }
-
-    return AccessInterface::DENY;
+  public function checkUnflag($flag_id) {
+    $flag = Flag::load($flag_id);
+    return AccessResult::allowedIf($flag->hasActionAccess('unflag'));
   }
 
 }
