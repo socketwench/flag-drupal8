@@ -9,7 +9,7 @@ define('FLAG_API_VERSION', 3);
 
 define('FLAG_ADMIN_PATH', 'admin/structure/flags');
 define('FLAG_ADMIN_PATH_START', 3);
-
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\flag\Entity\Flag;
 use Drupal\node\NodeInterface;
@@ -457,7 +457,7 @@ function flag_user_account_removal(UserInterface $account) {
     ->execute();
 
   // Remove flags that have been done to this user.
-  _flag_entity_delete('user', $account->id());
+  //_flag_entity_delete('user', $account->id());
 }
 
 /**
@@ -507,14 +507,14 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
     // For non-existent nodes (such as on the node add form), assume that the
     // current user is creating the content.
     if (empty($entity_id) || !($node = $flag->fetch_entity($entity_id))) {
-      return $flag->access_author == 'others' ? FALSE : NULL;
+      return AccessResult::allowedIf($flag->access_author == 'others')->cacheUntilEntityChanges($flag);
     }
 
     if ($flag->access_author == 'own' && $node->uid != $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
     elseif ($flag->access_author == 'others' && $node->uid == $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
   }
 
@@ -523,21 +523,21 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
     // For non-existent comments (such as on the comment add form), assume that
     // the current user is creating the content.
     if (empty($entity_id) || !($comment = $flag->fetch_entity($entity_id))) {
-      return $flag->access_author == 'comment_others' ? FALSE : NULL;
+      return $flag->access_author == 'comment_others' ? AccessResult::forbidden()->cacheUntilEntityChanges($flag) : NULL;
     }
 
     $node = node_load($comment->nid);
     if ($flag->access_author == 'node_own' && $node->uid != $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
     elseif ($flag->access_author == 'node_others' && $node->uid == $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
     elseif ($flag->access_author == 'comment_own' && $comment->uid != $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
     elseif ($flag->access_author == 'comment_others' && $comment->uid == $account->uid) {
-      return FALSE;
+      return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
   }
 }
