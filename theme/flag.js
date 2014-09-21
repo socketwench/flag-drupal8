@@ -117,11 +117,11 @@ Drupal.flagAnonymousLinks = function(context) {
     this.href += (this.href.match(/\?/) ? '&' : '?') + 'has_js=1';
     $(this).addClass('flag-anonymous-processed');
   });
-}
+};
 
 String.prototype.flagNameToCSS = function() {
   return this.replace(/_/g, '-');
-}
+};
 
 /**
  * A behavior specifically for anonymous users. Update links to the proper state.
@@ -166,7 +166,7 @@ Drupal.flagAnonymousLinkTemplates = function(context) {
       }
     }
   }
-}
+};
 
 /**
  * Utility function used to set Flag cookies.
