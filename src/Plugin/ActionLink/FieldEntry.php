@@ -95,9 +95,7 @@ class FieldEntry extends ActionLinkTypeBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $form_values = $form_state['values'];
-
-    if ($form_values['link_type'] == 'field_entry') {
+    if ($form_state->getValue('link_type') == 'field_entry') {
       if (empty($form_values['flag_confirmation'])) {
         $form_state->setErrorByName('flag_confirmation', 'A flag confirmation message is required when using the field entry link type.');
       }
@@ -109,7 +107,7 @@ class FieldEntry extends ActionLinkTypeBase {
       }
     }
 
-    if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_values['id'])) {
+    if (!preg_match('/^[a-z_][a-z0-9_]*$/', $form_state->getValue('id'))) {
       $form_state->setErrorByName('label', 'The flag name may only contain lowercase letters, underscores, and numbers.');
     }
   }

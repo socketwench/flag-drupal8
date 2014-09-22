@@ -131,7 +131,7 @@ class FieldEntryFormController extends ControllerBase {
     $entity = \Drupal::service('flag')->getFlaggableById($flag, $entity_id);
     $flaggings = \Drupal::service('flag')->getFlaggings($entity, $flag, $account);
 
-    return array_values($flaggings)[0];
+    return reset($flaggings);
   }
 
   /**
