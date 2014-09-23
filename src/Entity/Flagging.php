@@ -19,19 +19,32 @@ use Drupal\flag\FlaggingInterface;
  * @ContentEntityType(
  *  id = "flagging",
  *  label = @Translation("Flagging"),
+ *  bundle_label = @Translation("Flagging"),
+ *  handlers = {
+ *     "form" = {
+ *       "add" = "Drupal\flag\Form\FlaggingForm",
+ *       "edit" = "Drupal\flag\Form\FlaggingForm",
+ *       "delete" = "Drupal\flag\Form\FlaggingConfirmForm"
+ *     }
+ *  },
  *  base_table = "flagging",
+ *  data_table = "flagging_data",
  *  fieldable = TRUE,
- *  bundle_entity_type = "flag",
- *  field_ui_base_route = "flag.edit",
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
  *    "uuid" = "uuid"
+ *  },
+ *  bundle_entity_type = "flag",
+ *  field_ui_base_route = "flag.edit",
+ *  links = {
+ *    "delete-form" = "flag.confirm_unflag"
  *  }
  * )
  */
 class Flagging extends ContentEntityBase implements FlaggingInterface {
-
+  // @todo should there be a data_table annotation?
+  // @todo should the bundle entity_key annotation be "flag" not "type"?
   /**
    * Gets the flag ID for the parent flag.
    *
