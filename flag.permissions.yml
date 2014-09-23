@@ -1,0 +1,7 @@
+administer flag:
+  title: 'Administer Flag'
+  decription: 'Define and manage Flags and Flag settings.'
+  restrict access: TRUE
+
+permission_callbacks:
+  - Drupal\flag\FlagPermissions::permissions
