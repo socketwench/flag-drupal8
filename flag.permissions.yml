@@ -1,5 +1,5 @@
-administer flag:
-  title: 'Administer Flag'
+administer flags:
+  title: 'Administer Flags'
   decription: 'Define and manage Flags and Flag settings.'
   restrict access: TRUE
 
