@@ -68,6 +68,7 @@ class FlagSimpleTest extends WebTestBase {
     $this->adminUser = $this->drupalCreateUser([
       'administer flags',
       'administer flagging display',
+      'administer node display',
     ]);
 
     $this->drupalLogin($this->adminUser);
