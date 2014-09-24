@@ -9,6 +9,7 @@ namespace Drupal\flag\Controller;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\flag\FlagInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Provides a entity list page for Flags.
@@ -52,7 +53,7 @@ class FlagListController extends ConfigEntityListBuilder {
     $out = implode(', ', $all_roles);
 
     if (empty($out)) {
-      return '<em>None</em>';
+      return String::placeHolder($this->t('None'));
     }
 
     return rtrim($out, ', ');
