@@ -51,7 +51,7 @@ class EntityFlagType extends FlagTypeBase {
       // @see hook_entity_view().
       'show_in_links' => [],
       // Output the flag as individual pseudofields.
-      'show_as_field' => FALSE,
+      'show_as_field' => TRUE,
       // Add a checkbox for the flag in the entity form.
       // @see hook_field_attach_form().
       'show_on_form' => FALSE,
@@ -123,6 +123,38 @@ class EntityFlagType extends FlagTypeBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $form_values = $form_state->getValues();
+
+    // Check each of the display modes for the show_in_links field.
+    foreach ($form_values['show_in_links'] as $link_display) {
+      if (!empty($link_display)) {
+        return;
+      }
+    }
+
+    // Check if the user selected display as a psudofield.
+    if (!empty($form_values['show_as_field'])) {
+      return;
+    }
+
+    // Check if the user selected display on the entity edit form.
+    if (!empty($form_values['show_on_form'])) {
+      return;
+    }
+
+    // Check if the user selected display as a contextual link.
+    if (!empty($form_values['show_contextual_link'])) {
+      return;
+    }
+
+    // If we're still here, no display was selected. Return a form error.
+    $form_state->setErrorByName('show_as_field', 'No entity link display selected. Please select at least one link display such as \'Display link as field\'.');
   }
 
   /**
