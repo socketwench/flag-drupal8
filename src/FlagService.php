@@ -133,7 +133,7 @@ class FlagService {
 
     $result = $query->execute();
 
-    $flags = $this->entityMgr->getStorage('flag')->load($result);
+    $flags = $this->entityMgr->getStorage('flag')->loadMultiple($result);
 
     if ($account == NULL) {
       return $flags;
