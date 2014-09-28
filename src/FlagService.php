@@ -133,7 +133,7 @@ class FlagService {
 
     $result = $query->execute();
 
-    $flags = entity_load_multiple('flag', $result);
+    $flags = $this->entityMgr->getStorage('flag')->load($result);
 
     if ($account == NULL) {
       return $flags;
@@ -185,7 +185,7 @@ class FlagService {
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
-      $flaggings[$flagging_id] = entity_load('flagging', $flagging_id);
+      $flaggings[$flagging_id] = $this->entityMgr->getStorage('flagging')->load($flagging_id);
     }
 
     return $flaggings;
@@ -201,7 +201,7 @@ class FlagService {
    *   The flag entity.
    */
   public function getFlagById($flag_id) {
-    return entity_load('flag', $flag_id);
+    return  $this->entityMgr->getStorage('flag')->load($flag_id);
   }
 
   /**
@@ -216,7 +216,7 @@ class FlagService {
    *   The flaggable entity object.
    */
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
-    return entity_load($flag->getFlaggableEntityType(), $entity_id);
+    return $this->entityMgr->getStorage($flag->getFlaggableEntityType())->load($entity_id);
   }
 
   /**
@@ -243,7 +243,7 @@ class FlagService {
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
-      $flaggings[$flagging_id] = entity_load('flagging', $flagging_id);
+      $flaggings[$flagging_id] = $this->entityManager->getStorage('flagging')->load($flagging_id);
     }
 
     return $flaggings;
@@ -268,7 +268,7 @@ class FlagService {
       $account = $this->currentUser;
     }
 
-    $flagging = entity_create('flagging', [
+    $flagging = $this->entityMgr->getStorage('flagging')->create([
       'type' => 'flag',
       'uid' => $account->id(),
       'fid' => $flag->id(),

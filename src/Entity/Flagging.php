@@ -62,7 +62,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
    *   The flag related this this flagging.
    */
   public function getFlag() {
-    return entity_load('flag', $this->getFlagId());
+    return $this->entityManager()->getStorage('flag')->load($this->getFlagId());
   }
 
   /**
@@ -92,7 +92,7 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
    *   The flaggable entity.
    */
   public function getFlaggable() {
-    return entity_load($this->getFlaggableType(), $this->getFlaggableId());
+    return $this->entityManager()->getStorage($this->getFlaggableType())->load($this->getFlaggableId());
   }
 
   /**
