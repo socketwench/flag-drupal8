@@ -508,7 +508,7 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
       return $flag->access_author == 'comment_others' ? AccessResult::forbidden()->cacheUntilEntityChanges($flag) : NULL;
     }
 
-    $node = node_load($comment->nid);
+    $node = \Drupal::entityManager()->getStorage('node')->load($comment->nid);
     if ($flag->access_author == 'node_own' && $node->uid != $account->uid) {
       return AccessResult::forbidden()->cacheUntilEntityChanges($flag);
     }
