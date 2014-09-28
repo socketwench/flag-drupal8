@@ -39,8 +39,10 @@ class ConfirmForm extends ActionLinkTypeBase {
   public function defaultConfiguration() {
     $options = parent::defaultConfiguration();
 
-    $options['flag_confirmation'] = 'Flag this content?';
-    $options['unflag_confirmation'] = 'Unflag this content?';
+    $options += [
+      'flag_confirmation' => 'Flag this content?',
+      'unflag_confirmation' => 'Unflag this content?',
+    ];
 
     return $options;
   }
@@ -64,7 +66,7 @@ class ConfirmForm extends ActionLinkTypeBase {
     $form['display']['settings']['link_options_confirm']['flag_confirmation'] = [
       '#type' => 'textfield',
       '#title' => t('Flag confirmation message'),
-      '#default_value' => $this->configuration['flag_confirmation'],
+      '#default_value' => $this->getFlagQuestion(),
       '#description' => t('Message displayed if the user has clicked the "flag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to flag this content?"'),
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
@@ -73,7 +75,7 @@ class ConfirmForm extends ActionLinkTypeBase {
     $form['display']['settings']['link_options_confirm']['unflag_confirmation'] = [
       '#type' => 'textfield',
       '#title' => t('Unflag confirmation message'),
-      '#default_value' => $this->configuration['unflag_confirmation'],
+      '#default_value' => $this->getUnflagQuestion(),
       '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
