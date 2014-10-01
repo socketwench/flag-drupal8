@@ -98,7 +98,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
       $flag_roles = user_roles(FALSE, "flag $flag->label");
       if (isset($flag_roles[DRUPAL_ANONYMOUS_RID])) {
         // Disable page caching for anonymous users.
-        drupal_page_is_cacheable(FALSE);
+        \Drupal::service('page_cache_kill_switch')->trigger();
 
         // Add in the SID from Session API for anonymous users.
         $this->definition['extra'][] = [

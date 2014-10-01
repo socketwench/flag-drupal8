@@ -29,7 +29,6 @@ use Drupal\flag\FlaggingInterface;
  *  },
  *  base_table = "flagging",
  *  data_table = "flagging_data",
- *  fieldable = TRUE,
  *  entity_keys = {
  *    "id" = "id",
  *    "bundle" = "type",
