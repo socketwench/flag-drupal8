@@ -243,7 +243,7 @@ class FlagService {
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
-      $flaggings[$flagging_id] = $this->entityManager->getStorage('flagging')->load($flagging_id);
+      $flaggings[$flagging_id] = $this->entityMgr->getStorage('flagging')->load($flagging_id);
     }
 
     return $flaggings;
