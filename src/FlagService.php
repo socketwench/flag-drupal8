@@ -28,7 +28,7 @@ class FlagService {
    *
    * @var FlagTypePluginManager
    */
-  private $flagTypeMgr;
+  private $flagTypeManager;
 
   /**
    * The event dispatcher injected into the service.
@@ -42,7 +42,7 @@ class FlagService {
    *
    * @var QueryFactory
    */
-  private $entityQueryMgr;
+  private $entityQueryManager;
 
   /**
    * The current user injected into the service.
@@ -54,7 +54,7 @@ class FlagService {
   /*
    * @var EntityManagerInterface
    * */
-  private $entityMgr;
+  private $entityManager;
 
   /**
    * Constructor.
@@ -75,11 +75,11 @@ class FlagService {
                               QueryFactory $entity_query,
                               AccountInterface $current_user,
                               EntityManagerInterface $entity_manager) {
-    $this->flagTypeMgr = $flag_type;
+    $this->flagTypeManager = $flag_type;
     $this->eventDispatcher = $event_dispatcher;
-    $this->entityQueryMgr = $entity_query;
+    $this->entityQueryManager = $entity_query;
     $this->currentUser = $current_user;
-    $this->entityMgr = $entity_manager;
+    $this->entityManager = $entity_manager;
   }
 
   /**
@@ -97,10 +97,10 @@ class FlagService {
   public function fetchDefinition($entity_type = NULL) {
     // @todo Add caching, PLS!
     if (!empty($entity_type)) {
-      return $this->flagTypeMgr->getDefinition($entity_type);
+      return $this->flagTypeManager->getDefinition($entity_type);
     }
 
-    return $this->flagTypeMgr->getDefinitions();
+    return $this->flagTypeManager->getDefinitions();
   }
 
   /**
@@ -121,7 +121,7 @@ class FlagService {
    *   An array of the structure [fid] = flag_object.
    */
   public function getFlags($entity_type = NULL, $bundle = NULL, AccountInterface $account = NULL) {
-    $query = $this->entityQueryMgr->get('flag');
+    $query = $this->entityQueryManager->get('flag');
 
     if ($entity_type != NULL) {
       $query->condition('entity_type', $entity_type);
@@ -133,7 +133,7 @@ class FlagService {
 
     $result = $query->execute();
 
-    $flags = $this->entityMgr->getStorage('flag')->loadMultiple($result);
+    $flags = $this->entityManager->getStorage('flag')->loadMultiple($result);
 
     if ($account == NULL) {
       return $flags;
@@ -166,7 +166,7 @@ class FlagService {
    *   An array of flaggings.
    */
   public function getFlaggings(EntityInterface $entity = NULL, FlagInterface $flag = NULL, AccountInterface $account = NULL) {
-    $query = $this->entityQueryMgr->get('flagging');
+    $query = $this->entityQueryManager->get('flagging');
 
     if (!empty($account)) {
       $query = $query->condition('uid', $account->id());
@@ -185,7 +185,7 @@ class FlagService {
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
-      $flaggings[$flagging_id] = $this->entityMgr->getStorage('flagging')->load($flagging_id);
+      $flaggings[$flagging_id] = $this->entityManager->getStorage('flagging')->load($flagging_id);
     }
 
     return $flaggings;
@@ -201,7 +201,7 @@ class FlagService {
    *   The flag entity.
    */
   public function getFlagById($flag_id) {
-    return  $this->entityMgr->getStorage('flag')->load($flag_id);
+    return  $this->entityManager->getStorage('flag')->load($flag_id);
   }
 
   /**
@@ -216,7 +216,7 @@ class FlagService {
    *   The flaggable entity object.
    */
   public function getFlaggableById(FlagInterface $flag, $entity_id) {
-    return $this->entityMgr->getStorage($flag->getFlaggableEntityType())->load($entity_id);
+    return $this->entityManager->getStorage($flag->getFlaggableEntityType())->load($entity_id);
   }
 
   /**
@@ -231,7 +231,7 @@ class FlagService {
    *   An array of users who have flagged the entity.
    */
   public function getFlaggingUsers(EntityInterface $entity, FlagInterface $flag = NULL) {
-    $query = $this->entityQueryMgr->get('users')
+    $query = $this->entityQueryManager->get('users')
       ->condition('entity_type', $entity->getEntityTypeId())
       ->condition('entity_id', $entity->id());
 
@@ -243,7 +243,7 @@ class FlagService {
 
     $flaggings = [];
     foreach ($result as $flagging_id) {
-      $flaggings[$flagging_id] = $this->entityMgr->getStorage('flagging')->load($flagging_id);
+      $flaggings[$flagging_id] = $this->entityManager->getStorage('flagging')->load($flagging_id);
     }
 
     return $flaggings;
@@ -268,7 +268,7 @@ class FlagService {
       $account = $this->currentUser;
     }
 
-    $flagging = $this->entityMgr->getStorage('flagging')->create([
+    $flagging = $this->entityManager->getStorage('flagging')->create([
       'type' => 'flag',
       'uid' => $account->id(),
       'fid' => $flag->id(),
@@ -280,7 +280,7 @@ class FlagService {
 
     $this->incrementFlagCounts($flag, $entity);
 
-    $this->entityMgr
+    $this->entityManager
       ->getViewBuilder($entity->getEntityTypeId())
       ->resetCache([
         $entity,
