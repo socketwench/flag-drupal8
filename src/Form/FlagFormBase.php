@@ -9,6 +9,7 @@ namespace Drupal\flag\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\flag\FlagInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides the base flag add/edit form.
@@ -36,7 +37,7 @@ abstract class FlagFormBase extends EntityForm {
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#default_value' => $flag->label,
-      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
+      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => Url::fromRoute('views_ui.list'))),
       '#maxlength' => 255,
       '#required' => TRUE,
       '#weight' => -3,
@@ -268,14 +269,14 @@ abstract class FlagFormBase extends EntityForm {
 
     $flag->enable();
     $status = $flag->save();
-    $url = $flag->url();
+    $url = $flag->urlInfo();
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Flag %label has been updated.', ['%label' => $flag->label()]));
-      $this->logger('flag')->notice('Flag %label has been updated.', ['%label' => $flag->label(), 'link' => l(t('Edit'), $url)]);
+      $this->logger('flag')->notice('Flag %label has been updated.', ['%label' => $flag->label(), 'link' => \Drupal::l(t('Edit'), $url)]);
     }
     else {
       drupal_set_message(t('Flag %label has been added.', ['%label' => $flag->label()]));
-      $this->logger('flag')->notice('Flag %label has been added.', ['%label' => $flag->label(), 'link' => l(t('Edit'), $url)]);
+      $this->logger('flag')->notice('Flag %label has been added.', ['%label' => $flag->label(), 'link' => \Drupal::l(t('Edit'), $url)]);
     }
 
     // We clear caches more vigorously if the flag was new.

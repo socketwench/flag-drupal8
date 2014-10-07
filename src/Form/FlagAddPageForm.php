@@ -7,8 +7,8 @@
 namespace Drupal\flag\Form;
 
 use Drupal\Core\Form\FormBase;
-use Drupal\flag\Handlers\AbstractFlag;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides the flag add page.
@@ -43,7 +43,7 @@ class FlagAddPageForm extends FormBase {
     $form['flag_basic_info']['label'] = [
       '#type' => 'textfield',
       '#title' => t('Label'),
-      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => url('admin/structure/views'))),
+      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => Url::fromRoute('views_ui.list'))),
       '#maxlength' => 255,
       '#required' => TRUE,
       '#weight' => -3,

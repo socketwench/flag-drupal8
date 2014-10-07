@@ -8,6 +8,7 @@ namespace Drupal\flag\Plugin\views\relationship;
 
 use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a views relationship to select flag content by a flag.
@@ -69,7 +70,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     if (!$form['flag']['#options']) {
       $form = [
         'error' => [
-          '#markup' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', ['%type' => $entity_type, '@create-url' => url(FLAG_ADMIN_PATH)]) . '</p>',
+          '#markup' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', ['%type' => $entity_type, '@create-url' => Url::fromRoute('flag.list')]) . '</p>',
         ],
       ];
     }
