@@ -267,6 +267,11 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
   $flag_service = \Drupal::service('flag');
   $flags = $flag_service->getFlags($entity->getEntityTypeID(), $entity->bundle());
 
+  // Don't act on previews.
+  if ($entity->isNew()) {
+    return;
+  }
+
   foreach ($flags as $flag) {
     $link_type_plugin = $flag->getLinkTypePlugin();
     $flag_type_plugin = $flag->getFlagTypePlugin();
