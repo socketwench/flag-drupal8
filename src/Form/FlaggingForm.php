@@ -8,6 +8,7 @@ namespace Drupal\flag\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides the flagging form for field entry.
@@ -38,8 +39,18 @@ class FlaggingForm extends ContentEntityForm {
       unset($actions['delete']['#access']);
 
       $actions['delete']['#title'] = $this->t('Delete Flagging');
-      $actions['delete']['#route_parameters']['flag_id'] = $this->entity->getFlagId();
-      $actions['delete']['#route_parameters']['entity_id'] = $this->entity->getFlaggableId();
+
+      // Build the delete url from route. We need to build this manually
+      // otherwise Drupal will try to build the flagging entity's delete-form
+      // link. Since that route doesn't use the flagging ID, Drupal can't build
+      // the link for us.
+      $route_params = [
+        'flag_id' => $this->entity->getFlagId(),
+        'entity_id' => $this->entity->getFlaggableId(),
+      ];
+      $url = Url::fromRoute('flag.confirm_unflag', $route_params);
+
+      $actions['delete']['#url'] = $url;
     }
 
     return $actions;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagConfirmFormTest.
+ * Contains the FlagFieldEntryTest.
  */
 
 namespace Drupal\flag\Tests;
@@ -10,11 +10,11 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\user\Entity\Role;
 
 /**
- * Tests the confirm form link type.
+ * Test the Field Entry link type.
  *
  * @group flag
  */
-class FlagConfirmFormTest extends WebTestBase {
+class FlagFieldEntryTest extends WebTestBase {
 
   /**
    * The label of the flag to create for the test.
@@ -44,8 +44,15 @@ class FlagConfirmFormTest extends WebTestBase {
    */
   protected $nodeType = 'article';
 
+  protected $nodeId;
+
   protected $flagConfirmMessage = 'Flag test label 123?';
+  protected $flagDetailsMessage = 'Enter flag test label 123 details';
   protected $unflagConfirmMessage = 'Unflag test label 123?';
+
+  protected $flagFieldId = 'flag_text_field';
+  protected $flagFieldLabel = 'Flag Text Field';
+  protected $flagFieldValue;
 
   /**
    * User object.
@@ -62,23 +69,25 @@ class FlagConfirmFormTest extends WebTestBase {
   public static $modules = array('views', 'flag', 'node', 'field_ui');
 
   /**
-   * Test the confirm form link type.
+   * Create a new flag with the Field Entry type, and add fields.
    */
-  public function testCreateConfirmFlag() {
-    // Create and log in our user.
+  public function testCreateFieldEntryFlag() {
     $this->adminUser = $this->drupalCreateUser([
       'administer flags',
       'administer flagging display',
+      'administer flagging fields',
       'administer node display',
     ]);
 
     $this->drupalLogin($this->adminUser);
     $this->doCreateFlag();
-    $this->doCreateNode();
+    $this->doAddFields();
+    $this->doCreateFlagNode();
+    $this->doEditFlagField();
   }
 
   /**
-   * Create a node type and a flag.
+   * Create a node type and flag.
    */
   public function doCreateFlag() {
     // Create content type.
@@ -89,18 +98,20 @@ class FlagConfirmFormTest extends WebTestBase {
       'label' => $this->label,
       'id' => $this->id,
       'flag_entity_type' => 'flagtype_node',
-      'flag_link_type' => 'confirm',
+      'flag_link_type' => 'field_entry',
     ];
     $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
 
     // Check confirm form field entry.
     $this->assertText(t('Flag confirmation message'));
+    $this->assertText(t('Enter flagging details message'));
     $this->assertText(t('Unflag confirmation message'));
 
     // Update the flag.
     $edit = [
       'types[' . $this->nodeType . ']' => $this->nodeType,
       'flag_confirmation' => $this->flagConfirmMessage,
+      'flagging_edit_title' => $this->flagDetailsMessage,
       'unflag_confirmation' => $this->unflagConfirmMessage,
     ];
     $this->drupalPostForm(NULL, $edit, t('Create Flag'));
@@ -110,11 +121,31 @@ class FlagConfirmFormTest extends WebTestBase {
   }
 
   /**
+   * Add fields to flag.
+   */
+  public function doAddFields() {
+    $edit = [
+      'fields[_add_new_field][label]' => $this->flagFieldLabel,
+      'fields[_add_new_field][field_name]' => $this->flagFieldId,
+      'fields[_add_new_field][type]' => 'text',
+    ];
+    $this->drupalPostForm('admin/structure/flags/manage/' . $this->id . '/fields', $edit, t('Save'));
+
+    $edit = [
+      'field_storage[cardinality]' => '-1',
+      'field_storage[cardinality_number]' => '1',
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+
+    $this->assertText(t('Updated field') . ' ' . $this->flagFieldLabel . ' ' . t('field settings.'));
+  }
+
+  /**
    * Create a node and flag it.
    */
-  public function doCreateNode() {
+  public function doCreateFlagNode() {
     $node = $this->drupalCreateNode(['type' => $this->nodeType]);
-    $node_id = $node->id();
+    $this->nodeId = $node->id();
 
     // Grant the flag permissions to the authenticated role, so that both
     // users have the same roles and share the render cache.
@@ -128,19 +159,48 @@ class FlagConfirmFormTest extends WebTestBase {
     $this->drupalLogin($user_1);
 
     // Click the flag link.
-    $this->drupalGet('node/' . $node_id);
+    $this->drupalGet('node/' . $this->nodeId);
     $this->clickLink(t('Flag this item'));
 
     // Check if we have the confirm form message displayed.
     $this->assertText($this->flagConfirmMessage);
 
-    // Submit the confirm form.
-    $this->drupalPostForm('flag/confirm/flag/' . $this->id . '/' . $node_id, [], t('Flag'));
-    $this->assertResponse(200);
+    // Enter the field value and submit it.
+    $this->flagFieldValue = $this->randomString();
+    $edit = [
+      'field_' . $this->flagFieldId . '[0][value]' => $this->flagFieldValue,
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Update Flagging'));
 
     // Check that the node is flagged.
-    $this->drupalGet('node/' . $node_id);
     $this->assertLink(t('Unflag this item'));
+  }
+
+  /**
+   * Edit the field value of the existing flagging.
+   */
+  public function doEditFlagField() {
+    // Get the details form.
+    $this->drupalGet('flag/details/edit/' . $this->id . '/' . $this->nodeId);
+
+    // See if the details message is displayed.
+    $this->assertText($this->flagDetailsMessage);
+
+    // See if the field value was preserved.
+    $this->assertFieldByName('field_' . $this->flagFieldId . '[0][value]', $this->flagFieldValue);
+
+    // Update the field value.
+    $this->flagFieldValue = $this->randomString();
+    $edit = [
+      'field_' . $this->flagFieldId . '[0][value]' => $this->flagFieldValue,
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Update Flagging'));
+
+    // Get the details form.
+    $this->drupalGet('flag/details/edit/' . $this->id . '/' . $this->nodeId);
+
+    // See if the field value was preserved.
+    $this->assertFieldByName('field_' . $this->flagFieldId . '[0][value]', $this->flagFieldValue);
   }
 
 }
