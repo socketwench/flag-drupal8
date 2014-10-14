@@ -95,6 +95,8 @@ class FieldEntry extends ActionLinkTypeBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $form_values = $form_state->getValues();
+
     if ($form_state->getValue('link_type') == 'field_entry') {
       if (empty($form_values['flag_confirmation'])) {
         $form_state->setErrorByName('flag_confirmation', 'A flag confirmation message is required when using the field entry link type.');
@@ -118,9 +120,9 @@ class FieldEntry extends ActionLinkTypeBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
-    $this->configuration['flag_confirmation'] = $form_state['values']['flag_confirmation'];
-    $this->configuration['edit_flagging'] = $form_state['values']['flagging_edit_title'];
-    $this->configuration['unflag_confirmation'] = $form_state['values']['unflag_confirmation'];
+    $this->configuration['flag_confirmation'] = $form_state->getValue('flag_confirmation');
+    $this->configuration['edit_flagging'] = $form_state->getValue('flagging_edit_title');
+    $this->configuration['unflag_confirmation'] = $form_state->getValue('unflag_confirmation');
   }
 
   /**
