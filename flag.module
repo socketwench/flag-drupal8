@@ -263,14 +263,16 @@ function flag_node_links_alter(array &$links, NodeInterface $entity, array &$con
  * Handles the 'show_in_links' and 'show_as_field' flag options.
  */
 function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode, $langcode) {
-  // Get all possible flags for this entity type.
-  $flag_service = \Drupal::service('flag');
-  $flags = $flag_service->getFlags($entity->getEntityTypeID(), $entity->bundle());
-
   // Don't act on previews.
   if ($entity->isNew()) {
     return;
   }
+
+  // @todo: Add caching here PLZ.
+
+  // Get all possible flags for this entity type.
+  $flag_service = \Drupal::service('flag');
+  $flags = $flag_service->getFlags($entity->getEntityTypeID(), $entity->bundle());
 
   foreach ($flags as $flag) {
     $link_type_plugin = $flag->getLinkTypePlugin();
