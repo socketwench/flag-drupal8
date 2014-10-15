@@ -90,16 +90,16 @@ class FlagListController extends ConfigEntityListBuilder {
     }
     else {
       $output .= '<p>';
-      $output .= t('Lists of flagged content can be displayed using views. You can configure these in the <a href="@views-url">Views administration section</a>.', ['@views-url' => Url::fromRoute('views_ui.list')]);
+      $output .= t('Lists of flagged content can be displayed using views. You can configure these in the <a href="@views-url">Views administration section</a>.', ['@views-url' => Url::fromRoute('views_ui.list')->toString()]);
       if (\Drupal::service('flag')->getFlagById('bookmarks')) {
-        $output .= ' ' . t('Flag module automatically provides a few <a href="@views-url">default views for the <em>bookmarks</em> flag</a>. You can use these as templates by cloning these views and then customizing as desired.', ['@views-url' => Url::fromRoute('views_ui.list', ['query' => ['tag' => 'flag']])]);
+        $output .= ' ' . t('Flag module automatically provides a few <a href="@views-url">default views for the <em>bookmarks</em> flag</a>. You can use these as templates by cloning these views and then customizing as desired.', ['@views-url' => Url::fromRoute('views_ui.list', ['query' => ['tag' => 'flag']])->toString()]);
       }
       $output .= ' ' . t('The <a href="@flag-handbook-url">Flag module handbook</a> contains extensive <a href="@customize-url">documentation on creating customized views</a> using flags.', ['@flag-handbook-url' => 'http://drupal.org/handbook/modules/flag', '@customize-url' => 'http://drupal.org/node/296954']);
       $output .= '</p>';
     }
 
     if (!\Drupal::moduleHandler()->moduleExists('rules')) {
-      $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', ['@rules-url' => Url::fromUri('http://drupal.org/node/407070')]) . '</p>';
+      $output .= '<p>' . t('Flagging an item may trigger <em>rules</em>. However, you don\'t have the <a href="@rules-url">Rules</a> module enabled, so you won\'t be able to enjoy this feature. The Rules module is a more extensive solution than Flag actions.', ['@rules-url' => Url::fromUri('http://drupal.org/node/407070')->toString()]) . '</p>';
     }
 
     /*

@@ -43,7 +43,7 @@ class FlagAddPageForm extends FormBase {
     $form['flag_basic_info']['label'] = [
       '#type' => 'textfield',
       '#title' => t('Label'),
-      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => Url::fromRoute('views_ui.list'))),
+      '#description' => t('A short, descriptive title for this flag. It will be used in administrative interfaces to refer to this flag, and in page titles and menu items of some <a href="@insite-views-url">views</a> this module provides (theses are customizable, though). Some examples could be <em>Bookmarks</em>, <em>Favorites</em>, or <em>Offensive</em>.', array('@insite-views-url' => Url::fromRoute('views_ui.list')->toString())),
       '#maxlength' => 255,
       '#required' => TRUE,
       '#weight' => -3,

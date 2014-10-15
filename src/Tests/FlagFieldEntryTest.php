@@ -66,7 +66,7 @@ class FlagFieldEntryTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('views', 'flag', 'node', 'field_ui');
+  public static $modules = array('views', 'flag', 'node', 'field_ui', 'text');
 
   /**
    * Create a new flag with the Field Entry type, and add fields.
