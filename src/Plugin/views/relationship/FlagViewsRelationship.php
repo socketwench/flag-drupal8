@@ -70,7 +70,7 @@ class FlagViewsRelationship extends RelationshipPluginBase {
     if (!$form['flag']['#options']) {
       $form = [
         'error' => [
-          '#markup' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', ['%type' => $entity_type, '@create-url' => Url::fromRoute('flag.list')]) . '</p>',
+          '#markup' => '<p class="error form-item">' . t('No %type flags exist. You must first <a href="@create-url">create a %type flag</a> before being able to use this relationship type.', ['%type' => $entity_type, '@create-url' => Url::fromRoute('flag.list')->toString()]) . '</p>',
         ],
       ];
     }
