@@ -55,7 +55,7 @@ before_script:
   - git clone --depth 1 --branch $DRUPAL_VERSION $DRUPAL_REPO drupal
   - cd drupal
   # Install Drupal.
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@127.0.0.1/drupal testing
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@localhost/drupal testing
 
   # Reference and enable flag in build site.
   - ln -s $TESTDIR modules/$MODULE_NAME
@@ -64,13 +64,13 @@ before_script:
   # Start a web server on port 8080, run in the background; wait for
   # initialization. This is temporarly disabled since there are no web tests
   # yet.
-  - drush runserver 127.0.0.1:8080 &
+  - drush runserver localhost:8080 &
   - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
 
 script:
   # Run the Coder sniffer for Flag.
   - phpcs --report=full --standard=Drupal ./modules/$MODULE_NAME
   # Run the Simpletests for Flag.
-  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://127.0.0.1:8080 --verbose --color "$MODULE_TEST_GROUP"
+  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://localhost:8080 --verbose --color "$MODULE_TEST_GROUP"
   # Run the PHPUnit tests.
   - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/$MODULE_NAME
