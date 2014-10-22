@@ -65,7 +65,7 @@ before_script:
   - git clone --depth 1 --branch $DRUPAL_VERSION $DRUPAL_REPO drupal
   - cd drupal
   # Install Drupal.
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@1localhost/drupal testing
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@localhost/drupal testing
 
   # Reference and enable flag in build site.
   - ln -s $TESTDIR modules/$MODULE_NAME
