@@ -32,7 +32,7 @@ before_install:
   - $HOME/.phpenv/versions/`php -r "print PHP_VERSION;"`/sbin/php-fpm
 
   # Import the PHP configuration.
-  - phpenv config-add ./travis/php.ini
+  - phpenv config-add .travis/php.ini
 
   # Always update Composer to the recent version, otherwise the drush
   # installation fails.
