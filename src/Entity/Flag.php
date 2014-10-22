@@ -6,7 +6,7 @@
 
 namespace Drupal\flag\Entity;
 
-use Drupal\Core\Plugin\DefaultSinglePluginBag;
+use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -156,7 +156,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * A bag to store the FlagType plugin.
    *
-   * @var \Drupal\Core\Plugin\DefaultSinglePluginBag
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
    */
   protected $flagTypeBag;
 
@@ -178,7 +178,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * A bag to store the ActionLink plugin.
    *
-   * @var \Drupal\Core\Plugin\DefaultSinglePluginBag
+   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
    */
   protected $linkTypeBag;
 
@@ -203,13 +203,17 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     parent::__construct($values, $entity_type);
 
     if ($this->flag_type) {
-      $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
-                                                      $this->flag_type, $this->flagTypeConfig);
+      $this->flagTypeBag = new DefaultSingleLazyPluginCollection(
+        \Drupal::service('plugin.manager.flag.flagtype'),
+        $this->flag_type, $this->flagTypeConfig
+      );
     }
 
     if ($this->link_type) {
-      $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
-                                                      $this->link_type, $this->linkTypeConfig);
+      $this->linkTypeBag = new DefaultSingleLazyPluginCollection(
+        \Drupal::service('plugin.manager.flag.linktype'),
+        $this->link_type, $this->linkTypeConfig
+      );
     }
   }
 
@@ -280,8 +284,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->flag_type = $plugin_id;
     // $this->flagTypeBag->addInstanceId($pluginID);
     // Workaround for https://www.drupal.org/node/2288805
-    $this->flagTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.flagtype'),
-      $this->flag_type, $this->flagTypeConfig);
+    $this->flagTypeBag = new DefaultSingleLazyPluginCollection(
+      \Drupal::service('plugin.manager.flag.flagtype'),
+      $this->flag_type, $this->flagTypeConfig
+    );
 
     // Get the entity type from the plugin definition.
     $plugin = $this->getFlagTypePlugin();
@@ -304,8 +310,10 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
     // $this->linkTypeBag->addInstanceId($pluginID);
     // Workaround for https://www.drupal.org/node/2288805
-    $this->linkTypeBag = new DefaultSinglePluginBag(\Drupal::service('plugin.manager.flag.linktype'),
-      $this->link_type, $this->linkTypeConfig);
+    $this->linkTypeBag = new DefaultSingleLazyPluginCollection(
+      \Drupal::service('plugin.manager.flag.linktype'),
+      $this->link_type, $this->linkTypeConfig
+    );
   }
 
   /**
