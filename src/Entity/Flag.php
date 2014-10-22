@@ -259,7 +259,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPluginBags() {
+  public function getPluginCollections() {
     return [
       'flagTypeConfig' => $this->flagTypeBag,
       'linkTypeConfig' => $this->linkTypeBag,
