@@ -89,7 +89,7 @@ flag.confirm_unflag:
 flag.field_entry:
   path: '/flag/details/flag/{flag_id}/{entity_id}'
   defaults:
-    _content: '\Drupal\flag\Controller\FieldEntryFormController::flag'
+    _controller: '\Drupal\flag\Controller\FieldEntryFormController::flag'
     _title_callback: '\Drupal\flag\Controller\FieldEntryFormController::flagTitle'
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
@@ -97,7 +97,7 @@ flag.field_entry:
 flag.field_entry.edit:
   path: '/flag/details/edit/{flag_id}/{entity_id}'
   defaults:
-    _content: '\Drupal\flag\Controller\FieldEntryFormController::edit'
+    _controller: '\Drupal\flag\Controller\FieldEntryFormController::edit'
     _title_callback: '\Drupal\flag\Controller\FieldEntryFormController::editTitle'
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
