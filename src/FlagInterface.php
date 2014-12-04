@@ -8,7 +8,7 @@ namespace Drupal\flag;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityWithPluginBagsInterface;
+use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @package Drupal\flag
  */
-interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInterface {
+interface FlagInterface extends ConfigEntityInterface, EntityWithPluginCollectionInterface {
 
   /* @todo: Add getters and setters as necessary. */
 
@@ -243,7 +243,7 @@ interface FlagInterface extends ConfigEntityInterface, EntityWithPluginBagsInter
   /**
    * {@inheritdoc}
    */
-  public function getPluginBags();
+  public function getPluginCollections();
 
   /**
    * User access permission for flagging actions.
