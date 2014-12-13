@@ -70,9 +70,7 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $url = $this->buildLink($action, $flag, $entity);
 
-    // @todo: Use whatever https://www.drupal.org/node/2302065 comes up with
-    // instead.
-    $url->setRouteParameter('destination', Url::fromRoute('<current>'));
+    $url->setRouteParameter('destination', Url::fromRoute('<current>')->toString());
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
