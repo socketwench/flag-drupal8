@@ -65,12 +65,30 @@ abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePl
   }
 
   /**
+   * Helper method to generate a destination URL parameter.
+   *
+   * @return string
+   *  A string containing a destination URL parameter.
+   */
+  protected function getDestination() {
+    $current_url = Url::fromRoute('<current>');
+    $route_params = $current_url->getRouteParameters();
+
+    if (isset($route_params['destination'])) {
+      return $route_params['destination'];
+    }
+
+    $current_path = ltrim($current_url->toString(), '/');
+    return $current_path;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function renderLink($action, FlagInterface $flag, EntityInterface $entity) {
     $url = $this->buildLink($action, $flag, $entity);
 
-    $url->setRouteParameter('destination', Url::fromRoute('<current>')->toString());
+    $url->setRouteParameter('destination', $this->getDestination());
 
     $render = $url->toRenderArray();
     $render['#type'] = 'link';
