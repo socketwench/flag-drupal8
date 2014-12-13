@@ -47,6 +47,7 @@ class FlaggingForm extends ContentEntityForm {
       $route_params = [
         'flag_id' => $this->entity->getFlagId(),
         'entity_id' => $this->entity->getFlaggableId(),
+        'destination' => \Drupal::request()->get('destination'),
       ];
       $url = Url::fromRoute('flag.confirm_unflag', $route_params);
 
