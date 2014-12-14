@@ -154,11 +154,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   protected $flag_type;
 
   /**
-   * A bag to store the FlagType plugin.
+   * A collection to store the FlagType plugin.
    *
    * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
    */
-  protected $flagTypeBag;
+  protected $flagTypeCollection;
 
   /**
    * An array to store and load the FlagType plugin configuration.
@@ -176,11 +176,11 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   protected $link_type;
 
   /**
-   * A bag to store the ActionLink plugin.
+   * A collection to store the ActionLink plugin.
    *
    * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
    */
-  protected $linkTypeBag;
+  protected $linkTypeCollection;
 
   /**
    * An array to store and load the ActionLink plugin configuration.
@@ -203,14 +203,14 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     parent::__construct($values, $entity_type);
 
     if ($this->flag_type) {
-      $this->flagTypeBag = new DefaultSingleLazyPluginCollection(
+      $this->flagTypeCollection = new DefaultSingleLazyPluginCollection(
         \Drupal::service('plugin.manager.flag.flagtype'),
         $this->flag_type, $this->flagTypeConfig
       );
     }
 
     if ($this->link_type) {
-      $this->linkTypeBag = new DefaultSingleLazyPluginCollection(
+      $this->linkTypeCollection = new DefaultSingleLazyPluginCollection(
         \Drupal::service('plugin.manager.flag.linktype'),
         $this->link_type, $this->linkTypeConfig
       );
@@ -265,8 +265,8 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function getPluginCollections() {
     return [
-      'flagTypeConfig' => $this->flagTypeBag,
-      'linkTypeConfig' => $this->linkTypeBag,
+      'flagTypeConfig' => $this->flagTypeCollection,
+      'linkTypeConfig' => $this->linkTypeCollection,
     ];
   }
 
@@ -274,7 +274,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function getFlagTypePlugin() {
-    return $this->flagTypeBag->get($this->flag_type);
+    return $this->flagTypeCollection->get($this->flag_type);
   }
 
   /**
@@ -284,7 +284,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
     $this->flag_type = $plugin_id;
     // $this->flagTypeBag->addInstanceId($pluginID);
     // Workaround for https://www.drupal.org/node/2288805
-    $this->flagTypeBag = new DefaultSingleLazyPluginCollection(
+    $this->flagTypeCollection = new DefaultSingleLazyPluginCollection(
       \Drupal::service('plugin.manager.flag.flagtype'),
       $this->flag_type, $this->flagTypeConfig
     );
@@ -299,7 +299,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function getLinkTypePlugin() {
-    return $this->linkTypeBag->get($this->link_type);
+    return $this->linkTypeCollection->get($this->link_type);
   }
 
   /**
@@ -310,7 +310,7 @@ class Flag extends ConfigEntityBase implements FlagInterface {
 
     // $this->linkTypeBag->addInstanceId($pluginID);
     // Workaround for https://www.drupal.org/node/2288805
-    $this->linkTypeBag = new DefaultSingleLazyPluginCollection(
+    $this->linkTypeCollection = new DefaultSingleLazyPluginCollection(
       \Drupal::service('plugin.manager.flag.linktype'),
       $this->link_type, $this->linkTypeConfig
     );
