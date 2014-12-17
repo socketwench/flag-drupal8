@@ -587,3 +587,29 @@ function flag_reset_flag($flag, $entity_id = NULL) {
   $count_query->execute();
   return $query->execute();
 }
+
+/**
+ * Implements hook_entity_operation().
+ */
+function flag_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+  $operations = [];
+
+  if ($entity instanceof \Drupal\flag\FlagInterface) {
+    if ($entity->isEnabled()) {
+      $operations['enable'] = [
+        'title' => t('Enable'),
+        'route_name' => 'flag.enable',
+        'weight' => 50,
+      ];
+    }
+    else {
+      $operations['disable'] = [
+        'title' => t('Disable'),
+        'route_name' => 'flag.disable',
+        'weight' => 50,
+      ];
+    }
+  }
+
+  return $operations;
+}

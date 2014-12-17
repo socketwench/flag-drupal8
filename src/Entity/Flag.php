@@ -234,6 +234,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
   /**
    * {@inheritdoc}
    */
+  public function isEnabled() {
+    return $this->enabled;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
     if ($account == NULL) {
       $account = \Drupal::currentUser();
@@ -512,6 +519,30 @@ class Flag extends ConfigEntityBase implements FlagInterface {
       \Drupal::service('event_dispatcher')
         ->dispatch(FlagEvents::FLAG_DELETED, new FlagDeleteEvent($entity));
     }
+  }
+
+  /**
+   * Sorts the flag entities, putting disabled flags at the bottom.
+   *
+   * @see \Drupal\Core\Config\Entity\ConfigEntityBase::sort()
+   */
+  public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+
+    // Check if the entities are flags, if not go with the default.
+    if ($a instanceof FlagInterface && $b instanceof FlagInterface) {
+
+      if ($a->isEnabled() && $b->isEnabled()) {
+        return parent::sort($a, $b);
+      }
+      elseif (!$a->isEnabled()) {
+        return -1;
+      }
+      elseif (!$b->isEnabled()) {
+        return 1;
+      }
+    }
+
+    return parent::sort($a, $b);
   }
 
   /**
