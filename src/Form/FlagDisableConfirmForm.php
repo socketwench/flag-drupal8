@@ -24,11 +24,11 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
   }
 
   public function getQuestion() {
-    if ($flag->isEnabled()) {
-      return t('Disable flag @name?', array('@name' => $flag->label()));
+    if ($this->flag->isEnabled()) {
+      return t('Disable flag @name?', array('@name' => $this->flag->label()));
     }
 
-    return t('Enable flag @name?', array('@name' => $flag->label()));
+    return t('Enable flag @name?', array('@name' => $this->flag->label()));
   }
 
   /**
@@ -40,7 +40,7 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
       return Url::createFromPath($destination);
     }
 
-    return $this->entity->urlInfo();
+    return $this->flag->urlInfo();
   }
 
   public function getDescription() {
@@ -63,8 +63,9 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
     if ($this->flag->isEnabled()) {
       $this->flag->disable();
     }
-
-    $this->flag->enable();
+    else {
+      $this->flag->enable();
+    }
   }
 
 }
