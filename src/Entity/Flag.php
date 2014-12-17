@@ -39,7 +39,9 @@ use Drupal\flag\FlagInterface;
  *   },
  *   links = {
  *     "edit-form" = "flag.edit",
- *     "delete-form" = "flag.delete"
+ *     "delete-form" = "flag.delete",
+ *     "enable" = "flag.enable",
+ *     "disable" = "flag.disable"
  *   }
  * )
  */
@@ -229,6 +231,13 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    */
   public function disable() {
     $this->enabled = FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEnabled() {
+    return $this->enabled;
   }
 
   /**
@@ -512,6 +521,30 @@ class Flag extends ConfigEntityBase implements FlagInterface {
       \Drupal::service('event_dispatcher')
         ->dispatch(FlagEvents::FLAG_DELETED, new FlagDeleteEvent($entity));
     }
+  }
+
+  /**
+   * Sorts the flag entities, putting disabled flags at the bottom.
+   *
+   * @see \Drupal\Core\Config\Entity\ConfigEntityBase::sort()
+   */
+  public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+
+    // Check if the entities are flags, if not go with the default.
+    if ($a instanceof FlagInterface && $b instanceof FlagInterface) {
+
+      if ($a->isEnabled() && $b->isEnabled()) {
+        return parent::sort($a, $b);
+      }
+      elseif (!$a->isEnabled()) {
+        return -1;
+      }
+      elseif (!$b->isEnabled()) {
+        return 1;
+      }
+    }
+
+    return parent::sort($a, $b);
   }
 
   /**
