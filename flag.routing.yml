@@ -101,3 +101,19 @@ flag.field_entry.edit:
     _title_callback: '\Drupal\flag\Controller\FieldEntryFormController::editTitle'
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
+
+flag.enable:
+  path: '/flag/enable/{flag}'
+  defaults:
+    _form: '\Drupal\flag\Form\FlagDisableConfirmForm'
+    _title: 'Enable Flag?'
+  requirements:
+    _permission: 'administer flags'
+
+flag.disable:
+  path: '/flag/disable/{flag}'
+  defaults:
+    _form: '\Drupal\flag\Form\FlagDisableConfirmForm'
+    _title: 'Disable Flag?'
+  requirements:
+    _permission: 'administer flags'
