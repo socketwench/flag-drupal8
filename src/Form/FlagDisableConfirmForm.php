@@ -5,6 +5,7 @@
 
 namespace Drupal\flag\Form;
 
+use Drupal\Core\Url;
 use Drupal\flag\FlagInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -24,23 +25,18 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
   }
 
   public function getQuestion() {
-    if ($flag->isEnabled()) {
-      return t('Disable flag @name?', array('@name' => $flag->label()));
+    if ($this->flag->isEnabled()) {
+      return t('Disable flag @name?', array('@name' => $this->flag->label()));
     }
 
-    return t('Enable flag @name?', array('@name' => $flag->label()));
+    return t('Enable flag @name?', array('@name' => $this->flag->label()));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    $destination = \Drupal::request()->get('destination');
-    if (!empty($destination)) {
-      return Url::createFromPath($destination);
-    }
-
-    return $this->entity->urlInfo();
+    return new Url('flag.list');
   }
 
   public function getDescription() {
@@ -63,8 +59,13 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
     if ($this->flag->isEnabled()) {
       $this->flag->disable();
     }
+    else {
+      $this->flag->enable();
+    }
 
-    $this->flag->enable();
+    $this->flag->save();
+
+    $form_state->setRedirect('flag.list');
   }
 
 }

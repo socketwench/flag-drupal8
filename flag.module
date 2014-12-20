@@ -595,17 +595,17 @@ function flag_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
   $operations = [];
 
   if ($entity instanceof \Drupal\flag\FlagInterface) {
-    if ($entity->isEnabled()) {
+    if (!$entity->isEnabled()) {
       $operations['enable'] = [
         'title' => t('Enable'),
-        'route_name' => 'flag.enable',
+        'url' => $entity->urlInfo('enable'),
         'weight' => 50,
       ];
     }
     else {
       $operations['disable'] = [
         'title' => t('Disable'),
-        'route_name' => 'flag.disable',
+        'url' => $entity->urlInfo('disable'),
         'weight' => 50,
       ];
     }

@@ -39,7 +39,9 @@ use Drupal\flag\FlagInterface;
  *   },
  *   links = {
  *     "edit-form" = "flag.edit",
- *     "delete-form" = "flag.delete"
+ *     "delete-form" = "flag.delete",
+ *     "enable" = "flag.enable",
+ *     "disable" = "flag.disable"
  *   }
  * )
  */
