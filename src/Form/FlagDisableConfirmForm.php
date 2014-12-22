@@ -56,6 +56,7 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Toggle the flag state.
     if ($this->flag->isEnabled()) {
       $this->flag->disable();
     }
@@ -63,8 +64,15 @@ class FlagDisableConfirmForm extends ConfirmFormBase {
       $this->flag->enable();
     }
 
+    // Invalidate the flaggable render cache.
+    \Drupal::entityManager()
+      ->getViewBuilder($this->flag->entity_type)
+      ->resetCache();
+
+    // Save The flag entity.
     $this->flag->save();
 
+    // Redirect to the flag admin page.
     $form_state->setRedirect('flag.list');
   }
 
