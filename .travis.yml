@@ -19,7 +19,7 @@ env:
     - CODER_VERSION='dev-8.x-2.x'
 
 before_install:
-  // Set a local hostname alias
+  # Set a local hostname alias
   - sudo cp -f .travis/hosts /etc/hosts
 
   # Install Apache and FastCGI extension to connect to PHP-FPM.
