@@ -164,7 +164,7 @@ function flag_node_links_alter(array &$links, NodeInterface $entity, array &$con
  * Handles the 'show_in_links' and 'show_as_field' flag options.
  */
 function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode, $langcode) {
-  // Don't act on previews.
+  // Don't show on previews.
   if ($entity->isNew()) {
     return;
   }
@@ -176,6 +176,11 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
   $flags = $flag_service->getFlags($entity->getEntityTypeID(), $entity->bundle());
 
   foreach ($flags as $flag) {
+    // Do not display the flag if disabled.
+    if(!$flag->isEnabled()){
+      continue;
+    }
+
     $link_type_plugin = $flag->getLinkTypePlugin();
     $flag_type_plugin = $flag->getFlagTypePlugin();
 
@@ -586,4 +591,30 @@ function flag_reset_flag($flag, $entity_id = NULL) {
   }
   $count_query->execute();
   return $query->execute();
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function flag_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+  $operations = [];
+
+  if ($entity instanceof \Drupal\flag\FlagInterface) {
+    if (!$entity->isEnabled()) {
+      $operations['enable'] = [
+        'title' => t('Enable'),
+        'url' => $entity->urlInfo('enable'),
+        'weight' => 50,
+      ];
+    }
+    else {
+      $operations['disable'] = [
+        'title' => t('Disable'),
+        'url' => $entity->urlInfo('disable'),
+        'weight' => 50,
+      ];
+    }
+  }
+
+  return $operations;
 }

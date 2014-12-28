@@ -26,6 +26,7 @@ class FlagListController extends ConfigEntityListBuilder {
     $header['label'] = t('Flag');
     $header['roles'] = t('Roles');
     $header['is_global'] = t('Global?');
+    $header['status'] = t('Status');
 
     return $header + parent::buildHeader();
   }
@@ -70,6 +71,8 @@ class FlagListController extends ConfigEntityListBuilder {
     $row['roles'] = $this->getFlagRoles($entity);
 
     $row['is_global'] = $entity->isGlobal() ? t('Yes') : t('No');
+
+    $row['status'] = $entity->isEnabled() ? t('enabled') : t('disabled');
 
     return $row + parent::buildRow($entity);
   }

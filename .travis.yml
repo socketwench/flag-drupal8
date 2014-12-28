@@ -9,6 +9,10 @@ mysql:
   username: root
   encoding: utf8
 
+addons:
+  hosts:
+    - travis.dev
+
 env:
   global:
     - MODULE_NAME='flag'
@@ -65,7 +69,7 @@ before_script:
   - git clone --depth 1 --branch $DRUPAL_VERSION $DRUPAL_REPO drupal
   - cd drupal
   # Install Drupal.
-  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes site-install --db-url=mysql://root:@localhost/drupal testing
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes --uri=http://travis.dev site-install --db-url=mysql://root:@localhost/drupal testing
 
   # Reference and enable flag in build site.
   - ln -s $TESTDIR modules/$MODULE_NAME
@@ -81,7 +85,7 @@ script:
   # Run the Coder sniffer for Flag.
   - phpcs --report=full --standard=Drupal ./modules/$MODULE_NAME
   # Run the Simpletests for Flag.
-  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://localhost --verbose --color "$MODULE_TEST_GROUP"
+  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://travis.dev --verbose --color "$MODULE_TEST_GROUP"
   # Run the PHPUnit tests.
   - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/$MODULE_NAME
 
