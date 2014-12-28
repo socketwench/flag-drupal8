@@ -63,6 +63,9 @@ class FlagEnableDisableTest extends WebTestBase {
    */
   public static $modules = array('views', 'flag', 'node', 'field_ui');
 
+  /**
+   * Test the enabling and disabling of a flag from the Admin UI.
+   */
   public function testDiableEnableFlag() {
     // Create and log in our user.
     $this->adminUser = $this->drupalCreateUser([
@@ -122,6 +125,9 @@ class FlagEnableDisableTest extends WebTestBase {
     $this->assertText($this->flagShortText);
   }
 
+  /**
+   * Disable the flag and ensure the link does not appear on entities.
+   */
   public function doDisableFlag() {
     $this->drupalGet('admin/structure/flags');
     $this->assertText(t('enabled'));
@@ -136,6 +142,9 @@ class FlagEnableDisableTest extends WebTestBase {
     $this->assertNoText($this->flagShortText);
   }
 
+  /**
+   * Enable the flag and ensure it appears on target entities.
+   */
   public function doEnableFlag() {
     $this->drupalGet('admin/structure/flags');
     $this->assertText(t('disabled'));
