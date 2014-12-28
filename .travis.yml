@@ -9,6 +9,10 @@ mysql:
   username: root
   encoding: utf8
 
+addons:
+  hosts:
+    - travis.dev
+
 env:
   global:
     - MODULE_NAME='flag'
@@ -19,9 +23,6 @@ env:
     - CODER_VERSION='dev-8.x-2.x'
 
 before_install:
-  # Set a local hostname alias
-  - sudo cp -f .travis/hosts /etc/hosts
-
   # Install Apache and FastCGI extension to connect to PHP-FPM.
   - sudo apt-get update > /dev/null
   - sudo apt-get install apache2 libapache2-mod-fastcgi > /dev/null
@@ -84,7 +85,7 @@ script:
   # Run the Coder sniffer for Flag.
   - phpcs --report=full --standard=Drupal ./modules/$MODULE_NAME
   # Run the Simpletests for Flag.
-  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://drupal8.dev --verbose --color "$MODULE_TEST_GROUP"
+  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://travis.dev --verbose --color "$MODULE_TEST_GROUP"
   # Run the PHPUnit tests.
   - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/$MODULE_NAME
 
