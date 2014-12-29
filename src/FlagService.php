@@ -168,7 +168,7 @@ class FlagService {
   public function getFlaggings(EntityInterface $entity = NULL, FlagInterface $flag = NULL, AccountInterface $account = NULL) {
     $query = $this->entityQueryManager->get('flagging');
 
-    if (!empty($account)) {
+    if (!empty($account) && !$flag->isGlobal()) {
       $query = $query->condition('uid', $account->id());
     }
 

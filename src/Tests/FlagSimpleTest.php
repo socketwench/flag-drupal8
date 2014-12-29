@@ -74,7 +74,9 @@ class FlagSimpleTest extends WebTestBase {
     $this->drupalLogin($this->adminUser);
 
     $this->doTestFlagAdd();
+    $this->doGlobalFlag();
     $this->doTestHideFlagLinkFromTeaser();
+    $this->doTestUserDeletion();
   }
 
   /**
@@ -152,6 +154,60 @@ class FlagSimpleTest extends WebTestBase {
   }
 
   /**
+   * Test global flag.
+   */
+  public function doGlobalFlag() {
+    $node = $this->drupalCreateNode(['type' => $this->nodeType]);
+    $node_id = $node->id();
+
+    // Grant the flag permissions to the authenticated role, so that both
+    // users have the same roles and share the render cache.
+    $role = Role::load(DRUPAL_AUTHENTICATED_RID);
+    $role->grantPermission('flag ' . $this->id);
+    $role->grantPermission('unflag ' . $this->id);
+    $role->save();
+
+    // Create and login a new user.
+    $user_1 = $this->drupalCreateUser();
+    $user_2 = $this->drupalCreateUser();
+    $this->drupalLogin($user_1);
+
+    // Flag the node with user 1.
+    $this->drupalGet('node/' . $node_id);
+    $this->clickLink('Flag this item');
+    $this->assertResponse(200);
+    $this->assertLink('Unflag this item');
+
+    $this->drupalLogin($user_2);
+    $this->drupalGet('node/' . $node_id);
+    $this->assertLink('Flag this item');
+
+    $this->drupalLogin($this->adminUser);
+    $edit = [
+      'is_global' => true,
+    ];
+    $this->drupalPostForm('admin/structure/flags/manage/' . $this->id, $edit, t('Save Flag'));
+    $this->drupalGet('admin/structure/flags/manage/' . $this->id);
+    $this->assertFieldChecked('edit-is-global');
+
+    $this->drupalLogin($user_2);
+    $this->drupalGet('node/' . $node_id);
+    $this->assertLink('Unflag this item');
+
+    $this->drupalLogin($this->adminUser);
+    $edit = [
+      'is_global' => false,
+    ];
+    $this->drupalPostForm('admin/structure/flags/manage/' . $this->id, $edit, t('Save Flag'));
+    $this->drupalGet('admin/structure/flags/manage/' . $this->id);
+    $this->assertNoFieldChecked('edit-is-global');
+
+    $this->drupalLogin($user_2);
+    $this->drupalGet('node/' . $node_id);
+    $this->assertLink('Flag this item');
+  }
+
+  /**
    * Node creation and flag link.
    */
   public function doTestHideFlagLinkFromTeaser() {
@@ -222,7 +278,7 @@ class FlagSimpleTest extends WebTestBase {
       ->count()
       ->execute();
 
-    $this->assertTrue(0, $count_flags_after);
+    $this->assertEqual(0, $count_flags_after);
   }
 
   /**
@@ -283,7 +339,7 @@ class FlagSimpleTest extends WebTestBase {
       ->condition('entity_id', $node_id)
       ->count()
       ->execute();
-    $this->assertTrue(1, $count_flags_before);
+    $this->assertEqual(1, $count_flags_before);
 
     // Delete  user 1.
     $user_1->delete();
@@ -296,6 +352,7 @@ class FlagSimpleTest extends WebTestBase {
       ->condition('entity_id', $node_id)
       ->count()
       ->execute();
-    $this->assertTrue(0, $count_flags_before);
+
+    $this->assertEqual(0, $count_flags_before);
   }
 }
