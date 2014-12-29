@@ -245,21 +245,31 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function isFlagged(EntityInterface $entity, AccountInterface $account = NULL) {
+    // Get the current user if one wasn't passed to the method.
     if ($account == NULL) {
       $account = \Drupal::currentUser();
     }
 
-    $result = \Drupal::entityQuery('flagging')
-      ->condition('uid', $account->id())
+    // Query the flagging entities for the given flag and flaggable.
+    $query = \Drupal::entityQuery('flagging')
       ->condition('fid', $this->id())
       ->condition('entity_type', $entity->getEntityTypeId())
-      ->condition('entity_id', $entity->id())
-      ->execute();
+      ->condition('entity_id', $entity->id());
 
+    // Select by user if the flag is not global.
+    if (!$this->isGlobal()) {
+      $query = $query->condition('uid', $account->id());
+    }
+
+    // Execute the query.
+    $result = $query->execute();
+
+    // If we found a result, return TRUE.
     if (!empty($result)) {
       return TRUE;
     }
 
+    // If there's no result, the flag hasn't been used.
     return FALSE;
   }
 
