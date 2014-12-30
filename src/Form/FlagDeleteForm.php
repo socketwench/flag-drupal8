@@ -48,7 +48,7 @@ class FlagDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message(t('Flag %label was deleted.', [
      '%label' => $this->entity->label(),
