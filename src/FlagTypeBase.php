@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagTypeBase class.
+ * Contains the \Drupal\flag\FlagTypeBase class.
  */
 
 namespace Drupal\flag;
@@ -14,8 +14,6 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a base class for flag type plugins.
- *
- * @package Drupal\flag\Plugin\Flag
  */
 abstract class FlagTypeBase extends PluginBase implements FlagTypePluginInterface {
 

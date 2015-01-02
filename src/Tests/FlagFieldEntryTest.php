@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagFieldEntryTest.
+ * Contains \Drupal\flag\Tests\FlagFieldEntryTest.
  */
 
 namespace Drupal\flag\Tests;

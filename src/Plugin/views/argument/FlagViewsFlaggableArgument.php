@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains FlagViewsFlaggableArgument.
+ * Contains \Drupal\flag\Plugin\views\argument\FlagViewsFlaggableArgument.
  */
 
 namespace Drupal\flag\Plugin\views\argument;
@@ -14,8 +14,6 @@ use Drupal\flag\FlagInterface;
 
 /**
  * Provides an argument handler to get the title of flaggble content.
- *
- * @package Drupal\flag\Plugin\views\argument
  *
  * @ViewsArgument("FlagViewsFlaggableArgument")
  */

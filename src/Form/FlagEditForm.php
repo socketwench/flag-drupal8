@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains FlagEditForm.
+ * Contains \Drupal\flag\Form\FlagEditForm.
  */
 
 namespace Drupal\flag\Form;
@@ -15,7 +15,6 @@ use Drupal\Core\Form\FormStateInterface;
  * Like FlagAddForm, this class derives from FlagFormBase. This class modifies
  * the submit button name.
  *
- * @package Drupal\flag\Form
  * @see \Drupal\flag\Form\FlagFormBase
  */
 class FlagEditForm extends FlagFormBase {

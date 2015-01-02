@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the ActionLinkTypeBase class.
+ * Contains the \Drupal\flag\ActionLinkTypeBase class.
  */
 
 namespace Drupal\flag;
@@ -21,8 +21,6 @@ use Drupal\Core\Form\FormStateInterface;
  * Link types perform two key functions within Flag: They specify the route to
  * use when a flag link is clicked, and generate the render array to display
  * flag links.
- *
- * @package Drupal\flag
  */
 abstract class ActionLinkTypeBase extends PluginBase implements ActionLinkTypePluginInterface {
 

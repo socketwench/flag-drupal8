@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\action_link\ActionLinkPluginManager.
+ * Contains \Drupal\flag\ActionLinkPluginManager.
  */
 
 namespace Drupal\flag;
@@ -14,8 +14,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Plugin manager for link types.
- *
- * @package Drupal\flag
  *
  * @see Drupal\flag\ActionLinkTypeBase
  */

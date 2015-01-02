@@ -12,8 +12,6 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Provides a flag type for comments.
  *
- * @package Drupal\flag\Plugin\Flag
- *
  * @FlagType(
  *   id = "flagtype_comment",
  *   title = @Translation("Comment"),

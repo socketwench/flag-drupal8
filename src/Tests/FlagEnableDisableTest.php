@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the flag enable/disable test.
+ * Contains \Drupal\flag\Tests\FlagEnableDisableTest.
  */
 
 namespace Drupal\flag\Tests;

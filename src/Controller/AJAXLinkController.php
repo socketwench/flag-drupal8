@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the AJAXLinkController class.
+ * Contains the \Drupal\flag\Controller\AJAXLinkController class.
  */
 
 namespace Drupal\flag\Controller;
@@ -14,8 +14,6 @@ use Drupal\Core\Ajax\ReplaceCommand;
 
 /**
  * Provides a controller for AJAX-ified flag links.
- *
- * @package Drupal\flag\Controller
  */
 class AJAXLinkController extends ControllerBase {
 

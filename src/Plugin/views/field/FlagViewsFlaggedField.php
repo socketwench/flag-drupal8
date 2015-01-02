@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagViewsFlaggedField class.
+ * Contains \Drupal\flag\Plugin\views\field\FlagViewsFlaggedField.
  */
 
 namespace Drupal\flag\Plugin\views\field;
@@ -17,8 +17,6 @@ use Drupal\Core\Form\FormStateInterface;
  * This field differs from FlagViewsLinkField in that it is display only. It
  * does not provide an actionable link, but rather inherits from the Boolean
  * views field handler.
- *
- * @package Drupal\flag\Plugin\views\field
  *
  * @ViewsField("flag_flagged")
  */

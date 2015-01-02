@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the ActionLinkTypePluginInterface.
+ * Contains the \Drupal\flag\ActionLinkTypePluginInterface.
  */
 
 namespace Drupal\flag;
@@ -13,8 +13,6 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 
 /**
  * Provides an interface for link type plugins.
- *
- * @package Drupal\flag
  */
 interface ActionLinkTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
 

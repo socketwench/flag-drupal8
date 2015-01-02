@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagTypePluginInterface.
+ * Contains the \Drupal\flag\FlagTypePluginInterface.
  */
 
 namespace Drupal\flag;
@@ -12,8 +12,6 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides an interface for all flag type plugins.
- *
- * @package Drupal\flag
  */
 interface FlagTypePluginInterface extends PluginFormInterface, ConfigurablePluginInterface {
 

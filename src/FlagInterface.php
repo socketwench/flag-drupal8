@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagInterface.
+ * Contains \Drupal\flag\FlagInterface.
  */
 
 namespace Drupal\flag;
@@ -13,8 +13,6 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the interface for Flag entities.
- *
- * @package Drupal\flag
  */
 interface FlagInterface extends ConfigEntityInterface, EntityWithPluginCollectionInterface {
 

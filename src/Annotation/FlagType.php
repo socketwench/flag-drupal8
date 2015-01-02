@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagType annotation plugin.
+ * Contains the \Drupal\flag\Annotation\FlagType annotation plugin.
  */
 
 namespace Drupal\flag\Annotation;

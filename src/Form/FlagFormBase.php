@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagFormBase class.
+ * Contains the \Drupal\flag\Form\FlagFormBase class.
  */
 
 namespace Drupal\flag\Form;
@@ -17,8 +17,6 @@ use Drupal\Core\Url;
  * Since both the add and edit flag forms are largely the same, the majority of
  * functionality is done in this class. It generates the form, validates the
  * input, and handles the submit.
- *
- * @package Drupal\flag\Form
  */
 abstract class FlagFormBase extends EntityForm {
 

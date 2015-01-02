@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains the flagged content sort handler.
+ * Contains \Drupal\flag\Plugin\views\sort\FlagViewsSortFlagged;
  */
 
 namespace Drupal\flag\Plugin\views\sort;

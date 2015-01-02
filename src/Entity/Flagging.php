@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the Flagging content entity.
+ * Contains the \Drupal\flag\Entity\Flagging content entity.
  */
 
 namespace Drupal\flag\Entity;
@@ -13,8 +13,6 @@ use Drupal\flag\FlaggingInterface;
 
 /**
  * Provides the flagging content entity.
- *
- * @package Drupal\flag\Entity
  *
  * @ContentEntityType(
  *  id = "flagging",

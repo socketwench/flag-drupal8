@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * Contains the \Drupal\flag\Controller\FieldEntryFormController class.
  */
 
 namespace Drupal\flag\Controller;
@@ -11,8 +12,6 @@ use Drupal\flag\Entity\Flag;
 
 /**
  * Provides a controller for the Field Entry link type.
- *
- * @package Drupal\flag\Controller
  */
 class FieldEntryFormController extends ControllerBase {
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagViewsFilter class.
+ * Contains the \Drupal\flag\Plugin\views\filter\FlagViewsFilter class.
  */
 
 namespace Drupal\flag\Plugin\views\filter;
@@ -11,8 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Filters content by its flagging status in a view.
- *
- * @package Drupal\flag\Plugin\views\filter
  *
  * @ViewsFilter("flag_filter")
  */

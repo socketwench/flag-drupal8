@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagTypePluginManager class.
+ * Contains the \Drupal\flag\FlagTypePluginManager class.
  */
 
 namespace Drupal\flag;
@@ -12,8 +12,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * The plugin manager for flag type plugins.
- *
- * @package Drupal\flag
  */
 class FlagTypePluginManager extends DefaultPluginManager {
 

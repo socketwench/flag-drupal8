@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the AJAXactionLink class.
+ * Contains the \Drupal\flag\Plugin\ActionLink\AJAXactionLink class.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the ConfirmForm link type.
+ * Contains the \Drupal\flag\Plugin\ActionLink\ConfirmForm link type.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;
@@ -11,8 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides the Confirm Form link type.
- *
- * @package Drupal\flag\Plugin\ActionLink
  *
  * @ActionLinkType(
  *  id = "confirm",

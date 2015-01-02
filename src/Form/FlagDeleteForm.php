@@ -17,8 +17,6 @@ use Drupal\Core\Form\FormStateInterface;
  * FlagFormBase. Instead, it derives directly from EntityConfirmFormBase.
  * The reason is that we only need to provide a simple yes or no page when
  * deleting a flag.
- *
- * @package Drupal\flag\Form
  */
 class FlagDeleteForm extends EntityConfirmFormBase {
 

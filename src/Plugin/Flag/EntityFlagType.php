@@ -12,8 +12,6 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Provides a flag type for all entity types.
  *
- * @package Drupal\flag\Plugin\Flag
- *
  * Base entity flag handler.
  *
  * @FlagType(

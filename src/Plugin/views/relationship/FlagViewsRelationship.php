@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagViewsRelationship class.
+ * Contains \Drupal\flag\Plugin\views\relationship\FlagViewsRelationship.
  */
 
 namespace Drupal\flag\Plugin\views\relationship;
