@@ -87,17 +87,15 @@ class FlagSimpleTest extends WebTestBase {
     $this->drupalCreateContentType(['type' => $this->nodeType]);
 
     // Test with minimal value requirement.
-    $edit = [
-      'label' => $this->label,
-      'id' => $this->id,
-    ];
-    $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
+    $this->drupalPostForm('admin/structure/flags/add', [], t('Continue'));
     // Check for fieldset titles.
     $this->assertText(t('Messages'));
     $this->assertText(t('Flag access'));
     $this->assertText(t('Display options'));
 
     $edit = [
+      'label' => $this->label,
+      'id' => $this->id,
       'types[' . $this->nodeType . ']' => $this->nodeType,
     ];
     $this->drupalPostForm(NULL, $edit, t('Create Flag'));
