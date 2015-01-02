@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagAddForm class.
+ * Contains the \Drupal\flag\Form\FlagAddForm class.
  */
 
 namespace Drupal\flag\Form;
@@ -16,7 +16,6 @@ use Drupal\Core\Form\FormStateInterface;
  * the base class behavior in two key ways: It alters the text of the submit
  * button, and form where default values are loaded.
  *
- * @package Drupal\flag\Form
  * @see \Drupal\flag\Form\FlagFormBase
  */
 class FlagAddForm extends FlagFormBase {

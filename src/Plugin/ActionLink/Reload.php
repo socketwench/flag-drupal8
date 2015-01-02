@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the Normal Link (Reload) link type.
+ * Contains \Drupal\flag\Plugin\ActionLink\Reload.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;

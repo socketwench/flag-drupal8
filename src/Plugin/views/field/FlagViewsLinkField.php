@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagViewsLinkField class.
+ * Contains \Drupal\flag\Plugin\views\field\FlagViewsLinkField.
  */
 
 namespace Drupal\flag\Plugin\views\field;
@@ -16,8 +16,6 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * Unlike FlagViewsFlaggedField, this views field handler provides an
  * actionable link to flag or unflag the selected content.
- *
- * @package Drupal\flag\Plugin\views\field
  *
  * @ViewsField("flag_link")
  */

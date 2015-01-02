@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FieldEntry link type.
+ * Contains the \Drupal\flag\Plugin\ActionLink\FieldEntry link type.
  */
 
 namespace Drupal\flag\Plugin\ActionLink;
@@ -11,7 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Class FieldEntry
- * @package Drupal\flag\Plugin\ActionLink
  *
  * @ActionLinkType(
  *  id = "field_entry",

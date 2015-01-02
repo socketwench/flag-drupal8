@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagAddPageForm class.
+ * Contains the \Drupal\flag\Form\FlagAddPageForm class.
  */
 
 namespace Drupal\flag\Form;
@@ -17,7 +17,6 @@ use Drupal\Core\Url;
  * that allows the administrator to select key values that are necessary to
  * initialize the flag entity. Most importantly, this includes the FlagType.
  *
- * @package Drupal\flag\Form
  * @see \Drupal\flag\FlagTypeBase
  */
 class FlagAddPageForm extends FormBase {

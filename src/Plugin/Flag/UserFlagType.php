@@ -13,8 +13,6 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Provides a flag type for user entities.
  *
- * @package Drupal\flag\Plugin\Flag
- *
  * @FlagType(
  *   id = "flagtype_user",
  *   title = @Translation("User"),

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the ActionLinkType annotation plugin.
+ * Contains the \Drupal\flag\Annotation\ActionLinkType annotation plugin.
  */
 
 namespace Drupal\flag\Annotation;
@@ -10,8 +10,6 @@ use Drupal\Component\Annotation\Plugin;
 
 /**
  * Defines an ActionLink annotation object.
- *
- * @package Drupal\action_link\Annotation
  *
  * @Annotation
  */

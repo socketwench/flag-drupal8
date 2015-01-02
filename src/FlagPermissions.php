@@ -1,15 +1,13 @@
 <?php
 /**
  * @file
- * Provides the FlagPermissions class.
+ * Contains \Drupal\flag\FlagPermissions.
  */
 
 namespace Drupal\flag;
 
 /**
  * Provides dynamic permissions for defined flags.
- *
- * @package Drupal\flag
  */
 class FlagPermissions {
 

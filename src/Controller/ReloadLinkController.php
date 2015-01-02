@@ -14,8 +14,6 @@ use Drupal\flag\FlagService;
 
 /**
  * Provides a controller to flag and unflag when routed from a normal link.
- *
- * @package Drupal\flag\Controller
  */
 class ReloadLinkController extends ControllerBase implements ContainerInjectionInterface {
 

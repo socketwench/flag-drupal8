@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlagService class.
+ * Contains the \Drupal\flag\FlagService class.
  */
 
 namespace Drupal\flag;

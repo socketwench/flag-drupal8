@@ -19,8 +19,6 @@ use Drupal\flag\FlagInterface;
 /**
  * Provides the Flag configuration entity.
  *
- * @package Drupal\flag\Entity
- *
  * @ConfigEntityType(
  *   id = "flag",
  *   label = @Translation("Flag"),

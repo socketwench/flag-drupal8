@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the flagging form.
+ * Contains \Drupal\flag\Form\FlaggingForm.
  */
 
 namespace Drupal\flag\Form;
@@ -12,8 +12,6 @@ use Drupal\Core\Url;
 
 /**
  * Provides the flagging form for field entry.
- *
- * @package Drupal\flag\Form
  */
 class FlaggingForm extends ContentEntityForm {
 

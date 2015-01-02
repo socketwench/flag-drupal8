@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the FlaggingInterface.
+ * Contains \Drupal\flag\FlaggingInterface.
  */
 
 namespace Drupal\flag;
@@ -10,8 +10,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * The interface for flagging entities.
- *
- * @package Drupal\flag
  */
 interface FlaggingInterface extends ContentEntityInterface {
 

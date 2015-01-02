@@ -13,8 +13,6 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Provides a flag type for all content entities.
  *
- * @package Drupal\flag\Plugin\Flag
- *
  * @FlagType(
  *   id = "flagtype_node",
  *   title = @Translation("Content"),
