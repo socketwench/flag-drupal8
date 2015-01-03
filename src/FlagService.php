@@ -8,6 +8,7 @@ namespace Drupal\flag;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\Entity\Flag;
+use Drupal\flag\Entity\FlagDisabledException;
 use Drupal\flag\Entity\Flagging;
 use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\Event\FlaggingEvent;
@@ -260,12 +261,20 @@ class FlagService {
    *   Optional. The account of the user flagging the entity. If not given,
    *   the current user is used.
    *
+   * @throws \Drupal\flag\Entity\FlagDisabledException
+   *  Thrown when a flag operation is being performed against a disabled flag.
+   *
    * @return FlaggingInterface|null
    *   The flagging.
    */
   public function flagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
     if (empty($account)) {
       $account = $this->currentUser;
+    }
+
+    // Throw an exception if the flag is disabled.
+    if (!$flag->isEnabled()) {
+      throw new FlagDisabledException($flag);
     }
 
     $flagging = $this->entityManager->getStorage('flagging')->create([
@@ -356,10 +365,18 @@ class FlagService {
    * @param AccountInterface $account
    *   Optional. The account of the user that created the flagging.
    *
+   * @throws \Drupal\flag\Entity\FlagDisabledException
+   *  Thrown when an unflag is being performed on a disabled flag.
+   *
    * @return array
    *   An array of flagging IDs to delete.
    */
   public function unflagByObject(FlagInterface $flag, EntityInterface $entity, AccountInterface $account = NULL) {
+    // Throw an exception if the flag is disabled.
+    if (!$flag->isEnabled()) {
+      throw new FlagDisabledException($flag);
+    }
+
     $this->eventDispatcher->dispatch(FlagEvents::ENTITY_UNFLAGGED, new FlaggingEvent($flag, $entity, 'unflag'));
 
     $out = [];
