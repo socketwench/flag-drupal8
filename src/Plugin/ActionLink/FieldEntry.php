@@ -65,6 +65,7 @@ class FieldEntry extends ActionLinkTypeBase {
       '#title' => t('Flag confirmation message'),
       '#default_value' => $this->configuration['flag_confirmation'],
       '#description' => t('Message displayed if the user has clicked the "flag this" link and field entry is required. Usually presented in the form such as, "Please enter the flagging details."'),
+      '#description_display' => 'after',
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
     ];
@@ -74,6 +75,7 @@ class FieldEntry extends ActionLinkTypeBase {
       '#title' => t('Enter flagging details message'),
       '#default_value' => $this->configuration['edit_flagging'],
       '#description' => t('Message displayed if the user has clicked the "Edit flag" link. Usually presented in the form such as, "Please enter the flagging details."'),
+      '#description_display' => 'after',
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
     ];
@@ -83,6 +85,7 @@ class FieldEntry extends ActionLinkTypeBase {
       '#title' => t('Unflag confirmation message'),
       '#default_value' => $this->configuration['unflag_confirmation'],
       '#description' => t('Message displayed if the user has clicked the "delete flag" link in the field entry form. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
+      '#description_display' => 'after',
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
     ];

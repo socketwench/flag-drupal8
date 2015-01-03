@@ -66,6 +66,7 @@ class ConfirmForm extends ActionLinkTypeBase {
       '#title' => t('Flag confirmation message'),
       '#default_value' => $this->getFlagQuestion(),
       '#description' => t('Message displayed if the user has clicked the "flag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to flag this content?"'),
+      '#description_display' => 'after',
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
     ];
@@ -75,6 +76,7 @@ class ConfirmForm extends ActionLinkTypeBase {
       '#title' => t('Unflag confirmation message'),
       '#default_value' => $this->getUnflagQuestion(),
       '#description' => t('Message displayed if the user has clicked the "unflag this" link and confirmation is required. Usually presented in the form of a question such as, "Are you sure you want to unflag this content?"'),
+      '#description_display' => 'after',
       // This will get changed to a state by flag_link_type_options_states().
       '#required' => TRUE,
     ];
