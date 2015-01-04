@@ -37,7 +37,7 @@ class FlagTypePluginManager extends DefaultPluginManager {
    * Gets all flag types.
    *
    * @return array
-   *   Returns all flag types.
+   *   Returns an array of all flag type titles keyed by plugin ID.
    */
   public function getAllFlagTypes() {
     $flag_types = [];
