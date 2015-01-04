@@ -26,11 +26,7 @@ class FlaggingAccessController extends ControllerBase {
    */
   public function checkFlag($flag_id) {
     $flag = Flag::load($flag_id);
-    if (!isset($flag)) {
-      return AccessResult::allowedIf($flag->hasActionAccess('flag'));
-    }
-
-    return AccessResult::neutral();
+    return AccessResult::allowedIf($flag->hasActionAccess('flag'));
   }
 
   /**
@@ -44,11 +40,7 @@ class FlaggingAccessController extends ControllerBase {
    */
   public function checkUnflag($flag_id) {
     $flag = Flag::load($flag_id);
-    if (!isset($flag)){
-      return AccessResult::allowedIf($flag->hasActionAccess('unflag'));
-    }
-
-    return AccessResult::neutral();
+    return AccessResult::allowedIf($flag->hasActionAccess('unflag'));
   }
 
 }
