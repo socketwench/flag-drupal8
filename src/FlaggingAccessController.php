@@ -9,7 +9,6 @@ namespace Drupal\flag;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\flag\Entity\Flag;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controls flagging access permission.
@@ -19,8 +18,8 @@ class FlaggingAccessController extends ControllerBase {
   /**
    * Checks flagging permission.
    *
-   * @param Request $request
-   *   The request object.
+   * @param string $flag_id
+   *   The flag ID.
    *
    * @return string
    *   Returns indication value for flagging access permission.
@@ -33,8 +32,8 @@ class FlaggingAccessController extends ControllerBase {
   /**
    * Checks unflagging permission.
    *
-   * @param Request $request
-   *   The request object.
+   * @param string $flag_id
+   *   The flag ID.
    *
    * @return string
    *   Returns indication value for unflagging access permission.

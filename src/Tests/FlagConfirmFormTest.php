@@ -86,20 +86,25 @@ class FlagConfirmFormTest extends WebTestBase {
 
     // Test with minimal value requirement.
     $edit = [
-      'label' => $this->label,
-      'id' => $this->id,
       'flag_entity_type' => 'flagtype_node',
-      'flag_link_type' => 'confirm',
     ];
     $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
+
+    // Update the flag.
+    $edit = [
+      'label' => $this->label,
+      'id' => $this->id,
+      'types[' . $this->nodeType . ']' => $this->nodeType,
+      'link_type' => 'confirm',
+    ];
+    $this->drupalPostAjaxForm(NULL, $edit, 'edit-link-type-confirm');
+    $this->assertResponse(200);
 
     // Check confirm form field entry.
     $this->assertText(t('Flag confirmation message'));
     $this->assertText(t('Unflag confirmation message'));
 
-    // Update the flag.
     $edit = [
-      'types[' . $this->nodeType . ']' => $this->nodeType,
       'flag_confirmation' => $this->flagConfirmMessage,
       'unflag_confirmation' => $this->unflagConfirmMessage,
     ];

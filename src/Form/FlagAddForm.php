@@ -29,11 +29,9 @@ class FlagAddForm extends FlagFormBase {
     $step1_form = $tempstore->get('FlagAddPage');
 
     $flag = $this->entity;
-    $flag->label = $step1_form['label'];
-    $flag->id = $step1_form['id'];
 
     $flag->setFlagTypePlugin($step1_form['flag_entity_type']);
-    $flag->setLinkTypePlugin($step1_form['flag_link_type']);
+    $flag->setLinkTypePlugin('reload');
 
     // Mark the flag as new.
     $flag->is_new = TRUE;
