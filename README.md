@@ -1,14 +1,15 @@
-CONTENTS OF THIS FILE
-=====================
+Flag for Drupal 8 [![Build Status](https://travis-ci.org/socketwench/flag-drupal8.svg?branch=master)](https://travis-ci.org/socketwench/flag-drupal8)
+=================
 
+Contents:
  * Introduction
  * History and Maintainers
  * Installation
  * Configuration
  * Support
 
-INTRODUCTION
-============
+Introduction
+------------
 
 The Flag module allows you to define a boolean toggle field and attach it to a
 node, comment, user, or any entity type. You may define as many of these 'flags'
@@ -28,21 +29,20 @@ You may want to visit the handbook of this module, at:
 
   http://drupal.org/handbook/modules/flag
 
-HISTORY AND MAINTAINERS
-=======================
+History and Maintainers
+-----------------------
 
 This module was formerly known as Views Bookmark, which was originally was
 written by Earl Miles. Later versions of Flag were written by Nathan Haug and
 Mooffie. Flag 8.x was written by socketwench.
 
-Current Flag Maintainers
-------------------------
+Current Flag Maintainers:
  * Joachim
  * Shabana Blackborder
  * socketwench
 
-INSTALLATION
-============
+Installation
+------------
 
 Flag 8.x is installed like any other Drupal 8 module and requires brief
 configuration prior to use.
@@ -51,8 +51,8 @@ configuration prior to use.
 install contrib modules on your site.
 2. Go to Admin > Extend and enable the module.
 
-CONFIGURATION
-=============
+Configuration
+-------------
 
 Configuration of Flag module involves creating one or more flags.
 
@@ -64,8 +64,8 @@ Configuration of Flag module involves creating one or more flags.
 
 Once you are finished creating flags, you may choose to use Views to leverage your new flags.
 
-SUPPORT
-=======
+Support
+-------
 
 If you experience a problem with flag or have a problem, file a request or
 issue on the flag queue at http://drupal.org/project/issues/flag.
