@@ -31,10 +31,6 @@ class FlagAddForm extends FlagFormBase {
     $flag = $this->entity;
 
     $flag->setFlagTypePlugin($step1_form['flag_entity_type']);
-    $flag->setLinkTypePlugin('reload');
-
-    // Mark the flag as new.
-    $flag->is_new = TRUE;
 
     $form = parent::buildForm($form, $form_state);
 
