@@ -17,6 +17,15 @@ use Drupal\user\Entity\Role;
  * @group flag
  */
 class FlagSimpleTest extends WebTestBase {
+  /**
+   * Set to TRUE to strict check all configuration saved.
+   *
+   * @see \Drupal\Core\Config\Testing\ConfigSchemaChecker
+   *
+   * @var bool
+   */
+  protected $strictConfigSchema = FALSE;
+
 
   /**
    * The label of the flag to create for the test.

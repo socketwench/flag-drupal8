@@ -156,14 +156,14 @@ abstract class FlagFormBase extends EntityForm {
       '#description' => t('Flags are usually controlled through links that allow users to toggle their behavior. You can choose how users interact with flags by changing options here. It is legitimate to have none of the following checkboxes ticked, if, for some reason, you wish <a href="@placement-url">to place the the links on the page yourself</a>.', array('@placement-url' => 'http://drupal.org/node/295383')),
       '#tree' => FALSE,
       '#weight' => 20,
+      '#prefix' => '<div id="link-type-settings-wrapper">',
+      '#suffix' => '</div>',
       // @todo: Move flag_link_type_options_states() into controller?
       // '#after_build' => array('flag_link_type_options_states'),
     ];
 
     $form['display']['settings'] = [
       '#type' => 'container',
-      '#prefix' => '<div id="link-type-settings-wrapper">',
-      '#suffix' => '</div>',
       '#weight' => 21,
     ];
 
@@ -181,10 +181,7 @@ abstract class FlagFormBase extends EntityForm {
       '#attributes' => [
         'class' => ['flag-link-options'],
       ],
-      '#limit_validation_errors' => [['link_type']],
-      '#submit' => ['::submitSelectPlugin'],
       '#required' => TRUE,
-      '#executes_submit_callback' => TRUE,
       '#ajax' => [
         'callback' => '::updateSelectedPluginType',
         'wrapper' => 'link-type-settings-wrapper',
@@ -192,6 +189,7 @@ abstract class FlagFormBase extends EntityForm {
         'method' => 'replace',
       ],
     ];
+    debug($flag->getLinkTypePlugin()->getPluginId(), 'default value');
     $form['display']['link_type_submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Update'),
@@ -203,7 +201,12 @@ abstract class FlagFormBase extends EntityForm {
     // elements when FormAPI expands them.
     $action_link_plugin_defs = \Drupal::service('plugin.manager.flag.linktype')->getDefinitions();
     foreach ($action_link_plugin_defs as $key => $info) {
-      $form['display']['link_type'][$key]['#description'] = $info['description'];
+      $form['display']['link_type'][$key] = [
+        '#description' => $info['description'],
+        '#executes_submit_callback' => TRUE,
+        '#limit_validation_errors' => [['link_type']],
+        '#submit' => ['::submitSelectPlugin'],
+      ];
     }
 
     $action_link_plugin = $flag->getLinkTypePlugin();
@@ -216,32 +219,25 @@ abstract class FlagFormBase extends EntityForm {
    * Handles switching the configuration type selector.
    */
   public function updateSelectedPluginType($form, FormStateInterface $form_state) {
-    // Rebuild the entity using the form's new state.
-    $this->entity = $this->buildEntity($form, $form_state);
-    $flag = $this->entity;
-
-    // Reset the wrapper for the link type settings.
-    $form['display']['settings'] = [
-      '#type' => 'container',
-      '#prefix' => '<div id="link-type-settings-wrapper">',
-      '#suffix' => '</div>',
-      '#weight' => 21,
-    ];
-
-    // Update the link type settings wrapper for the new selection.
-    $action_link_plugin = $flag->getLinkTypePlugin();
-    $form = $action_link_plugin->buildConfigurationForm($form, $form_state);
-
-    $form_state->setRebuild();
-
-    return $form['display']['settings'];
+    return $form['display'];
   }
 
   /**
    * Handles submit call when sensor type is selected.
    */
   public function submitSelectPlugin(array $form, FormStateInterface $form_state) {
+    // Rebuild the entity using the form's new state.
+    $this->entity = $this->buildEntity($form, $form_state);
     $form_state->setRebuild();
+  }
+
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    $entity = parent::buildEntity($form, $form_state);
+    // Update the link type plugin.
+    // @todo Do this somewhere else?
+    $entity->setLinkTypePlugin($entity->get('link_type'));
+    debug($entity->getLinkTypePlugin()->getPluginId(), $entity->get('link_type'));
+    return $entity;
   }
 
   /**
