@@ -28,7 +28,7 @@ before_install:
   - sudo apt-get install apache2 libapache2-mod-fastcgi > /dev/null
   - sudo a2enmod rewrite actions fastcgi alias
   - sudo cp -f .travis/vhost.conf /etc/apache2/sites-available/default
-  - sudo sed -i -e "s,/var/www,`pwd`,g" /etc/apache2/sites-available/default
+  - sudo sed -i -e "s,/var/www,`pwd`/../drupal,g" /etc/apache2/sites-available/default
 
   # Start PHP-FPM. There is no process manager available to start PHP-FPM on
   # Travis CI currently, so we have to locate and enable it manually.
@@ -75,11 +75,8 @@ before_script:
   - ln -s $TESTDIR modules/$MODULE_NAME
   - drush --yes pm-enable simpletest $MODULE_NAME
 
-  # Start a web server on port 8080, run in the background; wait for
-  # initialization. This is temporarly disabled since there are no web tests
-  # yet.
-  - sudo apachectl restart
-  - until netstat -an 2>/dev/null | grep '80.*LISTEN'; do true; done
+  # Restart apache.
+  - sudo /etc/init.d/apache2 restart
 
 script:
   # Run the Coder sniffer for Flag.
