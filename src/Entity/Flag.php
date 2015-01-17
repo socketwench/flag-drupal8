@@ -37,10 +37,10 @@ use Drupal\flag\FlagInterface;
  *     "label" = "label",
  *   },
  *   links = {
- *     "edit-form" = "flag.edit",
- *     "delete-form" = "flag.delete",
- *     "enable" = "flag.enable",
- *     "disable" = "flag.disable"
+ *     "edit-form" = "/admin/structure/flags/manage/{flag}",
+ *     "delete-form" = "/admin/structure/flags/manage/{flag}/delete",
+ *     "enable" = "/flag/enable/{flag}",
+ *     "disable" = "/flag/disable/{flag}"
  *   }
  * )
  */

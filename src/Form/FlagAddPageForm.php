@@ -114,7 +114,7 @@ class FlagAddPageForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setRedirect('flag.add', [
+    $form_state->setRedirect('entity.flag.add_form', [
       'entity_type' => $form_state->getValue('flag_entity_type')
     ]);
 

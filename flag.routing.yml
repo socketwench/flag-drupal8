@@ -14,7 +14,7 @@ flag.list:
   requirements:
     _permission: 'administer flags'
 
-flag.add:
+entity.flag.add_form:
   path: '/admin/structure/flags/add/{entity_type}'
   defaults:
     _entity_form: flag.add
@@ -22,7 +22,7 @@ flag.add:
   requirements:
     _permission: 'administer flags'
 
-flag.edit:
+entity.flag.edit_form:
   path: '/admin/structure/flags/manage/{flag}'
   defaults:
     _entity_form: flag.edit
@@ -30,7 +30,7 @@ flag.edit:
   requirements:
     _entity_access: 'flag.update'
 
-flag.delete:
+entity.flag.delete_form:
   path: '/admin/structure/flags/manage/{flag}/delete'
   defaults:
     _entity_form: flag.delete
@@ -102,7 +102,7 @@ flag.field_entry.edit:
   requirements:
     _custom_access: '\Drupal\flag\FlaggingAccessController::checkflag'
 
-flag.enable:
+entity.flag.enable:
   path: '/flag/enable/{flag}'
   defaults:
     _form: '\Drupal\flag\Form\FlagDisableConfirmForm'
@@ -110,7 +110,7 @@ flag.enable:
   requirements:
     _permission: 'administer flags'
 
-flag.disable:
+entity.flag.disable:
   path: '/flag/disable/{flag}'
   defaults:
     _form: '\Drupal\flag\Form\FlagDisableConfirmForm'
