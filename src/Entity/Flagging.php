@@ -19,6 +19,7 @@ use Drupal\flag\FlaggingInterface;
  *  label = @Translation("Flagging"),
  *  bundle_label = @Translation("Flagging"),
  *  handlers = {
+ *     "views_data" = "Drupal\flag\FlagViewsData",
  *     "form" = {
  *       "add" = "Drupal\flag\Form\FlaggingForm",
  *       "edit" = "Drupal\flag\Form\FlaggingForm",

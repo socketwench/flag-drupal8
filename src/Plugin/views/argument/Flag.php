@@ -1,23 +1,23 @@
 <?php
 /**
  * @file
- * Contains \Drupal\flag\Plugin\views\argument\FlagViewsFlaggableArgument.
+ * Contains \Drupal\flag\Plugin\views\argument\Flag.
  */
 
 namespace Drupal\flag\Plugin\views\argument;
 
 
-use Drupal\views\Plugin\views\argument\Numeric;
-use Drupal\Component\Utility\String;
+use Drupal\views\Plugin\views\argument\String;
+use Drupal\Component\Utility\String as UtilityString;
 use Drupal\Core\Database\Connection;
 use Drupal\flag\FlagInterface;
 
 /**
  * Provides an argument handler to get the title of flaggble content.
  *
- * @ViewsArgument("FlagViewsFlaggableArgument")
+ * @ViewsArgument("flag")
  */
-class FlagViewsFlaggableArgument extends Numeric {
+class Flag extends String {
 
   /**
    * Database Service Object.
@@ -64,13 +64,13 @@ class FlagViewsFlaggableArgument extends Numeric {
     $def = \Drupal::entityManager()->getDefinition($entity_type);
     $entity_keys = $def->getKeys();
 
-    $result = $this->database->select($def->getBaseTable(), 'o')
+    $query = $this->database->select($def->getBaseTable(), 'o')
       ->fields('o', $entity_keys['label'])
-      ->condition('o.' . $entity_keys['id'], $this->value, 'IN')
-      ->execute();
+      ->condition('o.' . $entity_keys['id'], $this->value, 'IN');
+    $result= $query->execute();
 
     foreach ($result as $title) {
-      $titles[] = String::checkPlain($title->$entity_keys['label']);
+      $titles[] = UtilityString::checkPlain($title->$entity_keys['label']);
     }
 
     return $titles;

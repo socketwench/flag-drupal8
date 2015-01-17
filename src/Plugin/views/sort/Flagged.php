@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\flag\Plugin\views\sort\FlagViewsSortFlagged;
+ * Contains \Drupal\flag\Plugin\views\sort\Flagged;
  */
 
 namespace Drupal\flag\Plugin\views\sort;
@@ -12,9 +12,9 @@ use Drupal\views\Plugin\views\sort\SortPluginBase;
 /**
  * Sorts entities by flagged or unflagged in a view.
  *
- * @ViewsSort("flag_sort")
+ * @ViewsSort("flag_flagged")
  */
-class FlagViewsSortFlagged extends SortPluginBase {
+class Flagged extends SortPluginBase {
 
   /**
    * Provide a list of options for the default sort form.
