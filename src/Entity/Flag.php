@@ -500,6 +500,23 @@ class Flag extends ConfigEntityBase implements FlagInterface {
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
+
+    // If the types (bundles) array is empty, assume all bundle types.
+    $all_bundles = TRUE;
+    foreach ($this->types as $bundle => $status) {
+      if (!empty($status)) {
+        $all_bundles = FALSE;
+        break;
+      }
+    }
+
+    if ($all_bundles) {
+      $types = array_keys($this->types);
+      foreach ($types as $type) {
+        $this->types[$type] = $type;
+      }
+    }
+
     parent::preSave($storage);
     /*
     // Save the Flag Type configuration.
