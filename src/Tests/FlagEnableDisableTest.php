@@ -17,6 +17,15 @@ use Drupal\user\Entity\Role;
 class FlagEnableDisableTest extends WebTestBase {
 
   /**
+   * Set to TRUE to strict check all configuration saved.
+   *
+   * @see \Drupal\Core\Config\Testing\ConfigSchemaChecker
+   *
+   * @var bool
+   */
+  protected $strictConfigSchema = FALSE;
+
+  /**
    * The label of the flag to create for the test.
    *
    * @var string
@@ -91,13 +100,13 @@ class FlagEnableDisableTest extends WebTestBase {
 
     // Test with minimal value requirement.
     $edit = [
-      'label' => $this->label,
-      'id' => $this->id,
       'flag_entity_type' => 'flagtype_node',
     ];
     $this->drupalPostForm('admin/structure/flags/add', $edit, t('Continue'));
 
     $edit = [
+      'label' => $this->label,
+      'id' => $this->id,
       'types[' . $this->nodeType . ']' => $this->nodeType,
       'flag_short' => $this->flagShortText,
       'unflag_short' => $this->unflagShortText,
