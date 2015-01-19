@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\flag\Plugin\views\field\FlagViewsFlaggedField.
+ * Contains \Drupal\flag\Plugin\views\field\Flagged.
  */
 
 namespace Drupal\flag\Plugin\views\field;
@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ViewsField("flag_flagged")
  */
-class FlagViewsFlaggedField extends Boolean {
+class Flagged extends Boolean {
 
   // @todo: Define the FlagViewsFlaggedField::formats variable?
   /**

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the \Drupal\flag\Plugin\views\filter\FlagViewsFilter class.
+ * Contains \Drupal\flag\Plugin\views\filter\Flagged.
  */
 
 namespace Drupal\flag\Plugin\views\filter;
@@ -12,9 +12,9 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Filters content by its flagging status in a view.
  *
- * @ViewsFilter("flag_filter")
+ * @ViewsFilter("flag_flagged")
  */
-class FlagViewsFilter extends BooleanOperator {
+class Flagged extends BooleanOperator {
 
   /**
    * {@inheritdoc}

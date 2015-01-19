@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\flag\Plugin\views\relationship\FlagViewsRelationship.
+ * Contains \Drupal\flag\Plugin\views\relationship\Flag.
  */
 
 namespace Drupal\flag\Plugin\views\relationship;
@@ -13,9 +13,9 @@ use Drupal\Core\Url;
 /**
  * Provides a views relationship to select flag content by a flag.
  *
- * @ViewsRelationship("flag_relationship")
+ * @ViewsRelationship("flag")
  */
-class FlagViewsRelationship extends RelationshipPluginBase {
+class Flag extends RelationshipPluginBase {
 
   /**
    * {@inheritdoc}

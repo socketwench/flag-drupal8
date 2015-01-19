@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\flag\Plugin\views\field\FlagViewsLinkField.
+ * Contains \Drupal\flag\Plugin\views\field\Link.
  */
 
 namespace Drupal\flag\Plugin\views\field;
@@ -19,7 +19,7 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @ViewsField("flag_link")
  */
-class FlagViewsLinkField extends FieldPluginBase {
+class Link extends FieldPluginBase {
 
   /**
    * A helper method to retrieve the flag entity from the views relationship.
