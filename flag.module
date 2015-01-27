@@ -185,7 +185,7 @@ function flag_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
     $flag_type_plugin = $flag->getFlagTypePlugin();
 
     // Only add cache key if flag link is displayed.
-    if ($flag_type_plugin->showAsField() && !$display->getComponent('flag_' . $flag->id())) {
+    if (!$flag_type_plugin->showAsField() && !$display->getComponent('flag_' . $flag->id())) {
       continue;
     }
 
