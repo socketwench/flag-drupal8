@@ -1,8 +1,0 @@
-name: Flag
-description: Create customized flags that users can set on entities.
-core: 8.x
-type: module
-package: Flags
-configure: admin/structure/flags
-dependencies:
- - views_ui
